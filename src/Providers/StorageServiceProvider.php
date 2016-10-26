@@ -12,6 +12,7 @@
 
 namespace Flagrow\Upload\Providers;
 
+use Flagrow\Upload\Commands\UploadHandler;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,14 @@ class StorageServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
+        $uploadAdapter = function (Container $app) {
+            return $this->instantiateUploadAdapter($app);
+        };
+
+        $this->app->when(UploadHandler::class)
+            ->needs(FilesystemInterface::class)
+            ->give($uploadAdapter);
     }
 
     /**
@@ -39,8 +48,15 @@ class StorageServiceProvider extends ServiceProvider
      */
     protected function instantiateUploadAdapter($app)
     {
+        /** @var SettingsRepositoryInterface $settings */
         $settings = $app->make('flarum.settings');
         switch ($settings->get('flagrow.upload.uploadMethod', 'local')) {
+            default:
+                // Instantiate flysystem with local adapter.
+                return new Filesystem(
+                    new Local(public_path('assets/images')),
+                    $app->make(SettingsRepositoryInterface::class)
+                );
         }
     }
 }
