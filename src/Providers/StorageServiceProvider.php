@@ -50,12 +50,13 @@ class StorageServiceProvider extends ServiceProvider
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = $app->make('flarum.settings');
+
         switch ($settings->get('flagrow.upload.uploadMethod', 'local')) {
             default:
                 // Instantiate flysystem with local adapter.
                 return new Filesystem(
                     new Local(public_path('assets/images')),
-                    $app->make(SettingsRepositoryInterface::class)
+                    $settings->get('flagrow.upload.local', [])
                 );
         }
     }
