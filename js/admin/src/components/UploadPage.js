@@ -66,12 +66,12 @@ export default class UploadPage extends Component {
                                     onchange: this.values.uploadMethod,
                                     value: this.values.uploadMethod() || 'local'
                                 }),
-                                m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')),
-                                Switch.component({
-                                    state: this.values.overrideAvatarUpload() || false,
-                                    children: app.translator.trans('flagrow-upload.admin.labels.override_avatar_upload'),
-                                    onchange: this.values.overrideAvatarUpload
-                                }),
+                                // m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')),
+                                // Switch.component({
+                                //     state: this.values.overrideAvatarUpload() || false,
+                                //     children: app.translator.trans('flagrow-upload.admin.labels.override_avatar_upload'),
+                                //     onchange: this.values.overrideAvatarUpload
+                                // }),
                             ]
                         }),
                         m('div', {className: 'ImageUploadPage-preferences'}, [

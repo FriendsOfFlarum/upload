@@ -115,10 +115,6 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                                 options: this.uploadMethodOptions,
                                 onchange: this.values.uploadMethod,
                                 value: this.values.uploadMethod() || 'local'
-                            }), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')), Switch.component({
-                                state: this.values.overrideAvatarUpload() || false,
-                                children: app.translator.trans('flagrow-upload.admin.labels.override_avatar_upload'),
-                                onchange: this.values.overrideAvatarUpload
                             })]
                         }), m('div', {className: 'ImageUploadPage-preferences'}, [FieldSet.component({
                             label: app.translator.trans('flagrow-upload.admin.labels.preferences.title'),
