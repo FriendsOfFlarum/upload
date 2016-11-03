@@ -23,6 +23,7 @@ use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
+use Flarum\Util\Str;
 use Illuminate\Events\Dispatcher;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -101,10 +102,10 @@ class UploadHandler
         }
 
         $file = (new File())->forceFill([
-            'base_name'     => $uploadedFile->getClientOriginalName(),
-            'size'          => $uploadedFile->getSize(),
-            'type'          => $uploadedFile->getMimeType(),
-            'actor_id'      => $command->actor->id,
+            'base_name' => Str::slug($uploadedFile->getClientOriginalName()),
+            'size'      => $uploadedFile->getSize(),
+            'type'      => $uploadedFile->getMimeType(),
+            'actor_id'  => $command->actor->id,
         ]);
 
         $this->events->fire(
