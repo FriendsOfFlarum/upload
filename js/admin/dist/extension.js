@@ -110,31 +110,31 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                     key: "view",
                     value: function view() {
                         return [m('div', {className: 'ImageUploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [FieldSet.component({
-                            label: app.translator.trans('flagrow.upload.admin.labels.upload_method'),
-                            children: [m('div', {className: 'helpText'}, app.translator.trans('flagrow.upload.admin.help_texts.upload_method')), Select.component({
+                            label: app.translator.trans('flagrow-upload.admin.labels.upload_method'),
+                            children: [m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), Select.component({
                                 options: this.uploadMethodOptions,
                                 onchange: this.values.uploadMethod,
                                 value: this.values.uploadMethod() || 'local'
                             })]
                         }), m('div', {className: 'ImageUploadPage-preferences'}, [FieldSet.component({
-                            label: app.translator.trans('flagrow.upload.admin.labels.preferences.title'),
-                            children: [m('label', {}, app.translator.trans('flagrow.upload.admin.labels.preferences.max_file_size')), m('input', {
+                            label: app.translator.trans('flagrow-upload.admin.labels.preferences.title'),
+                            children: [m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
                                 className: 'FormControl',
                                 value: this.values.maxFileSize() || 2048,
                                 oninput: m.withAttr('value', this.values.maxFileSize)
                             })]
                         })]), m('div', {className: 'ImageUploadPage-resize'}, [FieldSet.component({
-                            label: app.translator.trans('flagrow.upload.admin.labels.resize.title'),
-                            children: [m('div', {className: 'helpText'}, app.translator.trans('flagrow.upload.admin.help_texts.resize')), Switch.component({
+                            label: app.translator.trans('flagrow-upload.admin.labels.resize.title'),
+                            children: [m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                                 state: this.values.mustResize() || false,
-                                children: app.translator.trans('flagrow.upload.admin.labels.resize.toggle'),
+                                children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                                 onchange: this.values.mustResize
-                            }), m('label', {}, app.translator.trans('flagrow.upload.admin.labels.resize.max_width')), m('input', {
+                            }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_width')), m('input', {
                                 className: 'FormControl',
                                 value: this.values.resizeMaxWidth() || 100,
                                 oninput: m.withAttr('value', this.values.resizeMaxWidth),
                                 disabled: !this.values.mustResize()
-                            }), m('label', {}, app.translator.trans('flagrow.upload.admin.labels.resize.max_height')), m('input', {
+                            }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_height')), m('input', {
                                 className: 'FormControl',
                                 value: this.values.resizeMaxHeight() || 100,
                                 oninput: m.withAttr('value', this.values.resizeMaxHeight),
@@ -144,8 +144,8 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'ImageUploadPage-local',
                             style: {display: this.values.uploadMethod() === 'local' ? "block" : "none"}
                         }, [FieldSet.component({
-                            label: app.translator.trans('flagrow.upload.admin.labels.local.title'),
-                            children: [m('label', {}, app.translator.trans('flagrow.upload.admin.labels.local.cdn_url')), m('input', {
+                            label: app.translator.trans('flagrow-upload.admin.labels.local.title'),
+                            children: [m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {
                                 className: 'FormControl',
                                 value: this.values.cdnUrl() || '',
                                 oninput: m.withAttr('value', this.values.cdnUrl)
@@ -153,7 +153,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         })]), Button.component({
                             type: 'submit',
                             className: 'Button Button--primary',
-                            children: app.translator.trans('flagrow.upload.admin.buttons.save'),
+                            children: app.translator.trans('flagrow-upload.admin.buttons.save'),
                             loading: this.loading,
                             disabled: !this.changed()
                         })])])])];
@@ -250,7 +250,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/app", "flarum/c
                 extend(PermissionGrid.prototype, 'startItems', function (items) {
                     items.add('upload', {
                         icon: 'file-o',
-                        label: app.translator.trans('flagrow-upload.admin.permissions.upload_images_label'),
+                        label: app.translator.trans('flagrow-upload.admin.permissions.upload_label'),
                         permission: 'flagrow.upload'
                     });
                 });
