@@ -19,7 +19,7 @@ class AwsS3v3 extends Local
 {
     protected function generateUrl(File $file)
     {
-        return sprintf(
+        $file->url = sprintf(
             'https://s3.%s.amazonaws.com/%s/%s',
             $this->filesystem->getAdapter()->getClient()->getRegion(),
             $this->filesystem->getAdapter()->getBucket(),
