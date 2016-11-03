@@ -15,7 +15,6 @@ class FileValidator extends AbstractValidator
         return [
             'file' => [
                 'required',
-                'file',
                 'max:' . $settings->get('maxFileSize', Settings::DEFAULT_MAX_FILE_SIZE)
             ]
         ];
