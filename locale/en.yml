@@ -11,6 +11,7 @@ flagrow-upload:
             upload_label: Upload files
         upload_methods:
             local: Local
+            aws-s3: Amazon S3
         labels:
             upload_method: Upload method
             preferences:
@@ -24,6 +25,11 @@ flagrow-upload:
             local:
                 title: Local storage settings
                 cdn_url: Content Delivery URL (prefixes files)
+            aws-s3:
+                key: Key
+                secret: Secret
+                bucket: Bucket
+                region: Region
         buttons:
             save: Save settings
         help_texts:
