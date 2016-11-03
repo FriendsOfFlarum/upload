@@ -28,7 +28,7 @@ return [
             $table->string('path')->nullable();
             $table->string('url');
             $table->string('type');
-            $table->int('size');
+            $table->integer('size');
 
             $table->string('upload_method');
 
