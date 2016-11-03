@@ -68,7 +68,7 @@ class StorageServiceProvider extends ServiceProvider
         switch ($settings->get('uploadMethod', 'local')) {
             default:
                 $app->bind(AdapterInterface::class, function () {
-                    new FlyAdapters\Local(public_path('assets/files'));
+                    return new FlyAdapters\Local(public_path('assets/files'));
                 });
 
                 return $this->local($app, $settings);
