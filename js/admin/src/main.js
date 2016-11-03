@@ -11,7 +11,7 @@ app.initializers.add('flagrow-upload', app => {
     extend(PermissionGrid.prototype, 'startItems', items => {
         items.add('upload', {
             icon: 'file-o',
-            label: app.translator.trans('flagrow-upload.admin.permissions.upload_images_label'),
+            label: app.translator.trans('flagrow-upload.admin.permissions.upload_label'),
             permission: 'flagrow.upload'
         });
     });
