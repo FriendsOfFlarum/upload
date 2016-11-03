@@ -43,7 +43,7 @@ class Local implements UploadAdapter
         }
 
         if (!$this->filesystem->{$method}(
-            $upload->getPath(),
+            $file->path,
             $contents
         )
         ) {
