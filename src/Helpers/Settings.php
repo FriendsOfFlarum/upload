@@ -122,16 +122,20 @@ class Settings
     public function getAvailableUploadMethods()
     {
         /** @var Collection $methods */
-        $methods = collect([
+        $methods = [
             'local'
-        ]);
+        ];
 
         if (class_exists(AwsClient::class)) {
-            $methods->push('aws-s3');
+            $methods[] = ['aws-s3'];
         }
 
-        return $methods->mapWithKeys(function ($item) {
-            return [$item => app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item)];
-        });
+        foreach ($methods as $i => $method) {
+            unset($methods[$i]);
+
+            $methods[$method] = app('translator')->trans('flagrow-upload.admin.upload_methods.' . $method);
+        }
+
+        return collect($methods);
     }
 }
