@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of flagrow/flarum-ext-image-upload.
+ * This file is part of flagrow/flarum-ext-file-upload.
  *
  * Copyright (c) Flagrow.
  *

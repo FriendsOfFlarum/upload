@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of flagrow/flarum-ext-file-upload.
  *
