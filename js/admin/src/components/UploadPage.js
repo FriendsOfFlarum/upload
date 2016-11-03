@@ -56,9 +56,9 @@ export default class UploadPage extends Component {
                 m('div', {className: 'container'}, [
                     m('form', {onsubmit: this.onsubmit.bind(this)}, [
                         FieldSet.component({
-                            label: app.translator.trans('flagrow.upload.admin.labels.upload_method'),
+                            label: app.translator.trans('flagrow-upload.admin.labels.upload_method'),
                             children: [
-                                m('div', {className: 'helpText'}, app.translator.trans('flagrow.upload.admin.help_texts.upload_method')),
+                                m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')),
                                 Select.component({
                                     options: this.uploadMethodOptions,
                                     onchange: this.values.uploadMethod,
@@ -68,9 +68,9 @@ export default class UploadPage extends Component {
                         }),
                         m('div', {className: 'ImageUploadPage-preferences'}, [
                             FieldSet.component({
-                                label: app.translator.trans('flagrow.upload.admin.labels.preferences.title'),
+                                label: app.translator.trans('flagrow-upload.admin.labels.preferences.title'),
                                 children: [
-                                    m('label', {}, app.translator.trans('flagrow.upload.admin.labels.preferences.max_file_size')),
+                                    m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')),
                                     m('input', {
                                         className: 'FormControl',
                                         value: this.values.maxFileSize() || 2048,
@@ -81,22 +81,22 @@ export default class UploadPage extends Component {
                         ]),
                         m('div', {className: 'ImageUploadPage-resize'}, [
                             FieldSet.component({
-                                label: app.translator.trans('flagrow.upload.admin.labels.resize.title'),
+                                label: app.translator.trans('flagrow-upload.admin.labels.resize.title'),
                                 children: [
-                                    m('div', {className: 'helpText'}, app.translator.trans('flagrow.upload.admin.help_texts.resize')),
+                                    m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')),
                                     Switch.component({
                                         state: this.values.mustResize() || false,
-                                        children: app.translator.trans('flagrow.upload.admin.labels.resize.toggle'),
+                                        children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                                         onchange: this.values.mustResize
                                     }),
-                                    m('label', {}, app.translator.trans('flagrow.upload.admin.labels.resize.max_width')),
+                                    m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_width')),
                                     m('input', {
                                         className: 'FormControl',
                                         value: this.values.resizeMaxWidth() || 100,
                                         oninput: m.withAttr('value', this.values.resizeMaxWidth),
                                         disabled: !this.values.mustResize()
                                     }),
-                                    m('label', {}, app.translator.trans('flagrow.upload.admin.labels.resize.max_height')),
+                                    m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_height')),
                                     m('input', {
                                         className: 'FormControl',
                                         value: this.values.resizeMaxHeight() || 100,
@@ -111,9 +111,9 @@ export default class UploadPage extends Component {
                             style: {display: (this.values.uploadMethod() === 'local' ? "block" : "none")}
                         }, [
                             FieldSet.component({
-                                label: app.translator.trans('flagrow.upload.admin.labels.local.title'),
+                                label: app.translator.trans('flagrow-upload.admin.labels.local.title'),
                                 children: [
-                                    m('label', {}, app.translator.trans('flagrow.upload.admin.labels.local.cdn_url')),
+                                    m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')),
                                     m('input', {
                                         className: 'FormControl',
                                         value: this.values.cdnUrl() || '',
@@ -125,7 +125,7 @@ export default class UploadPage extends Component {
                         Button.component({
                             type: 'submit',
                             className: 'Button Button--primary',
-                            children: app.translator.trans('flagrow.upload.admin.buttons.save'),
+                            children: app.translator.trans('flagrow-upload.admin.buttons.save'),
                             loading: this.loading,
                             disabled: !this.changed()
                         }),
