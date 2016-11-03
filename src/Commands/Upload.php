@@ -22,7 +22,7 @@ class Upload
     /**
      * @var int
      */
-    public $postId;
+    public $discussionId;
 
     /**
      * @var UploadedFileInterface
@@ -34,10 +34,10 @@ class Upload
      */
     public $actor;
 
-    public function __construct($postId, UploadedFileInterface $file, User $actor)
+    public function __construct($discussionId, UploadedFileInterface $file, User $actor)
     {
-        $this->postId = $postId;
-        $this->file = $file;
-        $this->actor = $actor;
+        $this->discussionId = $discussionId;
+        $this->file         = $file;
+        $this->actor        = $actor;
     }
 }

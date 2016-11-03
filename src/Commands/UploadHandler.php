@@ -101,11 +101,11 @@ class UploadHandler
         }
 
         $file = (new File())->forceFill([
-            'base_name' => $uploadedFile->getClientOriginalName(),
-            'size' => $uploadedFile->getSize(),
-            'type' => $uploadedFile->getMimeType(),
-            'actor_id' => $command->actor->id,
-            'post_id' => $command->postId,
+            'base_name'     => $uploadedFile->getClientOriginalName(),
+            'size'          => $uploadedFile->getSize(),
+            'type'          => $uploadedFile->getMimeType(),
+            'actor_id'      => $command->actor->id,
+            'discussion_id' => $command->discussionId,
         ]);
 
         $this->events->fire(

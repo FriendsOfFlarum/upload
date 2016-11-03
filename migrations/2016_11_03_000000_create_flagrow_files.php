@@ -22,7 +22,7 @@ return [
 
             $table->integer('actor_id')->unsigned()->nullable();
 
-            $table->integer('post_id')->unsigned();
+            $table->integer('discussion_id')->unsigned();
 
             $table->string('base_name');
             $table->string('path')->nullable();

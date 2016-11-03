@@ -43,7 +43,6 @@ export default class UploadButton extends Component {
         // get the file from the input field
         const data = new FormData();
         data.append('file', $(e.target)[0].files[0]);
-        data.append('post', app.current.discussion.id());
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
@@ -52,7 +51,7 @@ export default class UploadButton extends Component {
         // send a POST request to the api
         app.request({
             method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/flagrow/upload',
+            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.curent.discussion.id(),
             serialize: raw => raw,
             data
         }).then(

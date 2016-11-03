@@ -15,26 +15,26 @@
 namespace Flagrow\Upload;
 
 use Carbon\Carbon;
-use Flarum\Core\Post;
+use Flarum\Core\Discussion;
 use Flarum\Core\User;
 use Flarum\Database\AbstractModel;
 
 /**
- * @property int $id
+ * @property int        $id
  *
- * @property string $base_name
- * @property string $path
- * @property string $url
- * @property string $type
- * @property int $size
+ * @property string     $base_name
+ * @property string     $path
+ * @property string     $url
+ * @property string     $type
+ * @property int        $size
  *
- * @property int $post_id
- * @property Post $post
+ * @property int        $discussion_id
+ * @property Discussion $discussion
  *
- * @property int $actor_id
- * @property User $actor
+ * @property int        $actor_id
+ * @property User       $actor
  *
- * @property Carbon $created_at
+ * @property Carbon     $created_at
  */
 class File extends AbstractModel
 {
@@ -51,8 +51,8 @@ class File extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function post()
+    public function discussion()
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Discussion::class);
     }
 }
