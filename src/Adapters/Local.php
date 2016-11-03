@@ -40,13 +40,7 @@ class Local implements UploadAdapter
      */
     public function upload(File $file, UploadedFile $upload, $contents)
     {
-        $today = (new Carbon());
-
-        $file->path = sprintf(
-            "%s/%s",
-            $today->toDateString(),
-            $today->toTimeString() . $today->micro . '-' . $file->base_name
-        );
+        $this->generateFilename($file);
 
         $method = 'write';
 
@@ -62,11 +56,7 @@ class Local implements UploadAdapter
             return false;
         }
 
-        $file->url = str_replace(
-            public_path(),
-            '',
-            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
-        );
+        $this->generateUrl($file);
 
         return $file;
     }
@@ -112,5 +102,31 @@ class Local implements UploadAdapter
     public function getFilesystem()
     {
         return $this->filesystem;
+    }
+
+    /**
+     * @param File $file
+     */
+    protected function generateFilename(File $file)
+    {
+        $today = (new Carbon());
+
+        $file->path = sprintf(
+            "%s/%s",
+            $today->toDateString(),
+            $today->toTimeString() . $today->micro . '-' . $file->base_name
+        );
+    }
+
+    /**
+     * @param File $file
+     */
+    protected function generateUrl(File $file)
+    {
+        $file->url = str_replace(
+            public_path(),
+            '',
+            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
+        );
     }
 }

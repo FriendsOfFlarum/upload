@@ -64,15 +64,6 @@ class LoadSettingsFromDatabase
      */
     public function addUploadMethods(PrepareUnserializedSettings $event)
     {
-        // these are the upload methods that doesn't require external libraries
-        $methods = [
-            'local'
-        ];
-
-        // add the methods with the relative translations
-        $event->settings['flagrow.upload.availableUploadMethods'] = [];
-        foreach ($methods as $method) {
-            $event->settings['flagrow.upload.availableUploadMethods'][$method] = app('translator')->trans('flagrow-upload.admin.upload_methods.' . $method);
-        }
+        $event->settings['flagrow.upload.availableUploadMethods'] = $this->settings->getAvailableUploadMethods()->toArray();
     }
 }

@@ -14,8 +14,10 @@
 
 namespace Flagrow\Upload\Helpers;
 
+use Aws\AwsClient;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * @property int $maxFileSize
@@ -26,11 +28,21 @@ class Settings
 
     protected $definition = [
         'uploadMethod',
-        'imgurClientId',
+
+        // Images
         'mustResize',
         'resizeMaxWidth',
         'resizeMaxHeight',
-        'overrideAvatarUpload'
+        'cdnUrl',
+
+        // Override avatar upload
+        'overrideAvatarUpload',
+
+        // AWS
+        'awsS3Key',
+        'awsS3Secret',
+        'awsS3Bucket',
+        'awsS3Region',
     ];
 
     protected $prefix = 'flagrow.upload.';
@@ -102,5 +114,28 @@ class Settings
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAvailableUploadMethods()
+    {
+        /** @var Collection $methods */
+        $methods = [
+            'local'
+        ];
+
+        if (class_exists(AwsClient::class)) {
+            $methods[] = 'aws-s3';
+        }
+
+        return collect($methods)
+            ->keyBy(function ($item) {
+                return $item;
+            })
+            ->map(function ($item) {
+                return app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item);
+            });
     }
 }
