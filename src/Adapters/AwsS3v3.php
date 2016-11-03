@@ -22,7 +22,7 @@ class AwsS3v3 extends Local
         return sprintf(
             'https://s3.%s.amazonaws.com/%s/%s',
             $this->filesystem->getAdapter()->getClient()->getRegion(),
-            $this->filesystem->getBucket(),
+            $this->filesystem->getAdapter()->getBucket(),
             $file->path
         );
     }
