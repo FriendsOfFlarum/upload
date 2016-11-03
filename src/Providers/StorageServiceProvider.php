@@ -51,7 +51,7 @@ class StorageServiceProvider extends ServiceProvider
         if ($settings->get('overrideAvatarUpload')) {
             $this->app->when(UploadAvatarHandler::class)
                 ->needs(FilesystemInterface::class)
-                ->give($uploadAdapter()->getFilesystem());
+                ->give($uploadAdapter($this->app)->getFilesystem());
         }
     }
 
