@@ -53,7 +53,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         // send a POST request to the api
                         app.request({
                             method: 'POST',
-                            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.curent.discussion.id(),
+                            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.curent.discussion.data.id,
                             serialize: function serialize(raw) {
                                 return raw;
                             },
