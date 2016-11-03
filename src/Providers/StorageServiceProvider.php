@@ -14,6 +14,7 @@
 
 namespace Flagrow\Upload\Providers;
 
+use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Commands\UploadHandler;
 use Flagrow\Upload\Contracts\UploadAdapter;
@@ -21,6 +22,7 @@ use Flagrow\Upload\Helpers\Settings;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 
@@ -62,6 +64,11 @@ class StorageServiceProvider extends ServiceProvider
         $settings = $app->make(Settings::class);
 
         switch ($settings->get('uploadMethod', 'local')) {
+            case 'aws-s3':
+                if (class_exists(S3Client::class)) {
+                    return $this->awsS3($settings);
+                }
+
             default:
                 return $this->local($settings);
         }
@@ -77,6 +84,25 @@ class StorageServiceProvider extends ServiceProvider
             new Filesystem(
                 new FlyAdapters\Local(public_path('assets/files')),
                 $settings->get('local', [])
+            )
+        );
+    }
+
+    protected function awsS3(Settings $settings)
+    {
+        return new Adapters\AwsS3v3(
+            new Filesystem(
+                new AwsS3Adapter(
+                    new S3Client([
+                        'credentials' => [
+                            'key' => $settings->get('aws-s3.key'),
+                            'secret' => $settings->get('aws-s3.secret'),
+                        ],
+                        'region' => $settings->get('aws-s3.region'),
+                        'version' => 'latest',
+                    ]),
+                    $settings->get('aws-s3.bucket')
+                )
             )
         );
     }
