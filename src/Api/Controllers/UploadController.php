@@ -38,7 +38,7 @@ class UploadController extends AbstractResourceController
         $file = Arr::get($request->getUploadedFiles(), 'file');
 
         return $this->bus->dispatch(
-            new Upload()
+            new Upload($postId, $file, $actor)
         );
     }
 }
