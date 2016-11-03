@@ -11,6 +11,7 @@ use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
+use Illuminate\Events\Dispatcher;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -39,16 +40,23 @@ class UploadHandler
      */
     protected $mimeValidator;
 
+    /**
+     * @var Dispatcher
+     */
+    protected $events;
+
     public function __construct(
         Application $app,
         UploadAdapter $upload,
         FileValidator $fileValidator,
-        MimeValidator $mimeValidator
+        MimeValidator $mimeValidator,
+        Dispatcher $events
     ) {
         $this->app = $app;
         $this->upload = $upload;
         $this->fileValidator = $fileValidator;
         $this->mimeValidator = $mimeValidator;
+        $this->events = $events;
     }
 
     public function handle(Upload $command)
