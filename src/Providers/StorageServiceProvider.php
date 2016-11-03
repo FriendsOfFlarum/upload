@@ -74,6 +74,25 @@ class StorageServiceProvider extends ServiceProvider
         }
     }
 
+    protected function awsS3(Settings $settings)
+    {
+        return new Adapters\AwsS3v3(
+            new Filesystem(
+                new AwsS3Adapter(
+                    new S3Client([
+                        'credentials' => [
+                            'key'    => $settings->get('awsS3Key'),
+                            'secret' => $settings->get('awsS3Secret'),
+                        ],
+                        'region'      => $settings->get('awsS3Region'),
+                        'version'     => 'latest',
+                    ]),
+                    $settings->get('awsS3Bucket')
+                )
+            )
+        );
+    }
+
     /**
      * @param Settings $settings
      * @return Adapters\Local
@@ -84,25 +103,6 @@ class StorageServiceProvider extends ServiceProvider
             new Filesystem(
                 new FlyAdapters\Local(public_path('assets/files')),
                 $settings->get('local', [])
-            )
-        );
-    }
-
-    protected function awsS3(Settings $settings)
-    {
-        return new Adapters\AwsS3v3(
-            new Filesystem(
-                new AwsS3Adapter(
-                    new S3Client([
-                        'credentials' => [
-                            'key' => $settings->get('aws-s3.key'),
-                            'secret' => $settings->get('aws-s3.secret'),
-                        ],
-                        'region' => $settings->get('aws-s3.region'),
-                        'version' => 'latest',
-                    ]),
-                    $settings->get('aws-s3.bucket')
-                )
             )
         );
     }
