@@ -49,4 +49,9 @@ interface UploadAdapter
      * @return File|bool
      */
     public function delete(File $file);
+
+    /**
+     * @return Filesystem
+     */
+    public function getFilesystem();
 }

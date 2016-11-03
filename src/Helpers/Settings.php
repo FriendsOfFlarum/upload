@@ -29,7 +29,8 @@ class Settings
         'imgurClientId',
         'mustResize',
         'resizeMaxWidth',
-        'resizeMaxHeight'
+        'resizeMaxHeight',
+        'overrideAvatarUpload'
     ];
 
     protected $prefix = 'flagrow.file.';

@@ -105,4 +105,12 @@ class Local implements UploadAdapter
     {
         return true;
     }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFilesystem()
+    {
+        return $this->filesystem;
+    }
 }

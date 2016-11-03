@@ -18,6 +18,7 @@ use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Commands\UploadHandler;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Helpers\Settings;
+use Flarum\Core\Command\UploadAvatarHandler;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
@@ -34,6 +35,10 @@ class StorageServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        /** @var Settings $settings */
+        $settings = $this->app->make(Settings::class);
+
+        /** @var UploadAdapter $uploadAdapter */
         $uploadAdapter = function (Container $app) {
             return $this->instantiateUploadAdapter($app);
         };
@@ -41,17 +46,23 @@ class StorageServiceProvider extends ServiceProvider
         $this->app->when(UploadHandler::class)
             ->needs(UploadAdapter::class)
             ->give($uploadAdapter);
+
+        if ($settings->get('overrideAvatarUpload')) {
+            $this->app->when(UploadAvatarHandler::class)
+                ->needs(FilesystemInterface::class)
+                ->give($uploadAdapter->getFilesystem());
+        }
+
     }
 
     /**
      * Sets the upload adapter for the specific preferred service.
      *
-     * @param $app
+     * @param          $app
      * @return FilesystemInterface
      */
-    protected function instantiateUploadAdapter($app)
+    protected function instantiateUploadAdapter(Container $app)
     {
-        /** @var Settings $settings */
         $settings = $app->make(Settings::class);
 
         switch ($settings->get('uploadMethod', 'local')) {
