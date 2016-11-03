@@ -23,9 +23,10 @@ class Local implements UploadAdapter
     /**
      * @param File $file
      * @param UploadedFile $upload
+     * @param string $contents
      * @return File
      */
-    public function upload(File $file, UploadedFile $upload)
+    public function upload(File $file, UploadedFile $upload, $contents)
     {
         $today = (new Carbon())->toDateString();
 
@@ -35,9 +36,9 @@ class Local implements UploadAdapter
             $file->base_name
         );
 
-        if (!$this->filesystem->copy(
+        if (!$this->filesystem->write(
             $upload->getPath(),
-            $file->path
+            $contents
         )
         ) {
             return false;

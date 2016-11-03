@@ -20,9 +20,10 @@ interface UploadAdapter
      *
      * @param File $file
      * @param UploadedFile $upload
+     * @param string $contents
      * @return File|bool
      */
-    public function upload(File $file, UploadedFile $upload);
+    public function upload(File $file, UploadedFile $upload, $contents);
 
     /**
      * In case deletion is not possible, return false.

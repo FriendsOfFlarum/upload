@@ -97,7 +97,11 @@ class UploadHandler
             new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
         );
 
-        $response = $this->upload->upload($file, $uploadedFile);
+        $response = $this->upload->upload(
+            $file,
+            $uploadedFile,
+            $this->getTempFilesystem()->readAndDelete($uploadedFile->getPath())
+        );
 
         if (!($response instanceof Upload)) {
             return false;
