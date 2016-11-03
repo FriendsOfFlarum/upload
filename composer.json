@@ -1,5 +1,5 @@
 {
-    "name": "flagrow/flarum-ext-upload",
+    "name": "flagrow/upload",
     "description": "The file upload extension for the Flarum forum with insane intelligence.",
     "keywords": [
         "upload",
@@ -17,8 +17,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/flagrow/flarum-ext-upload/issues",
-        "source": "https://github.com/flagrow/flarum-ext-upload"
+        "issues": "https://github.com/flagrow/upload/issues",
+        "source": "https://github.com/flagrow/upload"
     },
     "require": {
         "flarum/core": "^0.1.0-beta.6",
@@ -29,7 +29,7 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "File Upload",
+            "title": "Flagrow Upload",
             "icon": {
                 "name": "files-o",
                 "backgroundColor": "#000",
