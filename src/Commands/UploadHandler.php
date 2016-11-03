@@ -124,7 +124,7 @@ class UploadHandler
 
         $tempFilesystem->delete($uploadedFile->getBasename());
 
-        if (!($response instanceof Upload)) {
+        if (!($response instanceof File)) {
             return false;
         }
 
