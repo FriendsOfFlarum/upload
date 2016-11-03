@@ -45,6 +45,8 @@ class File extends AbstractModel
 {
     protected $table = 'flagrow_files';
 
+    protected $appends = ['markdownString'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

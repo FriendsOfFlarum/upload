@@ -33,9 +33,9 @@ class Local implements UploadAdapter
     }
 
     /**
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
-     * @param string $contents
+     * @param string       $contents
      * @return File
      */
     public function upload(File $file, UploadedFile $upload, $contents)
@@ -63,9 +63,9 @@ class Local implements UploadAdapter
         }
 
         $file->url = str_replace(
-            public_path(), '/',
-            $this->filesystem->getAdapter()->getPathPrefix(),
-            $file->path
+            public_path(),
+            '/',
+            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
         );
 
         return $file;
