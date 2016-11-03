@@ -89,7 +89,7 @@ class UploadHandler
         }
 
         $file = (new File())->forceFill([
-            'base_name' => $uploadedFile->getBasename(),
+            'base_name' => $uploadedFile->getClientOriginalName(),
             'size' => $uploadedFile->getSize(),
             'type' => $uploadedFile->getMimeType(),
             'actor_id' => $command->actor->id,
