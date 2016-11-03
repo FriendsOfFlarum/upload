@@ -28,12 +28,12 @@ class Local implements UploadAdapter
      */
     public function upload(File $file, UploadedFile $upload, $contents)
     {
-        $today = (new Carbon())->toDateString();
+        $today = (new Carbon());
 
         $file->path = sprintf(
             "%s/%s",
-            $today,
-            $file->base_name
+            $today->toDateString(),
+            $today->toTimeString() . $today->micro . '-' . $file->base_name
         );
 
         $method = 'write';
