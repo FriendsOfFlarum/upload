@@ -27,9 +27,6 @@
     "require-dev": {
         "league/flysystem": "^1.0.32"
     },
-    "suggest": {
-        "cloudinary/cloudinary_php": "Allows uploading images to cloudinary."
-    },
     "extra": {
         "flarum-extension": {
             "title": "File Upload",
