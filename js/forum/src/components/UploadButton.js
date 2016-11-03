@@ -43,6 +43,7 @@ export default class UploadButton extends Component {
         // get the file from the input field
         const data = new FormData();
         data.append('file', $(e.target)[0].files[0]);
+        data.append('post', app.current.discussion.id());
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
