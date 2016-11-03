@@ -53,7 +53,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         // send a POST request to the api
                         app.request({
                             method: 'POST',
-                            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.current.discussion.id(),
+                            url: app.forum.attribute('apiUrl') + '/flagrow/upload',
                             serialize: function serialize(raw) {
                                 return raw;
                             },
@@ -81,8 +81,12 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         console.log(file);
 
                         // create a markdown string that holds the image link
-                        // var markdownString = '\n![image ' + link + '](' + link + ')\n';
-                        var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+
+                        if (file.data.attributes.markdownString) {
+                            var markdownString = '\n' + file.data.attributes.markdownString + '\n';
+                        } else {
+                            var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+                        }
 
                         // place the Markdown image link in the Composer
                         this.textAreaObj.insertAtCursor(markdownString);

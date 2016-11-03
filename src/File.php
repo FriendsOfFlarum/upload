@@ -16,8 +16,10 @@ namespace Flagrow\Upload;
 
 use Carbon\Carbon;
 use Flarum\Core\Discussion;
+use Flarum\Core\Post;
 use Flarum\Core\User;
 use Flarum\Database\AbstractModel;
+use Illuminate\Support\Str;
 
 /**
  * @property int        $id
@@ -27,6 +29,9 @@ use Flarum\Database\AbstractModel;
  * @property string     $url
  * @property string     $type
  * @property int        $size
+ *
+ * @property int        $post_id
+ * @property Post       $post
  *
  * @property int        $discussion_id
  * @property Discussion $discussion
@@ -51,8 +56,28 @@ class File extends AbstractModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function discussion()
     {
         return $this->belongsTo(Discussion::class);
+    }
+
+    public function getMarkdownStringAttribute()
+    {
+        $label = "![$this->base_name]";
+        $url   = "({$this->url})";
+
+        if (Str::startsWith($this->type, 'image')) {
+            $label = "![image {$this->base_name}]";
+        }
+
+        return $label . $url;
     }
 }

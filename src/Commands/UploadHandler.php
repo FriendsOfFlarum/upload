@@ -105,7 +105,6 @@ class UploadHandler
             'size'          => $uploadedFile->getSize(),
             'type'          => $uploadedFile->getMimeType(),
             'actor_id'      => $command->actor->id,
-            'discussion_id' => $command->discussionId,
         ]);
 
         $this->events->fire(

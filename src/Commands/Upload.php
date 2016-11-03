@@ -20,11 +20,6 @@ use Psr\Http\Message\UploadedFileInterface;
 class Upload
 {
     /**
-     * @var int
-     */
-    public $discussionId;
-
-    /**
      * @var UploadedFileInterface
      */
     public $file;
@@ -34,9 +29,8 @@ class Upload
      */
     public $actor;
 
-    public function __construct($discussionId, UploadedFileInterface $file, User $actor)
+    public function __construct(UploadedFileInterface $file, User $actor)
     {
-        $this->discussionId = $discussionId;
         $this->file         = $file;
         $this->actor        = $actor;
     }

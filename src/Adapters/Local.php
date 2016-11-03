@@ -62,7 +62,11 @@ class Local implements UploadAdapter
             return false;
         }
 
-        $file->url = str_replace(public_path(), '/', $this->filesystem->getAdapter()->getPathPrefix());
+        $file->url = str_replace(
+            public_path(), '/',
+            $this->filesystem->getAdapter()->getPathPrefix(),
+            $file->path
+        );
 
         return $file;
     }
