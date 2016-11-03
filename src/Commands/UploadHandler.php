@@ -102,7 +102,6 @@ class UploadHandler
 
         $tempFilesystem = $this->getTempFilesystem($uploadedFile);
 
-
         $response = $this->upload->upload(
             $file,
             $uploadedFile,
@@ -144,6 +143,6 @@ class UploadHandler
      */
     protected function getTempFilesystem(UploadedFile $uploadedFile)
     {
-        return new Filesystem(new Local(pathinfo($uploadedFile->getPath(), PATHINFO_DIRNAME)));
+        return new Filesystem(new Local($uploadedFile->getPath()));
     }
 }
