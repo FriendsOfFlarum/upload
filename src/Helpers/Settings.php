@@ -130,12 +130,12 @@ class Settings
             $methods[] = ['aws-s3'];
         }
 
-        foreach ($methods as $i => $method) {
-            unset($methods[$i]);
-
-            $methods[$method] = app('translator')->trans('flagrow-upload.admin.upload_methods.' . $method);
-        }
-
-        return collect($methods);
+        return collect($methods)
+            ->keyBy(function ($item) {
+                return $item;
+            })
+            ->map(function ($item) {
+                return app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item);
+            });
     }
 }
