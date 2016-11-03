@@ -70,31 +70,30 @@ export default class UploadButton extends Component {
     }
 
     /**
-     * Appends the image's link to the body of the composer.
+     * Appends the file's link to the body of the composer.
      *
-     * @param image
+     * @param file
      */
     success(file) {
         console.log(file);
-        //
-        // var link = image.data.attributes.url;
-        //
-        // // create a markdown string that holds the image link
+
+        // create a markdown string that holds the image link
         // var markdownString = '\n![image ' + link + '](' + link + ')\n';
-        //
-        // // place the Markdown image link in the Composer
-        // this.textAreaObj.insertAtCursor(markdownString);
-        //
-        // // if we are not starting a new discussion, the variable is defined
-        // if (typeof this.textAreaObj.props.preview !== 'undefined') {
-        //     // show what we just uploaded
-        //     this.textAreaObj.props.preview();
-        // }
-        //
-        // // reset the button for a new upload
-        // setTimeout(() => {
-        //     document.getElementById("flagrow-image-upload-form").reset();
-        //     this.loading = false;
-        // }, 1000);
+        var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+
+        // place the Markdown image link in the Composer
+        this.textAreaObj.insertAtCursor(markdownString);
+
+        // if we are not starting a new discussion, the variable is defined
+        if (typeof this.textAreaObj.props.preview !== 'undefined') {
+            // show what we just uploaded
+            this.textAreaObj.props.preview();
+        }
+
+        // reset the button for a new upload
+        setTimeout(() => {
+            document.getElementById("flagrow-upload-form").reset();
+            this.loading = false;
+        }, 1000);
     }
 }
