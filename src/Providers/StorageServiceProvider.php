@@ -52,7 +52,6 @@ class StorageServiceProvider extends ServiceProvider
                 ->needs(FilesystemInterface::class)
                 ->give($uploadAdapter->getFilesystem());
         }
-
     }
 
     /**
