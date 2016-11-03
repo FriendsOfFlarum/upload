@@ -127,7 +127,7 @@ class Settings
         ];
 
         if (class_exists(AwsClient::class)) {
-            $methods[] = ['aws-s3'];
+            $methods[] = 'aws-s3';
         }
 
         return collect($methods)
