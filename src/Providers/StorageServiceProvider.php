@@ -12,11 +12,13 @@
 
 namespace Flagrow\Upload\Providers;
 
+use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Commands\UploadHandler;
-use Flarum\Settings\SettingsRepositoryInterface;
+use Flagrow\Upload\Contracts\UploadAdapter;
+use Flagrow\Upload\Helpers\Settings;
 use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 
@@ -30,13 +32,12 @@ class StorageServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
         $uploadAdapter = function (Container $app) {
             return $this->instantiateUploadAdapter($app);
         };
 
         $this->app->when(UploadHandler::class)
-            ->needs(FilesystemInterface::class)
+            ->needs(UploadAdapter::class)
             ->give($uploadAdapter);
     }
 
@@ -48,16 +49,22 @@ class StorageServiceProvider extends ServiceProvider
      */
     protected function instantiateUploadAdapter($app)
     {
-        /** @var SettingsRepositoryInterface $settings */
-        $settings = $app->make('flarum.settings');
+        /** @var Settings $settings */
+        $settings = $app->make(Settings::class);
 
-        switch ($settings->get('flagrow.upload.uploadMethod', 'local')) {
+        switch ($settings->get('uploadMethod', 'local')) {
             default:
-                // Instantiate flysystem with local adapter.
-                return new Filesystem(
-                    new Local(public_path('assets/images')),
-                    $settings->get('flagrow.upload.local', [])
-                );
+                return $this->local($settings);
         }
+    }
+
+    protected function local(Settings $settings)
+    {
+        return new Adapters\Local(
+            new Filesystem(
+                new FlyAdapters\Local(public_path('assets/files')),
+                $settings->get('local', [])
+            )
+        );
     }
 }
