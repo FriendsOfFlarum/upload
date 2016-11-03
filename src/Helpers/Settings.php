@@ -33,7 +33,7 @@ class Settings
         'overrideAvatarUpload'
     ];
 
-    protected $prefix = 'flagrow.file.';
+    protected $prefix = 'flagrow.upload.';
 
     /**
      * @var SettingsRepositoryInterface
@@ -67,15 +67,15 @@ class Settings
      */
     public function toArray($prefixed = true, array $only = null)
     {
-        $definion = $this->definition;
+        $definition = $this->definition;
 
         if ($only) {
-            $definion = Arr::only($definion, $only);
+            $definition = Arr::only($definition, $only);
         }
 
         $result = [];
 
-        foreach ($definion as $property) {
+        foreach ($definition as $property) {
             if ($prefixed) {
                 $result[$this->prefix . $property] = $this->get($property);
             } else {
