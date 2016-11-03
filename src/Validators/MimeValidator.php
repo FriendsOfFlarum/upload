@@ -13,7 +13,7 @@ class MimeValidator extends AbstractValidator
             'mime' => [
                 'required',
                 'string',
-                'regex:^(image)\/.*$'
+                'regex:/^(image|text|audio|video)\/.*$/'
             ]
         ];
     }
