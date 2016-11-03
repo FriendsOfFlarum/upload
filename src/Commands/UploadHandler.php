@@ -68,7 +68,6 @@ class UploadHandler
 
         // Move the file to a temporary location first.
         $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.file');
-        $tempFilesystem = $this->getTempFilesystem($tempFile);
         $command->file->moveTo($tempFile);
 
         $uploadedFile = new UploadedFile(
@@ -80,8 +79,11 @@ class UploadHandler
             true
         );
 
+        unset($tempFile);
+
         $this->fileValidator->assertValid(['file' => $uploadedFile]);
         $this->mimeValidator->assertValid(['mime' => $uploadedFile->getMimeType()]);
+
         if (!$this->upload->forMime($uploadedFile->getMimeType())) {
             throw new ValidationException('Upload adapter does not support the provided mime type.');
         }
@@ -98,14 +100,18 @@ class UploadHandler
             new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
         );
 
+        $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+
 
         $response = $this->upload->upload(
             $file,
             $uploadedFile,
-            $this->upload->supportsStreams() ? $tempFilesystem->readStream($tempFile) : $tempFilesystem->read($tempFile)
+            $this->upload->supportsStreams() ?
+                $tempFilesystem->readStream($uploadedFile->getBasename()) :
+                $tempFilesystem->read($uploadedFile->getBasename())
         );
 
-        $tempFilesystem->delete($tempFile);
+        $tempFilesystem->delete($uploadedFile->getBasename());
 
         if (!($response instanceof Upload)) {
             return false;
@@ -133,11 +139,11 @@ class UploadHandler
     }
 
     /**
-     * @param $tempFile
+     * @param UploadedFile $uploadedFile
      * @return Filesystem
      */
-    protected function getTempFilesystem($tempFile)
+    protected function getTempFilesystem(UploadedFile $uploadedFile)
     {
-        return new Filesystem(new Local(pathinfo($tempFile, PATHINFO_DIRNAME)));
+        return new Filesystem(new Local(pathinfo($uploadedFile->getPath(), PATHINFO_DIRNAME)));
     }
 }
