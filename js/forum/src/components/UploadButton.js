@@ -51,7 +51,7 @@ export default class UploadButton extends Component {
         // send a POST request to the api
         app.request({
             method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.curent.discussion.data.id,
+            url: app.forum.attribute('apiUrl') + '/flagrow/upload?discussion=' + app.current.discussion.id(),
             serialize: raw => raw,
             data
         }).then(
