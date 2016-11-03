@@ -36,7 +36,13 @@ class Local implements UploadAdapter
             $file->base_name
         );
 
-        if (!$this->filesystem->write(
+        $method = 'write';
+
+        if (is_resource($contents) && get_resource_type($contents) == 'stream') {
+            $method = 'writeStream';
+        }
+
+        if (!$this->filesystem->{$method}(
             $upload->getPath(),
             $contents
         )
@@ -74,6 +80,14 @@ class Local implements UploadAdapter
     public function forMime($mime)
     {
         // We allow all, no checking.
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function supportsStreams()
+    {
         return true;
     }
 }

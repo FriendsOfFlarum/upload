@@ -68,6 +68,7 @@ class UploadHandler
 
         // Move the file to a temporary location first.
         $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.file');
+        $tempFilesystem = $this->getTempFilesystem($tempFile);
         $command->file->moveTo($tempFile);
 
         $uploadedFile = new UploadedFile(
@@ -97,11 +98,14 @@ class UploadHandler
             new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
         );
 
+
         $response = $this->upload->upload(
             $file,
             $uploadedFile,
-            $this->getTempFilesystem()->readAndDelete($uploadedFile->getPath())
+            $this->upload->supportsStreams() ? $tempFilesystem->readStream($tempFile) : $tempFilesystem->read($tempFile)
         );
+
+        $tempFilesystem->delete($tempFile);
 
         if (!($response instanceof Upload)) {
             return false;

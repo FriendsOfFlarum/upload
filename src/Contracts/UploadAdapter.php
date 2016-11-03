@@ -16,6 +16,11 @@ interface UploadAdapter
     public function forMime($mime);
 
     /**
+     * @return bool
+     */
+    public function supportsStreams();
+
+    /**
      * Attempt to upload to the (remote) filesystem.
      *
      * @param File $file
