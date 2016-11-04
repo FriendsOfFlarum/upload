@@ -161,7 +161,7 @@ class UploadHandler
         foreach ([$type, "{$type}_{$subType}", $subType] as $typePrefix) {
             $class = sprintf(
                 'Flagrow\\Upload\\Processors\\%sProcessor',
-                IllStr::camel($typePrefix)
+                IllStr::studly($typePrefix)
             );
 
             if (class_exists($class)) {
