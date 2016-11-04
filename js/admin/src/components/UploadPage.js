@@ -17,7 +17,6 @@ export default class UploadPage extends Component {
             'availableUploadMethods',
             'uploadMethod',
             'resizeMaxWidth',
-            'resizeMaxHeight',
             'cdnUrl',
             'maxFileSize',
             'overrideAvatarUpload',
@@ -108,13 +107,6 @@ export default class UploadPage extends Component {
                                         oninput: m.withAttr('value', this.values.resizeMaxWidth),
                                         disabled: !this.values.mustResize()
                                     }),
-                                    m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_height')),
-                                    m('input', {
-                                        className: 'FormControl',
-                                        value: this.values.resizeMaxHeight() || 100,
-                                        oninput: m.withAttr('value', this.values.resizeMaxHeight),
-                                        disabled: !this.values.mustResize()
-                                    })
                                 ]
                             })
                         ]),

@@ -25,6 +25,7 @@ use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
 use Flarum\Util\Str;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -80,7 +81,7 @@ class UploadHandler
         );
 
         // Move the file to a temporary location first.
-        $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.file');
+        $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.upload.');
         $command->file->moveTo($tempFile);
 
         $uploadedFile = new UploadedFile(
@@ -107,6 +108,8 @@ class UploadHandler
             'type'      => $uploadedFile->getMimeType(),
             'actor_id'  => $command->actor->id,
         ]);
+
+        $this->processable($file, $uploadedFile);
 
         $this->events->fire(
             new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
@@ -147,6 +150,24 @@ class UploadHandler
         );
 
         return $file;
+    }
+
+    protected function processable(File &$file, UploadedFile &$uploadedFile)
+    {
+        list($type, $subType) = explode('/', $file->type);
+
+        //.. todo fire event?
+
+        foreach (["{$type}_{$subType}", $type, $subType] as $typePrefix) {
+            $class = sprintf(
+                'Flagrow\\Upload\\Processors\\%sProcessor',
+                IllStr::studly($typePrefix)
+            );
+
+            if (class_exists($class)) {
+                return app($class)->process($file, $uploadedFile);
+            }
+        }
     }
 
     /**
