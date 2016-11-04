@@ -42,15 +42,17 @@ class ImageProcessor implements Processable
      */
     public function process(File &$file, UploadedFile &$upload)
     {
-        if ($this->settings->get('mustResize')) {
-            (new ImageManager())
-                ->make($upload->getRealPath())
-                ->resize($this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
-                    function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    })
-                ->save();
+        if ($this->settings->get('mustResize') && $upload->getMimeType() != 'image/gif') {
+            @file_put_contents(
+                $upload->getRealPath(),
+                (new ImageManager())
+                    ->make($upload->getRealPath())
+                    ->resize($this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
+                        function ($constraint) {
+                            $constraint->aspectRatio();
+                            $constraint->upsize();
+                        })
+                    ->encode($upload->getMimeType()));
         }
     }
 }

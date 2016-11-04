@@ -81,7 +81,7 @@ class UploadHandler
         );
 
         // Move the file to a temporary location first.
-        $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.file');
+        $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.upload.');
         $command->file->moveTo($tempFile);
 
         $uploadedFile = new UploadedFile(
