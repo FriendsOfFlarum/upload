@@ -1,0 +1,43 @@
+flagrow-upload:
+    forum:
+        buttons:
+            attach: 添加附件
+        states:
+            loading: 加载中
+            success: 成功
+            error: 错误
+    admin:
+        permissions:
+            upload_label: 文件上传设定
+        upload_methods:
+            local: 本地
+            aws-s3: 亚马逊 S3
+        labels:
+            upload_method: 上传方式
+            preferences:
+                title: 偏好设定
+                max_file_size: 最大文件大小 (单位为 KB)
+            resize:
+                title: 调整图片大小
+                toggle: 切换图片调整
+                max_width: 最大图片宽度
+                max_height: 最大图片长度
+            local:
+                title: 本地存储设定
+                cdn_url: CDN 网址 (附加在文件前面)
+            aws-s3:
+                key: Key
+                secret: Secret
+                bucket: Bucket
+                region: 地区
+        buttons:
+            save: 保存设定
+        help_texts:
+            description: 
+                设置上传服务与偏好设定
+            upload_method: 
+                你可以在这里选择上传文件方式。 当你选择其中一种方式的时候，
+                相对应的选项将会出现。
+            resize: 
+                你可以选择是否在上传图片之前调整图片大小。 以像素为单位,
+                你可以选择图片最大的长度和宽度。调整图片大小将会保持图片的纵横比。
