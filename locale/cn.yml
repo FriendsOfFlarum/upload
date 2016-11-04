@@ -33,11 +33,11 @@ flagrow-upload:
         buttons:
             save: 保存设定
         help_texts:
-            description: >
+            description: 
                 设置上传设定与偏好设定
-            upload_method: >
+            upload_method: 
                 你可以在这里选择上传文件的方式。 当你选择其中一种方式的时候，
                 相对应的选项卡将会出现。
-            resize: >
+            resize: 
                 你可以选择是否在上传图片之前调整图片大小。 以像素为单位,
                 你可以选择图片最大的长度和宽度。调整图片大小将会保持图片的纵横比。
