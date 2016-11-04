@@ -56,7 +56,7 @@ export default class UploadPage extends Component {
      */
     view() {
         return [
-            m('div', {className: 'ImageUploadPage'}, [
+            m('div', {className: 'UploadPage'}, [
                 m('div', {className: 'container'}, [
                     m('form', {onsubmit: this.onsubmit.bind(this)}, [
                         m('fieldset', {}, [
