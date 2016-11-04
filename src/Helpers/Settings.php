@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
 class Settings
 {
     const DEFAULT_MAX_FILE_SIZE = 2048;
+    const DEFAULT_MAX_IMAGE_WIDTH = 100;
 
     protected $definition = [
         'uploadMethod',
@@ -32,7 +33,6 @@ class Settings
         // Images
         'mustResize',
         'resizeMaxWidth',
-        'resizeMaxHeight',
         'cdnUrl',
 
         // Override avatar upload

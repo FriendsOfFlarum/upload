@@ -80,7 +80,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.loading = false;
 
                         // the fields we need to watch and to save
-                        this.fields = ['availableUploadMethods', 'uploadMethod', 'resizeMaxWidth', 'resizeMaxHeight', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload', 'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
+                        this.fields = ['availableUploadMethods', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload', 'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
@@ -133,11 +133,6 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                                 className: 'FormControl',
                                 value: this.values.resizeMaxWidth() || 100,
                                 oninput: m.withAttr('value', this.values.resizeMaxWidth),
-                                disabled: !this.values.mustResize()
-                            }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.resize.max_height')), m('input', {
-                                className: 'FormControl',
-                                value: this.values.resizeMaxHeight() || 100,
-                                oninput: m.withAttr('value', this.values.resizeMaxHeight),
                                 disabled: !this.values.mustResize()
                             })]
                         })]), m('div', {
