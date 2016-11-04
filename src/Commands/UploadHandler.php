@@ -98,7 +98,10 @@ class UploadHandler
         $this->fileValidator->assertValid(['file' => $uploadedFile]);
         $this->mimeValidator->assertValid(['mime' => $uploadedFile->getMimeType()]);
 
+        $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+
         if (!$this->upload->forMime($uploadedFile->getMimeType())) {
+            $tempFilesystem->delete($uploadedFile->getBasename());
             throw new ValidationException('Upload adapter does not support the provided mime type.');
         }
 
@@ -114,8 +117,6 @@ class UploadHandler
         $this->events->fire(
             new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
         );
-
-        $tempFilesystem = $this->getTempFilesystem($uploadedFile);
 
         $response = $this->upload->upload(
             $file,
@@ -152,6 +153,15 @@ class UploadHandler
         return $file;
     }
 
+    /**
+     * @param UploadedFile $uploadedFile
+     * @return Filesystem
+     */
+    protected function getTempFilesystem(UploadedFile $uploadedFile)
+    {
+        return new Filesystem(new Local($uploadedFile->getPath()));
+    }
+
     protected function processable(File &$file, UploadedFile &$uploadedFile)
     {
         list($type, $subType) = explode('/', $file->type);
@@ -168,14 +178,5 @@ class UploadHandler
                 return app($class)->process($file, $uploadedFile);
             }
         }
-    }
-
-    /**
-     * @param UploadedFile $uploadedFile
-     * @return Filesystem
-     */
-    protected function getTempFilesystem(UploadedFile $uploadedFile)
-    {
-        return new Filesystem(new Local($uploadedFile->getPath()));
     }
 }
