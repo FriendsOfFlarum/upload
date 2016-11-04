@@ -44,7 +44,7 @@ class ImageProcessor implements Processable
     {
         if ($this->settings->get('mustResize')) {
             (new ImageManager())
-                ->make($upload->getPath())
+                ->make($upload->getRealPath())
                 ->resize($this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
                     function ($constraint) {
                         $constraint->aspectRatio();

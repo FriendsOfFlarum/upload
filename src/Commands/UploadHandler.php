@@ -158,7 +158,7 @@ class UploadHandler
 
         //.. todo fire event?
 
-        foreach ([$type, "{$type}_{$subType}", $subType] as $typePrefix) {
+        foreach (["{$type}_{$subType}", $type, $subType] as $typePrefix) {
             $class = sprintf(
                 'Flagrow\\Upload\\Processors\\%sProcessor',
                 IllStr::studly($typePrefix)
