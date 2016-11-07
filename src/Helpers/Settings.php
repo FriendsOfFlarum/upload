@@ -39,6 +39,9 @@ class Settings
         // Override avatar upload
         'overrideAvatarUpload',
 
+        // Imgur
+        'imgurClientId',
+
         // AWS
         'awsS3Key',
         'awsS3Secret',

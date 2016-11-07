@@ -76,7 +76,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.loading = false;
 
                         // the fields we need to watch and to save
-                        this.fields = ['availableUploadMethods', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload', 'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
+                        this.fields = ['availableUploadMethods', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                            // Imgur
+                            'imgurClientId',
+                            // AWS
+                            'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
@@ -129,6 +133,13 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'FormControl',
                             value: this.values.cdnUrl() || '',
                             oninput: m.withAttr('value', this.values.cdnUrl)
+                        })]), m('fieldset', {
+                            className: 'ImageUploadPage-imgur',
+                            style: {display: this.values.uploadMethod() === 'imgur' ? "block" : "none"}
+                        }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.client_id')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.imgurClientId() || '',
+                            oninput: m.withAttr('value', this.values.imgurClientId)
                         })]), m('fieldset', {
                             className: 'ImageUploadPage-aws-s3',
                             style: { display: this.values.uploadMethod() === 'aws-s3' ? "block" : "none" }

@@ -25,6 +25,9 @@ flagrow-upload:
             local:
                 title: Local storage settings
                 cdn_url: Content Delivery URL (prefixes files)
+            imgur:
+                title: Imgur image storage settings
+                client_id: Imgur client ID
             aws-s3:
                 title: AWS S3 storage settings
                 key: Key

@@ -102,7 +102,7 @@ class StorageServiceProvider extends ServiceProvider
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers'  => [
-                    'Authorization' => 'Client-ID ' . $settings->get('imgur.clientId')
+                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId')
                 ]
             ])
         );
