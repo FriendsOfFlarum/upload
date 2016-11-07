@@ -14,6 +14,7 @@ export default class UploadPage extends Component {
         // the fields we need to watch and to save
         this.fields = [
             'availableUploadMethods',
+            'mimeTypesAllowed',
             'uploadMethod',
             'resizeMaxWidth',
             'cdnUrl',
@@ -67,6 +68,12 @@ export default class UploadPage extends Component {
                                 onchange: this.values.uploadMethod,
                                 value: this.values.uploadMethod() || 'local'
                             }),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')),
+                            m('input', {
+                                className: 'FormControl',
+                                value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
+                                oninput: m.withAttr('value', this.values.mimeTypesAllowed)
+                            }),
                             // m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')),
                             // Switch.component({
                             //     state: this.values.overrideAvatarUpload() || false,
@@ -74,7 +81,7 @@ export default class UploadPage extends Component {
                             //     onchange: this.values.overrideAvatarUpload
                             // }),
                         ]),
-                        m('fieldset', {className: 'ImageUploadPage-preferences'}, [
+                        m('fieldset', {className: 'UploadPage-preferences'}, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')),
                             m('input', {
@@ -83,7 +90,7 @@ export default class UploadPage extends Component {
                                 oninput: m.withAttr('value', this.values.maxFileSize)
                             }),
                         ]),
-                        m('fieldset', {className: 'ImageUploadPage-resize'}, [
+                        m('fieldset', {className: 'UploadPage-resize'}, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')),
                             m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')),
                             Switch.component({
@@ -100,7 +107,7 @@ export default class UploadPage extends Component {
                             }),
                         ]),
                         m('fieldset', {
-                            className: 'ImageUploadPage-local',
+                            className: 'UploadPage-local',
                             style: {display: (this.values.uploadMethod() === 'local' ? "block" : "none")}
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')),
@@ -112,7 +119,7 @@ export default class UploadPage extends Component {
                             }),
                         ]),
                         m('fieldset', {
-                            className: 'ImageUploadPage-aws-s3',
+                            className: 'UploadPage-aws-s3',
                             style: {display: (this.values.uploadMethod() === 'aws-s3' ? "block" : "none")}
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.title')),

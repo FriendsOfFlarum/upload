@@ -14,17 +14,24 @@
 
 namespace Flagrow\Upload\Validators;
 
+use Flagrow\Upload\Helpers\Settings;
 use Flarum\Core\Validator\AbstractValidator;
 
 class MimeValidator extends AbstractValidator
 {
     public function getRules()
     {
+        $mimeTypesAllowed = app(Settings::class)->get('mimeTypesAllowed');
+
+        if (!$mimeTypesAllowed) {
+            $mimeTypesAllowed = '(image|audio|video)\/.*';
+        }
+
         return [
             'mime' => [
                 'required',
                 'string',
-                'regex:/^(image|audio|video)\/.*$/'
+                "regex:/^{$mimeTypesAllowed}$/"
             ]
         ];
     }

@@ -17,6 +17,7 @@ flagrow-upload:
             preferences:
                 title: General preferences
                 max_file_size: Maximum file size (in kilobytes)
+                mime_types_allowed: Specify the mime types you like to allow in your application using a regular expression
             resize:
                 title: Image resize
                 toggle: Toggle the resize
