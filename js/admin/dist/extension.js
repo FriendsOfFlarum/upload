@@ -105,11 +105,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                 }, {
                     key: "view",
                     value: function view() {
-                        return [m('div', {className: 'UploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), Select.component({
+                        return [m('div', {className: 'UploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), m('div', {}, [Select.component({
                             options: this.uploadMethodOptions,
                             onchange: this.values.uploadMethod,
                             value: this.values.uploadMethod() || 'local'
-                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
+                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
                             className: 'FormControl',
                             value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
                             oninput: m.withAttr('value', this.values.mimeTypesAllowed)

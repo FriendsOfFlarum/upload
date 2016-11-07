@@ -63,11 +63,13 @@ export default class UploadPage extends Component {
                         m('fieldset', {}, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')),
                             m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')),
-                            Select.component({
-                                options: this.uploadMethodOptions,
-                                onchange: this.values.uploadMethod,
-                                value: this.values.uploadMethod() || 'local'
-                            }),
+                            m('div', {}, [
+                                Select.component({
+                                    options: this.uploadMethodOptions,
+                                    onchange: this.values.uploadMethod,
+                                    value: this.values.uploadMethod() || 'local'
+                                }),
+                            ]),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')),
                             m('input', {
                                 className: 'FormControl',
