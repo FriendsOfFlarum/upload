@@ -35,7 +35,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function view() {
                         return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}), m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')), m('form#flagrow-upload-form', [m('input', {
                             type: 'file',
-                            name: 'flagrow-upload-input',
+                            multiple: true,
                             onchange: this.process.bind(this)
                         })])]);
                     }
@@ -44,7 +44,12 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function process(e) {
                         // get the file from the input field
                         var data = new FormData();
-                        data.append('file', $(e.target)[0].files[0]);
+
+                        var files = $(e.target)[0].files;
+
+                        for (var i = 0; i < files.length; i++) {
+                            data.append('files[]', files[i]);
+                        }
 
                         // set the button in the loading state (and redraw the element!)
                         this.loading = true;
@@ -54,6 +59,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         app.request({
                             method: 'POST',
                             url: app.forum.attribute('apiUrl') + '/flagrow/upload',
+                            // prevent JSON.stringify'ing the form data in the XHR call
                             serialize: function serialize(raw) {
                                 return raw;
                             },
@@ -75,17 +81,25 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 
                 }, {
                     key: "success",
-                    value: function success(file) {
+                    value: function success(response) {
                         var _this2 = this;
 
-                        console.log(file);
+                        console.log(response);
 
-                        // create a markdown string that holds the image link
+                        var markdownString = '';
+                        var file;
 
-                        if (file.data.attributes.markdownString) {
-                            var markdownString = '\n' + file.data.attributes.markdownString + '\n';
-                        } else {
-                            var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+                        for (var i = 0; i < response.data.length; i++) {
+
+                            file = response.data[i].attributes;
+
+                            // create a markdown string that holds the image link
+
+                            if (file.markdownString) {
+                                markdownString += '\n' + file.markdownString + '\n';
+                            } else {
+                                markdownString += '\n![' + file.base_name + '](' + file.url + ')\n';
+                            }
                         }
 
                         // place the Markdown image link in the Composer

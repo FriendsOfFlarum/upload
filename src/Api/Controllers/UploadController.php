@@ -16,13 +16,13 @@ namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Api\Serializers\FileSerializer;
 use Flagrow\Upload\Commands\Upload;
-use Flarum\Api\Controller\AbstractResourceController;
+use Flarum\Api\Controller\AbstractCollectionController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
-class UploadController extends AbstractResourceController
+class UploadController extends AbstractCollectionController
 {
     public $serializer = FileSerializer::class;
 
@@ -46,10 +46,10 @@ class UploadController extends AbstractResourceController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
-        $file = Arr::get($request->getUploadedFiles(), 'file');
+        $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
         return $this->bus->dispatch(
-            new Upload($file, $actor)
+            new Upload($files, $actor)
         );
     }
 }
