@@ -19,6 +19,9 @@ export default class UploadPage extends Component {
             'cdnUrl',
             'maxFileSize',
             'overrideAvatarUpload',
+            // Imgur
+            'imgurClientId',
+            // AWS
             'awsS3Key',
             'awsS3Secret',
             'awsS3Bucket',
@@ -109,6 +112,18 @@ export default class UploadPage extends Component {
                                 className: 'FormControl',
                                 value: this.values.cdnUrl() || '',
                                 oninput: m.withAttr('value', this.values.cdnUrl)
+                            }),
+                        ]),
+                        m('fieldset', {
+                            className: 'ImageUploadPage-imgur',
+                            style: {display: (this.values.uploadMethod() === 'imgur' ? "block" : "none")}
+                        }, [
+                            m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.title')),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.client_id')),
+                            m('input', {
+                                className: 'FormControl',
+                                value: this.values.imgurClientId() || '',
+                                oninput: m.withAttr('value', this.values.imgurClientId)
                             }),
                         ]),
                         m('fieldset', {
