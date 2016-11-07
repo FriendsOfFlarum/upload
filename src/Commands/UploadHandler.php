@@ -156,7 +156,7 @@ class UploadHandler
             return $file;
         });
 
-        return $savedFiles->filter()->toArray();
+        return $savedFiles->filter();
     }
 
     /**

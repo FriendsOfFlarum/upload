@@ -17,6 +17,7 @@ namespace Flagrow\Upload\Api\Serializers;
 use Flagrow\Upload\File;
 use Flarum\Api\Serializer\AbstractSerializer;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class FileSerializer extends AbstractSerializer
 {
@@ -25,14 +26,17 @@ class FileSerializer extends AbstractSerializer
     /**
      * Get the default set of serialized attributes for a model.
      *
-     * @param File $model
+     * @param Collection $collection
      * @return array
      */
-    protected function getDefaultAttributes($model)
+    protected function getDefaultAttributes($collection)
     {
-        return Arr::only(
-            $model->attributesToArray(),
-            ['base_name', 'path', 'url', 'type', 'size', 'markdownString']
-        );
+        return $collection->map(function (File $file) {
+            return Arr::only(
+                $file->attributesToArray(),
+                ['base_name', 'path', 'url', 'type', 'size', 'markdownString']
+
+            );
+        })->toArray();
     }
 }
