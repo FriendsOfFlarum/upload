@@ -86,9 +86,9 @@ export default class UploadButton extends Component {
         var markdownString = '';
         var file;
 
-        for (var i = 0; i < response.data.attributes.length; i++) {
+        for (var i = 0; i < response.data.length; i++) {
 
-            file = response.data.attributes[i];
+            file = response.data[i];
 
             // create a markdown string that holds the image link
 
