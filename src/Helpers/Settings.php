@@ -30,6 +30,7 @@ class Settings
 
     protected $definition = [
         'uploadMethod',
+        'mimeTypesAllowed',
 
         // Images
         'mustResize',

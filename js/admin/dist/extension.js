@@ -76,7 +76,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.loading = false;
 
                         // the fields we need to watch and to save
-                        this.fields = ['availableUploadMethods', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                        this.fields = ['availableUploadMethods', 'mimeTypesAllowed', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
                         // Imgur
                         'imgurClientId',
                         // AWS
@@ -109,15 +109,19 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                 }, {
                     key: "view",
                     value: function view() {
-                        return [m('div', { className: 'UploadPage' }, [m('div', { className: 'container' }, [m('form', { onsubmit: this.onsubmit.bind(this) }, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), Select.component({
+                        return [m('div', {className: 'UploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), m('div', {}, [Select.component({
                             options: this.uploadMethodOptions,
                             onchange: this.values.uploadMethod,
                             value: this.values.uploadMethod() || 'local'
-                        })]), m('fieldset', { className: 'ImageUploadPage-preferences' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
+                        })])]), m('fieldset', {className: 'UploadPage-preferences'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
                             className: 'FormControl',
                             value: this.values.maxFileSize() || 2048,
                             oninput: m.withAttr('value', this.values.maxFileSize)
-                        })]), m('fieldset', { className: 'ImageUploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
+                            oninput: m.withAttr('value', this.values.mimeTypesAllowed)
+                        })]), m('fieldset', {className: 'UploadPage-resize'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                             state: this.values.mustResize() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                             onchange: this.values.mustResize
@@ -127,21 +131,21 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             oninput: m.withAttr('value', this.values.resizeMaxWidth),
                             disabled: !this.values.mustResize()
                         })]), m('fieldset', {
-                            className: 'ImageUploadPage-local',
+                            className: 'UploadPage-local',
                             style: { display: this.values.uploadMethod() === 'local' ? "block" : "none" }
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {
                             className: 'FormControl',
                             value: this.values.cdnUrl() || '',
                             oninput: m.withAttr('value', this.values.cdnUrl)
                         })]), m('fieldset', {
-                            className: 'ImageUploadPage-imgur',
+                            className: 'UploadPage-imgur',
                             style: { display: this.values.uploadMethod() === 'imgur' ? "block" : "none" }
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.client_id')), m('input', {
                             className: 'FormControl',
                             value: this.values.imgurClientId() || '',
                             oninput: m.withAttr('value', this.values.imgurClientId)
                         })]), m('fieldset', {
-                            className: 'ImageUploadPage-aws-s3',
+                            className: 'UploadPage-aws-s3',
                             style: { display: this.values.uploadMethod() === 'aws-s3' ? "block" : "none" }
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.key')), m('input', {
                             className: 'FormControl',
