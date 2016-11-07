@@ -12,6 +12,7 @@ flagrow-upload:
         upload_methods:
             local: Local
             aws-s3: Amazon S3
+            imgur: Imgur
         labels:
             upload_method: Upload method
             preferences:
