@@ -35,6 +35,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function view() {
                         return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}), m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')), m('form#flagrow-upload-form', [m('input', {
                             type: 'file',
+                            multiple: true,
                             name: 'flagrow-upload-input',
                             onchange: this.process.bind(this)
                         })])]);
@@ -44,7 +45,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function process(e) {
                         // get the file from the input field
                         var data = new FormData();
-                        data.append('file', $(e.target)[0].files[0]);
+                        data.append('files', $(e.target)[0].files);
 
                         // set the button in the loading state (and redraw the element!)
                         this.loading = true;
@@ -75,17 +76,22 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 
                 }, {
                     key: "success",
-                    value: function success(file) {
+                    value: function success(response) {
                         var _this2 = this;
 
                         console.log(file);
 
-                        // create a markdown string that holds the image link
+                        var markdownString = '';
 
-                        if (file.data.attributes.markdownString) {
-                            var markdownString = '\n' + file.data.attributes.markdownString + '\n';
-                        } else {
-                            var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+                        for (file in response.data) {
+
+                            // create a markdown string that holds the image link
+
+                            if (file.attributes.markdownString) {
+                                markdownString += '\n' + file.attributes.markdownString + '\n';
+                            } else {
+                                markdownString += '\n![' + file.attributes.base_name + '](' + file.attributes.url + ')\n';
+                            }
                         }
 
                         // place the Markdown image link in the Composer

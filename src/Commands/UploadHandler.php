@@ -28,6 +28,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadHandler
@@ -80,77 +81,82 @@ class UploadHandler
             'flagrow.upload'
         );
 
-        // Move the file to a temporary location first.
-        $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.upload.');
-        $command->file->moveTo($tempFile);
+        $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
 
-        $uploadedFile = new UploadedFile(
-            $tempFile,
-            $command->file->getClientFilename(),
-            $command->file->getClientMediaType(),
-            $command->file->getSize(),
-            $command->file->getError(),
-            true
-        );
+            // Move the file to a temporary location first.
+            $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.upload.');
+            $file->moveTo($tempFile);
 
-        unset($tempFile);
+            $uploadedFile = new UploadedFile(
+                $tempFile,
+                $file->getClientFilename(),
+                $file->getClientMediaType(),
+                $file->getSize(),
+                $file->getError(),
+                true
+            );
 
-        $this->fileValidator->assertValid(['file' => $uploadedFile]);
-        $this->mimeValidator->assertValid(['mime' => $uploadedFile->getMimeType()]);
+            unset($tempFile);
 
-        $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+            $this->fileValidator->assertValid(['file' => $uploadedFile]);
+            $this->mimeValidator->assertValid(['mime' => $uploadedFile->getMimeType()]);
 
-        if (!$this->upload->forMime($uploadedFile->getMimeType())) {
+            $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+
+            if (!$this->upload->forMime($uploadedFile->getMimeType())) {
+                $tempFilesystem->delete($uploadedFile->getBasename());
+                throw new ValidationException('Upload adapter does not support the provided mime type.');
+            }
+
+            $file = (new File())->forceFill([
+                'base_name' => Str::slug($uploadedFile->getClientOriginalName()),
+                'size' => $uploadedFile->getSize(),
+                'type' => $uploadedFile->getMimeType(),
+                'actor_id' => $command->actor->id,
+            ]);
+
+            $this->processable($file, $uploadedFile);
+
+            $this->events->fire(
+                new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
+            );
+
+            $response = $this->upload->upload(
+                $file,
+                $uploadedFile,
+                $this->upload->supportsStreams() ?
+                    $tempFilesystem->readStream($uploadedFile->getBasename()) :
+                    $tempFilesystem->read($uploadedFile->getBasename())
+            );
+
             $tempFilesystem->delete($uploadedFile->getBasename());
-            throw new ValidationException('Upload adapter does not support the provided mime type.');
-        }
 
-        $file = (new File())->forceFill([
-            'base_name' => Str::slug($uploadedFile->getClientOriginalName()),
-            'size'      => $uploadedFile->getSize(),
-            'type'      => $uploadedFile->getMimeType(),
-            'actor_id'  => $command->actor->id,
-        ]);
+            if (!($response instanceof File)) {
+                return false;
+            }
 
-        $this->processable($file, $uploadedFile);
+            $file = $response;
 
-        $this->events->fire(
-            new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
-        );
+            $this->events->fire(
+                new Events\WasUploaded($command->actor, $file, $uploadedFile)
+            );
 
-        $response = $this->upload->upload(
-            $file,
-            $uploadedFile,
-            $this->upload->supportsStreams() ?
-                $tempFilesystem->readStream($uploadedFile->getBasename()) :
-                $tempFilesystem->read($uploadedFile->getBasename())
-        );
+            $this->events->fire(
+                new Events\WillBeSaved($command->actor, $file, $uploadedFile)
+            );
 
-        $tempFilesystem->delete($uploadedFile->getBasename());
+            if ($file->isDirty() || !$file->exists) {
+                $file->save();
+            }
 
-        if (!($response instanceof File)) {
-            return false;
-        }
+            $this->events->fire(
+                new Events\WasSaved($command->actor, $file, $uploadedFile)
+            );
 
-        $file = $response;
+            return $file;
+        });
 
-        $this->events->fire(
-            new Events\WasUploaded($command->actor, $file, $uploadedFile)
-        );
-
-        $this->events->fire(
-            new Events\WillBeSaved($command->actor, $file, $uploadedFile)
-        );
-
-        if ($file->isDirty() || !$file->exists) {
-            $file->save();
-        }
-
-        $this->events->fire(
-            new Events\WasSaved($command->actor, $file, $uploadedFile)
-        );
-
-        return $file;
+        return $savedFiles->filter()->toArray();
     }
 
     /**

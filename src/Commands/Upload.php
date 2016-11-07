@@ -15,23 +15,23 @@
 namespace Flagrow\Upload\Commands;
 
 use Flarum\Core\User;
-use Psr\Http\Message\UploadedFileInterface;
+use Illuminate\Support\Collection;
 
 class Upload
 {
     /**
-     * @var UploadedFileInterface
+     * @var Collection
      */
-    public $file;
+    public $files;
 
     /**
      * @var User
      */
     public $actor;
 
-    public function __construct(UploadedFileInterface $file, User $actor)
+    public function __construct(Collection $files, User $actor)
     {
-        $this->file         = $file;
+        $this->files = $files;
         $this->actor        = $actor;
     }
 }

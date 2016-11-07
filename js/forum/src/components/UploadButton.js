@@ -27,6 +27,7 @@ export default class UploadButton extends Component {
             m('form#flagrow-upload-form', [
                 m('input', {
                     type: 'file',
+                    multiple: true,
                     name: 'flagrow-upload-input',
                     onchange: this.process.bind(this)
                 })
@@ -42,7 +43,7 @@ export default class UploadButton extends Component {
     process(e) {
         // get the file from the input field
         const data = new FormData();
-        data.append('file', $(e.target)[0].files[0]);
+        data.append('files', $(e.target)[0].files);
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
@@ -74,15 +75,20 @@ export default class UploadButton extends Component {
      *
      * @param file
      */
-    success(file) {
+    success(response) {
         console.log(file);
 
-        // create a markdown string that holds the image link
+        var markdownString = '';
 
-        if (file.data.attributes.markdownString) {
-            var markdownString = '\n' + file.data.attributes.markdownString + '\n';
-        } else {
-            var markdownString = '\n![' + file.data.attributes.base_name + '](' + file.data.attributes.url + ')\n';
+        for (file in response.data) {
+
+            // create a markdown string that holds the image link
+
+            if (file.attributes.markdownString) {
+                markdownString += '\n' + file.attributes.markdownString + '\n';
+            } else {
+                markdownString += '\n![' + file.attributes.base_name + '](' + file.attributes.url + ')\n';
+            }
         }
 
         // place the Markdown image link in the Composer
