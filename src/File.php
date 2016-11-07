@@ -30,6 +30,9 @@ use Illuminate\Support\Str;
  * @property string     $type
  * @property int        $size
  *
+ * @property string     $upload_method
+ * @property string     $remote_id
+ *
  * @property int        $post_id
  * @property Post       $post
  *

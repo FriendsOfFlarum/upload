@@ -79,7 +79,7 @@ class StorageServiceProvider extends ServiceProvider
 
     protected function awsS3(Settings $settings)
     {
-        return new Adapters\AwsS3v3(
+        return new Adapters\AwsS3(
             new Filesystem(
                 new AwsS3Adapter(
                     new S3Client([

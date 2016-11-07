@@ -31,7 +31,7 @@ return [
             $table->string('type');
             $table->integer('size');
 
-            $table->string('upload_method');
+            $table->string('upload_method')->nullable();
 
             $table->timestamp('created_at');
         });

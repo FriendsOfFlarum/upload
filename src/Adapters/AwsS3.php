@@ -15,7 +15,7 @@ namespace Flagrow\Upload\Adapters;
 
 use Flagrow\Upload\File;
 
-class AwsS3v3 extends Local
+class AwsS3 extends Local
 {
     protected function generateUrl(File $file)
     {

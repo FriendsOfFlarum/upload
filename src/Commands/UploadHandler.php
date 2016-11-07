@@ -129,6 +129,8 @@ class UploadHandler
                     $tempFilesystem->read($uploadedFile->getBasename())
             );
 
+            $file->upload_method = IllStr::snake(basename(get_class($this->upload)));
+
             $tempFilesystem->delete($uploadedFile->getBasename());
 
             if (!($response instanceof File)) {

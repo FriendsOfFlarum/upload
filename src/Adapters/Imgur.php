@@ -71,7 +71,10 @@ class Imgur implements UploadAdapter
 
         // successful upload, let's get the generated URL
         if ($response->getStatusCode() == 200) {
-            $file->url = Arr::get(json_decode($response->getBody(), true), 'data.link');
+            $meta = Arr::get(json_decode($response->getBody(), true), 'data', []);
+
+            $file->url       = Arr::get($meta, 'link');
+            $file->remote_id = Arr::get($meta, 'id');
         }
 
         if ($response->getStatusCode() != 200 || empty($file->url)) {
