@@ -70,9 +70,7 @@ class StorageServiceProvider extends ServiceProvider
                     return $this->awsS3($settings);
                 }
             case 'imgur':
-                if (class_exists(Imgur::class)) {
-                    return $this->imgur($settings);
-                }
+                return $this->imgur($settings);
 
             default:
                 return $this->local($settings);
@@ -98,6 +96,18 @@ class StorageServiceProvider extends ServiceProvider
         );
     }
 
+    protected function imgur(Settings $settings)
+    {
+        return new Adapters\Imgur(
+            new Guzzle([
+                'base_uri' => 'https://api.imgur.com/3/',
+                'headers'  => [
+                    'Authorization' => 'Client-ID ' . $settings->get('imgur.clientId')
+                ]
+            ])
+        );
+    }
+
     /**
      * @param Settings $settings
      * @return Adapters\Local
@@ -109,18 +119,6 @@ class StorageServiceProvider extends ServiceProvider
                 new FlyAdapters\Local(public_path('assets/files')),
                 $settings->get('local', [])
             )
-        );
-    }
-
-    protected function imgur(Settings $settings)
-    {
-        return new Adapters\Imgur(
-            new Guzzle([
-                'base_uri' => 'https://api.imgur.com/3/',
-                'headers' => [
-                    'Authorization' => 'Client-ID ' . $settings->get('imgur.clientId')
-                ]
-            ])
         );
     }
 }

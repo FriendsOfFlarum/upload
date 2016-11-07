@@ -131,9 +131,7 @@ class Settings
             $methods[] = 'aws-s3';
         }
 
-        if (class_exists(Imgur::class)) {
-            $methods[] = 'imgur';
-        }
+        $methods[] = 'imgur';
 
         return collect($methods)
             ->keyBy(function ($item) {
