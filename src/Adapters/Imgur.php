@@ -30,7 +30,7 @@ class Imgur implements UploadAdapter
 
     public function __construct(Guzzle $api)
     {
-        $this->api = $api->api('image');
+        $this->api = $api;
     }
 
     /**
