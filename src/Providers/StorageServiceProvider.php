@@ -87,7 +87,7 @@ class StorageServiceProvider extends ServiceProvider
                             'key'    => $settings->get('awsS3Key'),
                             'secret' => $settings->get('awsS3Secret'),
                         ],
-                        'region'      => $settings->get('awsS3Region'),
+                        'region'      => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
                         'version'     => 'latest',
                     ]),
                     $settings->get('awsS3Bucket')
