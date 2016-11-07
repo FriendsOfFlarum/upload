@@ -33,7 +33,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                 }, {
                     key: "view",
                     value: function view() {
-                        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}), m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')), m('form#flagrow-upload-form', [m('input', {
+                        return m('div', { className: 'Button hasIcon flagrow-upload-button Button--icon' }, [this.loading ? LoadingIndicator.component({ className: 'Button-icon' }) : icon('file-o', { className: 'Button-icon' }), m('span', { className: 'Button-label' }, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')), m('form#flagrow-upload-form', [m('input', {
                             type: 'file',
                             multiple: true,
                             onchange: this.process.bind(this)
@@ -68,8 +68,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     }
                 }, {
                     key: "failure",
-                    value: function failure(message) {
-                    }
+                    value: function failure(message) {}
                     // todo show popup
 
 
@@ -124,8 +123,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
             _export("default", UploadButton);
         }
     };
-});
-;
+});;
 "use strict";
 
 System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton"], function (_export, _context) {
