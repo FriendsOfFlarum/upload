@@ -28,7 +28,6 @@ export default class UploadButton extends Component {
                 m('input', {
                     type: 'file',
                     multiple: true,
-                    name: 'flagrow-upload-input',
                     onchange: this.process.bind(this)
                 })
             ])
@@ -42,8 +41,13 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        const data = new FormData();
-        data.append('files', $(e.target)[0].files);
+        const data = new FormData;
+
+        var files = $(e.target)[0];
+
+        for (var i = 0; i < files.length; i++) {
+            data.append('files[]', files[i]);
+        }
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
@@ -53,6 +57,7 @@ export default class UploadButton extends Component {
         app.request({
             method: 'POST',
             url: app.forum.attribute('apiUrl') + '/flagrow/upload',
+            // prevent JSON.stringify'ing the form data in the XHR call
             serialize: raw => raw,
             data
         }).then(
@@ -76,18 +81,21 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        console.log(file);
+        console.log(response);
 
         var markdownString = '';
+        var file;
 
-        for (file in response.data) {
+        for (var i = 0; i < response.data.attributes.length; i++) {
+
+            file = response.data.attributes[i];
 
             // create a markdown string that holds the image link
 
-            if (file.attributes.markdownString) {
-                markdownString += '\n' + file.attributes.markdownString + '\n';
+            if (file.markdownString) {
+                markdownString += '\n' + file.markdownString + '\n';
             } else {
-                markdownString += '\n![' + file.attributes.base_name + '](' + file.attributes.url + ')\n';
+                markdownString += '\n![' + file.base_name + '](' + file.url + ')\n';
             }
         }
 
