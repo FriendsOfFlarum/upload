@@ -18,6 +18,7 @@ use Aws\AwsClient;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Imgur\Client as Imgur;
 
 /**
  * @property int $maxFileSize
@@ -128,6 +129,10 @@ class Settings
 
         if (class_exists(AwsClient::class)) {
             $methods[] = 'aws-s3';
+        }
+
+        if (class_exists(Imgur::class)) {
+            $methods[] = 'imgur';
         }
 
         return collect($methods)
