@@ -43,7 +43,7 @@ export default class UploadButton extends Component {
         // get the file from the input field
         const data = new FormData;
 
-        var files = $(e.target)[0];
+        var files = $(e.target)[0].files;
 
         for (var i = 0; i < files.length; i++) {
             data.append('files[]', files[i]);
