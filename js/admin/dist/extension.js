@@ -109,14 +109,14 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             options: this.uploadMethodOptions,
                             onchange: this.values.uploadMethod,
                             value: this.values.uploadMethod() || 'local'
-                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
-                            className: 'FormControl',
-                            value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
-                            oninput: m.withAttr('value', this.values.mimeTypesAllowed)
-                        })]), m('fieldset', {className: 'UploadPage-preferences'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
+                        })])]), m('fieldset', {className: 'UploadPage-preferences'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
                             className: 'FormControl',
                             value: this.values.maxFileSize() || 2048,
                             oninput: m.withAttr('value', this.values.maxFileSize)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
+                            oninput: m.withAttr('value', this.values.mimeTypesAllowed)
                         })]), m('fieldset', {className: 'UploadPage-resize'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                             state: this.values.mustResize() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),

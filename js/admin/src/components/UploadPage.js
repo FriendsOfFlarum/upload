@@ -70,12 +70,6 @@ export default class UploadPage extends Component {
                                     value: this.values.uploadMethod() || 'local'
                                 }),
                             ]),
-                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')),
-                            m('input', {
-                                className: 'FormControl',
-                                value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
-                                oninput: m.withAttr('value', this.values.mimeTypesAllowed)
-                            }),
                             // m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')),
                             // Switch.component({
                             //     state: this.values.overrideAvatarUpload() || false,
@@ -90,6 +84,12 @@ export default class UploadPage extends Component {
                                 className: 'FormControl',
                                 value: this.values.maxFileSize() || 2048,
                                 oninput: m.withAttr('value', this.values.maxFileSize)
+                            }),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')),
+                            m('input', {
+                                className: 'FormControl',
+                                value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
+                                oninput: m.withAttr('value', this.values.mimeTypesAllowed)
                             }),
                         ]),
                         m('fieldset', {className: 'UploadPage-resize'}, [
