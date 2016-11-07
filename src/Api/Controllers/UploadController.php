@@ -46,7 +46,7 @@ class UploadController extends AbstractResourceController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
-        $files = Arr::get($request->getUploadedFiles(), 'files', []);
+        $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
         return $this->bus->dispatch(
             new Upload($files, $actor)
