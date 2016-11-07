@@ -129,7 +129,7 @@ class UploadHandler
                     $tempFilesystem->read($uploadedFile->getBasename())
             );
 
-            $file->upload_method = IllStr::snake(basename(get_class($this->upload)));
+            $file->upload_method = IllStr::snake(last(explode('\\', get_class($this->api))));
 
             $tempFilesystem->delete($uploadedFile->getBasename());
 
