@@ -94,7 +94,7 @@ class Local implements UploadAdapter
         if ($settings->get('cdnUrl')) {
             $file->url = $settings->get('cdnUrl') . $file->url;
         } else {
-            $file->url = app(UrlGenerator::class)->toPath($file->url);
+            $file->url = app(UrlGenerator::class)->toPath(ltrim($file->url, '/'));
         }
     }
 
