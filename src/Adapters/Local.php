@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
+use Flarum\Forum\UrlGenerator;
 use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -81,14 +82,20 @@ class Local implements UploadAdapter
      */
     protected function generateUrl(File $file)
     {
+        $file->url = str_replace(
+            public_path(),
+            '',
+            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
+        );
+
         /** @var Settings $settings */
         $settings = app()->make(Settings::class);
 
-        $file->url = str_replace(
-            public_path(),
-            $settings->get('cdnUrl') ?: '',
-            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
-        );
+        if ($settings->get('cdnUrl')) {
+            $file->url = $settings->get('cdnUrl') . $file->url;
+        } else {
+            $file->url = app(UrlGenerator::class)->toPath($file->url);
+        }
     }
 
     /**
