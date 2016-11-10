@@ -27,12 +27,11 @@ app.initializers.add('flagrow-upload', app => {
             }
         );
     });
-    extend(TextEditor.prototype, 'configTextarea', function () {
+    extend(TextEditor.prototype, 'init', function () {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 
         var drag = new DragAndDrop;
-        drag.element = this.$('textarea');
         drag.textAreaObj = this;
         drag.uploadButton = uploadButton;
     });

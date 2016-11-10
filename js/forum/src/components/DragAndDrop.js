@@ -17,6 +17,8 @@ export default class DragAndDrop extends Component {
 
         $(this.element).bind('drop', this.dropping);
 
+        console.log(this.textAreaObj);
+        console.log(this.uploadButton);
         console.log(this.element);
     }
 
