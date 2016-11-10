@@ -47,6 +47,7 @@ export default class DragAndDrop extends Component {
         }
 
         this.loading = true;
+        m.redraw();
 
         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 

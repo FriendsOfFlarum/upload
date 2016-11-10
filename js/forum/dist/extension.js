@@ -67,6 +67,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         }
 
                         this.loading = true;
+                        m.redraw();
 
                         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 
