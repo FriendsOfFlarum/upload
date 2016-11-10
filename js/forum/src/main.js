@@ -1,7 +1,7 @@
 import {extend} from "flarum/extend";
 import TextEditor from "flarum/components/TextEditor";
 import UploadButton from "flagrow/upload/components/UploadButton";
-import DragAndDrop from "flagrow/upload/components/DragAndDrop";
+import {DragAndDrop} from "flagrow/upload/components/DragAndDrop";
 
 app.initializers.add('flagrow-upload', app => {
     extend(TextEditor.prototype, 'controlItems', function (items) {
