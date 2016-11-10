@@ -46,7 +46,14 @@ export default class DragAndDrop extends Component {
     dropping(e) {
         e.preventDefault();
 
+        if (this.loading) {
+            return
+        }
+
+        this.loading = true;
+
         console.log('dropping on textarea');
+        console.log(e);
         // ..
     }
 
