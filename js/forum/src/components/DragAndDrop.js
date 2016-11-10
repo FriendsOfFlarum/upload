@@ -11,7 +11,6 @@ export default class DragAndDrop extends Component {
 
         $(this.textarea).bind('dragleave', this.out);
         $(this.textarea).bind('dragend', this.out);
-        window.bind('blur', this.out);
 
         $(this.textarea).bind('drop', this.dropping);
 

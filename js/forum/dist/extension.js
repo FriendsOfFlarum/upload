@@ -29,7 +29,6 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         $(this.textarea).bind('dragleave', this.out);
                         $(this.textarea).bind('dragend', this.out);
-                        window.bind('blur', this.out);
 
                         $(this.textarea).bind('drop', this.dropping);
                     }
