@@ -26,6 +26,14 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         this.loading = false;
                         this.over = false;
+
+                        $(this.element).bind('dragover', this.in);
+
+                        $(this.element).bind('dragleave', this.out);
+                        $(this.element).bind('dragend', this.out);
+                        $(this.element).bind('blur', this.out);
+
+                        $(this.element).bind('drop', this.dropping);
                     }
                 }, {
                     key: 'in',
@@ -226,16 +234,9 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     if (!app.forum.attribute('canUpload')) return;
 
                     var drag = new DragAndDrop();
+                    drag.element = this.element;
                     drag.textAreaObj = this;
                     drag.uploadButton = uploadButton;
-
-                    $(this.element).bind('dragover', drag.in);
-
-                    $(this.element).bind('dragleave', drag.out);
-                    $(this.element).bind('dragend', drag.out);
-                    $(this.element).bind('blur', drag.out);
-
-                    $(this.element).bind('drop', drag.dropping);
                 });
             });
         }
