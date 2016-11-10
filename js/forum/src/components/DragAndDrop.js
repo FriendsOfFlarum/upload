@@ -9,28 +9,28 @@ export default class DragAndDrop extends Component {
         this.loading = false;
         this.over = false;
 
-        $(this.element).bind('dragover', this.in);
+        this.textarea = $(this.props.textAreaObj.element);
 
-        $(this.element).bind('dragleave', this.out);
-        $(this.element).bind('dragend', this.out);
-        $(this.element).bind('blur', this.out);
+        $(this.textarea).bind('dragover', this.in);
 
-        $(this.element).bind('drop', this.dropping);
+        $(this.textarea).bind('dragleave', this.out);
+        $(this.textarea).bind('dragend', this.out);
+        $(this.textarea).bind('blur', this.out);
 
-        console.log(this.textAreaObj);
-        console.log(this.uploadButton);
-        console.log(this.element);
+        $(this.textarea).bind('drop', this.dropping);
+
+        console.log(this.textarea);
         console.log(this.props);
     }
 
     in(e) {
         console.log('entering textarea');
-        $(this.textAreaObj).toggleClass('flagrow-upload-dragging', true);
+        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', true);
     }
 
     out(e) {
         console.log('leaving textarea');
-        $(this.textAreaObj).toggleClass('flagrow-upload-dragging', false);
+        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', false);
     }
 
     dropping(e) {
