@@ -20,6 +20,7 @@ export default class DragAndDrop extends Component {
         console.log(this.textAreaObj);
         console.log(this.uploadButton);
         console.log(this.element);
+        console.log(this.props);
     }
 
     in(e) {

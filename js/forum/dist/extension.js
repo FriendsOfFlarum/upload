@@ -38,6 +38,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         console.log(this.textAreaObj);
                         console.log(this.uploadButton);
                         console.log(this.element);
+                        console.log(this.props);
                     }
                 }, {
                     key: 'in',
@@ -243,9 +244,10 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     console.log(this);
                     console.log(uploadButton);
 
-                    var drag = new DragAndDrop();
-                    drag.textAreaObj = this;
-                    drag.uploadButton = uploadButton;
+                    var drag = new DragAndDrop({
+                        textAreaObj: this,
+                        uploadButton: uploadButton
+                    });
                 });
             });
         }

@@ -34,8 +34,9 @@ app.initializers.add('flagrow-upload', app => {
         console.log(this);
         console.log(uploadButton);
 
-        var drag = new DragAndDrop;
-        drag.textAreaObj = this;
-        drag.uploadButton = uploadButton;
+        var drag = new DragAndDrop({
+            textAreaObj: this,
+            uploadButton: uploadButton
+        });
     });
 });
