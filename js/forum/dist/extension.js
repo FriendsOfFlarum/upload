@@ -29,12 +29,9 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         $(this.textarea).bind('dragleave', this.out);
                         $(this.textarea).bind('dragend', this.out);
-                        $(this.textarea).bind('blur', this.out);
+                        window.bind('blur', this.out);
 
                         $(this.textarea).bind('drop', this.dropping);
-
-                        console.log(this.textarea);
-                        console.log(this.props);
                     }
                 }, {
                     key: 'in',
@@ -45,7 +42,6 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                             return;
                         }
 
-                        console.log('entering textarea');
                         $(this.textarea).toggleClass('flagrow-upload-dragging', true);
 
                         this.over = true;
@@ -57,7 +53,6 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                             return;
                         }
 
-                        console.log('leaving textarea');
                         $(this.textarea).toggleClass('flagrow-upload-dragging', false);
 
                         this.over = false;
@@ -73,9 +68,10 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         this.loading = true;
 
-                        console.log('dropping on textarea');
-                        console.log((e.dataTransfer || e.target).files);
-                        // ..
+                        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
+
+                        this.loading = false;
+                        this.over = false;
                     }
                 }, {
                     key: 'view',
@@ -136,17 +132,23 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     key: "process",
                     value: function process(e) {
                         // get the file from the input field
-                        var data = new FormData();
 
                         var files = $(e.target)[0].files;
-
-                        for (var i = 0; i < files.length; i++) {
-                            data.append('files[]', files[i]);
-                        }
 
                         // set the button in the loading state (and redraw the element!)
                         this.loading = true;
                         m.redraw();
+
+                        this.uploadFiles(files);
+                    }
+                }, {
+                    key: "uploadFiles",
+                    value: function uploadFiles(files) {
+                        var data = new FormData();
+
+                        for (var i = 0; i < files.length; i++) {
+                            data.append('files[]', files[i]);
+                        }
 
                         // send a POST request to the api
                         app.request({
@@ -256,17 +258,13 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         $(this).addClass('Button--icon');
                     });
                 });
-                extend(TextEditor.prototype, 'configTextarea', function (element) {
+                extend(TextEditor.prototype, 'configTextarea', function () {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    console.log(this);
-                    console.log(uploadButton);
-
-                    var drag = new DragAndDrop({
+                    new DragAndDrop({
                         textAreaObj: this,
-                        uploadButton: uploadButton,
-                        element: element
+                        uploadButton: uploadButton
                     });
                 });
             });

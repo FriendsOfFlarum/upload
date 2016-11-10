@@ -41,17 +41,22 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        const data = new FormData;
 
         var files = $(e.target)[0].files;
-
-        for (var i = 0; i < files.length; i++) {
-            data.append('files[]', files[i]);
-        }
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
         m.redraw();
+
+        this.uploadFiles(files);
+    }
+
+    uploadFiles(files) {
+        const data = new FormData;
+
+        for (var i = 0; i < files.length; i++) {
+            data.append('files[]', files[i]);
+        }
 
         // send a POST request to the api
         app.request({
