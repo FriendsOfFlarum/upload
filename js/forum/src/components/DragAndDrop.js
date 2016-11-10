@@ -20,7 +20,7 @@ export default class DragAndDrop extends Component {
     in(e) {
         e.preventDefault();
 
-        if (this.over) {
+        if (this.over || this.loading) {
             return;
         }
 
@@ -30,7 +30,7 @@ export default class DragAndDrop extends Component {
     }
 
     out(e) {
-        if (!this.over) {
+        if (!this.over || this.loading) {
             return;
         }
 
@@ -47,6 +47,7 @@ export default class DragAndDrop extends Component {
         }
 
         this.loading = true;
+
         m.redraw();
 
         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
