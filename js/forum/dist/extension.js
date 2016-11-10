@@ -27,7 +27,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         this.loading = false;
                         this.over = false;
 
-                        this.textarea = $('.TextEditor textarea.FormControl');
+                        this.textarea = $('.TextEditor textarea');
 
                         $(this.textarea).bind('dragover', this.in);
 
