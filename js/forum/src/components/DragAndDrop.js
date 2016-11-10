@@ -5,15 +5,15 @@ export default class DragAndDrop extends Component {
         this.loading = false;
         this.over = false;
 
-        this.$textarea = $(this.props.textAreaObj.element).find('textarea').first();
+        this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
 
-        this.$textarea.bind('dragover', this.in);
+        $(this.textarea).bind('dragover', this.in);
 
-        this.$textarea.bind('dragleave', this.out);
-        this.$textarea.bind('dragend', this.out);
-        this.$textarea.bind('blur', this.out);
+        $(this.textarea).bind('dragleave', this.out);
+        $(this.textarea).bind('dragend', this.out);
+        $(this.textarea).bind('blur', this.out);
 
-        this.$textarea.bind('drop', this.dropping);
+        $(this.textarea).bind('drop', this.dropping);
 
         console.log(this.textarea);
         console.log(this.props);
@@ -27,7 +27,7 @@ export default class DragAndDrop extends Component {
         }
 
         console.log('entering textarea');
-        this.$textarea.toggleClass('flagrow-upload-dragging', true);
+        $(this.textarea).toggleClass('flagrow-upload-dragging', true);
 
         this.over = true;
     }
@@ -38,7 +38,7 @@ export default class DragAndDrop extends Component {
         }
 
         console.log('leaving textarea');
-        this.$textarea.toggleClass('flagrow-upload-dragging', false);
+        $(this.textarea).toggleClass('flagrow-upload-dragging', false);
 
         this.over = false;
     }
