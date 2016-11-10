@@ -24,14 +24,15 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         this.over = false;
 
                         this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
-                        this.uploadButton = this.props.uploadButton;
 
-                        $(this.textarea).bind('dragover', this.in);
+                        $(this.textarea).on('dragover', this.in);
 
-                        $(this.textarea).bind('dragleave', this.out);
-                        $(this.textarea).bind('dragend', this.out);
+                        $(this.textarea).on('dragleave', this.out);
+                        $(this.textarea).on('dragend', this.out);
 
-                        $(this.textarea).bind('drop', this.dropping);
+                        $(this.textarea).on('drop', {
+                            uploadButton: this.props.uploadButton
+                        }, this.dropping);
                     }
                 }, {
                     key: 'in',
@@ -68,7 +69,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         this.loading = true;
 
-                        this.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
+                        e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 
                         this.loading = false;
                         this.over = false;
