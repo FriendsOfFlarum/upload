@@ -34,20 +34,25 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         $(this.element).bind('blur', this.out);
 
                         $(this.element).bind('drop', this.dropping);
+
+                        console.log(this.element);
                     }
                 }, {
                     key: 'in',
                     value: function _in(e) {
+                        console.log('entering textarea');
                         $(this.textAreaObj).toggleClass('flagrow-upload-dragging', true);
                     }
                 }, {
                     key: 'out',
                     value: function out(e) {
+                        console.log('leaving textarea');
                         $(this.textAreaObj).toggleClass('flagrow-upload-dragging', false);
                     }
                 }, {
                     key: 'dropping',
                     value: function dropping(e) {
+                        console.log('dropping on textarea');
                         // ..
                     }
                 }, {
