@@ -74,7 +74,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         this.loading = true;
 
                         console.log('dropping on textarea');
-                        console.log(e);
+                        console.log((e.dataTransfer || e.target).files);
                         // ..
                     }
                 }, {
