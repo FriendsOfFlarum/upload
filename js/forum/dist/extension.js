@@ -239,7 +239,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     if (!app.forum.attribute('canUpload')) return;
 
                     var drag = new DragAndDrop();
-                    drag.element = this.element;
+                    drag.element = this.$('textarea');
                     drag.textAreaObj = this;
                     drag.uploadButton = uploadButton;
                 });

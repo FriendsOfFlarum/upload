@@ -32,7 +32,7 @@ app.initializers.add('flagrow-upload', app => {
         if (!app.forum.attribute('canUpload')) return;
 
         var drag = new DragAndDrop;
-        drag.element = this.element;
+        drag.element = this.$('textarea');
         drag.textAreaObj = this;
         drag.uploadButton = uploadButton;
     });
