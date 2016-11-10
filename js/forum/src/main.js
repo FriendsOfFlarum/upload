@@ -30,15 +30,15 @@ app.initializers.add('flagrow-upload', app => {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 
-        var DragAndDrop = new DragAndDrop;
-        DragAndDrop.textAreaObj = this;
+        var drag = new DragAndDrop;
+        drag.textAreaObj = this;
 
-        $(element).bind('dragover', DragAndDrop.in);
+        $(element).bind('dragover', drag.in);
 
-        $(element).bind('dragleave', DragAndDrop.out);
-        $(element).bind('dragend', DragAndDrop.out);
-        $(element).bind('blur', DragAndDrop.out);
+        $(element).bind('dragleave', drag.out);
+        $(element).bind('dragend', drag.out);
+        $(element).bind('blur', drag.out);
 
-        $(element).bind('drop', DragAndDrop.dropping);
+        $(element).bind('drop', drag.dropping);
     });
 });
