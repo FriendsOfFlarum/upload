@@ -35,12 +35,12 @@ app.initializers.add('flagrow-upload', app => {
         drag.textAreaObj = this;
         drag.uploadButton = uploadButton;
 
-        $(element).bind('dragover', drag.in);
+        $(this.element).bind('dragover', drag.in);
 
-        $(element).bind('dragleave', drag.out);
-        $(element).bind('dragend', drag.out);
-        $(element).bind('blur', drag.out);
+        $(this.element).bind('dragleave', drag.out);
+        $(this.element).bind('dragend', drag.out);
+        $(this.element).bind('blur', drag.out);
 
-        $(element).bind('drop', drag.dropping);
+        $(this.element).bind('drop', drag.dropping);
     });
 });
