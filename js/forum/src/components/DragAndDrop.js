@@ -10,7 +10,6 @@ export default class DragAndDrop extends Component {
         $(this.textarea).on('dragover', this.in);
 
         $(this.textarea).on('dragleave', this.out);
-        $(this.textarea).on('dragend', this.out);
 
         $(this.textarea).on('drop', {
             uploadButton: this.props.uploadButton
@@ -44,15 +43,14 @@ export default class DragAndDrop extends Component {
         e.preventDefault();
 
         if (this.loading) {
-            return
+            return;
         }
 
         this.loading = true;
 
         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 
-        this.loading = false;
-        this.over = false;
+        this.out(e);
     }
 
     view() {
