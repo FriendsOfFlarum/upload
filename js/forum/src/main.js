@@ -1,6 +1,7 @@
 import {extend} from "flarum/extend";
 import TextEditor from "flarum/components/TextEditor";
 import UploadButton from "flagrow/upload/components/UploadButton";
+import DragAndDrop from "flagrow/upload/components/DragAndDrop";
 
 app.initializers.add('flagrow-upload', app => {
     extend(TextEditor.prototype, 'controlItems', function (items) {
@@ -24,5 +25,18 @@ app.initializers.add('flagrow-upload', app => {
                 $(this).addClass('Button--icon')
             }
         );
+    });
+    extend(TextEditor.prototype, 'configTextarea', function () {
+
+        var DragAndDrop = new DragAndDrop;
+        DragAndDrop.textAreaObj = this;
+
+        $(element).bind('dragover', DragAndDrop.in);
+
+        $(element).bind('dragleave', DragAndDrop.out);
+        $(element).bind('dragend', DragAndDrop.out);
+        $(element).bind('blur', DragAndDrop.out);
+
+        $(element).bind('drop', DragAndDrop.dropping);
     });
 });

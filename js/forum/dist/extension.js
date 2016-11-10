@@ -1,5 +1,61 @@
 "use strict";
 
+System.register("flagrow/upload/components/DragAndDrop", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
+    "use strict";
+
+    var Component, icon, LoadingIndicator, DragAndDrop;
+    return {
+        setters: [function (_flarumComponent) {
+            Component = _flarumComponent.default;
+        }, function (_flarumHelpersIcon) {
+            icon = _flarumHelpersIcon.default;
+        }, function (_flarumComponentsLoadingIndicator) {
+            LoadingIndicator = _flarumComponentsLoadingIndicator.default;
+        }],
+        execute: function () {
+            DragAndDrop = function (_Component) {
+                babelHelpers.inherits(DragAndDrop, _Component);
+
+                function DragAndDrop() {
+                    babelHelpers.classCallCheck(this, DragAndDrop);
+                    return babelHelpers.possibleConstructorReturn(this, (DragAndDrop.__proto__ || Object.getPrototypeOf(DragAndDrop)).apply(this, arguments));
+                }
+
+                babelHelpers.createClass(DragAndDrop, [{
+                    key: "init",
+                    value: function init() {
+                        // the service type handling uploads
+                        this.textAreaObj = null;
+
+                        this.loading = false;
+                        this.over = false;
+                    }
+                }, {
+                    key: "in",
+                    value: function _in(e) {
+                        $(this.textAreaObj).toggleClass('flagrow-upload-dragging', true);
+                    }
+                }, {
+                    key: "out",
+                    value: function out(e) {
+                        $(this.textAreaObj).toggleClass('flagrow-upload-dragging', false);
+                    }
+                }, {
+                    key: "dropping",
+                    value: function dropping(e) {
+                        // ..
+                    }
+                }]);
+                return DragAndDrop;
+            }(Component);
+
+            _export("default", DragAndDrop);
+        }
+    };
+});
+;
+"use strict";
+
 System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
     "use strict";
 
@@ -126,10 +182,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flarum/components/Composer"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton;
+    var extend, TextEditor, UploadButton, DragAndDrop, Composer;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -137,6 +193,10 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             TextEditor = _flarumComponentsTextEditor.default;
         }, function (_flagrowUploadComponentsUploadButton) {
             UploadButton = _flagrowUploadComponentsUploadButton.default;
+        }, function (_flagrowUploadComponentsDragAndDrop) {
+            DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
+        }, function (_flarumComponentsComposer) {
+            Composer = _flarumComponentsComposer.default;
         }],
         execute: function () {
 
@@ -159,6 +219,19 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         $('.Button-label', this).hide();
                         $(this).addClass('Button--icon');
                     });
+                });
+                extend(TextEditor.prototype, 'configTextarea', function () {
+
+                    var DragAndDrop = new DragAndDrop();
+                    DragAndDrop.textAreaObj = this;
+
+                    $(element).bind('dragover', DragAndDrop.in);
+
+                    $(element).bind('dragleave', DragAndDrop.out);
+                    $(element).bind('dragend', DragAndDrop.out);
+                    $(element).bind('blur', DragAndDrop.out);
+
+                    $(element).bind('drop', DragAndDrop.dropping);
                 });
             });
         }
