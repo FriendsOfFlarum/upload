@@ -40,13 +40,13 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                     key: 'in',
                     value: function _in(e) {
                         console.log('entering textarea');
-                        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', true);
+                        $(this.textarea).toggleClass('flagrow-upload-dragging', true);
                     }
                 }, {
                     key: 'out',
                     value: function out(e) {
                         console.log('leaving textarea');
-                        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', false);
+                        $(this.textarea).toggleClass('flagrow-upload-dragging', false);
                     }
                 }, {
                     key: 'dropping',

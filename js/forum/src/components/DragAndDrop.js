@@ -21,12 +21,12 @@ export default class DragAndDrop extends Component {
 
     in(e) {
         console.log('entering textarea');
-        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', true);
+        $(this.textarea).toggleClass('flagrow-upload-dragging', true);
     }
 
     out(e) {
         console.log('leaving textarea');
-        $(this.props.textAreaObj.element).toggleClass('flagrow-upload-dragging', false);
+        $(this.textarea).toggleClass('flagrow-upload-dragging', false);
     }
 
     dropping(e) {
