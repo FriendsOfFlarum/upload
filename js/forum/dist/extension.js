@@ -22,6 +22,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                     value: function init() {
                         // the service type handling uploads
                         this.textAreaObj = null;
+                        this.uploadButton = null;
 
                         this.loading = false;
                         this.over = false;
@@ -195,17 +196,18 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
         }, function (_flagrowUploadComponentsUploadButton) {
             UploadButton = _flagrowUploadComponentsUploadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
-            DragAndDrop = _flagrowUploadComponentsDragAndDrop.DragAndDrop;
+            DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
         }],
         execute: function () {
 
             app.initializers.add('flagrow-upload', function (app) {
+                var uploadButton;
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
                     // create and add the button
-                    var uploadButton = new UploadButton();
+                    uploadButton = new UploadButton();
                     uploadButton.textAreaObj = this;
                     items.add('flagrow-upload', uploadButton, 0);
 
@@ -225,6 +227,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
 
                     var drag = new DragAndDrop();
                     drag.textAreaObj = this;
+                    drag.uploadButton = uploadButton;
 
                     $(element).bind('dragover', drag.in);
 
