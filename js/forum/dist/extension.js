@@ -1,16 +1,12 @@
-"use strict";
+'use strict';
 
-System.register("flagrow/upload/components/DragAndDrop", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
+System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], function (_export, _context) {
     "use strict";
 
-    var Component, icon, LoadingIndicator, DragAndDrop;
+    var Component, DragAndDrop;
     return {
         setters: [function (_flarumComponent) {
             Component = _flarumComponent.default;
-        }, function (_flarumHelpersIcon) {
-            icon = _flarumHelpersIcon.default;
-        }, function (_flarumComponentsLoadingIndicator) {
-            LoadingIndicator = _flarumComponentsLoadingIndicator.default;
         }],
         execute: function () {
             DragAndDrop = function (_Component) {
@@ -22,7 +18,7 @@ System.register("flagrow/upload/components/DragAndDrop", ["flarum/Component", "f
                 }
 
                 babelHelpers.createClass(DragAndDrop, [{
-                    key: "init",
+                    key: 'init',
                     value: function init() {
                         // the service type handling uploads
                         this.textAreaObj = null;
@@ -31,25 +27,30 @@ System.register("flagrow/upload/components/DragAndDrop", ["flarum/Component", "f
                         this.over = false;
                     }
                 }, {
-                    key: "in",
+                    key: 'in',
                     value: function _in(e) {
                         $(this.textAreaObj).toggleClass('flagrow-upload-dragging', true);
                     }
                 }, {
-                    key: "out",
+                    key: 'out',
                     value: function out(e) {
                         $(this.textAreaObj).toggleClass('flagrow-upload-dragging', false);
                     }
                 }, {
-                    key: "dropping",
+                    key: 'dropping',
                     value: function dropping(e) {
                         // ..
+                    }
+                }, {
+                    key: 'view',
+                    value: function view() {
+                        // .. nothing here
                     }
                 }]);
                 return DragAndDrop;
             }(Component);
 
-            _export("default", DragAndDrop);
+            _export('default', DragAndDrop);
         }
     };
 });
@@ -182,10 +183,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flarum/components/Composer"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DragAndDrop, Composer;
+    var extend, TextEditor, UploadButton, DragAndDrop;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -195,8 +196,6 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             UploadButton = _flagrowUploadComponentsUploadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
-        }, function (_flarumComponentsComposer) {
-            Composer = _flarumComponentsComposer.default;
         }],
         execute: function () {
 
@@ -221,6 +220,8 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     });
                 });
                 extend(TextEditor.prototype, 'configTextarea', function () {
+                    // check whether the user can upload images. If not, returns.
+                    if (!app.forum.attribute('canUpload')) return;
 
                     var DragAndDrop = new DragAndDrop();
                     DragAndDrop.textAreaObj = this;

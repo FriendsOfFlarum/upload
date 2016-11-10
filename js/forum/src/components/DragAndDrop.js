@@ -20,4 +20,8 @@ export default class DragAndDrop extends Component {
     dropping(e) {
         // ..
     }
+
+    view() {
+        // .. nothing here
+    }
 }
