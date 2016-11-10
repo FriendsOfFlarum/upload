@@ -50,7 +50,7 @@ export default class DragAndDrop extends Component {
 
         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 
-        this.out(e);
+        this.over = this.loading = false;
     }
 
     view() {

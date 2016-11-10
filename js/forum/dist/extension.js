@@ -70,7 +70,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
 
-                        this.out(e);
+                        this.over = this.loading = false;
                     }
                 }, {
                     key: 'view',
