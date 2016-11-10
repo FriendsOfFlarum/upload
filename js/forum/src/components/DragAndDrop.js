@@ -2,14 +2,10 @@ import Component from "flarum/Component";
 
 export default class DragAndDrop extends Component {
     init() {
-        // the service type handling uploads
-        this.textAreaObj = null;
-        this.uploadButton = null;
-
         this.loading = false;
         this.over = false;
 
-        this.textarea = $('.TextEditor textarea');
+        this.textarea = $(this.props.element);
 
         $(this.textarea).bind('dragover', this.in);
 

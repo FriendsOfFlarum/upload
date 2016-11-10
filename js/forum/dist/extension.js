@@ -20,14 +20,10 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 babelHelpers.createClass(DragAndDrop, [{
                     key: 'init',
                     value: function init() {
-                        // the service type handling uploads
-                        this.textAreaObj = null;
-                        this.uploadButton = null;
-
                         this.loading = false;
                         this.over = false;
 
-                        this.textarea = $('.TextEditor textarea');
+                        this.textarea = $(this.props.element);
 
                         $(this.textarea).bind('dragover', this.in);
 
@@ -237,7 +233,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         $(this).addClass('Button--icon');
                     });
                 });
-                extend(TextEditor.prototype, 'init', function () {
+                extend(TextEditor.prototype, 'configTextarea', function (element) {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
@@ -246,7 +242,8 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
 
                     var drag = new DragAndDrop({
                         textAreaObj: this,
-                        uploadButton: uploadButton
+                        uploadButton: uploadButton,
+                        element: element
                     });
                 });
             });
