@@ -76,7 +76,7 @@ class File extends AbstractModel
 
     public function getMarkdownStringAttribute()
     {
-        $label = "![$this->base_name]";
+        $label = "[$this->base_name]";
         $url   = "({$this->url})";
 
         if (Str::startsWith($this->type, 'image')) {
