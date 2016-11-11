@@ -241,14 +241,14 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    var drag = new DragAndDrop(this, uploadButton);
+                    var drag = new DragAndDrop(undefined, uploadButton);
 
-                    this.element.addEventListener('dragover', drag.in);
+                    undefined.element.addEventListener('dragover', drag.in);
 
-                    this.element.addEventListener('dragleave', drag.out);
-                    this.element.addEventListener('dragend', drag.out);
+                    undefined.element.addEventListener('dragleave', drag.out);
+                    undefined.element.addEventListener('dragend', drag.out);
 
-                    this.element.addEventListener('drop', drag.dropping);
+                    undefined.element.addEventListener('drop', drag.dropping);
                 });
             });
         }

@@ -27,7 +27,7 @@ app.initializers.add('flagrow-upload', app => {
             }
         );
     });
-    extend(TextEditor.prototype, 'configTextarea', function () {
+    extend(TextEditor.prototype, 'configTextarea', () => {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 
