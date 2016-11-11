@@ -20,14 +20,8 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 babelHelpers.createClass(DragAndDrop, [{
                     key: 'init',
                     value: function init() {
-                        this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
-
-                        $(this.textarea).on('dragover', this.in.bind(this));
-
-                        $(this.textarea).on('dragleave', this.out.bind(this));
-                        $(this.textarea).on('dragend', this.out.bind(this));
-
-                        $(this.textarea).on('drop', this.dropping.bind(this));
+                        this.textAreaObj = null;
+                        this.uploadButton = null;
                     }
                 }, {
                     key: 'in',
@@ -66,7 +60,14 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 }, {
                     key: 'view',
                     value: function view() {
-                        // .. nothing here
+                        this.textarea = $(this.textAreaObj.element).find('textarea').first();
+
+                        $(this.textarea).on('dragover', this.in.bind(this));
+
+                        $(this.textarea).on('dragleave', this.out.bind(this));
+                        $(this.textarea).on('dragend', this.out.bind(this));
+
+                        $(this.textarea).on('drop', this.dropping.bind(this));
                     }
                 }]);
                 return DragAndDrop;
@@ -250,10 +251,9 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    new DragAndDrop({
-                        textAreaObj: this,
-                        uploadButton: uploadButton
-                    });
+                    var drag = new DragAndDrop();
+                    drag.textAreaObj = this;
+                    drag.uploadButton = uploadButton;
                 });
             });
         }

@@ -2,15 +2,8 @@ import Component from "flarum/Component";
 
 export default class DragAndDrop extends Component {
     init() {
-        this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
-
-        $(this.textarea).on('dragover', this.in.bind(this));
-
-        $(this.textarea).on('dragleave', this.out.bind(this));
-        $(this.textarea).on('dragend', this.out.bind(this));
-
-        $(this.textarea).on('drop', this.dropping.bind(this));
-
+        this.textAreaObj = null;
+        this.uploadButton = null;
     }
 
     in(e) {
@@ -45,6 +38,13 @@ export default class DragAndDrop extends Component {
     }
 
     view() {
-        // .. nothing here
+        this.textarea = $(this.textAreaObj.element).find('textarea').first();
+
+        $(this.textarea).on('dragover', this.in.bind(this));
+
+        $(this.textarea).on('dragleave', this.out.bind(this));
+        $(this.textarea).on('dragend', this.out.bind(this));
+
+        $(this.textarea).on('drop', this.dropping.bind(this));
     }
 }
