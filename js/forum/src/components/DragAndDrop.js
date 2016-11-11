@@ -50,18 +50,11 @@ export default class DragAndDrop extends Component {
 
         m.redraw();
 
-        var self = this;
+        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files)
+            .then(function () {
+                this.over = this.loading = false;
+            });
 
-        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files, this.success.bind(self), this.failure.bind(self));
-    }
-
-    success(response) {
-        self.props.uploadButton.success(response);
-        self.over = self.loading = false;
-    }
-
-    failure(response) {
-        self.props.uploadButton.failure(response);
     }
 
     view() {

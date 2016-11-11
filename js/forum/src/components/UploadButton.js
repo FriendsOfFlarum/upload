@@ -59,15 +59,15 @@ export default class UploadButton extends Component {
         }
 
         // send a POST request to the api
-        app.request({
+        return app.request({
             method: 'POST',
             url: app.forum.attribute('apiUrl') + '/flagrow/upload',
             // prevent JSON.stringify'ing the form data in the XHR call
             serialize: raw => raw,
             data
         }).then(
-            successCallback.bind(this),
-            failureCallback.bind(this)
+            this.success.bind(this),
+            this.failure.bind(this)
         );
     }
 

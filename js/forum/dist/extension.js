@@ -70,20 +70,9 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         m.redraw();
 
-                        var self = this;
-
-                        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files, this.success.bind(self), this.failure.bind(self));
-                    }
-                }, {
-                    key: 'success',
-                    value: function success(response) {
-                        self.props.uploadButton.success(response);
-                        self.over = self.loading = false;
-                    }
-                }, {
-                    key: 'failure',
-                    value: function failure(response) {
-                        self.props.uploadButton.failure(response);
+                        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
+                            this.over = this.loading = false;
+                        });
                     }
                 }, {
                     key: 'view',
@@ -163,7 +152,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         }
 
                         // send a POST request to the api
-                        app.request({
+                        return app.request({
                             method: 'POST',
                             url: app.forum.attribute('apiUrl') + '/flagrow/upload',
                             // prevent JSON.stringify'ing the form data in the XHR call
@@ -171,7 +160,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                                 return raw;
                             },
                             data: data
-                        }).then(successCallback.bind(this), failureCallback.bind(this));
+                        }).then(this.success.bind(this), this.failure.bind(this));
                     }
                 }, {
                     key: "failure",
