@@ -19,15 +19,7 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
 
                     this.textarea = $(this.textAreaObj.element).find('textarea').first();
 
-                    $(this.textarea).on('dragover', this.in.bind(this));
-
-                    $(this.textarea).on('dragleave', this.out.bind(this));
-                    $(this.textarea).on('dragend', this.out.bind(this));
-
-                    $(this.textarea).on('drop', this.dropping.bind(this));
-
                     this.initialized = true;
-
                     this.dropping = this.over = false;
                 }
 
@@ -249,7 +241,14 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    new DragAndDrop(this, uploadButton);
+                    var drag = new DragAndDrop(this, uploadButton);
+
+                    this.element.addEventListener('dragover', drag.in);
+
+                    this.element.addEventListener('dragleave', drag.out);
+                    this.element.addEventListener('dragend', drag.out);
+
+                    this.element.addEventListener('drop', drag.dropping);
                 });
             });
         }

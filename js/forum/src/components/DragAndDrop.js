@@ -10,15 +10,7 @@ export default class DragAndDrop {
 
         this.textarea = $(this.textAreaObj.element).find('textarea').first();
 
-        $(this.textarea).on('dragover', this.in.bind(this));
-
-        $(this.textarea).on('dragleave', this.out.bind(this));
-        $(this.textarea).on('dragend', this.out.bind(this));
-
-        $(this.textarea).on('drop', this.dropping.bind(this));
-
         this.initialized = true;
-
         this.dropping = this.over = false;
     }
 
