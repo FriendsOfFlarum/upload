@@ -1,6 +1,8 @@
 export default class DragAndDrop {
 
     initialized: false;
+    dropping: false;
+    over: false;
 
     constructor(textAreaObj, uploadButton) {
 
@@ -23,24 +25,24 @@ export default class DragAndDrop {
     }
 
     in(e) {
-        if (!$(this.textarea).hasClass('flagrow-upload-dragging')) {
+        if (!this.over) {
             $(this.textarea).toggleClass('flagrow-upload-dragging', true);
+            this.over = true;
         }
     }
 
     out(e) {
-        if ($(this.textarea).hasClass('flagrow-upload-dragging')) {
+        if (this.over) {
             $(this.textarea).toggleClass('flagrow-upload-dragging', false);
+            this.over = false;
         }
     }
 
     dropping(e) {
-        if (!$(this.textarea).hasClass('flagrow-dropping')) {
+        if (!this.dropping) {
             e.preventDefault();
 
-            console.log(e);
-            console.trace();
-
+            this.dropping = true;
             $(this.textarea).addClass('flagrow-dropping');
 
             m.redraw();
@@ -48,6 +50,7 @@ export default class DragAndDrop {
             this.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files)
                 .then(() => {
                     $(this.textarea).removeClass('flagrow-dropping');
+                    this.dropping = false;
                 });
         }
 
