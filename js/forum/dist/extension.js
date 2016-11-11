@@ -38,7 +38,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                     value: function _in(e) {
                         e.preventDefault();
 
-                        if (this.over) {
+                        if (this.over || this.loading) {
                             return;
                         }
 
@@ -49,7 +49,9 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 }, {
                     key: 'out',
                     value: function out(e) {
-                        if (!this.over) {
+                        e.preventDefault();
+
+                        if (!this.over || this.loading) {
                             return;
                         }
 
@@ -67,6 +69,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         }
 
                         this.loading = true;
+
                         m.redraw();
 
                         e.data.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);

@@ -30,6 +30,8 @@ export default class DragAndDrop extends Component {
     }
 
     out(e) {
+        e.preventDefault();
+
         if (!this.over || this.loading) {
             return;
         }
