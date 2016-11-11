@@ -63,8 +63,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                     key: 'dropping',
                     value: function dropping(e) {
                         e.preventDefault();
-
-                        console.log(e);
+                        e.stopPropagation();
 
                         if (this.loading) {
                             return;
