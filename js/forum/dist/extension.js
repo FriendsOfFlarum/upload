@@ -46,6 +46,8 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 }, {
                     key: 'dropping',
                     value: function dropping(e) {
+                        var _this2 = this;
+
                         if (!$(this.textarea).hasClass('flagrow-dropping')) {
                             e.preventDefault();
 
@@ -54,7 +56,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                             m.redraw();
 
                             this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
-                                $(this.textarea).removeClass('flagrow-dropping');
+                                $(_this2.textarea).removeClass('flagrow-dropping');
                             });
                         }
                     }
