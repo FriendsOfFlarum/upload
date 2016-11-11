@@ -58,7 +58,7 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
 
                             m.redraw();
 
-                            this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
+                            this.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
                                 $(_this.textarea).removeClass('flagrow-dropping');
                             });
                         }
