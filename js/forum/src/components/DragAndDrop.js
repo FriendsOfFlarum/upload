@@ -29,6 +29,9 @@ export default class DragAndDrop extends Component {
         if (!$(this.textarea).hasClass('flagrow-dropping')) {
             e.preventDefault();
 
+            console.log(e);
+            console.trace();
+
             $(this.textarea).addClass('flagrow-dropping');
 
             m.redraw();

@@ -51,6 +51,9 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         if (!$(this.textarea).hasClass('flagrow-dropping')) {
                             e.preventDefault();
 
+                            console.log(e);
+                            console.trace();
+
                             $(this.textarea).addClass('flagrow-dropping');
 
                             m.redraw();
@@ -164,8 +167,6 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     key: "success",
                     value: function success(response) {
                         var _this2 = this;
-
-                        console.log(response);
 
                         var markdownString = '';
                         var file;

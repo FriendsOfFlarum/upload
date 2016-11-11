@@ -86,8 +86,6 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        console.log(response);
-
         var markdownString = '';
         var file;
 
