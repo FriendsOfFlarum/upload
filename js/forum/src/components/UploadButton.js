@@ -41,20 +41,25 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        const data = new FormData;
 
         var files = $(e.target)[0].files;
-
-        for (var i = 0; i < files.length; i++) {
-            data.append('files[]', files[i]);
-        }
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
         m.redraw();
 
+        this.uploadFiles(files, this.success, this.failure);
+    }
+
+    uploadFiles(files, successCallback, failureCallback) {
+        const data = new FormData;
+
+        for (var i = 0; i < files.length; i++) {
+            data.append('files[]', files[i]);
+        }
+
         // send a POST request to the api
-        app.request({
+        return app.request({
             method: 'POST',
             url: app.forum.attribute('apiUrl') + '/flagrow/upload',
             // prevent JSON.stringify'ing the form data in the XHR call
@@ -81,8 +86,6 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        console.log(response);
-
         var markdownString = '';
         var file;
 

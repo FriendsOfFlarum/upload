@@ -1,14 +1,17 @@
 import {extend} from "flarum/extend";
 import TextEditor from "flarum/components/TextEditor";
 import UploadButton from "flagrow/upload/components/UploadButton";
+import DragAndDrop from "flagrow/upload/components/DragAndDrop";
 
 app.initializers.add('flagrow-upload', app => {
+    var uploadButton;
+    var drag;
     extend(TextEditor.prototype, 'controlItems', function (items) {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 
         // create and add the button
-        var uploadButton = new UploadButton;
+        uploadButton = new UploadButton;
         uploadButton.textAreaObj = this;
         items.add('flagrow-upload', uploadButton, 0);
 
@@ -24,5 +27,13 @@ app.initializers.add('flagrow-upload', app => {
                 $(this).addClass('Button--icon')
             }
         );
+    });
+    extend(TextEditor.prototype, 'configTextarea', function() {
+        // check whether the user can upload images. If not, returns.
+        if (!app.forum.attribute('canUpload')) return;
+
+        if (!drag) {
+            drag = new DragAndDrop(uploadButton);
+        }
     });
 });
