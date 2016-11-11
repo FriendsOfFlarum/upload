@@ -34,7 +34,7 @@ export default class DragAndDrop extends Component {
             m.redraw();
 
             this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files)
-                .then(function () {
+                .then(() => {
                     $(this.textarea).removeClass('flagrow-dropping');
                 });
         }
