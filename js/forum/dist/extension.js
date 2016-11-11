@@ -27,6 +27,8 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                     $(this.textarea).on('drop', this.dropping.bind(this));
 
                     this.initialized = true;
+
+                    this.dropping = this.over = false;
                 }
 
                 babelHelpers.createClass(DragAndDrop, [{
@@ -50,8 +52,9 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                     value: function dropping(e) {
                         var _this = this;
 
+                        e.preventDefault();
+
                         if (!this.dropping) {
-                            e.preventDefault();
 
                             this.dropping = true;
                             $(this.textarea).addClass('flagrow-dropping');

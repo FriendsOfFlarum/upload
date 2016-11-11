@@ -1,9 +1,5 @@
 export default class DragAndDrop {
 
-    initialized: false;
-    dropping: false;
-    over: false;
-
     constructor(textAreaObj, uploadButton) {
 
         if (this.initialized) return;
@@ -22,6 +18,8 @@ export default class DragAndDrop {
         $(this.textarea).on('drop', this.dropping.bind(this));
 
         this.initialized = true;
+
+        this.dropping = this.over = false;
     }
 
     in(e) {
@@ -39,8 +37,9 @@ export default class DragAndDrop {
     }
 
     dropping(e) {
+        e.preventDefault();
+
         if (!this.dropping) {
-            e.preventDefault();
 
             this.dropping = true;
             $(this.textarea).addClass('flagrow-dropping');
