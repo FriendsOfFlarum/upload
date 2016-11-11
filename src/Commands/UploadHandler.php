@@ -115,8 +115,6 @@ class UploadHandler
                 'actor_id' => $command->actor->id,
             ]);
 
-            $this->processable($file, $uploadedFile);
-
             $this->events->fire(
                 new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
             );
@@ -137,7 +135,8 @@ class UploadHandler
                 return false;
             }
 
-            $file = $response;
+            $file                  = $response;
+            $file->markdown_string = $this->getDefaultMarkdownStringAttribute($file);
 
             $this->events->fire(
                 new Events\WasUploaded($command->actor, $file, $uploadedFile)
@@ -170,21 +169,15 @@ class UploadHandler
         return new Filesystem(new Local($uploadedFile->getPath()));
     }
 
-    protected function processable(File &$file, UploadedFile &$uploadedFile)
+    /**
+     * @param File $file
+     * @return string
+     */
+    public function getDefaultMarkdownStringAttribute(File $file)
     {
-        list($type, $subType) = explode('/', $file->type);
+        $label = "[$file->base_name]";
+        $url   = "({$file->url})";
 
-        //.. todo fire event?
-
-        foreach (["{$type}_{$subType}", $type, $subType] as $typePrefix) {
-            $class = sprintf(
-                'Flagrow\\Upload\\Processors\\%sProcessor',
-                IllStr::studly($typePrefix)
-            );
-
-            if (class_exists($class)) {
-                return app($class)->process($file, $uploadedFile);
-            }
-        }
+        return $label . $url;
     }
 }

@@ -22,5 +22,10 @@ return function (Dispatcher $events, Application $app) {
     $events->subscribe(Listeners\AddClientAssets::class);
     $events->subscribe(Listeners\LoadSettingsFromDatabase::class);
 
+    /**
+     * Processors
+     */
+    $events->subscribe(Listeners\ProcessesImages::class);
+
     $app->register(Providers\StorageServiceProvider::class);
 };

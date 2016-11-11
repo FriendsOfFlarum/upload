@@ -177,10 +177,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 
                             // create a markdown string that holds the image link
 
-                            if (file.markdownString) {
-                                markdownString += '\n' + file.markdownString + '\n';
+                            if (file.markdown_string) {
+                                markdownString += '\n' + file.markdown_string + '\n';
                             } else {
-                                markdownString += '\n![' + file.base_name + '](' + file.url + ')\n';
+                                markdownString += '\n[' + file.base_name + '](' + file.url + ')\n';
                             }
                         }
 

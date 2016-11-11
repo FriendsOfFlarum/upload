@@ -19,7 +19,6 @@ use Flarum\Core\Discussion;
 use Flarum\Core\Post;
 use Flarum\Core\User;
 use Flarum\Database\AbstractModel;
-use Illuminate\Support\Str;
 
 /**
  * @property int        $id
@@ -32,6 +31,7 @@ use Illuminate\Support\Str;
  *
  * @property string     $upload_method
  * @property string     $remote_id
+ * @property string     $markdown_string
  *
  * @property int        $post_id
  * @property Post       $post
@@ -47,8 +47,6 @@ use Illuminate\Support\Str;
 class File extends AbstractModel
 {
     protected $table = 'flagrow_files';
-
-    protected $appends = ['markdownString'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -72,17 +70,5 @@ class File extends AbstractModel
     public function discussion()
     {
         return $this->belongsTo(Discussion::class);
-    }
-
-    public function getMarkdownStringAttribute()
-    {
-        $label = "[$this->base_name]";
-        $url   = "({$this->url})";
-
-        if (Str::startsWith($this->type, 'image')) {
-            $label = "![image {$this->base_name}]";
-        }
-
-        return $label . $url;
     }
 }

@@ -32,7 +32,7 @@ class FileSerializer extends AbstractSerializer
     {
         return Arr::only(
             $model->attributesToArray(),
-            ['base_name', 'path', 'url', 'type', 'size', 'markdownString']
+            ['base_name', 'path', 'url', 'type', 'size', 'markdown_string']
         );
     }
 }
