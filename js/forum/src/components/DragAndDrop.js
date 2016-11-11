@@ -5,7 +5,7 @@ export default class DragAndDrop extends Component {
         this.loading = false;
         this.over = false;
 
-        this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
+        this.textarea = this.props.textAreaObj.element;
 
         this.textarea.addEventListener('dragover', this.in);
 
