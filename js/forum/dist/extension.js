@@ -17,17 +17,24 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                     this.textAreaObj = textAreaObj;
                     this.uploadButton = uploadButton;
 
-                    this.textarea = $(this.textAreaObj.element).find('textarea').first();
+                    this.textarea = this.textAreaObj.$('textarea');
 
+                    this.textarea.on('dragover', this.in);
+
+                    this.textarea.on('dragleave', this.out);
+                    this.textarea.on('dragend', this.out);
+
+                    this.textarea.on('drop', this.dropping);
+
+                    this.isDropping = this.over = false;
                     this.initialized = true;
-                    this.dropping = this.over = false;
                 }
 
                 babelHelpers.createClass(DragAndDrop, [{
                     key: 'in',
                     value: function _in(e) {
                         if (!this.over) {
-                            $(this.textarea).toggleClass('flagrow-upload-dragging', true);
+                            this.textarea.toggleClass('flagrow-upload-dragging', true);
                             this.over = true;
                         }
                     }
@@ -35,7 +42,7 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                     key: 'out',
                     value: function out(e) {
                         if (this.over) {
-                            $(this.textarea).toggleClass('flagrow-upload-dragging', false);
+                            this.textarea.toggleClass('flagrow-upload-dragging', false);
                             this.over = false;
                         }
                     }
@@ -46,16 +53,16 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
 
                         e.preventDefault();
 
-                        if (!this.dropping) {
+                        if (!this.isDropping) {
 
-                            this.dropping = true;
-                            $(this.textarea).addClass('flagrow-dropping');
+                            this.isDropping = true;
+                            this.textarea.addClass('flagrow-dropping');
 
                             m.redraw();
 
                             this.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
-                                $(_this.textarea).removeClass('flagrow-dropping');
-                                _this.dropping = false;
+                                _this.textarea.removeClass('flagrow-dropping');
+                                _this.isDropping = false;
                             });
                         }
                     }
@@ -218,6 +225,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
 
             app.initializers.add('flagrow-upload', function (app) {
                 var uploadButton;
+                var drag;
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
@@ -241,14 +249,9 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    var drag = new DragAndDrop(undefined, uploadButton);
-
-                    undefined.element.addEventListener('dragover', drag.in);
-
-                    undefined.element.addEventListener('dragleave', drag.out);
-                    undefined.element.addEventListener('dragend', drag.out);
-
-                    undefined.element.addEventListener('drop', drag.dropping);
+                    if (!drag) {
+                        drag = new DragAndDrop(undefined, uploadButton);
+                    }
                 });
             });
         }

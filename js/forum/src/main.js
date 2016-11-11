@@ -5,6 +5,7 @@ import DragAndDrop from "flagrow/upload/components/DragAndDrop";
 
 app.initializers.add('flagrow-upload', app => {
     var uploadButton;
+    var drag;
     extend(TextEditor.prototype, 'controlItems', function (items) {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
@@ -31,14 +32,8 @@ app.initializers.add('flagrow-upload', app => {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 
-        var drag = new DragAndDrop(this, uploadButton);
-
-
-        this.element.addEventListener('dragover', drag.in);
-
-        this.element.addEventListener('dragleave', drag.out);
-        this.element.addEventListener('dragend', drag.out);
-
-        this.element.addEventListener('drop', drag.dropping);
+        if (!drag) {
+            drag = new DragAndDrop(this, uploadButton);
+        }
     });
 });
