@@ -23,15 +23,14 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                         this.loading = false;
                         this.over = false;
 
-                        this.textarea = this.props.textAreaObj.element;
+                        this.textarea = $(this.props.textAreaObj.element).find('textarea').first();
 
-                        this.textarea.addEventListener('dragover', this.in);
+                        $(this.textarea).on('dragover', this.in.bind(this));
 
-                        this.textarea.addEventListener('dragleave', this.out);
-                        this.textarea.addEventListener('dragend', this.out);
-                        window.addEventListener('blur', this.out);
+                        $(this.textarea).on('dragleave', this.out.bind(this));
+                        $(this.textarea).on('dragend', this.out.bind(this));
 
-                        this.textarea.addEventListener('drop', this.dropping);
+                        $(this.textarea).on('drop', this.dropping.bind(this));
                     }
                 }, {
                     key: 'in',
