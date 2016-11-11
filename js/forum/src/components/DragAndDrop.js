@@ -44,6 +44,8 @@ export default class DragAndDrop extends Component {
     dropping(e) {
         e.preventDefault();
 
+        console.log(e);
+
         if (this.loading) {
             return;
         }
