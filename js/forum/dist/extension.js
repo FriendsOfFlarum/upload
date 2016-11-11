@@ -69,7 +69,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                             return;
                         }
 
-                        this.loading = true;
+                        this.over = this.loading = true;
 
                         m.redraw();
 

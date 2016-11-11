@@ -49,7 +49,7 @@ export default class DragAndDrop extends Component {
             return;
         }
 
-        this.loading = true;
+        this.over = this.loading = true;
 
         m.redraw();
 
