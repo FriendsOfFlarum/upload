@@ -1,29 +1,35 @@
 'use strict';
 
-System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], function (_export, _context) {
+System.register('flagrow/upload/components/DragAndDrop', [], function (_export, _context) {
     "use strict";
 
-    var Component, DragAndDrop;
+    var DragAndDrop;
     return {
-        setters: [function (_flarumComponent) {
-            Component = _flarumComponent.default;
-        }],
+        setters: [],
         execute: function () {
-            DragAndDrop = function (_Component) {
-                babelHelpers.inherits(DragAndDrop, _Component);
-
-                function DragAndDrop() {
+            DragAndDrop = function () {
+                function DragAndDrop(textAreaObj, uploadButton) {
                     babelHelpers.classCallCheck(this, DragAndDrop);
-                    return babelHelpers.possibleConstructorReturn(this, (DragAndDrop.__proto__ || Object.getPrototypeOf(DragAndDrop)).apply(this, arguments));
+
+
+                    if (this.initialized) return;
+
+                    this.textAreaObj = textAreaObj;
+                    this.uploadButton = uploadButton;
+
+                    this.textarea = $(this.textAreaObj.element).find('textarea').first();
+
+                    $(this.textarea).on('dragover', this.in.bind(this));
+
+                    $(this.textarea).on('dragleave', this.out.bind(this));
+                    $(this.textarea).on('dragend', this.out.bind(this));
+
+                    $(this.textarea).on('drop', this.dropping.bind(this));
+
+                    this.initialized = true;
                 }
 
                 babelHelpers.createClass(DragAndDrop, [{
-                    key: 'init',
-                    value: function init() {
-                        this.textAreaObj = null;
-                        this.uploadButton = null;
-                    }
-                }, {
                     key: 'in',
                     value: function _in(e) {
                         if (!$(this.textarea).hasClass('flagrow-upload-dragging')) {
@@ -40,7 +46,7 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 }, {
                     key: 'dropping',
                     value: function dropping(e) {
-                        var _this2 = this;
+                        var _this = this;
 
                         if (!$(this.textarea).hasClass('flagrow-dropping')) {
                             e.preventDefault();
@@ -53,25 +59,13 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                             m.redraw();
 
                             this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files).then(function () {
-                                $(_this2.textarea).removeClass('flagrow-dropping');
+                                $(_this.textarea).removeClass('flagrow-dropping');
                             });
                         }
                     }
-                }, {
-                    key: 'view',
-                    value: function view() {
-                        this.textarea = $(this.textAreaObj.element).find('textarea').first();
-
-                        $(this.textarea).on('dragover', this.in.bind(this));
-
-                        $(this.textarea).on('dragleave', this.out.bind(this));
-                        $(this.textarea).on('dragend', this.out.bind(this));
-
-                        $(this.textarea).on('drop', this.dropping.bind(this));
-                    }
                 }]);
                 return DragAndDrop;
-            }(Component);
+            }();
 
             _export('default', DragAndDrop);
         }
@@ -251,9 +245,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
 
-                    var drag = new DragAndDrop();
-                    drag.textAreaObj = this;
-                    drag.uploadButton = uploadButton;
+                    new DragAndDrop(this, uploadButton);
                 });
             });
         }
