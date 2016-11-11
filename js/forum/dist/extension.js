@@ -48,8 +48,6 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
                 }, {
                     key: 'out',
                     value: function out(e) {
-                        e.preventDefault();
-
                         if (!this.over || this.loading) {
                             return;
                         }
@@ -72,9 +70,20 @@ System.register('flagrow/upload/components/DragAndDrop', ['flarum/Component'], f
 
                         m.redraw();
 
-                        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
+                        var self = this;
 
-                        this.over = this.loading = false;
+                        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files, this.success.bind(self), this.failure.bind(self));
+                    }
+                }, {
+                    key: 'success',
+                    value: function success(response) {
+                        self.props.uploadButton.success(response);
+                        self.over = self.loading = false;
+                    }
+                }, {
+                    key: 'failure',
+                    value: function failure(response) {
+                        self.props.uploadButton.failure(response);
                     }
                 }, {
                     key: 'view',
@@ -142,11 +151,11 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                         this.loading = true;
                         m.redraw();
 
-                        this.uploadFiles(files);
+                        this.uploadFiles(files, this.success, this.failure);
                     }
                 }, {
                     key: "uploadFiles",
-                    value: function uploadFiles(files) {
+                    value: function uploadFiles(files, successCallback, failureCallback) {
                         var data = new FormData();
 
                         for (var i = 0; i < files.length; i++) {
@@ -162,7 +171,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                                 return raw;
                             },
                             data: data
-                        }).then(this.success.bind(this), this.failure.bind(this));
+                        }).then(successCallback.bind(this), failureCallback.bind(this));
                     }
                 }, {
                     key: "failure",

@@ -29,8 +29,6 @@ export default class DragAndDrop extends Component {
     }
 
     out(e) {
-        e.preventDefault();
-
         if (!this.over || this.loading) {
             return;
         }
@@ -52,9 +50,18 @@ export default class DragAndDrop extends Component {
 
         m.redraw();
 
-        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files);
+        var self = this;
 
-        this.over = this.loading = false;
+        this.props.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files, this.success.bind(self), this.failure.bind(self));
+    }
+
+    success(response) {
+        self.props.uploadButton.success(response);
+        self.over = self.loading = false;
+    }
+
+    failure(response) {
+        self.props.uploadButton.failure(response);
     }
 
     view() {

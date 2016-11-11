@@ -48,10 +48,10 @@ export default class UploadButton extends Component {
         this.loading = true;
         m.redraw();
 
-        this.uploadFiles(files);
+        this.uploadFiles(files, this.success, this.failure);
     }
 
-    uploadFiles(files) {
+    uploadFiles(files, successCallback, failureCallback) {
         const data = new FormData;
 
         for (var i = 0; i < files.length; i++) {
@@ -66,8 +66,8 @@ export default class UploadButton extends Component {
             serialize: raw => raw,
             data
         }).then(
-            this.success.bind(this),
-            this.failure.bind(this)
+            successCallback.bind(this),
+            failureCallback.bind(this)
         );
     }
 
