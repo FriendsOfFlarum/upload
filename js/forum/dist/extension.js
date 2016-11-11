@@ -8,23 +8,22 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
         setters: [],
         execute: function () {
             DragAndDrop = function () {
-                function DragAndDrop(textAreaObj, uploadButton) {
+                function DragAndDrop(uploadButton) {
                     babelHelpers.classCallCheck(this, DragAndDrop);
 
 
                     if (this.initialized) return;
 
-                    this.textAreaObj = textAreaObj;
                     this.uploadButton = uploadButton;
 
-                    this.textarea = this.textAreaObj.$('textarea');
+                    this.textarea = $("#composer .Composer");
 
-                    this.textarea.on('dragover', this.in);
+                    $(this.textarea).on('dragover', this.in.bind(this));
 
-                    this.textarea.on('dragleave', this.out);
-                    this.textarea.on('dragend', this.out);
+                    $(this.textarea).on('dragleave', this.out.bind(this));
+                    $(this.textarea).on('dragend', this.out.bind(this));
 
-                    this.textarea.on('drop', this.dropping);
+                    $(this.textarea).on('drop', this.dropping.bind(this));
 
                     this.isDropping = this.over = false;
                     this.initialized = true;
@@ -33,6 +32,8 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                 babelHelpers.createClass(DragAndDrop, [{
                     key: 'in',
                     value: function _in(e) {
+                        e.preventDefault();
+
                         if (!this.over) {
                             this.textarea.toggleClass('flagrow-upload-dragging', true);
                             this.over = true;
@@ -41,6 +42,8 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
                 }, {
                     key: 'out',
                     value: function out(e) {
+                        e.preventDefault();
+
                         if (this.over) {
                             this.textarea.toggleClass('flagrow-upload-dragging', false);
                             this.over = false;
@@ -73,8 +76,7 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
             _export('default', DragAndDrop);
         }
     };
-});
-;
+});;
 "use strict";
 
 System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
@@ -250,7 +252,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     if (!app.forum.attribute('canUpload')) return;
 
                     if (!drag) {
-                        drag = new DragAndDrop(undefined, uploadButton);
+                        drag = new DragAndDrop(uploadButton);
                     }
                 });
             });

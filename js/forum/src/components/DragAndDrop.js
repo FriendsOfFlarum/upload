@@ -1,27 +1,27 @@
 export default class DragAndDrop {
 
-    constructor(textAreaObj, uploadButton) {
+    constructor(uploadButton) {
 
         if (this.initialized) return;
 
-        this.textAreaObj = textAreaObj;
         this.uploadButton = uploadButton;
 
+        this.textarea = $("#composer .Composer");
 
-        this.textarea = this.textAreaObj.$('textarea');
+        $(this.textarea).on('dragover', this.in.bind(this));
 
-        this.textarea.on('dragover', this.in);
+        $(this.textarea).on('dragleave', this.out.bind(this));
+        $(this.textarea).on('dragend', this.out.bind(this));
 
-        this.textarea.on('dragleave', this.out);
-        this.textarea.on('dragend', this.out);
-
-        this.textarea.on('drop', this.dropping);
+        $(this.textarea).on('drop', this.dropping.bind(this));
 
         this.isDropping = this.over = false;
         this.initialized = true;
     }
 
     in(e) {
+        e.preventDefault();
+
         if (!this.over) {
             this.textarea.toggleClass('flagrow-upload-dragging', true);
             this.over = true;
@@ -29,6 +29,8 @@ export default class DragAndDrop {
     }
 
     out(e) {
+        e.preventDefault();
+
         if (this.over) {
             this.textarea.toggleClass('flagrow-upload-dragging', false);
             this.over = false;
