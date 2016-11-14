@@ -16,6 +16,7 @@ namespace Flagrow\Upload\Processors;
 use Flagrow\Upload\Contracts\Processable;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -42,19 +43,43 @@ class ImageProcessor implements Processable
      */
     public function process(File &$file, UploadedFile &$upload)
     {
-        if ($this->settings->get('mustResize') && $upload->getMimeType() != 'image/gif') {
+        if ($upload->getMimeType() != 'image/gif') {
+
+            $image = (new ImageManager())->make($upload->getRealPath());
+
+            if ($this->settings->get('mustResize')) {
+                $this->resize($image);
+            }
+
+            if ($this->settings->get('addsWatermarks')) {
+                $this->watermark($image);
+            }
+
             @file_put_contents(
                 $upload->getRealPath(),
-                (new ImageManager())
-                    ->make($upload->getRealPath())
-                    ->resize(
-                        $this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
-                        null,
-                        function ($constraint) {
-                            $constraint->aspectRatio();
-                            $constraint->upsize();
-                        })
-                    ->encode($upload->getMimeType()));
+                $image->encode($upload->getMimeType())
+            );
+        }
+    }
+
+    protected function resize(Image $manager)
+    {
+        $manager->resize(
+            $this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
+            null,
+            function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+    }
+
+    protected function watermark(Image $image)
+    {
+        if ($this->settings->get('watermark')) {
+            $image->insert(
+                $this->settings->get('watermark'),
+                $this->settings->get('watermarkPosition', 'bottom-right')
+            );
         }
     }
 }

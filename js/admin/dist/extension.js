@@ -40,10 +40,10 @@ System.register("flagrow/upload/addUploadPane", ["flarum/extend", "flarum/compon
 });;
 "use strict";
 
-System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "flarum/components/Button", "flarum/utils/saveSettings", "flarum/components/Alert", "flarum/components/Select", "flarum/components/Switch"], function (_export, _context) {
+System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "flarum/components/Button", "flarum/utils/saveSettings", "flarum/components/Alert", "flarum/components/Select", "flarum/components/Switch", "flarum/components/UploadImageButton"], function (_export, _context) {
     "use strict";
 
-    var Component, Button, saveSettings, Alert, Select, Switch, UploadPage;
+    var Component, Button, saveSettings, Alert, Select, Switch, UploadImageButton, UploadPage;
     return {
         setters: [function (_flarumComponent) {
             Component = _flarumComponent.default;
@@ -57,6 +57,8 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
             Select = _flarumComponentsSelect.default;
         }, function (_flarumComponentsSwitch) {
             Switch = _flarumComponentsSwitch.default;
+        }, function (_flarumComponentsUploadImageButton) {
+            UploadImageButton = _flarumComponentsUploadImageButton.default;
         }],
         execute: function () {
             UploadPage = function (_Component) {
@@ -76,7 +78,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.loading = false;
 
                         // the fields we need to watch and to save
-                        this.fields = ['availableUploadMethods', 'mimeTypesAllowed', 'uploadMethod', 'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                        this.fields = ['availableUploadMethods', 'mimeTypesAllowed', 'uploadMethod',
+                            // image
+                            'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                            // watermark
+                            'addsWatermarks', 'watermark', 'watermarkPosition',
                         // Imgur
                         'imgurClientId',
                         // AWS
@@ -130,7 +136,15 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             value: this.values.resizeMaxWidth() || 100,
                             oninput: m.withAttr('value', this.values.resizeMaxWidth),
                             disabled: !this.values.mustResize()
-                        })]), m('fieldset', {
+                        })]), m('fieldset', {className: 'UploadPage-watermark'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.watermark')), Switch.component({
+                            state: this.values.addsWatermarks() || false,
+                            children: app.translator.trans('flagrow-upload.admin.labels.watermark.toggle'),
+                            onchange: this.values.addsWatermarks
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.position')), m('div', {}, [Select.component({
+                            options: ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center', 'left', 'top', 'right', 'bottom'],
+                            onchange: this.values.watermarkPosition,
+                            value: this.values.watermarkPosition() || 'bottom-right'
+                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, {name: "flagrow/watermark"})]), m('fieldset', {
                             className: 'UploadPage-local',
                             style: { display: this.values.uploadMethod() === 'local' ? "block" : "none" }
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {

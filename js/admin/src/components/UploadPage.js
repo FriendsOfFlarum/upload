@@ -4,6 +4,7 @@ import saveSettings from "flarum/utils/saveSettings";
 import Alert from "flarum/components/Alert";
 import Select from "flarum/components/Select";
 import Switch from "flarum/components/Switch";
+import UploadImageButton from "flarum/components/UploadImageButton";
 
 export default class UploadPage extends Component {
 
@@ -16,10 +17,15 @@ export default class UploadPage extends Component {
             'availableUploadMethods',
             'mimeTypesAllowed',
             'uploadMethod',
+            // image
             'resizeMaxWidth',
             'cdnUrl',
             'maxFileSize',
             'overrideAvatarUpload',
+            // watermark
+            'addsWatermarks',
+            'watermark',
+            'watermarkPosition',
             // Imgur
             'imgurClientId',
             // AWS
@@ -110,6 +116,25 @@ export default class UploadPage extends Component {
                                 oninput: m.withAttr('value', this.values.resizeMaxWidth),
                                 disabled: !this.values.mustResize()
                             }),
+                        ]),
+                        m('fieldset', {className: 'UploadPage-watermark'}, [
+                            m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')),
+                            m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.watermark')),
+                            Switch.component({
+                                state: this.values.addsWatermarks() || false,
+                                children: app.translator.trans('flagrow-upload.admin.labels.watermark.toggle'),
+                                onchange: this.values.addsWatermarks
+                            }),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.position')),
+                            m('div', {}, [
+                                Select.component({
+                                    options: ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center', 'left', 'top', 'right', 'bottom'],
+                                    onchange: this.values.watermarkPosition,
+                                    value: this.values.watermarkPosition() || 'bottom-right'
+                                }),
+                            ]),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')),
+                            <UploadImageButton name="flagrow/watermark"/>
                         ]),
                         m('fieldset', {
                             className: 'UploadPage-local',
