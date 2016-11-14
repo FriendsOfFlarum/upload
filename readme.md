@@ -4,8 +4,6 @@
 
 An extension that handles file uploads intelligently for your forum. This is the descendant of the Flagrow image upload extension.
 
-![image demo](https://discuss.hyn.me/assets/files/2016-11-04/06:25:460-test-gif)
-
 ### features
 
 - For images:
@@ -38,7 +36,7 @@ Enable the extension, a new tab will appear on the left hand side. This separate
 
 ### donate
 
-If you're happy with this extension, feel free to [buy me a cup of coffee](https://paypal.me/luceos/5).
+If you're happy with this extension, feel free to [buy me a cup of :coffee: and a :donut:](https://paypal.me/luceos/5) to keep me going.
 
 ---
 
