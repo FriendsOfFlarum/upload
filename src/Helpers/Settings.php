@@ -37,6 +37,11 @@ class Settings
         'resizeMaxWidth',
         'cdnUrl',
 
+        // Watermarks
+        'addsWatermarks',
+        'watermarkPosition',
+        'watermark',
+
         // Override avatar upload
         'overrideAvatarUpload',
 

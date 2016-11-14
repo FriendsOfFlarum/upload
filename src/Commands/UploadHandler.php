@@ -23,7 +23,6 @@ use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
-use Flarum\Util\Str;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
@@ -109,7 +108,7 @@ class UploadHandler
             }
 
             $file = (new File())->forceFill([
-                'base_name' => Str::slug($uploadedFile->getClientOriginalName()),
+                'base_name' => $this->getBasename($uploadedFile),
                 'size' => $uploadedFile->getSize(),
                 'type' => $uploadedFile->getMimeType(),
                 'actor_id' => $command->actor->id,
@@ -179,5 +178,15 @@ class UploadHandler
         $url   = "({$file->url})";
 
         return $label . $url;
+    }
+
+    protected function getBasename(UploadedFile $uploadedFile)
+    {
+        return sprintf("%s.%s",
+            basename($uploadedFile->getClientOriginalName(), ".{$uploadedFile->getClientOriginalExtension()}"),
+            $uploadedFile->guessExtension() ?
+                $uploadedFile->guessExtension() :
+                $uploadedFile->getClientOriginalExtension()
+        );
     }
 }
