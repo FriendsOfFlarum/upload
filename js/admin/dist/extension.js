@@ -72,7 +72,8 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                 babelHelpers.createClass(UploadPage, [{
                     key: "init",
                     value: function init() {
-                        var _this2 = this;
+                        var _watermarkPositions,
+                            _this2 = this;
 
                         // whether we are saving the settings or not right now
                         this.loading = false;
@@ -90,6 +91,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
+
+                        // watermark positions
+                        this.watermarkPositions = (_watermarkPositions = {
+                            'top-right': 'top-left'
+                        }, babelHelpers.defineProperty(_watermarkPositions, "top-right", 'top-right'), babelHelpers.defineProperty(_watermarkPositions, 'bottom-left', 'bottom-left'), babelHelpers.defineProperty(_watermarkPositions, 'bottom-right', 'bottom-right'), babelHelpers.defineProperty(_watermarkPositions, 'center', 'center'), babelHelpers.defineProperty(_watermarkPositions, 'left', 'left'), babelHelpers.defineProperty(_watermarkPositions, 'top', 'top'), babelHelpers.defineProperty(_watermarkPositions, 'right', 'right'), babelHelpers.defineProperty(_watermarkPositions, 'bottom', 'bottom'), _watermarkPositions);
 
                         // options for the dropdown menu
                         this.uploadMethodOptions = {};
@@ -141,7 +147,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             children: app.translator.trans('flagrow-upload.admin.labels.watermark.toggle'),
                             onchange: this.values.addsWatermarks
                         }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.position')), m('div', {}, [Select.component({
-                            options: ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center', 'left', 'top', 'right', 'bottom'],
+                            options: this.watermarkPositions,
                             onchange: this.values.watermarkPosition,
                             value: this.values.watermarkPosition() || 'bottom-right'
                         })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, {name: "flagrow/watermark"})]), m('fieldset', {

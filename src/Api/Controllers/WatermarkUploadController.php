@@ -15,6 +15,7 @@
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\UploadFaviconController;
+use Flarum\Core\Group;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -31,12 +32,13 @@ class WatermarkUploadController extends UploadFaviconController
 
         $file = array_get($request->getUploadedFiles(), 'flagrow/watermark');
 
-        $tmpFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow/watermark');
+        $tmpFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.watermark');
+
         $file->moveTo($tmpFile);
 
         $mount = new MountManager([
             'source' => new Filesystem(new Local(pathinfo($tmpFile, PATHINFO_DIRNAME))),
-            'target' => new Filesystem(new Local($this->app->publicPath() . '/assets')),
+            'target' => new Filesystem(new Local($this->app->storagePath())),
         ]);
 
         if (($path = $this->settings->get('flagrow.upload.watermark')) && $mount->has($file = "target://$path")) {
@@ -49,6 +51,8 @@ class WatermarkUploadController extends UploadFaviconController
 
         $this->settings->set('flagrow.upload.watermark', $uploadName);
 
-        return parent::data($request, $document);
+        return [
+            'groups' => Group::whereVisibleTo($request->getAttribute('actor'))->get()
+        ];
     }
 }

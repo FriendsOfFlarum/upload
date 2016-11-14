@@ -41,6 +41,19 @@ export default class UploadPage extends Component {
             'overrideAvatarUpload'
         ];
 
+        // watermark positions
+        this.watermarkPositions = {
+            'top-right': 'top-left',
+            'top-right': 'top-right',
+            'bottom-left': 'bottom-left',
+            'bottom-right': 'bottom-right',
+            'center': 'center',
+            'left': 'left',
+            'top': 'top',
+            'right': 'right',
+            'bottom': 'bottom'
+        };
+
         // options for the dropdown menu
         this.uploadMethodOptions = {};
 
@@ -128,7 +141,7 @@ export default class UploadPage extends Component {
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.position')),
                             m('div', {}, [
                                 Select.component({
-                                    options: ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center', 'left', 'top', 'right', 'bottom'],
+                                    options: this.watermarkPositions,
                                     onchange: this.values.watermarkPosition,
                                     value: this.values.watermarkPosition() || 'bottom-right'
                                 }),

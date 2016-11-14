@@ -77,7 +77,7 @@ class ImageProcessor implements Processable
     {
         if ($this->settings->get('watermark')) {
             $image->insert(
-                $this->settings->get('watermark'),
+                storage_path($this->settings->get('watermark')),
                 $this->settings->get('watermarkPosition', 'bottom-right')
             );
         }
