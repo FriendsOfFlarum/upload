@@ -6,13 +6,16 @@ An extension that handles file uploads intelligently for your forum. This is the
 
 ![image demo](https://discuss.hyn.me/assets/files/2016-11-04/06:25:460-test-gif)
 
-### goals
+### features
 
-- [Intelligently delete images](https://github.com/flagrow/upload/issues/7)
-- [Send notifications](https://github.com/flagrow/upload/issues/8)
-- [Prevent upload of malevolent files](https://github.com/flagrow/upload/issues/9)
-- Support a wide bunch of upload systems (anything support by the League flysystem will work) that provides an URL to access the file
-- Intelligently provide markdown strings per mime type
+- For images:
+  - Auto watermarks.
+  - Auto resizing.
+- Whitelisting mime types.
+- Uploading on different storage services (local, imgur, AWS S3 for instance).
+- Drag and drop uploads.
+- Uploading multiple files at once (button and drag and drop both support this).
+- Easily extendable, the extension heavily relies on Events.
 
 For a complete overview of our releases, please visit the [milestones tracker](https://github.com/flagrow/upload/milestones) on Github.
 
