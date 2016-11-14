@@ -36,7 +36,7 @@ Enable the extension, a new tab will appear on the left hand side. This separate
 
 ### donate
 
-If you're happy with this extension, feel free to [buy me a cup of :coffee: and a :donut:](https://paypal.me/luceos/5) to keep me going.
+If you're happy with this extension, feel free to [buy me a cup of :coffee: and a :cake:](https://paypal.me/luceos/5) to keep me going.
 
 ---
 
