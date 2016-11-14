@@ -44,7 +44,6 @@ class ImageProcessor implements Processable
     public function process(File &$file, UploadedFile &$upload)
     {
         if ($upload->getMimeType() != 'image/gif') {
-
             $image = (new ImageManager())->make($upload->getRealPath());
 
             if ($this->settings->get('mustResize')) {
