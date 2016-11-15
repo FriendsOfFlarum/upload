@@ -201,7 +201,7 @@ class UploadHandler
      */
     protected function identifyUploadAdapterForMime($mime)
     {
-        return $this->settings->getMimeTypesConfiguration()->first(function($regex) use ($mime) {
+        return $this->settings->getMimeTypesConfiguration()->first(function ($regex) use ($mime) {
             return preg_match($regex, $mime);
         });
 
