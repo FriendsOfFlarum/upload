@@ -16,8 +16,6 @@ namespace Flagrow\Upload\Providers;
 
 use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
-use Flagrow\Upload\Commands\UploadHandler;
-use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Helpers\Settings;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Container\Container;
@@ -40,14 +38,7 @@ class StorageServiceProvider extends ServiceProvider
         /** @var Settings $settings */
         $settings = $this->app->make(Settings::class);
 
-        /** @var UploadAdapter $uploadAdapter */
-        $uploadAdapter = function (Container $app) {
-            return $this->instantiateUploadAdapter($app);
-        };
-
-        $this->app->when(UploadHandler::class)
-            ->needs(UploadAdapter::class)
-            ->give($uploadAdapter);
+        $this->instantiateUploadAdapters($this->app);
 
         if ($settings->get('overrideAvatarUpload')) {
             // .. todo
@@ -60,21 +51,29 @@ class StorageServiceProvider extends ServiceProvider
      * @param          $app
      * @return FilesystemInterface
      */
-    protected function instantiateUploadAdapter(Container $app)
+    protected function instantiateUploadAdapters(Container $app)
     {
+        /** @var Settings $settings */
         $settings = $app->make(Settings::class);
 
-        switch ($settings->get('uploadMethod', 'local')) {
-            case 'aws-s3':
-                if (class_exists(S3Client::class)) {
-                    return $this->awsS3($settings);
-                }
-            case 'imgur':
-                return $this->imgur($settings);
+        $settings->getMimeTypesConfiguration()
+            ->unique()
+            ->values()
+            ->each(function ($adapter) use ($app, $settings) {
+                $app->bind("flagrow.upload-adapter.$adapter", function () use ($settings, $adapter) {
+                    switch ($adapter) {
+                        case 'aws-s3':
+                            if (class_exists(S3Client::class)) {
+                                return $this->awsS3($settings);
+                            }
+                        case 'imgur':
+                            return $this->imgur($settings);
 
-            default:
-                return $this->local($settings);
-        }
+                        default:
+                            return $this->local($settings);
+                    }
+                });
+            });
     }
 
     protected function awsS3(Settings $settings)
@@ -84,11 +83,11 @@ class StorageServiceProvider extends ServiceProvider
                 new AwsS3Adapter(
                     new S3Client([
                         'credentials' => [
-                            'key'    => $settings->get('awsS3Key'),
+                            'key' => $settings->get('awsS3Key'),
                             'secret' => $settings->get('awsS3Secret'),
                         ],
-                        'region'      => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
-                        'version'     => 'latest',
+                        'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
+                        'version' => 'latest',
                     ]),
                     $settings->get('awsS3Bucket')
                 )
@@ -101,7 +100,7 @@ class StorageServiceProvider extends ServiceProvider
         return new Adapters\Imgur(
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
-                'headers'  => [
+                'headers' => [
                     'Authorization' => 'Client-ID ' . $settings->get('imgurClientId')
                 ]
             ])

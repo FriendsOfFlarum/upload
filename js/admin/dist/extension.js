@@ -79,11 +79,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.loading = false;
 
                         // the fields we need to watch and to save
-                        this.fields = ['availableUploadMethods', 'mimeTypesAllowed', 'uploadMethod',
-                            // image
-                            'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
-                            // watermark
-                            'addsWatermarks', 'watermark', 'watermarkPosition',
+                        this.fields = [
+                        // image
+                        'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                        // watermark
+                        'addsWatermarks', 'watermark', 'watermarkPosition',
                         // Imgur
                         'imgurClientId',
                         // AWS
@@ -91,6 +91,9 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
+
+                        // fields that are objects
+                        this.objects = ['mimeTypes'];
 
                         // watermark positions
                         this.watermarkPositions = (_watermarkPositions = {
@@ -117,23 +120,39 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.checkboxes.forEach(function (key) {
                             return _this2.values[key] = m.prop(settings[_this2.addPrefix(key)] === '1');
                         });
+                        this.objects.forEach(function (key) {
+                            return _this2.values[key] = settings[_this2.addPrefix(key)] ? m.prop(JSON.parse(settings[_this2.addPrefix(key)])) : m.prop();
+                        });
+
+                        this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
+                            '^image\\/.*': 'local'
+                        }));
                     }
                 }, {
                     key: "view",
                     value: function view() {
-                        return [m('div', {className: 'UploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), m('div', {}, [Select.component({
-                            options: this.uploadMethodOptions,
-                            onchange: this.values.uploadMethod,
-                            value: this.values.uploadMethod() || 'local'
-                        })])]), m('fieldset', {className: 'UploadPage-preferences'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
+                        var _this3 = this;
+
+                        return [m('div', { className: 'UploadPage' }, [m('div', { className: 'container' }, [m('form', { onsubmit: this.onsubmit.bind(this) }, [m('fieldset', { className: 'UploadPage-preferences' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
                             className: 'FormControl',
                             value: this.values.maxFileSize() || 2048,
                             oninput: m.withAttr('value', this.values.maxFileSize)
-                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')), m('input', {
-                            className: 'FormControl',
-                            value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
-                            oninput: m.withAttr('value', this.values.mimeTypesAllowed)
-                        })]), m('fieldset', {className: 'UploadPage-resize'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types')), m('div', { className: 'MimeTypes--Container' }, Object.keys(this.values.mimeTypes()).map(function (mime) {
+                            return m('div', {}, [m('input', {
+                                className: 'FormControl MimeTypes',
+                                value: mime,
+                                oninput: m.withAttr('value', _this3.updateMimeTypeKey.bind(_this3, mime))
+                            }), Select.component({
+                                options: _this3.uploadMethodOptions,
+                                onchange: _this3.updateMimeTypeValue.bind(_this3, mime),
+                                value: _this3.values.mimeTypes()[mime] || 'local'
+                            }), Button.component({
+                                type: 'button',
+                                className: 'Button Button--warning',
+                                children: 'x',
+                                onclick: _this3.deleteMimeType.bind(_this3, mime)
+                            })]);
+                        })), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types'))]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                             state: this.values.mustResize() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                             onchange: this.values.mustResize
@@ -142,7 +161,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             value: this.values.resizeMaxWidth() || 100,
                             oninput: m.withAttr('value', this.values.resizeMaxWidth),
                             disabled: !this.values.mustResize()
-                        })]), m('fieldset', {className: 'UploadPage-watermark'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.watermark')), Switch.component({
+                        })]), m('fieldset', { className: 'UploadPage-watermark' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.watermark')), Switch.component({
                             state: this.values.addsWatermarks() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.watermark.toggle'),
                             onchange: this.values.addsWatermarks
@@ -150,23 +169,20 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             options: this.watermarkPositions,
                             onchange: this.values.watermarkPosition,
                             value: this.values.watermarkPosition() || 'bottom-right'
-                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, {name: "flagrow/watermark"})]), m('fieldset', {
-                            className: 'UploadPage-local',
-                            style: { display: this.values.uploadMethod() === 'local' ? "block" : "none" }
+                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, { name: "flagrow/watermark" })]), m('fieldset', {
+                            className: 'UploadPage-local'
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {
                             className: 'FormControl',
                             value: this.values.cdnUrl() || '',
                             oninput: m.withAttr('value', this.values.cdnUrl)
                         })]), m('fieldset', {
-                            className: 'UploadPage-imgur',
-                            style: { display: this.values.uploadMethod() === 'imgur' ? "block" : "none" }
+                            className: 'UploadPage-imgur'
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.client_id')), m('input', {
                             className: 'FormControl',
                             value: this.values.imgurClientId() || '',
                             oninput: m.withAttr('value', this.values.imgurClientId)
                         })]), m('fieldset', {
-                            className: 'UploadPage-aws-s3',
-                            style: { display: this.values.uploadMethod() === 'aws-s3' ? "block" : "none" }
+                            className: 'UploadPage-aws-s3'
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.key')), m('input', {
                             className: 'FormControl',
                             value: this.values.awsS3Key() || '',
@@ -192,22 +208,42 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         })])])])];
                     }
                 }, {
+                    key: "updateMimeTypeKey",
+                    value: function updateMimeTypeKey(mime, value) {
+                        this.values.mimeTypes()[value] = this.values.mimeTypes()[mime];
+
+                        this.deleteMimeType(mime);
+                    }
+                }, {
+                    key: "updateMimeTypeValue",
+                    value: function updateMimeTypeValue(mime, value) {
+                        this.values.mimeTypes()[mime] = value;
+                    }
+                }, {
+                    key: "deleteMimeType",
+                    value: function deleteMimeType(mime) {
+                        delete this.values.mimeTypes()[mime];
+                    }
+                }, {
                     key: "changed",
                     value: function changed() {
-                        var _this3 = this;
+                        var _this4 = this;
 
                         var fieldsCheck = this.fields.some(function (key) {
-                            return _this3.values[key]() !== app.data.settings[_this3.addPrefix(key)];
+                            return _this4.values[key]() !== app.data.settings[_this4.addPrefix(key)];
                         });
                         var checkboxesCheck = this.checkboxes.some(function (key) {
-                            return _this3.values[key]() !== (app.data.settings[_this3.addPrefix(key)] == '1');
+                            return _this4.values[key]() !== (app.data.settings[_this4.addPrefix(key)] == '1');
                         });
-                        return fieldsCheck || checkboxesCheck;
+                        var objectsCheck = this.objects.some(function (key) {
+                            return JSON.stringify(_this4.values[key]()) !== app.data.settings[_this4.addPrefix(key)];
+                        });
+                        return fieldsCheck || checkboxesCheck || objectsCheck;
                     }
                 }, {
                     key: "onsubmit",
                     value: function onsubmit(e) {
-                        var _this4 = this;
+                        var _this5 = this;
 
                         // prevent the usual form submit behaviour
                         e.preventDefault();
@@ -217,28 +253,33 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // prevents multiple savings
                         this.loading = true;
+
+                        // remove previous success popup
                         app.alerts.dismiss(this.successAlert);
 
                         var settings = {};
 
                         // gets all the values from the form
                         this.fields.forEach(function (key) {
-                            return settings[_this4.addPrefix(key)] = _this4.values[key]();
+                            return settings[_this5.addPrefix(key)] = _this5.values[key]();
                         });
                         this.checkboxes.forEach(function (key) {
-                            return settings[_this4.addPrefix(key)] = _this4.values[key]();
+                            return settings[_this5.addPrefix(key)] = _this5.values[key]();
+                        });
+                        this.objects.forEach(function (key) {
+                            return settings[_this5.addPrefix(key)] = JSON.stringify(_this5.values[key]());
                         });
 
                         // actually saves everything in the database
                         saveSettings(settings).then(function () {
-                            // on succes, show an alert
-                            app.alerts.show(_this4.successAlert = new Alert({
+                            // on success, show popup
+                            app.alerts.show(_this5.successAlert = new Alert({
                                 type: 'success',
                                 children: app.translator.trans('core.admin.basics.saved_message')
                             }));
                         }).catch(function () {}).then(function () {
                             // return to the initial state and redraw the page
-                            _this4.loading = false;
+                            _this5.loading = false;
                             m.redraw();
                         });
                     }

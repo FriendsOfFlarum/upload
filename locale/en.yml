@@ -14,11 +14,10 @@ flagrow-upload:
             aws-s3: Amazon S3
             imgur: Imgur
         labels:
-            upload_method: Upload method
             preferences:
                 title: General preferences
                 max_file_size: Maximum file size (in kilobytes)
-                mime_types_allowed: Specify the mime types you like to allow in your application using a regular expression
+                mime_types: Configure your mime type, upload adapter mapping
             resize:
                 title: Image resize
                 toggle: Resize images
@@ -46,10 +45,10 @@ flagrow-upload:
         help_texts:
             description: >
                 Set up uploading services and preferences.
-            upload_method: >
-                Here you can select the method that you want to use
-                to upload your files. When you select one the
-                relative setting card is going to be displayed.
+            mime_types: >
+                Please configure your mapping here. Each mime type
+                regular expression will be handled by a specific
+                upload adapter.
             resize: >
                 Choose whether you want to resize your images before
                 they get uploaded. You can choose a maximum width
