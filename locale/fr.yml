@@ -1,0 +1,60 @@
+flagrow-upload:
+    forum:
+        buttons:
+            attach: Joindre
+        states:
+            loading: Téléchargement
+            success: Succès
+            error: Erreur
+    admin:
+        permissions:
+            upload_label: Joindre des fichiers
+        upload_methods:
+            local: Local
+            aws-s3: Amazon S3
+            imgur: Imgur
+        labels:
+            upload_method: Méthode de téléchargement
+            preferences:
+                title: Préférences générales
+                max_file_size: Taille maximale du fichier (en kilobytes)
+                mime_types_allowed: Déterminer les extensions que vous souhaitez autoriser dans votre application en utilisant une expression régulière
+            resize:
+                title: Redimensionnement des images
+                toggle: Redimensionner les images
+                max_width: Largeur maximale de l'image
+                max_height: Hauteur maximale de l'image
+            watermark:
+                title: Watermark images
+                toggle: Watermark images
+                position: Position du watermark
+                file: Upload your watermark image
+            local:
+                title: Paramètres du stockage local
+                cdn_url: Content Delivery URL (prefixes files)
+            imgur:
+                title: Imgur image storage settings
+                client_id: Imgur client ID
+            aws-s3:
+                title: AWS S3 storage settings
+                key: Key
+                secret: Secret
+                bucket: Bucket
+                region: Region
+        buttons:
+            save: Sauvegarder les paramètres
+        help_texts:
+            description: >
+                Paramétrer les services et préférences de téléchargement.
+            upload_method: >
+                Vous pouvez sélectionner la méthode que vous souhaitez utiliser pour joindre vos fichiers. Lorsque vous en sélectionner une, the
+                relative setting card is going to be displayed.
+            resize: >
+                Choose whether you want to resize your images before
+                they get uploaded. You can choose a maximum width
+                and height, in pixels. The resizing process keeps the
+                aspect ratio of the images.
+            watermark: >
+                Choose whether images will have a watermark added during
+                upload. Watermarks are added to non-gifs based on your
+                preferences below.
