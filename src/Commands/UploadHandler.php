@@ -21,7 +21,6 @@ use Flagrow\Upload\Validators\FileValidator;
 use Flagrow\Upload\Validators\MimeValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
-use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str as IllStr;
@@ -32,7 +31,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadHandler
 {
-    use AssertPermissionTrait, DispatchEventsTrait;
+    use AssertPermissionTrait;
 
     /**
      * @var Application
