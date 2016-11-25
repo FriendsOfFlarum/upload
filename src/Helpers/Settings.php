@@ -28,6 +28,14 @@ class Settings
     const DEFAULT_MAX_FILE_SIZE = 2048;
     const DEFAULT_MAX_IMAGE_WIDTH = 100;
 
+    /**
+     * The settings shared with the frontend.
+     *
+     * @var array
+     */
+    protected $frontend = [
+    ];
+
     protected $definition = [
         'uploadMethod',
         'mimeTypesAllowed',
@@ -106,6 +114,20 @@ class Settings
         }
 
         return $result;
+    }
+
+    /**
+     * Loads only settings used in the frontend.
+     *
+     * @param bool $prefixed
+     * @param array|null $only
+     * @return array
+     */
+    public function toArrayFrontend($prefixed = true, array $only = [])
+    {
+        $only = array_merge($only, $this->frontend);
+
+        return $this->toArray(true, $only);
     }
 
     public function get($name, $default = null)
