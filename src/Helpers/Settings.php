@@ -127,7 +127,7 @@ class Settings
     {
         $only = array_merge($only, $this->frontend);
 
-        return $this->toArray(true, $only);
+        return $this->toArray($prefixed, $only);
     }
 
     public function get($name, $default = null)
