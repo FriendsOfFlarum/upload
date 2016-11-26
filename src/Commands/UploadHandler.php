@@ -23,6 +23,7 @@ use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -182,7 +183,7 @@ class UploadHandler
     protected function getBasename(UploadedFile $uploadedFile)
     {
         return sprintf("%s.%s",
-            basename($uploadedFile->getClientOriginalName(), ".{$uploadedFile->getClientOriginalExtension()}"),
+            basename(Str::slug($uploadedFile->getClientOriginalName()), ".{$uploadedFile->getClientOriginalExtension()}"),
             $uploadedFile->guessExtension() ?
                 $uploadedFile->guessExtension() :
                 $uploadedFile->getClientOriginalExtension()
