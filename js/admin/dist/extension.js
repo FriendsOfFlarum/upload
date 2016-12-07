@@ -127,6 +127,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
                             '^image\\/.*': 'local'
                         }));
+
+                        this.newMimeType = {
+                            'regex': m.prop(''),
+                            'adapter': m.prop('local')
+                        };
                     }
                 }, {
                     key: "view",
@@ -152,7 +157,21 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                                 children: 'x',
                                 onclick: _this3.deleteMimeType.bind(_this3, mime)
                             })]);
-                        })), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types'))]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
+                        }), m('div', {}, [m('input', {
+                            className: 'FormControl MimeTypes add-MimeType-key',
+                            value: this.newMimeType.regex(),
+                            oninput: m.withAttr('value', this.newMimeType.regex)
+                        }), Select.component({
+                            options: this.uploadMethodOptions,
+                            className: 'add-MimeType-value',
+                            oninput: m.withAttr('value', this.newMimeType.adapter),
+                            value: this.newMimeType.adapter()
+                        }), Button.component({
+                            type: 'button',
+                            className: 'Button Button--warning',
+                            children: '+',
+                            onclick: this.addMimeType.bind(this)
+                        })])), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types'))]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                             state: this.values.mustResize() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                             onchange: this.values.mustResize
@@ -223,6 +242,14 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                     key: "deleteMimeType",
                     value: function deleteMimeType(mime) {
                         delete this.values.mimeTypes()[mime];
+                    }
+                }, {
+                    key: "addMimeType",
+                    value: function addMimeType() {
+                        this.values.mimeTypes()[this.newMimeType.regex()] = this.newMimeType.adapter();
+
+                        this.newMimeType.regex('');
+                        this.newMimeType.adapter('local');
                     }
                 }, {
                     key: "changed",

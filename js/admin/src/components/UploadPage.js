@@ -83,6 +83,11 @@ export default class UploadPage extends Component {
         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
             '^image\\/.*': 'local'
         }));
+
+        this.newMimeType = {
+            'regex': m.prop(''),
+            'adapter': m.prop('local')
+        };
     }
 
     /**
@@ -125,6 +130,25 @@ export default class UploadPage extends Component {
                                         }),
                                     ])
                                 }),
+                                m('div', {}, [
+                                    m('input', {
+                                        className: 'FormControl MimeTypes add-MimeType-key',
+                                        value: this.newMimeType.regex(),
+                                        oninput: m.withAttr('value', this.newMimeType.regex)
+                                    }),
+                                    Select.component({
+                                        options: this.uploadMethodOptions,
+                                        className: 'add-MimeType-value',
+                                        oninput: m.withAttr('value', this.newMimeType.adapter),
+                                        value: this.newMimeType.adapter()
+                                    }),
+                                    Button.component({
+                                        type: 'button',
+                                        className: 'Button Button--warning',
+                                        children: '+',
+                                        onclick: this.addMimeType.bind(this)
+                                    }),
+                                ])
                             ),
                             m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.mime_types')),
                         ]),
@@ -239,6 +263,13 @@ export default class UploadPage extends Component {
 
     deleteMimeType(mime) {
         delete this.values.mimeTypes()[mime];
+    }
+
+    addMimeType() {
+        this.values.mimeTypes()[this.newMimeType.regex()] = this.newMimeType.adapter();
+
+        this.newMimeType.regex('');
+        this.newMimeType.adapter('local');
     }
 
 
