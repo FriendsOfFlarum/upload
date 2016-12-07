@@ -1,6 +1,7 @@
 # Upload by ![flagrow logo](https://avatars0.githubusercontent.com/u/16413865?v=3&s=15) [flagrow](https://discuss.flarum.org/d/1832-flagrow-extension-developer-group)
 
-[![Latest Stable Version](https://poser.pugx.org/flagrow/upload/v/stable)](https://packagist.org/packages/flagrow/upload) [![Total Downloads](https://poser.pugx.org/flagrow/upload/downloads)](https://packagist.org/packages/flagrow/flarum-ext-:package)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/flagrow/upload/license.md)
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://paypal.me/luceos)
 
 An extension that handles file uploads intelligently for your forum. This is the descendant of the Flagrow image upload extension.
 
