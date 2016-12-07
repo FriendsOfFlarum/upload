@@ -201,14 +201,14 @@ class UploadHandler
      */
     protected function identifyUploadAdapterForMime($mime)
     {
-        return $this->settings->getMimeTypesConfiguration()->first(function($regex) use ($mime) {
-            return preg_match($regex, $mime);
+        $adapter = $this->settings->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
+            return preg_match("/$regex/", $mime);
         });
 
         if (!$adapter) {
             return null;
         }
 
-        return app("flagrow.upload-adapters.{$adapter}");
+        return app("flagrow.upload-adapters.$adapter");
     }
 }

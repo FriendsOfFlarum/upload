@@ -200,8 +200,9 @@ class Settings
      */
     public function getMimeTypesConfiguration()
     {
-        return $this->getJsonValue('mimeTypes', collect([
-            '^image\/.*' => 'local'
-        ]));
+        return $this->getJsonValue(
+            'mimeTypes',
+            collect(['^image\/.*' => 'local'])
+        );
     }
 }
