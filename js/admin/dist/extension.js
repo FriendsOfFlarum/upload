@@ -157,7 +157,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                                 children: 'x',
                                 onclick: _this3.deleteMimeType.bind(_this3, mime)
                             })]);
-                        }), m('div', {}, [m('input', {
+                        }), m('br'), m('div', {}, [m('input', {
                             className: 'FormControl MimeTypes add-MimeType-key',
                             value: this.newMimeType.regex(),
                             oninput: m.withAttr('value', this.newMimeType.regex)

@@ -130,6 +130,7 @@ export default class UploadPage extends Component {
                                         }),
                                     ])
                                 }),
+                                m('br'),
                                 m('div', {}, [
                                     m('input', {
                                         className: 'FormControl MimeTypes add-MimeType-key',
