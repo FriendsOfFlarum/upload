@@ -22,9 +22,9 @@ use Flagrow\Upload\Validators\FileValidator;
 use Flagrow\Upload\Validators\MimeValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
-use Flarum\Core\Support\DispatchEventsTrait;
 use Flarum\Foundation\Application;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadHandler
 {
-    use AssertPermissionTrait, DispatchEventsTrait;
+    use AssertPermissionTrait;
 
     /**
      * @var Application
@@ -188,7 +188,7 @@ class UploadHandler
     protected function getBasename(UploadedFile $uploadedFile)
     {
         return sprintf("%s.%s",
-            basename($uploadedFile->getClientOriginalName(), ".{$uploadedFile->getClientOriginalExtension()}"),
+            basename(Str::slug($uploadedFile->getClientOriginalName()), ".{$uploadedFile->getClientOriginalExtension()}"),
             $uploadedFile->guessExtension() ?
                 $uploadedFile->guessExtension() :
                 $uploadedFile->getClientOriginalExtension()

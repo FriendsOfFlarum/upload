@@ -34,6 +34,21 @@ php flarum cache:clear
 
 Enable the extension, a new tab will appear on the left hand side. This separate settings page allows you to further configure the extension.
 
+#### Mimetype regular expression
+
+Regular expressions allow you a lot of freedom, but they are also very difficult to understand. Here are some pointers, but feel free to ask
+for help on the official Flarum forums.
+
+In case you want to allow all regular file types including video, music, compressed files and images, use this:
+
+```text
+(video\/(3gpp|mp4|mpeg|quicktime|webm))|(audio\/(aiff|midi|mpeg|mp4))|(image\/(gif|jpeg|png))|(application\/(x-(7z|rar)-compressed|zip|arj|x-(bzip2|gzip|lha|stuffit|tar)|pdf))
+```
+
+A mimetype consists of a primary and secondary type. The primary type can be `image`, `video` and `application` for instance. The secondary
+is like a more detailed specification, eg `png`, `pdf` etc. These two are divided by a `/`, in regex you have to escape this character by using: `\/`.
+
+
 ### donate
 
 If you're happy with this extension, feel free to [buy me a cup of :coffee: and a :cake:](https://paypal.me/luceos/5) to keep me going.

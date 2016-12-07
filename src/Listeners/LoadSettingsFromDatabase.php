@@ -52,7 +52,7 @@ class LoadSettingsFromDatabase
     public function prepareApiAttributes(PrepareApiAttributes $event)
     {
         if ($event->isSerializer(ForumSerializer::class)) {
-            $event->attributes = array_merge($event->attributes, $this->settings->toArray());
+            $event->attributes = array_merge($event->attributes, $this->settings->toArrayFrontend());
         }
     }
 
