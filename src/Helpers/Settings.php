@@ -36,6 +36,11 @@ class Settings
     protected $frontend = [
     ];
 
+    /**
+     * All setting options of this extension.
+     *
+     * @var array
+     */
     protected $definition = [
         'mimeTypes',
 
@@ -129,11 +134,19 @@ class Settings
         return $this->toArray($prefixed, $only);
     }
 
+    /**
+     * @param $name
+     * @param null $default
+     * @return null
+     */
     public function get($name, $default = null)
     {
         return $this->{$name} ? $this->{$name} : $default;
     }
 
+    /**
+     * @return array
+     */
     public function getDefinition()
     {
         return $this->definition;
