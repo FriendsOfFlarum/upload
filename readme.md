@@ -2,13 +2,14 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/flagrow/upload/license.md) [![Latest Stable Version](https://img.shields.io/packagist/v/flagrow/upload.svg)](https://github.com/flagrow/upload) [![Total Downloads](https://img.shields.io/packagist/dt/flagrow/upload.svg)](https://github.com/flagrow/upload) [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://paypal.me/luceos)
 
-An extension that handles file uploads intelligently for your forum. This is the descendant of the Flagrow image upload extension.
+An extension that handles file uploads intelligently for your forum.
 
 ### features
 
 - For images:
   - Auto watermarks.
   - Auto resizing.
+- Mime type to upload adapter mapping.
 - Whitelisting mime types.
 - Uploading on different storage services (local, imgur, AWS S3 for instance).
 - Drag and drop uploads.
@@ -33,6 +34,8 @@ php flarum cache:clear
 ### configuration
 
 Enable the extension, a new tab will appear on the left hand side. This separate settings page allows you to further configure the extension.
+
+Make sure you configure the upload permission on the permissions page as well.
 
 #### Mimetype regular expression
 
