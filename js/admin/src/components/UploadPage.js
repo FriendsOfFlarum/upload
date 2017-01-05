@@ -14,9 +14,6 @@ export default class UploadPage extends Component {
 
         // the fields we need to watch and to save
         this.fields = [
-            'availableUploadMethods',
-            'mimeTypesAllowed',
-            'uploadMethod',
             // image
             'resizeMaxWidth',
             'cdnUrl',
@@ -47,6 +44,11 @@ export default class UploadPage extends Component {
             'overrideAvatarUpload'
         ];
 
+        // fields that are objects
+        this.objects = [
+            'mimeTypes'
+        ];
+
         // watermark positions
         this.watermarkPositions = {
             'top-right': 'top-left',
@@ -74,8 +76,24 @@ export default class UploadPage extends Component {
         // set the upload methods
         this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')];
         // bind the values of the fields and checkboxes to the getter/setter functions
-        this.fields.forEach(key => this.values[key] = m.prop(settings[this.addPrefix(key)]));
-        this.checkboxes.forEach(key => this.values[key] = m.prop(settings[this.addPrefix(key)] === '1'));
+        this.fields.forEach(key =>
+            this.values[key] = m.prop(settings[this.addPrefix(key)])
+        );
+        this.checkboxes.forEach(key =>
+            this.values[key] = m.prop(settings[this.addPrefix(key)] === '1')
+        );
+        this.objects.forEach(key =>
+            this.values[key] = settings[this.addPrefix(key)] ? m.prop(JSON.parse(settings[this.addPrefix(key)])) : m.prop()
+        );
+
+        this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
+            '^image\\/.*': 'local'
+        }));
+
+        this.newMimeType = {
+            'regex': m.prop(''),
+            'adapter': m.prop('local')
+        };
     }
 
     /**
@@ -88,23 +106,6 @@ export default class UploadPage extends Component {
             m('div', {className: 'UploadPage'}, [
                 m('div', {className: 'container'}, [
                     m('form', {onsubmit: this.onsubmit.bind(this)}, [
-                        m('fieldset', {}, [
-                            m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')),
-                            m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')),
-                            m('div', {}, [
-                                Select.component({
-                                    options: this.uploadMethodOptions,
-                                    onchange: this.values.uploadMethod,
-                                    value: this.values.uploadMethod() || 'local'
-                                }),
-                            ]),
-                            // m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.override_avatar_upload')),
-                            // Switch.component({
-                            //     state: this.values.overrideAvatarUpload() || false,
-                            //     children: app.translator.trans('flagrow-upload.admin.labels.override_avatar_upload'),
-                            //     onchange: this.values.overrideAvatarUpload
-                            // }),
-                        ]),
                         m('fieldset', {className: 'UploadPage-preferences'}, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')),
@@ -113,12 +114,50 @@ export default class UploadPage extends Component {
                                 value: this.values.maxFileSize() || 2048,
                                 oninput: m.withAttr('value', this.values.maxFileSize)
                             }),
-                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types_allowed')),
-                            m('input', {
-                                className: 'FormControl',
-                                value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
-                                oninput: m.withAttr('value', this.values.mimeTypesAllowed)
-                            }),
+                            m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types')),
+                            m('div', {className: 'MimeTypes--Container'},
+                                Object.keys(this.values.mimeTypes()).map(mime => {
+                                    return m('div', {}, [
+                                        m('input', {
+                                            className: 'FormControl MimeTypes',
+                                            value: mime,
+                                            oninput: m.withAttr('value', this.updateMimeTypeKey.bind(this, mime))
+                                        }),
+                                        Select.component({
+                                            options: this.uploadMethodOptions,
+                                            onchange: this.updateMimeTypeValue.bind(this, mime),
+                                            value: this.values.mimeTypes()[mime] || 'local'
+                                        }),
+                                        Button.component({
+                                            type: 'button',
+                                            className: 'Button Button--warning',
+                                            children: 'x',
+                                            onclick: this.deleteMimeType.bind(this, mime)
+                                        }),
+                                    ])
+                                }),
+                                m('br'),
+                                m('div', {}, [
+                                    m('input', {
+                                        className: 'FormControl MimeTypes add-MimeType-key',
+                                        value: this.newMimeType.regex(),
+                                        oninput: m.withAttr('value', this.newMimeType.regex)
+                                    }),
+                                    Select.component({
+                                        options: this.uploadMethodOptions,
+                                        className: 'add-MimeType-value',
+                                        oninput: m.withAttr('value', this.newMimeType.adapter),
+                                        value: this.newMimeType.adapter()
+                                    }),
+                                    Button.component({
+                                        type: 'button',
+                                        className: 'Button Button--warning',
+                                        children: '+',
+                                        onclick: this.addMimeType.bind(this)
+                                    }),
+                                ])
+                            ),
+                            m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.mime_types')),
                         ]),
                         m('fieldset', {className: 'UploadPage-resize'}, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')),
@@ -157,7 +196,6 @@ export default class UploadPage extends Component {
                         ]),
                         m('fieldset', {
                             className: 'UploadPage-local',
-                            style: {display: (this.values.uploadMethod() === 'local' ? "block" : "none")}
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')),
@@ -169,7 +207,6 @@ export default class UploadPage extends Component {
                         ]),
                         m('fieldset', {
                             className: 'UploadPage-imgur',
-                            style: {display: (this.values.uploadMethod() === 'imgur' ? "block" : "none")}
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.imgur.client_id')),
@@ -181,7 +218,6 @@ export default class UploadPage extends Component {
                         ]),
                         m('fieldset', {
                             className: 'UploadPage-aws-s3',
-                            style: {display: (this.values.uploadMethod() === 'aws-s3' ? "block" : "none")}
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aws-s3.key')),
@@ -210,8 +246,7 @@ export default class UploadPage extends Component {
                             }),
                         ]),
                         m('fieldset', {
-                            className: 'UploadPage-ovh-svfs',
-                            style: {display: (this.values.uploadMethod() === 'ovh-svfs' ? "block" : "none")}
+                            className: 'UploadPage-ovh-svfs'
                         }, [
                             m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.title')),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.container')),
@@ -258,16 +293,39 @@ export default class UploadPage extends Component {
         ];
     }
 
+    updateMimeTypeKey(mime, value) {
+        this.values.mimeTypes()[value] = this.values.mimeTypes()[mime];
+
+        this.deleteMimeType(mime);
+    }
+
+    updateMimeTypeValue(mime, value) {
+        this.values.mimeTypes()[mime] = value;
+    }
+
+    deleteMimeType(mime) {
+        delete this.values.mimeTypes()[mime];
+    }
+
+    addMimeType() {
+        this.values.mimeTypes()[this.newMimeType.regex()] = this.newMimeType.adapter();
+
+        this.newMimeType.regex('');
+        this.newMimeType.adapter('local');
+    }
+
+
     /**
      * Checks if the values of the fields and checkboxes are different from
      * the ones stored in the database
      *
-     * @returns bool
+     * @returns boolean
      */
     changed() {
         var fieldsCheck = this.fields.some(key => this.values[key]() !== app.data.settings[this.addPrefix(key)]);
         var checkboxesCheck = this.checkboxes.some(key => this.values[key]() !== (app.data.settings[this.addPrefix(key)] == '1'));
-        return fieldsCheck || checkboxesCheck;
+        var objectsCheck = this.objects.some(key => JSON.stringify(this.values[key]()) !== (app.data.settings[this.addPrefix(key)]));
+        return fieldsCheck || checkboxesCheck || objectsCheck;
     }
 
     /**
@@ -284,6 +342,8 @@ export default class UploadPage extends Component {
 
         // prevents multiple savings
         this.loading = true;
+
+        // remove previous success popup
         app.alerts.dismiss(this.successAlert);
 
         const settings = {};
@@ -291,11 +351,12 @@ export default class UploadPage extends Component {
         // gets all the values from the form
         this.fields.forEach(key => settings[this.addPrefix(key)] = this.values[key]());
         this.checkboxes.forEach(key => settings[this.addPrefix(key)] = this.values[key]());
+        this.objects.forEach(key => settings[this.addPrefix(key)] = JSON.stringify(this.values[key]()));
 
         // actually saves everything in the database
         saveSettings(settings)
             .then(() => {
-                // on succes, show an alert
+                // on success, show popup
                 app.alerts.show(this.successAlert = new Alert({
                     type: 'success',
                     children: app.translator.trans('core.admin.basics.saved_message')

@@ -35,9 +35,13 @@ class Settings
     protected $frontend = [
     ];
 
+    /**
+     * All setting options of this extension.
+     *
+     * @var array
+     */
     protected $definition = [
-        'uploadMethod',
-        'mimeTypesAllowed',
+        'mimeTypes',
 
         // Images
         'mustResize',
@@ -137,11 +141,19 @@ class Settings
         return $this->toArray($prefixed, $only);
     }
 
+    /**
+     * @param $name
+     * @param null $default
+     * @return null
+     */
     public function get($name, $default = null)
     {
         return $this->{$name} ? $this->{$name} : $default;
     }
 
+    /**
+     * @return array
+     */
     public function getDefinition()
     {
         return $this->definition;
@@ -182,5 +194,39 @@ class Settings
             ->map(function ($item) {
                 return app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item);
             });
+    }
+
+    /**
+     * @param $field
+     * @param null $default
+     * @param null $attribute
+     * @return Collection|mixed|null
+     */
+    public function getJsonValue($field, $default = null, $attribute = null)
+    {
+        $json = $this->{$field};
+
+        if (empty($json)) {
+            return $default;
+        }
+
+        $collect = collect(json_decode($json, true));
+
+        if ($attribute) {
+            return $collect->get($attribute, $default);
+        }
+
+        return $collect;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getMimeTypesConfiguration()
+    {
+        return $this->getJsonValue(
+            'mimeTypes',
+            collect(['^image\/.*' => 'local'])
+        );
     }
 }

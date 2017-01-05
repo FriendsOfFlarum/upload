@@ -13,9 +13,10 @@
 
 namespace Flagrow\Upload\Adapters;
 
+use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
 
-class AwsS3 extends Local
+class AwsS3 extends Flysystem implements UploadAdapter
 {
     protected function generateUrl(File $file)
     {

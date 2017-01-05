@@ -17,6 +17,7 @@ namespace Flagrow\Upload\Commands;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Events\File as Events;
 use Flagrow\Upload\File;
+use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Validators\FileValidator;
 use Flagrow\Upload\Validators\MimeValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
@@ -40,9 +41,9 @@ class UploadHandler
     protected $app;
 
     /**
-     * @var UploadAdapter
+     * @var Settings
      */
-    protected $upload;
+    protected $settings;
 
     /**
      * @var FileValidator
@@ -50,26 +51,24 @@ class UploadHandler
     protected $fileValidator;
 
     /**
-     * @var MimeValidator
-     */
-    protected $mimeValidator;
-
-    /**
      * @var Dispatcher
      */
     protected $events;
 
+    /**
+     * @var UploadAdapter
+     */
+    protected $upload;
+
     public function __construct(
         Application $app,
-        UploadAdapter $upload,
         FileValidator $fileValidator,
-        MimeValidator $mimeValidator,
-        Dispatcher $events
+        Dispatcher $events,
+        Settings $settings
     ) {
         $this->app = $app;
-        $this->upload = $upload;
+        $this->settings = $settings;
         $this->fileValidator = $fileValidator;
-        $this->mimeValidator = $mimeValidator;
         $this->events = $events;
     }
 
@@ -98,9 +97,15 @@ class UploadHandler
             unset($tempFile);
 
             $this->fileValidator->assertValid(['file' => $uploadedFile]);
-            $this->mimeValidator->assertValid(['mime' => $uploadedFile->getMimeType()]);
+
+            $this->upload = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
 
             $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+
+            if (!$this->upload) {
+                $tempFilesystem->delete($uploadedFile->getBasename());
+                throw new ValidationException('Uploading files of this type is not allowed.');
+            }
 
             if (!$this->upload->forMime($uploadedFile->getMimeType())) {
                 $tempFilesystem->delete($uploadedFile->getBasename());
@@ -134,7 +139,7 @@ class UploadHandler
                 return false;
             }
 
-            $file                  = $response;
+            $file = $response;
             $file->markdown_string = $this->getDefaultMarkdownStringAttribute($file);
 
             $this->events->fire(
@@ -175,7 +180,7 @@ class UploadHandler
     public function getDefaultMarkdownStringAttribute(File $file)
     {
         $label = "[$file->base_name]";
-        $url   = "({$file->url})";
+        $url = "({$file->url})";
 
         return $label . $url;
     }
@@ -188,5 +193,22 @@ class UploadHandler
                 $uploadedFile->guessExtension() :
                 $uploadedFile->getClientOriginalExtension()
         );
+    }
+
+    /**
+     * @param $mime
+     * @return UploadAdapter|null
+     */
+    protected function identifyUploadAdapterForMime($mime)
+    {
+        $adapter = $this->settings->getMimeTypesConfiguration()->first(function ($regex, $_) use ($mime) {
+            return preg_match("/$regex/", $mime);
+        });
+
+        if (!$adapter) {
+            return null;
+        }
+
+        return app("flagrow.upload-adapter.$adapter");
     }
 }

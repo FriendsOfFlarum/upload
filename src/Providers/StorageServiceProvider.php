@@ -15,8 +15,6 @@ namespace Flagrow\Upload\Providers;
 
 use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
-use Flagrow\Upload\Commands\UploadHandler;
-use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Helpers\Settings;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Container\Container;
@@ -41,14 +39,7 @@ class StorageServiceProvider extends ServiceProvider
         /** @var Settings $settings */
         $settings = $this->app->make(Settings::class);
 
-        /** @var UploadAdapter $uploadAdapter */
-        $uploadAdapter = function (Container $app) {
-            return $this->instantiateUploadAdapter($app);
-        };
-
-        $this->app->when(UploadHandler::class)
-            ->needs(UploadAdapter::class)
-            ->give($uploadAdapter);
+        $this->instantiateUploadAdapters($this->app);
 
         if ($settings->get('overrideAvatarUpload')) {
             // .. todo
@@ -61,26 +52,39 @@ class StorageServiceProvider extends ServiceProvider
      * @param          $app
      * @return FilesystemInterface
      */
-    protected function instantiateUploadAdapter(Container $app)
+    protected function instantiateUploadAdapters(Container $app)
     {
+        /** @var Settings $settings */
         $settings = $app->make(Settings::class);
 
-        switch ($settings->get('uploadMethod', 'local')) {
-            case 'aws-s3':
-                if (class_exists(S3Client::class)) {
-                    return $this->awsS3($settings);
-                }
-            case 'ovh-svfs':
-                if (class_exists(OVHClient::class)) {
-                    return $this->ovh($settings);
-                }
-            case 'imgur':
-                return $this->imgur($settings);
-            default:
-                return $this->local($settings);
-        }
+        $settings->getMimeTypesConfiguration()
+            ->unique()
+            ->values()
+            ->each(function ($adapter) use ($app, $settings) {
+                $app->bind("flagrow.upload-adapter.$adapter", function () use ($settings, $adapter) {
+                    switch ($adapter) {
+                        case 'aws-s3':
+                            if (class_exists(S3Client::class)) {
+                                return $this->awsS3($settings);
+                            }
+                        case 'ovh-svfs':
+                            if (class_exists(OVHClient::class)) {
+                                return $this->ovh($settings);
+                            }
+                        case 'imgur':
+                            return $this->imgur($settings);
+
+                        default:
+                            return $this->local($settings);
+                    }
+                });
+            });
     }
 
+    /**
+     * @param Settings $settings
+     * @return Adapters\AwsS3
+     */
     protected function awsS3(Settings $settings)
     {
         return new Adapters\AwsS3(
@@ -100,6 +104,10 @@ class StorageServiceProvider extends ServiceProvider
         );
     }
 
+    /**
+     * @param Settings $settings
+     * @return Adapters\OVH
+     */
     protected function ovh(Settings $settings)
     {
         $client = new OVHClient([
@@ -115,14 +123,18 @@ class StorageServiceProvider extends ServiceProvider
         );
     }
 
+    /**
+     * @param Settings $settings
+     * @return Adapters\Imgur
+     */
     protected function imgur(Settings $settings)
     {
         return new Adapters\Imgur(
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers' => [
-                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId'),
-                ],
+                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId')
+                ]
             ])
         );
     }
