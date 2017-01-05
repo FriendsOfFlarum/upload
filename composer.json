@@ -25,11 +25,13 @@
         "flarum/flarum-ext-markdown": "^0.1.0-beta.5"
     },
     "suggest": {
-        "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3."
+        "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
+        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API."
     },
     "require-dev": {
         "league/flysystem": "^1.0.32",
-        "league/flysystem-aws-s3-v3": "^1.0"
+        "league/flysystem-aws-s3-v3": "^1.0",
+        "techyah/flysystem-ovh": "^1.0"
     },
     "extra": {
         "flarum-extension": {

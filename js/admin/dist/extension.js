@@ -80,14 +80,16 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // the fields we need to watch and to save
                         this.fields = ['availableUploadMethods', 'mimeTypesAllowed', 'uploadMethod',
-                            // image
-                            'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
-                            // watermark
-                            'addsWatermarks', 'watermark', 'watermarkPosition',
+                        // image
+                        'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
+                        // watermark
+                        'addsWatermarks', 'watermark', 'watermarkPosition',
                         // Imgur
                         'imgurClientId',
                         // AWS
-                        'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
+                        'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region',
+                        // OVH
+                        'ovhUsername', 'ovhPassword', 'ovhTenantId', 'ovhContainer', 'ovhRegion'];
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
@@ -121,11 +123,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                 }, {
                     key: "view",
                     value: function view() {
-                        return [m('div', {className: 'UploadPage'}, [m('div', {className: 'container'}, [m('form', {onsubmit: this.onsubmit.bind(this)}, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), m('div', {}, [Select.component({
+                        return [m('div', { className: 'UploadPage' }, [m('div', { className: 'container' }, [m('form', { onsubmit: this.onsubmit.bind(this) }, [m('fieldset', {}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.upload_method')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.upload_method')), m('div', {}, [Select.component({
                             options: this.uploadMethodOptions,
                             onchange: this.values.uploadMethod,
                             value: this.values.uploadMethod() || 'local'
-                        })])]), m('fieldset', {className: 'UploadPage-preferences'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
+                        })])]), m('fieldset', { className: 'UploadPage-preferences' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.max_file_size')), m('input', {
                             className: 'FormControl',
                             value: this.values.maxFileSize() || 2048,
                             oninput: m.withAttr('value', this.values.maxFileSize)
@@ -133,7 +135,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'FormControl',
                             value: this.values.mimeTypesAllowed() || "(image|audio|video)\\/.*",
                             oninput: m.withAttr('value', this.values.mimeTypesAllowed)
-                        })]), m('fieldset', {className: 'UploadPage-resize'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
+                        })]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
                             state: this.values.mustResize() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
                             onchange: this.values.mustResize
@@ -142,7 +144,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             value: this.values.resizeMaxWidth() || 100,
                             oninput: m.withAttr('value', this.values.resizeMaxWidth),
                             disabled: !this.values.mustResize()
-                        })]), m('fieldset', {className: 'UploadPage-watermark'}, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')), m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.watermark')), Switch.component({
+                        })]), m('fieldset', { className: 'UploadPage-watermark' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.watermark')), Switch.component({
                             state: this.values.addsWatermarks() || false,
                             children: app.translator.trans('flagrow-upload.admin.labels.watermark.toggle'),
                             onchange: this.values.addsWatermarks
@@ -150,7 +152,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             options: this.watermarkPositions,
                             onchange: this.values.watermarkPosition,
                             value: this.values.watermarkPosition() || 'bottom-right'
-                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, {name: "flagrow/watermark"})]), m('fieldset', {
+                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, { name: "flagrow/watermark" })]), m('fieldset', {
                             className: 'UploadPage-local',
                             style: { display: this.values.uploadMethod() === 'local' ? "block" : "none" }
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {
@@ -183,6 +185,29 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'FormControl',
                             value: this.values.awsS3Region() || '',
                             oninput: m.withAttr('value', this.values.awsS3Region)
+                        })]), m('fieldset', {
+                            className: 'UploadPage-ovh-svfs',
+                            style: { display: this.values.uploadMethod() === 'ovh-svfs' ? "block" : "none" }
+                        }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.container')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhContainer() || '',
+                            oninput: m.withAttr('value', this.values.ovhContainer)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.tenantid')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhTenantId() || '',
+                            oninput: m.withAttr('value', this.values.ovhTenantId)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.username')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhUsername() || '',
+                            oninput: m.withAttr('value', this.values.ovhUsername)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.password')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhPassword() || '',
+                            oninput: m.withAttr('value', this.values.ovhPassword)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.region')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhRegion() || '',
+                            oninput: m.withAttr('value', this.values.ovhRegion)
                         })]), Button.component({
                             type: 'submit',
                             className: 'Button Button--primary',
