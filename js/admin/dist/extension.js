@@ -87,7 +87,9 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         // Imgur
                         'imgurClientId',
                         // AWS
-                        'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region'];
+                        'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region',
+                        // OVH
+                        'ovhUsername', 'ovhPassword', 'ovhTenantId', 'ovhContainer', 'ovhRegion'];
 
                         // the checkboxes we need to watch and to save.
                         this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
@@ -218,6 +220,28 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'FormControl',
                             value: this.values.awsS3Region() || '',
                             oninput: m.withAttr('value', this.values.awsS3Region)
+                        })]), m('fieldset', {
+                            className: 'UploadPage-ovh-svfs'
+                        }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.container')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhContainer() || '',
+                            oninput: m.withAttr('value', this.values.ovhContainer)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.tenantid')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhTenantId() || '',
+                            oninput: m.withAttr('value', this.values.ovhTenantId)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.username')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhUsername() || '',
+                            oninput: m.withAttr('value', this.values.ovhUsername)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.password')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhPassword() || '',
+                            oninput: m.withAttr('value', this.values.ovhPassword)
+                        }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.ovh-svfs.region')), m('input', {
+                            className: 'FormControl',
+                            value: this.values.ovhRegion() || '',
+                            oninput: m.withAttr('value', this.values.ovhRegion)
                         })]), Button.component({
                             type: 'submit',
                             className: 'Button Button--primary',

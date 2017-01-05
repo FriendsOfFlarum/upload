@@ -11,14 +11,13 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Helpers;
 
 use Aws\AwsClient;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Imgur\Client as Imgur;
+use Techyah\Flysystem\OVH\OVHClient;
 
 /**
  * @property int $maxFileSize
@@ -65,6 +64,14 @@ class Settings
         'awsS3Secret',
         'awsS3Bucket',
         'awsS3Region',
+
+        // OVH
+        'ovhUsername',
+        'ovhPassword',
+        'ovhTenantId',
+        'ovhContainer',
+        'ovhRegion',
+
     ];
 
     protected $prefix = 'flagrow.upload.';
@@ -167,11 +174,15 @@ class Settings
     {
         /** @var Collection $methods */
         $methods = [
-            'local'
+            'local',
         ];
 
         if (class_exists(AwsClient::class)) {
             $methods[] = 'aws-s3';
+        }
+
+        if (class_exists(OVHClient::class)) {
+            $methods[] = 'ovh-svfs';
         }
 
         $methods[] = 'imgur';

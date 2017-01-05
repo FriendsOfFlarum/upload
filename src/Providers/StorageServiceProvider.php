@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Providers;
 
 use Aws\S3\S3Client;
@@ -24,6 +23,8 @@ use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use Techyah\Flysystem\OVH\OVHAdapter;
+use Techyah\Flysystem\OVH\OVHClient;
 
 class StorageServiceProvider extends ServiceProvider
 {
@@ -66,6 +67,10 @@ class StorageServiceProvider extends ServiceProvider
                             if (class_exists(S3Client::class)) {
                                 return $this->awsS3($settings);
                             }
+                        case 'ovh-svfs':
+                            if (class_exists(OVHClient::class)) {
+                                return $this->ovh($settings);
+                            }
                         case 'imgur':
                             return $this->imgur($settings);
 
@@ -76,6 +81,10 @@ class StorageServiceProvider extends ServiceProvider
             });
     }
 
+    /**
+     * @param Settings $settings
+     * @return Adapters\AwsS3
+     */
     protected function awsS3(Settings $settings)
     {
         return new Adapters\AwsS3(
@@ -95,6 +104,29 @@ class StorageServiceProvider extends ServiceProvider
         );
     }
 
+    /**
+     * @param Settings $settings
+     * @return Adapters\OVH
+     */
+    protected function ovh(Settings $settings)
+    {
+        $client = new OVHClient([
+            'username' => $settings->get('ovhUsername'),
+            'password' => $settings->get('ovhPassword'),
+            'tenantId' => $settings->get('ovhTenantId'),
+            'container' => $settings->get('ovhContainer'),
+            'region' => empty($settings->get('ovhRegion')) ? 'BHS1' : $settings->get('ovhRegion'),
+        ]);
+
+        return new Adapters\OVH(
+            new Filesystem(new OVHAdapter($client->getContainer()))
+        );
+    }
+
+    /**
+     * @param Settings $settings
+     * @return Adapters\Imgur
+     */
     protected function imgur(Settings $settings)
     {
         return new Adapters\Imgur(
