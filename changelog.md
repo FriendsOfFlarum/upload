@@ -57,3 +57,5 @@
   - Indonesian translation.
 - 0.4.3
   - Fixed #41 where filenames held the original file extension.
+- 0.4.4
+  - French translation updated.
