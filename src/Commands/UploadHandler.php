@@ -72,6 +72,10 @@ class UploadHandler
         $this->events = $events;
     }
 
+    /**
+     * @param Upload $command
+     * @return static
+     */
     public function handle(Upload $command)
     {
         $this->assertCan(
@@ -185,10 +189,16 @@ class UploadHandler
         return $label . $url;
     }
 
+    /**
+     * @param UploadedFile $uploadedFile
+     * @return string
+     */
     protected function getBasename(UploadedFile $uploadedFile)
     {
+        $name = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+
         return sprintf("%s.%s",
-            basename(Str::slug($uploadedFile->getClientOriginalName()), ".{$uploadedFile->getClientOriginalExtension()}"),
+            Str::slug($name),
             $uploadedFile->guessExtension() ?
                 $uploadedFile->guessExtension() :
                 $uploadedFile->getClientOriginalExtension()
