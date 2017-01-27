@@ -18,7 +18,7 @@ flagrow-upload:
             preferences:
                 title: Préférences générales
                 max_file_size: Taille maximale du fichier (en kilobytes)
-                mime_types_allowed: Déterminer les extensions que vous souhaitez autoriser dans votre application en utilisant une expression régulière
+                mime_types: Déterminez les extensions à autoriser en utilisant une expression régulière
             resize:
                 title: Redimensionnement des images
                 toggle: Redimensionner les images
@@ -46,6 +46,9 @@ flagrow-upload:
         help_texts:
             description: >
                 Paramétrer les services et préférences de téléchargement.
+            mime_types: >
+                Configurez la correspondance entre le type de données et le stockage. Chaque type mime représenté par une expression régulière sera géré
+                par le service de stockage correspondant.
             upload_method: >
                 Vous pouvez sélectionner la méthode que vous souhaitez utiliser pour joindre vos fichiers. Lorsque vous en sélectionner une, the
                 relative setting card is going to be displayed.
