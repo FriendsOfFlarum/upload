@@ -69,8 +69,9 @@ abstract class Flysystem implements UploadAdapter
         $today = (new Carbon());
 
         $file->path = sprintf(
-            "%s/%s",
+            "%s%s%s",
             $today->toDateString(),
+            $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
             $today->toTimeString() . $today->micro . '-' . $file->base_name
         );
     }
