@@ -21,8 +21,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
 use Techyah\Flysystem\OVH\OVHAdapter;
 use Techyah\Flysystem\OVH\OVHClient;
 
@@ -49,8 +47,7 @@ class StorageServiceProvider extends ServiceProvider
     /**
      * Sets the upload adapter for the specific preferred service.
      *
-     * @param          $app
-     * @return FilesystemInterface
+     * @param Container $app
      */
     protected function instantiateUploadAdapters(Container $app)
     {
@@ -88,18 +85,16 @@ class StorageServiceProvider extends ServiceProvider
     protected function awsS3(Settings $settings)
     {
         return new Adapters\AwsS3(
-            new Filesystem(
-                new AwsS3Adapter(
-                    new S3Client([
-                        'credentials' => [
-                            'key' => $settings->get('awsS3Key'),
-                            'secret' => $settings->get('awsS3Secret'),
-                        ],
-                        'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
-                        'version' => 'latest',
-                    ]),
-                    $settings->get('awsS3Bucket')
-                )
+            new AwsS3Adapter(
+                new S3Client([
+                    'credentials' => [
+                        'key' => $settings->get('awsS3Key'),
+                        'secret' => $settings->get('awsS3Secret'),
+                    ],
+                    'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
+                    'version' => 'latest',
+                ]),
+                $settings->get('awsS3Bucket')
             )
         );
     }
@@ -119,7 +114,7 @@ class StorageServiceProvider extends ServiceProvider
         ]);
 
         return new Adapters\OVH(
-            new Filesystem(new OVHAdapter($client->getContainer()))
+            new OVHAdapter($client->getContainer())
         );
     }
 
@@ -146,10 +141,7 @@ class StorageServiceProvider extends ServiceProvider
     protected function local(Settings $settings)
     {
         return new Adapters\Local(
-            new Filesystem(
-                new FlyAdapters\Local(public_path('assets/files')),
-                $settings->get('local', [])
-            )
+            new FlyAdapters\Local(public_path('assets/files'))
         );
     }
 }
