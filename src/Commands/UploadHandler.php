@@ -29,6 +29,7 @@ use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadHandler
@@ -197,8 +198,16 @@ class UploadHandler
     {
         $name = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
 
+
+        $slug = trim(Str::slug($name));
+
+        // Fixes uploads of filenames with foreign characters.
+        if (empty($slug)) {
+            $slug = $uuid = Uuid::uuid1();
+        }
+
         return sprintf("%s.%s",
-            Str::slug($name),
+            $slug,
             $uploadedFile->guessExtension() ?
                 $uploadedFile->guessExtension() :
                 $uploadedFile->getClientOriginalExtension()
