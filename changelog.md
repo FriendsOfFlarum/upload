@@ -59,3 +59,6 @@
   - Fixed #41 where filenames held the original file extension.
 - 0.4.4
   - French translation updated.
+- 0.4.5
+  - Fixed local uploads on Windows systems.
+  - Fixed multiple uploads of file with filenames in foreign characters.
