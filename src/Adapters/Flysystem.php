@@ -24,9 +24,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var AdapterInterface
+     * @var Adap`terInterface
      */
     protected $adapter;
+
+    protected $meta;
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -49,12 +51,13 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        $this->adapter->write();
         $meta = $this->adapter->{$method}($file->path, $contents);
 
         if (!$meta) {
             return false;
         }
+
+        $this->meta = $meta;
 
         $this->generateUrl($file);
 
