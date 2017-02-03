@@ -15,6 +15,7 @@
 namespace Flagrow\Upload\Commands;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
+use Flagrow\Upload\Events\Adapter\Identified;
 use Flagrow\Upload\Events\File as Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
@@ -104,6 +105,10 @@ class UploadHandler
             $this->fileValidator->assertValid(['file' => $uploadedFile]);
 
             $this->upload = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
+
+            $this->events->fire(
+                new Identified($command->actor, $uploadedFile, $this->upload)
+            );
 
             $tempFilesystem = $this->getTempFilesystem($uploadedFile);
 
