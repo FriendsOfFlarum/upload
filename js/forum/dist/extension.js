@@ -77,6 +77,58 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
         }
     };
 });;
+'use strict';
+
+System.register('flagrow/upload/components/PasteClipboard', [], function (_export, _context) {
+    "use strict";
+
+    var PasteClipboard;
+    return {
+        setters: [],
+        execute: function () {
+            PasteClipboard = function () {
+                function PasteClipboard(uploadButton) {
+                    babelHelpers.classCallCheck(this, PasteClipboard);
+
+                    if (this.initialized) return;
+
+                    this.uploadButton = uploadButton;
+
+                    document.addEventListener('paste', this.paste.bind(this));
+                }
+
+                babelHelpers.createClass(PasteClipboard, [{
+                    key: 'paste',
+                    value: function paste(e) {
+                        if (e.clipboardData && e.clipboardData.items) {
+                            console.log(e);
+
+                            var items = e.clipboardData.items;
+
+                            var images = [];
+
+                            for (var i = 0; i < items.length; i++) {
+                                if (items[i].type.indexOf('image') !== -1) {
+                                    images.push(items[i].getAsFile());
+                                }
+                            }
+
+                            if (images.length > 0) {
+                                m.redraw();
+
+                                this.uploadButton.uploadFiles(images);
+                            }
+                            e.preventDefault();
+                        }
+                    }
+                }]);
+                return PasteClipboard;
+            }();
+
+            _export('default', PasteClipboard);
+        }
+    };
+});;
 "use strict";
 
 System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
@@ -209,10 +261,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DragAndDrop;
+    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -222,12 +274,14 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             UploadButton = _flagrowUploadComponentsUploadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
+        }, function (_flagrowUploadComponentsPasteClipboard) {
+            PasteClipboard = _flagrowUploadComponentsPasteClipboard.default;
         }],
         execute: function () {
 
             app.initializers.add('flagrow-upload', function (app) {
-                var uploadButton;
-                var drag;
+                var uploadButton, drag, clipboard;
+
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
@@ -253,6 +307,9 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
 
                     if (!drag) {
                         drag = new DragAndDrop(uploadButton);
+                    }
+                    if (!clipboard) {
+                        clipboard = new PasteClipboard(uploadButton);
                     }
                 });
             });
