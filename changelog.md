@@ -64,3 +64,5 @@
   - Fixed multiple uploads of file with filenames in foreign characters.
 - 0.4.6
   - Imgur links are now without protocol, allowing loading via http & https.
+- 0.4.7
+  - Pasting from clipboard implemented.
