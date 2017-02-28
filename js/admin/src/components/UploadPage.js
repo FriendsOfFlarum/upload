@@ -51,7 +51,7 @@ export default class UploadPage extends Component {
 
         // watermark positions
         this.watermarkPositions = {
-            'top-right': 'top-left',
+            'top-left': 'top-left',
             'top-right': 'top-right',
             'bottom-left': 'bottom-left',
             'bottom-right': 'bottom-right',

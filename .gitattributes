@@ -1,0 +1,10 @@
+.gitattributes export-ignore
+.github export-ignore
+.gitignore export-ignore
+.gitmodules export-ignore
+.travis.yml export-ignore
+changelog.md export-ignore
+tests export-ignore
+js/*/src export-ignore
+
+js/*/dist/*.js -diff
