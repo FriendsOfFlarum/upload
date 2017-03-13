@@ -23,8 +23,6 @@ export default class PasteClipboard {
                 m.redraw();
 
                 this.uploadButton.uploadFiles(files);
-
-                e.preventDefault();
             }
         }
     }

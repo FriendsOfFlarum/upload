@@ -115,8 +115,6 @@ System.register('flagrow/upload/components/PasteClipboard', [], function (_expor
                                 m.redraw();
 
                                 this.uploadButton.uploadFiles(files);
-
-                                e.preventDefault();
                             }
                         }
                     }
