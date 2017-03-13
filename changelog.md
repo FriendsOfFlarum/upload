@@ -66,3 +66,5 @@
   - Imgur links are now without protocol, allowing loading via http & https.
 - 0.4.7
   - Pasting from clipboard implemented.
+- 0.4.8
+  - Fixed unable to paste by removing preventDefault
