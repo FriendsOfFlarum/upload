@@ -3,7 +3,7 @@ flagrow-upload:
         buttons:
             attach: Allega
         states:
-            loading: Caricando...
+            loading: Caricamento
             success: Successo
             error: Errore
     admin:
@@ -13,6 +13,7 @@ flagrow-upload:
             local: Locale
             aws-s3: Amazon S3
             imgur: Imgur
+            ovh-svfs: OVH SVFS
         labels:
             upload_method: Metodo di caricamento
             preferences:
@@ -25,31 +26,38 @@ flagrow-upload:
                 max_width: Larghezza massima immagini
                 max_height: Altezza massima immagini
             watermark:
-                title: Watermark immagini
-                toggle: Watermark immagini
-                position: Posizione del Watermark
-                file: Carica il tuo file di Watermark
+                title: Immagini Watermark
+                toggle: Immagini Watermark
+                position: Posizione Watermark
+                file: Carica la tua immagine di Watermark
             local:
-                title: Impostazioni archivio locale
+                title: Impostazioni archiviazione locale
                 cdn_url: URL della CDN (prefisso ai file)
             imgur:
-                title: Imgur image storage settings
+                title: Impostazioni archiviazione Imgur
                 client_id: Imgur client ID
             aws-s3:
-                title: Imposazioni archivio AWS S3
+                title: Imposazioni archiviazione AWS S3
                 key: Key
                 secret: Secret
                 bucket: Bucket
                 region: Region
+            ovh-svfs:
+                title: Impostazioni archiviazione OVH SVFS
+                container: Container
+                tenantid: Tenant ID
+                username: Nome utente
+                password: Password
+                region: Regione
         buttons:
             save: Salva impostazioni
         help_texts:
             description: >
                 Imposta i servizi di caricamento e le preferenze.
-            upload_method: >
-                Qui puoi selezionare il metodo da usare per caricare 
-                i tuoi file. Quando ne selezionerai uno, la scheda 
-                con le relative impostazioni sarà visualizzata.
+            mime_types: >
+                Configura la mappatura qui. Ogni singolo
+                tipo di mime sarà gestito da un adattatore di
+                caricamento specifico.
             resize: >
                 Qui puoi decidere se ridimensionare le tue immagini
                 prima che vengano caricate. Puoi impostare le dimensioni
