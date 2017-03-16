@@ -67,4 +67,6 @@
 - 0.4.7
   - Pasting from clipboard implemented.
 - 0.4.8
-  - Fixed unable to paste by removing preventDefault
+  - Fixed unable to paste by removing preventDefault.
+- 0.4.9
+  - Updated Italian locale.
