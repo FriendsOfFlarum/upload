@@ -18,16 +18,18 @@ use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
 use League\Flysystem\AdapterInterface;
-use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var Adap`terInterface
+     * @var AdapterInterface
      */
     protected $adapter;
 
+    /**
+     * @var array|false
+     */
     protected $meta;
 
     public function __construct(AdapterInterface $adapter)
@@ -117,13 +119,5 @@ abstract class Flysystem implements UploadAdapter
     public function supportsStreams()
     {
         return true;
-    }
-
-    /**
-     * @return Filesystem
-     */
-    public function getFilesystem()
-    {
-        return $this->filesystem;
     }
 }
