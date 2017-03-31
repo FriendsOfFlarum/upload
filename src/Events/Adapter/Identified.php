@@ -19,16 +19,16 @@ class Identified
     public $upload;
 
     /**
-     * @var UploadAdapter
+     * @var UploadAdapter|null
      */
     public $adapter;
 
     /**
      * @param User $actor
      * @param UploadedFile $upload
-     * @param UploadAdapter $adapter
+     * @param UploadAdapter|null $adapter
      */
-    public function __construct(User $actor, UploadedFile $upload, UploadAdapter $adapter)
+    public function __construct(User $actor, UploadedFile $upload, UploadAdapter $adapter = null)
     {
         $this->actor = $actor;
         $this->upload = $upload;
