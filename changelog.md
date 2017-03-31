@@ -70,3 +70,5 @@
   - Fixed unable to paste by removing preventDefault.
 - 0.4.9
   - Updated Italian locale.
+- 0.4.10
+  - Fixed triggering an internal server error in case no upload adapter was found for an uploaded file.
