@@ -114,12 +114,12 @@ class UploadHandler
 
             if (!$this->upload) {
                 $tempFilesystem->delete($uploadedFile->getBasename());
-                throw new ValidationException('Uploading files of this type is not allowed.');
+                throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
             }
 
             if (!$this->upload->forMime($uploadedFile->getMimeType())) {
                 $tempFilesystem->delete($uploadedFile->getBasename());
-                throw new ValidationException('Upload adapter does not support the provided mime type.');
+                throw new ValidationException(['upload' => 'Upload adapter does not support the provided mime type.']);
             }
 
             $file = (new File())->forceFill([
