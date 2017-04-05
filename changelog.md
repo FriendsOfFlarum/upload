@@ -72,3 +72,8 @@
   - Updated Italian locale.
 - 0.4.10
   - Fixed triggering an internal server error in case no upload adapter was found for an uploaded file.
+- 0.4.11
+  - Fixed introduced error from 0.4.10.
+- 0.4.12
+  - Naming convention altered for files, now using timestamp.
+  - Event dispatching now works.
