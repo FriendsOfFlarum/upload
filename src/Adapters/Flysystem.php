@@ -72,7 +72,7 @@ abstract class Flysystem implements UploadAdapter
             "%s%s%s",
             $today->toDateString(),
             $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
-            $today->toTimeString() . $today->micro . '-' . $file->base_name
+            $today->timestamp .'-' . $today->micro . '-' . $file->base_name
         );
     }
 
