@@ -24,7 +24,7 @@ use Flagrow\Upload\Validators\MimeValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Str as IllStr;
 use League\Flysystem\Adapter\Local;
@@ -202,7 +202,6 @@ class UploadHandler
     protected function getBasename(UploadedFile $uploadedFile)
     {
         $name = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-
 
         $slug = trim(Str::slug($name));
 
