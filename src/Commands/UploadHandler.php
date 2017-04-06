@@ -15,12 +15,10 @@
 namespace Flagrow\Upload\Commands;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
-use Flagrow\Upload\Events\Adapter\Identified;
-use Flagrow\Upload\Events\File as Events;
+use Flagrow\Upload\Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Validators\FileValidator;
-use Flagrow\Upload\Validators\MimeValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
@@ -76,7 +74,7 @@ class UploadHandler
 
     /**
      * @param Upload $command
-     * @return static
+     * @return \Illuminate\Support\Collection
      */
     public function handle(Upload $command)
     {
@@ -107,7 +105,7 @@ class UploadHandler
             $this->upload = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
 
             $this->events->fire(
-                new Identified($command->actor, $uploadedFile, $this->upload)
+                new Events\Adapter\Identified($command->actor, $uploadedFile, $this->upload)
             );
 
             $tempFilesystem = $this->getTempFilesystem($uploadedFile);
@@ -130,7 +128,7 @@ class UploadHandler
             ]);
 
             $this->events->fire(
-                new Events\WillBeUploaded($command->actor, $file, $uploadedFile)
+                new Events\File\WillBeUploaded($command->actor, $file, $uploadedFile)
             );
 
             $response = $this->upload->upload(
@@ -153,11 +151,11 @@ class UploadHandler
             $file->markdown_string = $this->getDefaultMarkdownStringAttribute($file);
 
             $this->events->fire(
-                new Events\WasUploaded($command->actor, $file, $uploadedFile)
+                new Events\File\WasUploaded($command->actor, $file, $uploadedFile)
             );
 
             $this->events->fire(
-                new Events\WillBeSaved($command->actor, $file, $uploadedFile)
+                new Events\File\WillBeSaved($command->actor, $file, $uploadedFile)
             );
 
             if ($file->isDirty() || !$file->exists) {
@@ -165,7 +163,7 @@ class UploadHandler
             }
 
             $this->events->fire(
-                new Events\WasSaved($command->actor, $file, $uploadedFile)
+                new Events\File\WasSaved($command->actor, $file, $uploadedFile)
             );
 
             return $file;
@@ -224,7 +222,7 @@ class UploadHandler
      */
     protected function identifyUploadAdapterForMime($mime)
     {
-        $adapter = $this->settings->getMimeTypesConfiguration()->first(function ($regex, $_) use ($mime) {
+        $adapter = $this->settings->getMimeTypesConfiguration()->first(function ($regex) use ($mime) {
             return preg_match("/$regex/", $mime);
         });
 
