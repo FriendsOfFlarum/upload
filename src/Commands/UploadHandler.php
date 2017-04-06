@@ -55,11 +55,6 @@ class UploadHandler
      */
     protected $events;
 
-    /**
-     * @var UploadAdapter
-     */
-    protected $upload;
-
     public function __construct(
         Application $app,
         FileValidator $fileValidator,
@@ -102,20 +97,20 @@ class UploadHandler
 
             $this->fileValidator->assertValid(['file' => $uploadedFile]);
 
-            $this->upload = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
+            $adapter = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
 
             $this->events->fire(
-                new Events\Adapter\Identified($command->actor, $uploadedFile, $this->upload)
+                new Events\Adapter\Identified($command->actor, $uploadedFile, $adapter)
             );
 
             $tempFilesystem = $this->getTempFilesystem($uploadedFile);
 
-            if (!$this->upload) {
+            if (!$adapter) {
                 $tempFilesystem->delete($uploadedFile->getBasename());
                 throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
             }
 
-            if (!$this->upload->forMime($uploadedFile->getMimeType())) {
+            if (!$adapter->forMime($uploadedFile->getMimeType())) {
                 $tempFilesystem->delete($uploadedFile->getBasename());
                 throw new ValidationException(['upload' => 'Upload adapter does not support the provided mime type.']);
             }
@@ -131,15 +126,15 @@ class UploadHandler
                 new Events\File\WillBeUploaded($command->actor, $file, $uploadedFile)
             );
 
-            $response = $this->upload->upload(
+            $response = $adapter->upload(
                 $file,
                 $uploadedFile,
-                $this->upload->supportsStreams() ?
+                $adapter->supportsStreams() ?
                     $tempFilesystem->readStream($uploadedFile->getBasename()) :
                     $tempFilesystem->read($uploadedFile->getBasename())
             );
 
-            $file->upload_method = IllStr::snake(last(explode('\\', get_class($this->upload))));
+            $file->upload_method = IllStr::snake(last(explode('\\', get_class($adapter))));
 
             $tempFilesystem->delete($uploadedFile->getBasename());
 
