@@ -28,10 +28,10 @@ class Identified
      * @param UploadedFile $upload
      * @param UploadAdapter|null $adapter
      */
-    public function __construct(User $actor, UploadedFile $upload, UploadAdapter $adapter = null)
+    public function __construct(User $actor, UploadedFile &$upload, UploadAdapter &$adapter = null)
     {
         $this->actor = $actor;
-        $this->upload = $upload;
-        $this->adapter = $adapter;
+        $this->upload = &$upload;
+        $this->adapter = &$adapter;
     }
 }
