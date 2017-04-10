@@ -43,7 +43,7 @@ class ProcessesImages
 
     protected function validateMime($mime)
     {
-        if (Str::startsWith($mime, 'image/')) {
+        if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
             return true;
         }
 
