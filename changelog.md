@@ -77,3 +77,7 @@
 - 0.4.12
   - Naming convention altered for files, now using timestamp.
   - Event dispatching now works.
+- 0.4.13
+  - Allows svg images to be parsed as images.
+  - Added CS locale.
+  - Fixed allowing mutation of adapter and uploaded file from event.
