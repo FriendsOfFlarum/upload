@@ -15,10 +15,12 @@
 namespace Flagrow\Upload;
 
 use Carbon\Carbon;
+use Flagrow\Upload\Contracts\UploadAdapter;
 use Flarum\Core\Discussion;
 use Flarum\Core\Post;
 use Flarum\Core\User;
 use Flarum\Database\AbstractModel;
+use Illuminate\Support\Str;
 
 /**
  * @property int        $id
@@ -70,5 +72,17 @@ class File extends AbstractModel
     public function discussion()
     {
         return $this->belongsTo(Discussion::class);
+    }
+
+    /**
+     * @param string|UploadAdapter $value
+     */
+    public function setUploadMethodAttribute($value)
+    {
+        if (is_object($value) && in_array(UploadAdapter::class, class_implements($value))) {
+            $value = Str::snake(last(explode('\\', get_class($value))));
+        }
+
+        $this->attributes['upload_method'] = $value;
     }
 }

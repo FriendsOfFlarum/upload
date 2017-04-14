@@ -14,8 +14,7 @@
 
 namespace Flagrow\Upload\Listeners;
 
-use Flagrow\Upload\Api\Controllers\UploadController;
-use Flagrow\Upload\Api\Controllers\WatermarkUploadController;
+use Flagrow\Upload\Api\Controllers;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
 use Flarum\Event\PrepareApiAttributes;
@@ -41,8 +40,9 @@ class AddUploadsApi
      */
     public function configureApiRoutes(ConfigureApiRoutes $event)
     {
-        $event->post('/flagrow/upload', 'flagrow.upload', UploadController::class);
-        $event->post('/flagrow/watermark', 'flagrow.watermark', WatermarkUploadController::class);
+        $event->post('/flagrow/upload', 'flagrow.upload', Controllers\UploadController::class);
+        $event->post('/flagrow/watermark', 'flagrow.watermark', Controllers\WatermarkUploadController::class);
+        $event->get('/flagrow/download/{uuid}', 'flagrow.download', Controllers\DownloadController::class);
     }
 
     /**

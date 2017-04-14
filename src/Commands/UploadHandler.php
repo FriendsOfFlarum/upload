@@ -14,22 +14,17 @@
 
 namespace Flagrow\Upload\Commands;
 
+use Exception;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
-use Flagrow\Upload\Validators\FileValidator;
+use Flagrow\Upload\Repositories\FileRepository;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Str;
-use Illuminate\Support\Str as IllStr;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
-use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadHandler
 {
@@ -46,25 +41,24 @@ class UploadHandler
     protected $settings;
 
     /**
-     * @var FileValidator
-     */
-    protected $fileValidator;
-
-    /**
      * @var Dispatcher
      */
     protected $events;
+    /**
+     * @var FileRepository
+     */
+    protected $files;
 
     public function __construct(
         Application $app,
-        FileValidator $fileValidator,
         Dispatcher $events,
-        Settings $settings
+        Settings $settings,
+        FileRepository $files
     ) {
         $this->app = $app;
         $this->settings = $settings;
-        $this->fileValidator = $fileValidator;
         $this->events = $events;
+        $this->files = $files;
     }
 
     /**
@@ -80,86 +74,65 @@ class UploadHandler
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
 
-            // Move the file to a temporary location first.
-            $tempFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.upload.');
-            $file->moveTo($tempFile);
+            try {
+                $upload = $this->files->moveUploadedFileToTemp($file);
+                $adapter = $this->identifyUploadAdapterForMime($upload->getMimeType());
 
-            $uploadedFile = new UploadedFile(
-                $tempFile,
-                $file->getClientFilename(),
-                $file->getClientMediaType(),
-                $file->getSize(),
-                $file->getError(),
-                true
-            );
+                $this->events->fire(
+                    new Events\Adapter\Identified($command->actor, $upload, $adapter)
+                );
 
-            unset($tempFile);
+                if (!$adapter) {
+                    throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
+                }
 
-            $this->fileValidator->assertValid(['file' => $uploadedFile]);
+                if (!$adapter->forMime($upload->getMimeType())) {
+                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getMimeType()}."]);
+                }
 
-            $adapter = $this->identifyUploadAdapterForMime($uploadedFile->getMimeType());
+                $file = $this->files->createFileFromUpload($upload, $command->actor);
 
-            $this->events->fire(
-                new Events\Adapter\Identified($command->actor, $uploadedFile, $adapter)
-            );
+                $this->events->fire(
+                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
+                );
 
-            $tempFilesystem = $this->getTempFilesystem($uploadedFile);
+                $response = $adapter->upload(
+                    $file,
+                    $upload,
+                    $this->files->readUpload($upload, $adapter)
+                );
 
-            if (!$adapter) {
-                $tempFilesystem->delete($uploadedFile->getBasename());
-                throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
+                $this->files->removeFromTemp($upload);
+
+                if (!($response instanceof File)) {
+                    return false;
+                }
+
+                $file = $response;
+
+                $file->upload_method = $adapter;
+                $file->markdown_string = $this->markdownString($file);
+
+                $this->events->fire(
+                    new Events\File\WillBeSaved($command->actor, $file, $upload)
+                );
+
+                if ($file->isDirty() || !$file->exists) {
+                    $file->save();
+                }
+
+                $this->events->fire(
+                    new Events\File\WasSaved($command->actor, $file, $upload)
+                );
+
+            } catch (Exception $e) {
+
+                if (isset($upload)) {
+                    $this->files->removeFromTemp($upload);
+                }
+
+                throw $e;
             }
-
-            if (!$adapter->forMime($uploadedFile->getMimeType())) {
-                $tempFilesystem->delete($uploadedFile->getBasename());
-                throw new ValidationException(['upload' => 'Upload adapter does not support the provided mime type.']);
-            }
-
-            $file = (new File())->forceFill([
-                'base_name' => $this->getBasename($uploadedFile),
-                'size' => $uploadedFile->getSize(),
-                'type' => $uploadedFile->getMimeType(),
-                'actor_id' => $command->actor->id,
-            ]);
-
-            $this->events->fire(
-                new Events\File\WillBeUploaded($command->actor, $file, $uploadedFile)
-            );
-
-            $response = $adapter->upload(
-                $file,
-                $uploadedFile,
-                $adapter->supportsStreams() ?
-                    $tempFilesystem->readStream($uploadedFile->getBasename()) :
-                    $tempFilesystem->read($uploadedFile->getBasename())
-            );
-
-            $file->upload_method = IllStr::snake(last(explode('\\', get_class($adapter))));
-
-            $tempFilesystem->delete($uploadedFile->getBasename());
-
-            if (!($response instanceof File)) {
-                return false;
-            }
-
-            $file = $response;
-            $file->markdown_string = $this->getDefaultMarkdownStringAttribute($file);
-
-            $this->events->fire(
-                new Events\File\WasUploaded($command->actor, $file, $uploadedFile)
-            );
-
-            $this->events->fire(
-                new Events\File\WillBeSaved($command->actor, $file, $uploadedFile)
-            );
-
-            if ($file->isDirty() || !$file->exists) {
-                $file->save();
-            }
-
-            $this->events->fire(
-                new Events\File\WasSaved($command->actor, $file, $uploadedFile)
-            );
 
             return $file;
         });
@@ -168,47 +141,15 @@ class UploadHandler
     }
 
     /**
-     * @param UploadedFile $uploadedFile
-     * @return Filesystem
-     */
-    protected function getTempFilesystem(UploadedFile $uploadedFile)
-    {
-        return new Filesystem(new Local($uploadedFile->getPath()));
-    }
-
-    /**
      * @param File $file
      * @return string
      */
-    public function getDefaultMarkdownStringAttribute(File $file)
+    public function markdownString(File $file)
     {
         $label = "[$file->base_name]";
         $url = "({$file->url})";
 
         return $label . $url;
-    }
-
-    /**
-     * @param UploadedFile $uploadedFile
-     * @return string
-     */
-    protected function getBasename(UploadedFile $uploadedFile)
-    {
-        $name = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-
-        $slug = trim(Str::slug($name));
-
-        // Fixes uploads of filenames with foreign characters.
-        if (empty($slug)) {
-            $slug = $uuid = Uuid::uuid1();
-        }
-
-        return sprintf("%s.%s",
-            $slug,
-            $uploadedFile->guessExtension() ?
-                $uploadedFile->guessExtension() :
-                $uploadedFile->getClientOriginalExtension()
-        );
     }
 
     /**
