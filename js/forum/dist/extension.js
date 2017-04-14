@@ -1,3 +1,126 @@
+"use strict";
+
+System.register("flagrow/upload/components/DownloadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
+    "use strict";
+
+    var Component, icon, LoadingIndicator, DownloadButton;
+    return {
+        setters: [function (_flarumComponent) {
+            Component = _flarumComponent.default;
+        }, function (_flarumHelpersIcon) {
+            icon = _flarumHelpersIcon.default;
+        }, function (_flarumComponentsLoadingIndicator) {
+            LoadingIndicator = _flarumComponentsLoadingIndicator.default;
+        }],
+        execute: function () {
+            DownloadButton = function (_Component) {
+                babelHelpers.inherits(DownloadButton, _Component);
+
+                function DownloadButton() {
+                    babelHelpers.classCallCheck(this, DownloadButton);
+                    return babelHelpers.possibleConstructorReturn(this, (DownloadButton.__proto__ || Object.getPrototypeOf(DownloadButton)).apply(this, arguments));
+                }
+
+                babelHelpers.createClass(DownloadButton, [{
+                    key: "init",
+                    value: function init() {
+                        // the service type handling uploads
+                        this.textAreaObj = null;
+
+                        // initial state of the button
+                        this.loading = false;
+                    }
+                }, {
+                    key: "view",
+                    value: function view() {
+                        var _this2 = this;
+
+                        return m('div', {
+                            className: 'Button hasIcon flagrow-download-button Button--icon',
+                            click: function click() {
+                                return _this2.process.bind(_this2);
+                            }
+                        }, [this.loading ? LoadingIndicator.component({ className: 'Button-icon' }) : icon('file-o', { className: 'Button-icon' }), m('span', { className: 'Button-label' }, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.download'))]);
+                    }
+                }, {
+                    key: "process",
+                    value: function process(e) {
+                        console.log('download');
+                    }
+                }, {
+                    key: "uploadFiles",
+                    value: function uploadFiles(files, successCallback, failureCallback) {
+                        var data = new FormData();
+
+                        for (var i = 0; i < files.length; i++) {
+                            data.append('files[]', files[i]);
+                        }
+
+                        // send a POST request to the api
+                        return app.request({
+                            method: 'POST',
+                            url: app.forum.attribute('apiUrl') + '/flagrow/upload',
+                            // prevent JSON.stringify'ing the form data in the XHR call
+                            serialize: function serialize(raw) {
+                                return raw;
+                            },
+                            data: data
+                        }).then(this.success.bind(this), this.failure.bind(this));
+                    }
+                }, {
+                    key: "failure",
+                    value: function failure(message) {}
+                    // todo show popup
+
+
+                    /**
+                     * Appends the file's link to the body of the composer.
+                     *
+                     * @param file
+                     */
+
+                }, {
+                    key: "success",
+                    value: function success(response) {
+                        var _this3 = this;
+
+                        var markdownString = '';
+                        var file;
+
+                        for (var i = 0; i < response.data.length; i++) {
+
+                            file = response.data[i].attributes;
+
+                            // create a markdown string that holds the image link
+
+                            if (file.uuid) {
+                                markdownString += '\n$file-' + file.uuid + '\n';
+                            }
+                        }
+
+                        // place the Markdown image link in the Composer
+                        this.textAreaObj.insertAtCursor(markdownString);
+
+                        // if we are not starting a new discussion, the variable is defined
+                        if (typeof this.textAreaObj.props.preview !== 'undefined') {
+                            // show what we just uploaded
+                            this.textAreaObj.props.preview();
+                        }
+
+                        // reset the button for a new upload
+                        setTimeout(function () {
+                            document.getElementById("flagrow-upload-form").reset();
+                            _this3.loading = false;
+                        }, 1000);
+                    }
+                }]);
+                return DownloadButton;
+            }(Component);
+
+            _export("default", DownloadButton);
+        }
+    };
+});;
 'use strict';
 
 System.register('flagrow/upload/components/DragAndDrop', [], function (_export, _context) {
@@ -128,10 +251,10 @@ System.register('flagrow/upload/components/PasteClipboard', [], function (_expor
 });;
 "use strict";
 
-System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
+System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator", "flagrow/upload/components/DownloadButton"], function (_export, _context) {
     "use strict";
 
-    var Component, icon, LoadingIndicator, UploadButton;
+    var Component, icon, LoadingIndicator, DownloadButton, UploadButton;
     return {
         setters: [function (_flarumComponent) {
             Component = _flarumComponent.default;
@@ -139,6 +262,8 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
             icon = _flarumHelpersIcon.default;
         }, function (_flarumComponentsLoadingIndicator) {
             LoadingIndicator = _flarumComponentsLoadingIndicator.default;
+        }, function (_flagrowUploadComponentsDownloadButton) {
+            DownloadButton = _flagrowUploadComponentsDownloadButton.default;
         }],
         execute: function () {
             UploadButton = function (_Component) {
@@ -217,22 +342,21 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function success(response) {
                         var _this2 = this;
 
-                        var markdownString = '';
-                        var file;
+                        var downloadButtons = [];
+                        var appendToTextarea = '';
 
                         for (var i = 0; i < response.data.length; i++) {
 
-                            file = response.data[i].attributes;
+                            var file = response.data[i].attributes;
 
-                            // create a markdown string that holds the image link
+                            downloadButtons.push(DownloadButton.component({
+                                file: file
+                            }));
 
-                            if (file.uuid) {
-                                markdownString += '\n$' + file.uuid + '\n';
-                            }
+                            appendToTextarea += '\n<div class="flagrow-upload-button-preview" data-uuid="' + file.uuid + '" data-base-name="' + file.base_name + '" />\n';
                         }
 
-                        // place the Markdown image link in the Composer
-                        this.textAreaObj.insertAtCursor(markdownString);
+                        this.textAreaObj.insertAtCursor(appendToTextarea);
 
                         // if we are not starting a new discussion, the variable is defined
                         if (typeof this.textAreaObj.props.preview !== 'undefined') {
@@ -256,10 +380,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DownloadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard", "flarum/components/CommentPost"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard;
+    var extend, TextEditor, UploadButton, DownloadButton, DragAndDrop, PasteClipboard, CommentPost;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -267,15 +391,36 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             TextEditor = _flarumComponentsTextEditor.default;
         }, function (_flagrowUploadComponentsUploadButton) {
             UploadButton = _flagrowUploadComponentsUploadButton.default;
+        }, function (_flagrowUploadComponentsDownloadButton) {
+            DownloadButton = _flagrowUploadComponentsDownloadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
         }, function (_flagrowUploadComponentsPasteClipboard) {
             PasteClipboard = _flagrowUploadComponentsPasteClipboard.default;
+        }, function (_flarumComponentsCommentPost) {
+            CommentPost = _flarumComponentsCommentPost.default;
         }],
         execute: function () {
 
             app.initializers.add('flagrow-upload', function (app) {
                 var uploadButton, drag, clipboard;
+
+                extend(CommentPost.prototype, 'config', function () {
+                    var contentHtml = this.props.post.contentHtml();
+                    // if (! this.isEditing()) return;
+
+                    var parentPost = this.props.post;
+                    var $parentPost = this.$();
+
+                    this.$('.flagrow-upload-button-preview').each(function () {
+                        console.log('one found');
+                        var $this = $(this);
+                        var uuid = $this.attr('data-uuid');
+                        var base_name = $this.attr('data-base-name');
+
+                        $this.replaceWith('foo');
+                    });
+                });
 
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.
@@ -296,6 +441,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         $(this).addClass('Button--icon');
                     });
                 });
+
                 extend(TextEditor.prototype, 'configTextarea', function () {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;

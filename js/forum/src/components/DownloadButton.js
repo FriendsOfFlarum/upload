@@ -1,9 +1,8 @@
 import Component from "flarum/Component";
 import icon from "flarum/helpers/icon";
 import LoadingIndicator from "flarum/components/LoadingIndicator";
-import DownloadButton from 'flagrow/upload/components/DownloadButton';
 
-export default class UploadButton extends Component {
+export default class DownloadButton extends Component {
 
     /**
      * Load the configured remote uploader service.
@@ -22,17 +21,17 @@ export default class UploadButton extends Component {
      * @returns {*}
      */
     view() {
-        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [
-            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}),
-            m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')),
-            m('form#flagrow-upload-form', [
-                m('input', {
-                    type: 'file',
-                    multiple: true,
-                    onchange: this.process.bind(this)
-                })
-            ])
-        ]);
+        return m(
+            'div',
+            {
+                className: 'Button hasIcon flagrow-download-button Button--icon',
+                click: () => this.process.bind(this)
+            },
+            [
+                this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}),
+                m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.download')),
+            ]
+        );
     }
 
     /**
@@ -41,15 +40,7 @@ export default class UploadButton extends Component {
      * @param e
      */
     process(e) {
-        // get the file from the input field
-
-        var files = $(e.target)[0].files;
-
-        // set the button in the loading state (and redraw the element!)
-        this.loading = true;
-        m.redraw();
-
-        this.uploadFiles(files, this.success, this.failure);
+        console.log('download');
     }
 
     uploadFiles(files, successCallback, failureCallback) {
@@ -87,21 +78,22 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        var downloadButtons = [];
-        var appendToTextarea = '';
+        var markdownString = '';
+        var file;
 
         for (var i = 0; i < response.data.length; i++) {
 
-            let file = response.data[i].attributes;
+            file = response.data[i].attributes;
 
-            downloadButtons.push(DownloadButton.component({
-                file
-            }));
+            // create a markdown string that holds the image link
 
-            appendToTextarea += '\n<div class="flagrow-upload-button-preview" data-uuid="' + file.uuid + '" data-base-name="' + file.base_name + '" />\n';
+            if (file.uuid) {
+                markdownString += '\n$file-' + file.uuid + '\n';
+            }
         }
 
-        this.textAreaObj.insertAtCursor(appendToTextarea);
+        // place the Markdown image link in the Composer
+        this.textAreaObj.insertAtCursor(markdownString);
 
         // if we are not starting a new discussion, the variable is defined
         if (typeof this.textAreaObj.props.preview !== 'undefined') {

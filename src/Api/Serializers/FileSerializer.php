@@ -32,7 +32,7 @@ class FileSerializer extends AbstractSerializer
     {
         return Arr::only(
             $model->attributesToArray(),
-            ['uuid']
+            ['uuid', 'base_name']
         );
     }
 }

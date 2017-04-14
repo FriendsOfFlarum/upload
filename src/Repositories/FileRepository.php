@@ -17,10 +17,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 class FileRepository
 {
     /**
-     * @var File
-     */
-    protected $file;
-    /**
      * @var string
      */
     protected $path;
@@ -29,20 +25,19 @@ class FileRepository
      */
     private $validator;
 
-    function __construct(File $file, Application $app, UploadValidator $validator)
+    function __construct(Application $app, UploadValidator $validator)
     {
-        $this->file = $file;
         $this->path = $app->storagePath();
         $this->validator = $validator;
     }
 
     /**
      * @param $uuid
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return File
      */
     public function findByUuid($uuid)
     {
-        return $this->file->newQuery()
+        return File::query()
             ->where('uuid', $uuid)
             ->first();
     }
@@ -61,7 +56,7 @@ class FileRepository
             }
         }
 
-        return ($this->file->newInstance())->forceFill([
+        return (new File)->forceFill([
             'uuid' => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
             'size' => $file->getSize(),
