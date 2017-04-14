@@ -18,13 +18,10 @@ use Flarum\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
 
 return function (Dispatcher $events, Application $app) {
-    $events->subscribe(Listeners\AddUploadsApi::class);
     $events->subscribe(Listeners\AddClientAssets::class);
+    $events->subscribe(Listeners\AddPostDownloadTag::class);
+    $events->subscribe(Listeners\AddUploadsApi::class);
     $events->subscribe(Listeners\LoadSettingsFromDatabase::class);
-
-    /**
-     * Processors
-     */
     $events->subscribe(Listeners\ProcessesImages::class);
 
     $app->register(Providers\StorageServiceProvider::class);

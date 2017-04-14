@@ -42,7 +42,7 @@ class AddUploadsApi
     {
         $event->post('/flagrow/upload', 'flagrow.upload', Controllers\UploadController::class);
         $event->post('/flagrow/watermark', 'flagrow.watermark', Controllers\WatermarkUploadController::class);
-        $event->get('/flagrow/download/{uuid}', 'flagrow.download', Controllers\DownloadController::class);
+        $event->get('/flagrow/download/{uuid}', 'flagrow.upload.download', Controllers\DownloadController::class);
     }
 
     /**

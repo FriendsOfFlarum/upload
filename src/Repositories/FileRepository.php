@@ -55,7 +55,7 @@ class FileRepository
     public function createFileFromUpload(Upload $file, User $actor)
     {
         // Generate a guaranteed unique Uuid.
-        while($uuid = Uuid::uuid4()) {
+        while($uuid = Uuid::uuid4()->toString()) {
             if (! $this->findByUuid($uuid)) {
                 break;
             }
