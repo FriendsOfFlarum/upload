@@ -54,6 +54,7 @@ class AddUploadsApi
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             $event->attributes['canUpload'] = $event->actor->can('flagrow.upload');
+            $event->attributes['canDownload'] = $event->actor->can('flagrow.upload.download');
         }
     }
 }

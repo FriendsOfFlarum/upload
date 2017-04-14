@@ -17,16 +17,21 @@ use Flagrow\Upload\Events\File\WillBeSaved;
 use Flagrow\Upload\Events\File\WillBeUploaded;
 use Flagrow\Upload\Processors\ImageProcessor;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Str;
 
 class ProcessesImages
 {
+    /**
+     * @param Dispatcher $events
+     */
     public function subscribe(Dispatcher $events)
     {
         $events->listen(WillBeUploaded::class, [$this, 'processor']);
         $events->listen(WillBeSaved::class, [$this, 'modifyMarkdown']);
     }
 
+    /**
+     * @param WillBeUploaded $event
+     */
     public function processor(WillBeUploaded $event)
     {
         if ($this->validateMime($event->file->type)) {
@@ -34,6 +39,9 @@ class ProcessesImages
         }
     }
 
+    /**
+     * @param WillBeSaved $event
+     */
     public function modifyMarkdown(WillBeSaved $event)
     {
         if ($this->validateMime($event->file->type)) {
@@ -41,6 +49,10 @@ class ProcessesImages
         }
     }
 
+    /**
+     * @param $mime
+     * @return bool
+     */
     protected function validateMime($mime)
     {
         if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {

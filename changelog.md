@@ -81,3 +81,10 @@
   - Allows svg images to be parsed as images.
   - Added CS locale.
   - Fixed allowing mutation of adapter and uploaded file from event.
+- 0.5.0
+  - WasUploaded event is removed. It was a duplicate for WillBeSaved.
+  - Refactored uploading by separating code into repository.
+  - Added a PHP proxy, by which:
+    - The extension can now track the uploads.
+    - Understands where files are located.
+    - Streams remote files, so automatically upgrades to https in case your forum has SSL.

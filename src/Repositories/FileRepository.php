@@ -4,7 +4,7 @@ namespace Flagrow\Upload\Repositories;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
-use Flagrow\Upload\Validators\FileValidator;
+use Flagrow\Upload\Validators\UploadValidator;
 use Flarum\Core\User;
 use Flarum\Foundation\Application;
 use Illuminate\Support\Str;
@@ -29,12 +29,22 @@ class FileRepository
      */
     private $validator;
 
-    function __construct(File $file, Application $app, FileValidator $validator)
+    function __construct(File $file, Application $app, UploadValidator $validator)
     {
-
         $this->file = $file;
         $this->path = $app->storagePath();
         $this->validator = $validator;
+    }
+
+    /**
+     * @param $uuid
+     * @return \Illuminate\Database\Eloquent\Model|null|static
+     */
+    public function findByUuid($uuid)
+    {
+        return $this->file->newQuery()
+            ->where('uuid', $uuid)
+            ->first();
     }
 
     /**
@@ -44,9 +54,14 @@ class FileRepository
      */
     public function createFileFromUpload(Upload $file, User $actor)
     {
-        $uuid = Uuid::uuid4();
+        // Generate a guaranteed unique Uuid.
+        while($uuid = Uuid::uuid4()) {
+            if (! $this->findByUuid($uuid)) {
+                break;
+            }
+        }
 
-        return (new File())->forceFill([
+        return ($this->file->newInstance())->forceFill([
             'uuid' => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
             'size' => $file->getSize(),

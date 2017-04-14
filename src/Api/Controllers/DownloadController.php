@@ -3,6 +3,7 @@
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Api\Serializers\FileSerializer;
+use Flagrow\Upload\Commands\Download;
 use Flarum\Api\Controller\AbstractResourceController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
@@ -34,5 +35,12 @@ class DownloadController extends AbstractResourceController
     {
         $actor = $request->getAttribute('actor');
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
+        $discussion = Arr::get($request->getParsedBody(), 'discussion');
+        $post = Arr::get($request->getParsedBody(), 'post');
+
+        $this->bus->dispatch(
+            new Download($uuid, $actor, $discussion, $post)
+        );
     }
 }
+

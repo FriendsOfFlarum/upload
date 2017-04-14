@@ -9,6 +9,7 @@ flagrow-upload:
     admin:
         permissions:
             upload_label: Upload files
+            download_label: Download files
         upload_methods:
             local: Local
             aws-s3: Amazon S3
