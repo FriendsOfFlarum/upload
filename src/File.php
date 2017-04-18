@@ -23,28 +23,30 @@ use Flarum\Database\AbstractModel;
 use Illuminate\Support\Str;
 
 /**
- * @property int        $id
+ * @property int $id
  *
- * @property string     $base_name
- * @property string     $path
- * @property string     $url
- * @property string     $type
- * @property int        $size
+ * @property string $base_name
+ * @property string $path
+ * @property string $url
+ * @property string $type
+ * @property int $size
  *
- * @property string     $upload_method
- * @property string     $remote_id
- * @property string     $markdown_string
+ * @property string $upload_method
+ * @property string $remote_id
+ * @property string $markdown_string
  *
- * @property int        $post_id
- * @property Post       $post
+ * @property int $post_id
+ * @property Post $post
  *
- * @property int        $discussion_id
+ * @property int $discussion_id
  * @property Discussion $discussion
  *
- * @property int        $actor_id
- * @property User       $actor
+ * @property int $actor_id
+ * @property User $actor
  *
- * @property Carbon     $created_at
+ * @property \Illuminate\Database\Eloquent\Collection|Download[] $downloads
+ *
+ * @property Carbon $created_at
  */
 class File extends AbstractModel
 {
@@ -72,6 +74,14 @@ class File extends AbstractModel
     public function discussion()
     {
         return $this->belongsTo(Discussion::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function downloads()
+    {
+        return $this->hasMany(Download::class);
     }
 
     /**

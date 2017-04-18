@@ -33,7 +33,6 @@ class AddPostDownloadTag
     {
         $events->listen(ConfigureFormatter::class, [$this, 'configure']);
         $events->listen(ConfigureFormatterParser::class, [$this, 'parse']);
-        $events->listen(ConfigureFormatterRenderer::class, [$this, 'render']);
     }
 
     /**
@@ -49,12 +48,16 @@ class AddPostDownloadTag
 
         $tag->attributes->add('uuid');
         $tag->attributes->add('base_name');
+        $tag->attributes->add('downloads')->filterChain->append('#uint');
         $tag->attributes->add('discussionid')->filterChain->append('#uint');
         $tag->attributes->add('number')->filterChain->append('#uint');
         $tag->attributes['discussionid']->required = false;
         $tag->attributes['number']->required = false;
 
-        $tag->template = '<a href="{$FLAGROW_DOWNLOAD_URL}{@uuid}" class="Button hasIcon flagrow-download-button Button--icon" data-uuid="{@uuid}"><xsl:value-of select="@base_name"/></a>';
+        $tag->template =
+            '<div class="Button hasIcon flagrow-download-button" data-uuid="{@uuid}">'.
+            '<xsl:value-of select="@base_name"/>'.
+            '</div>';
 
         $tag->filterChain->prepend([static::class, 'addAttributes'])
             ->addParameterByName('fileRepository')
@@ -72,19 +75,15 @@ class AddPostDownloadTag
     }
 
     /**
-     * @param ConfigureFormatterRenderer $event
+     * @param $tag
+     * @param FileRepository $files
+     * @return bool
      */
-    public function render(ConfigureFormatterRenderer $event)
-    {
-        // @todo URL cannot be resolved somehow
-//        $event->renderer->setParameter('FLAGROW_DOWNLOAD_URL', $this->url->toRoute('flagrow.upload', ['uuid' => '']));
-        $event->renderer->setParameter('FLAGROW_DOWNLOAD_URL', '/api/flagrow/download/');
-    }
-
     public static function addAttributes($tag, FileRepository $files)
     {
         $file = $files->findByUuid($tag->getAttribute('uuid'));
         $tag->setAttribute('base_name', $file->base_name);
+        $tag->setAttribute('downloads', $file->downloads->count());
         return true;
     }
 }
