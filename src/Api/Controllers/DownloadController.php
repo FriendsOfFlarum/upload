@@ -4,13 +4,13 @@ namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Api\Serializers\FileSerializer;
 use Flagrow\Upload\Commands\Download;
-use Flarum\Api\Controller\AbstractResourceController;
+use Flarum\Http\Controller\ControllerInterface;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
-class DownloadController extends AbstractResourceController
+class DownloadController implements ControllerInterface
 {
     public $serializer = FileSerializer::class;
 
@@ -25,20 +25,17 @@ class DownloadController extends AbstractResourceController
     }
 
     /**
-     * Get the data to be serialized and assigned to the response document.
-     *
      * @param ServerRequestInterface $request
-     * @param Document $document
-     * @return mixed
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    protected function data(ServerRequestInterface $request, Document $document)
+    public function handle(ServerRequestInterface $request)
     {
         $actor = $request->getAttribute('actor');
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
         $discussion = Arr::get($request->getParsedBody(), 'discussion');
         $post = Arr::get($request->getParsedBody(), 'post');
 
-        $this->bus->dispatch(
+        return $this->bus->dispatch(
             new Download($uuid, $actor, $discussion, $post)
         );
     }

@@ -25,6 +25,8 @@ class DownloadValidator extends AbstractValidator
         $settings = app(Settings::class);
 
         $rules = [
+            'url' => ['required', 'url'],
+            'base_name' => ['required', 'string']
         ];
 
         return $rules;

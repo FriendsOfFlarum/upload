@@ -353,7 +353,7 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                                 file: file
                             }));
 
-                            appendToTextarea += '\n<div class="flagrow-upload-button-preview" data-uuid="' + file.uuid + '" data-base-name="' + file.base_name + '" />\n';
+                            appendToTextarea += '\n$file-' + file.uuid + '\n';
                         }
 
                         this.textAreaObj.insertAtCursor(appendToTextarea);
@@ -380,10 +380,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DownloadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard", "flarum/components/CommentPost"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DownloadButton, DragAndDrop, PasteClipboard, CommentPost;
+    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -391,36 +391,17 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             TextEditor = _flarumComponentsTextEditor.default;
         }, function (_flagrowUploadComponentsUploadButton) {
             UploadButton = _flagrowUploadComponentsUploadButton.default;
-        }, function (_flagrowUploadComponentsDownloadButton) {
-            DownloadButton = _flagrowUploadComponentsDownloadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
         }, function (_flagrowUploadComponentsPasteClipboard) {
             PasteClipboard = _flagrowUploadComponentsPasteClipboard.default;
-        }, function (_flarumComponentsCommentPost) {
-            CommentPost = _flarumComponentsCommentPost.default;
         }],
         execute: function () {
 
             app.initializers.add('flagrow-upload', function (app) {
-                var uploadButton, drag, clipboard;
-
-                extend(CommentPost.prototype, 'config', function () {
-                    var contentHtml = this.props.post.contentHtml();
-                    // if (! this.isEditing()) return;
-
-                    var parentPost = this.props.post;
-                    var $parentPost = this.$();
-
-                    this.$('.flagrow-upload-button-preview').each(function () {
-                        console.log('one found');
-                        var $this = $(this);
-                        var uuid = $this.attr('data-uuid');
-                        var base_name = $this.attr('data-base-name');
-
-                        $this.replaceWith('foo');
-                    });
-                });
+                var uploadButton = void 0,
+                    drag = void 0,
+                    clipboard = void 0;
 
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.

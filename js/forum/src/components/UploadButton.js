@@ -98,7 +98,7 @@ export default class UploadButton extends Component {
                 file
             }));
 
-            appendToTextarea += '\n<div class="flagrow-upload-button-preview" data-uuid="' + file.uuid + '" data-base-name="' + file.base_name + '" />\n';
+            appendToTextarea += '\n$file-' + file.uuid + '\n';
         }
 
         this.textAreaObj.insertAtCursor(appendToTextarea);

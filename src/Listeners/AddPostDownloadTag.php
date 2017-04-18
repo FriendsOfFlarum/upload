@@ -54,13 +54,13 @@ class AddPostDownloadTag
         $tag->attributes['discussionid']->required = false;
         $tag->attributes['number']->required = false;
 
-        $tag->template = '<a href="{$FLAGROW_DOWNLOAD_URL}{@uuid}" class="Flagrow--Download-Button" data-uuid="{@uuid}">$<xsl:value-of select="@base_name"/></a>';
+        $tag->template = '<a href="{$FLAGROW_DOWNLOAD_URL}{@uuid}" class="Button hasIcon flagrow-download-button Button--icon" data-uuid="{@uuid}"><xsl:value-of select="@base_name"/></a>';
 
         $tag->filterChain->prepend([static::class, 'addAttributes'])
             ->addParameterByName('fileRepository')
             ->setJS('function() { return true; }');
 
-        $configurator->Preg->match('/\$file-(?<uuid>[a-z0-9-]{36})/', $tagName);
+        $configurator->Preg->match('/'. preg_quote('$file-') .'(?<uuid>[a-z0-9-]{36})/', $tagName);
     }
 
     /**
@@ -78,15 +78,13 @@ class AddPostDownloadTag
     {
         // @todo URL cannot be resolved somehow
 //        $event->renderer->setParameter('FLAGROW_DOWNLOAD_URL', $this->url->toRoute('flagrow.upload', ['uuid' => '']));
-        $event->renderer->setParameter('FLAGROW_DOWNLOAD_URL', '/flagrow/download/');
+        $event->renderer->setParameter('FLAGROW_DOWNLOAD_URL', '/api/flagrow/download/');
     }
 
     public static function addAttributes($tag, FileRepository $files)
     {
-        if ($file = $files->findByUuid($tag->getAttribute('uuid'))) {
-            $tag->setAttribute('base_name', $file->base_name);
-
-            return true;
-        }
+        $file = $files->findByUuid($tag->getAttribute('uuid'));
+        $tag->setAttribute('base_name', $file->base_name);
+        return true;
     }
 }

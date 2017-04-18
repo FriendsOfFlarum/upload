@@ -2,7 +2,10 @@
 
 namespace Flagrow\Upload\Repositories;
 
+use Carbon\Carbon;
+use Flagrow\Upload\Commands\Download as DownloadCommand;
 use Flagrow\Upload\Contracts\UploadAdapter;
+use Flagrow\Upload\Download;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Validators\UploadValidator;
 use Flarum\Core\User;
@@ -140,5 +143,25 @@ class FileRepository
         return $adapter->supportsStreams()
             ? $filesystem->readStream($upload->getBasename())
             : $filesystem->read($upload->getBasename());
+    }
+
+    /**
+     * @param File $file
+     * @param DownloadCommand $command
+     * @return Download
+     */
+    public function downloadedEntry(File $file, DownloadCommand $command)
+    {
+        $download = new Download();
+
+        $download->forceFill([
+            'file_id' => $file->id,
+            'actor_id' => $command->actor->id,
+            'discussion_id' => $command->discussionId,
+            'post_id' => $command->postId,
+            'downloaded_at' => new Carbon
+        ]);
+
+        return $download;
     }
 }
