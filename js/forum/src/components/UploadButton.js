@@ -94,10 +94,6 @@ export default class UploadButton extends Component {
 
             let file = response.data[i].attributes;
 
-            downloadButtons.push(DownloadButton.component({
-                file
-            }));
-
             appendToTextarea += '\n$file-' + file.uuid + '\n';
         }
 

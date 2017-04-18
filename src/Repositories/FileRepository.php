@@ -156,11 +156,13 @@ class FileRepository
 
         $download->forceFill([
             'file_id' => $file->id,
-            'actor_id' => $command->actor->id,
+            'actor_id' => $command->actor ? $command->actor->id : null,
             'discussion_id' => $command->discussionId,
             'post_id' => $command->postId,
             'downloaded_at' => new Carbon
         ]);
+
+        $download->save();
 
         return $download;
     }

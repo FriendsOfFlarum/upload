@@ -49,14 +49,12 @@ class AddPostDownloadTag
         $tag->attributes->add('uuid');
         $tag->attributes->add('base_name');
         $tag->attributes->add('downloads')->filterChain->append('#uint');
-        $tag->attributes->add('discussionid')->filterChain->append('#uint');
-        $tag->attributes->add('number')->filterChain->append('#uint');
-        $tag->attributes['discussionid']->required = false;
-        $tag->attributes['number']->required = false;
 
         $tag->template =
-            '<div class="Button hasIcon flagrow-download-button" data-uuid="{@uuid}">'.
-            '<xsl:value-of select="@base_name"/>'.
+            '<div class="flagrow-download-button ButtonGroup" data-uuid="{@uuid}">'.
+                '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
+                '<div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>'.
+                '<div class="Button"><xsl:value-of select="@downloads"/></div>'.
             '</div>';
 
         $tag->filterChain->prepend([static::class, 'addAttributes'])

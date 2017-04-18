@@ -41,7 +41,10 @@ export default class UploadPage extends Component {
         // the checkboxes we need to watch and to save.
         this.checkboxes = [
             'mustResize',
-            'overrideAvatarUpload'
+            'overrideAvatarUpload',
+
+            'disableHotlinkProtection',
+            'disableDownloadLogging',
         ];
 
         // fields that are objects
@@ -193,6 +196,22 @@ export default class UploadPage extends Component {
                             ]),
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')),
                             <UploadImageButton name="flagrow/watermark"/>
+                        ]),
+                        m('fieldset', {className: 'UploadPage-downloading'}, [
+                            m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.disable-hotlink-protection.title')),
+                            m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.disable-hotlink-protection')),
+                            Switch.component({
+                                state: this.values.disableHotlinkProtection() || false,
+                                children: app.translator.trans('flagrow-upload.admin.labels.disable-hotlink-protection.toggle'),
+                                onchange: this.values.disableHotlinkProtection
+                            }),
+                            m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.disable-download-logging.title')),
+                            m('div', {className: 'helpText'}, app.translator.trans('flagrow-upload.admin.help_texts.disable-download-logging')),
+                            Switch.component({
+                                state: this.values.disableDownloadLogging() || false,
+                                children: app.translator.trans('flagrow-upload.admin.labels.disable-download-logging.toggle'),
+                                onchange: this.values.disableDownloadLogging
+                            }),
                         ]),
                         m('fieldset', {
                             className: 'UploadPage-local',

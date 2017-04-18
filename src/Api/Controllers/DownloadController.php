@@ -4,11 +4,13 @@ namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Api\Serializers\FileSerializer;
 use Flagrow\Upload\Commands\Download;
+use Flagrow\Upload\Helpers\Settings;
+use Flarum\Core\Repository\PostRepository;
 use Flarum\Http\Controller\ControllerInterface;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
-use Tobscure\JsonApi\Document;
 
 class DownloadController implements ControllerInterface
 {
@@ -18,10 +20,20 @@ class DownloadController implements ControllerInterface
      * @var Dispatcher
      */
     protected $bus;
+    /**
+     * @var PostRepository
+     */
+    private $posts;
+    /**
+     * @var Settings
+     */
+    private $settings;
 
-    public function __construct(Dispatcher $bus)
+    public function __construct(Dispatcher $bus, PostRepository $posts, Settings $settings)
     {
         $this->bus = $bus;
+        $this->posts = $posts;
+        $this->settings = $settings;
     }
 
     /**
@@ -32,11 +44,20 @@ class DownloadController implements ControllerInterface
     {
         $actor = $request->getAttribute('actor');
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
-        $discussion = Arr::get($request->getParsedBody(), 'discussion');
-        $post = Arr::get($request->getParsedBody(), 'post');
+        $postId = Arr::get($request->getQueryParams(), 'post');
+        $csrf = Arr::get($request->getQueryParams(), 'csrf');
+
+        $post = $this->posts->findOrFail($postId, $actor);
+        $discussion = $post->discussion_id;
+
+        $session = $request->getAttribute('session');
+
+        if ($this->settings->get('disableHotlinkProtection') != 1 && $csrf !== $session->get('csrf_token')) {
+            throw new ModelNotFoundException();
+        }
 
         return $this->bus->dispatch(
-            new Download($uuid, $actor, $discussion, $post)
+            new Download($uuid, $actor, $discussion, $postId)
         );
     }
 }

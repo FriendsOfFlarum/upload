@@ -1,126 +1,3 @@
-"use strict";
-
-System.register("flagrow/upload/components/DownloadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
-    "use strict";
-
-    var Component, icon, LoadingIndicator, DownloadButton;
-    return {
-        setters: [function (_flarumComponent) {
-            Component = _flarumComponent.default;
-        }, function (_flarumHelpersIcon) {
-            icon = _flarumHelpersIcon.default;
-        }, function (_flarumComponentsLoadingIndicator) {
-            LoadingIndicator = _flarumComponentsLoadingIndicator.default;
-        }],
-        execute: function () {
-            DownloadButton = function (_Component) {
-                babelHelpers.inherits(DownloadButton, _Component);
-
-                function DownloadButton() {
-                    babelHelpers.classCallCheck(this, DownloadButton);
-                    return babelHelpers.possibleConstructorReturn(this, (DownloadButton.__proto__ || Object.getPrototypeOf(DownloadButton)).apply(this, arguments));
-                }
-
-                babelHelpers.createClass(DownloadButton, [{
-                    key: "init",
-                    value: function init() {
-                        // the service type handling uploads
-                        this.textAreaObj = null;
-
-                        // initial state of the button
-                        this.loading = false;
-                    }
-                }, {
-                    key: "view",
-                    value: function view() {
-                        var _this2 = this;
-
-                        return m('div', {
-                            className: 'Button hasIcon flagrow-download-button Button--icon',
-                            click: function click() {
-                                return _this2.process.bind(_this2);
-                            }
-                        }, [this.loading ? LoadingIndicator.component({ className: 'Button-icon' }) : icon('file-o', { className: 'Button-icon' }), m('span', { className: 'Button-label' }, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.download'))]);
-                    }
-                }, {
-                    key: "process",
-                    value: function process(e) {
-                        console.log('download');
-                    }
-                }, {
-                    key: "uploadFiles",
-                    value: function uploadFiles(files, successCallback, failureCallback) {
-                        var data = new FormData();
-
-                        for (var i = 0; i < files.length; i++) {
-                            data.append('files[]', files[i]);
-                        }
-
-                        // send a POST request to the api
-                        return app.request({
-                            method: 'POST',
-                            url: app.forum.attribute('apiUrl') + '/flagrow/upload',
-                            // prevent JSON.stringify'ing the form data in the XHR call
-                            serialize: function serialize(raw) {
-                                return raw;
-                            },
-                            data: data
-                        }).then(this.success.bind(this), this.failure.bind(this));
-                    }
-                }, {
-                    key: "failure",
-                    value: function failure(message) {}
-                    // todo show popup
-
-
-                    /**
-                     * Appends the file's link to the body of the composer.
-                     *
-                     * @param file
-                     */
-
-                }, {
-                    key: "success",
-                    value: function success(response) {
-                        var _this3 = this;
-
-                        var markdownString = '';
-                        var file;
-
-                        for (var i = 0; i < response.data.length; i++) {
-
-                            file = response.data[i].attributes;
-
-                            // create a markdown string that holds the image link
-
-                            if (file.uuid) {
-                                markdownString += '\n$file-' + file.uuid + '\n';
-                            }
-                        }
-
-                        // place the Markdown image link in the Composer
-                        this.textAreaObj.insertAtCursor(markdownString);
-
-                        // if we are not starting a new discussion, the variable is defined
-                        if (typeof this.textAreaObj.props.preview !== 'undefined') {
-                            // show what we just uploaded
-                            this.textAreaObj.props.preview();
-                        }
-
-                        // reset the button for a new upload
-                        setTimeout(function () {
-                            document.getElementById("flagrow-upload-form").reset();
-                            _this3.loading = false;
-                        }, 1000);
-                    }
-                }]);
-                return DownloadButton;
-            }(Component);
-
-            _export("default", DownloadButton);
-        }
-    };
-});;
 'use strict';
 
 System.register('flagrow/upload/components/DragAndDrop', [], function (_export, _context) {
@@ -349,10 +226,6 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 
                             var file = response.data[i].attributes;
 
-                            downloadButtons.push(DownloadButton.component({
-                                file: file
-                            }));
-
                             appendToTextarea += '\n$file-' + file.uuid + '\n';
                         }
 
@@ -380,10 +253,10 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 });;
 "use strict";
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard"], function (_export, _context) {
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard", "flagrow/upload/downloadButtonInteraction"], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard;
+    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard, downloadButtonInteraction;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -395,6 +268,8 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
         }, function (_flagrowUploadComponentsPasteClipboard) {
             PasteClipboard = _flagrowUploadComponentsPasteClipboard.default;
+        }, function (_flagrowUploadDownloadButtonInteraction) {
+            downloadButtonInteraction = _flagrowUploadDownloadButtonInteraction.default;
         }],
         execute: function () {
 
@@ -434,7 +309,45 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         clipboard = new PasteClipboard(uploadButton);
                     }
                 });
+
+                downloadButtonInteraction();
             });
         }
+    };
+});;
+'use strict';
+
+System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'flarum/components/Post'], function (_export, _context) {
+    "use strict";
+
+    var extend, Post;
+
+    _export('default', function () {
+        extend(Post.prototype, 'config', function (isInitialized) {
+            var _this = this;
+
+            if (isInitialized) return;
+
+            this.$('.flagrow-download-button[data-uuid]').click('.download', function (e) {
+                e.preventDefault();
+
+                var url = app.forum.attribute('apiUrl') + '/flagrow/download';
+
+                url += '/' + $(e.currentTarget).attr('data-uuid');
+                url += '/' + _this.props.post.id();
+                url += '/' + app.session.csrfToken;
+
+                window.open(url);
+            });
+        });
+    });
+
+    return {
+        setters: [function (_flarumExtend) {
+            extend = _flarumExtend.extend;
+        }, function (_flarumComponentsPost) {
+            Post = _flarumComponentsPost.default;
+        }],
+        execute: function () {}
     };
 });

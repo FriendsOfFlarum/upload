@@ -4,6 +4,8 @@ import UploadButton from "flagrow/upload/components/UploadButton";
 import DragAndDrop from "flagrow/upload/components/DragAndDrop";
 import PasteClipboard from "flagrow/upload/components/PasteClipboard";
 
+import downloadButtonInteraction from 'flagrow/upload/downloadButtonInteraction';
+
 app.initializers.add('flagrow-upload', app => {
     let uploadButton,
         drag,
@@ -44,4 +46,6 @@ app.initializers.add('flagrow-upload', app => {
             clipboard = new PasteClipboard(uploadButton);
         }
     });
+
+    downloadButtonInteraction();
 });

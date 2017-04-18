@@ -6,6 +6,7 @@ use Flagrow\Upload\Events\File\WasLoaded;
 use Flagrow\Upload\Events\File\WillBeDownloaded;
 use Flagrow\Upload\Exceptions\InvalidDownloadException;
 use Flagrow\Upload\File;
+use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Validators\DownloadValidator;
 use Flarum\Core\Access\AssertPermissionTrait;
@@ -39,15 +40,19 @@ class DownloadHandler
      * @var Dispatcher
      */
     private $events;
+    /**
+     * @var Settings
+     */
+    private $settings;
 
-    public function __construct(FileRepository $files, DownloadValidator $validator, DiscussionRepository $discussions, Client $api, Dispatcher $events)
+    public function __construct(FileRepository $files, DownloadValidator $validator, DiscussionRepository $discussions, Client $api, Dispatcher $events, Settings $settings)
     {
-
         $this->files = $files;
         $this->validator = $validator;
         $this->discussions = $discussions;
         $this->api = $api;
         $this->events = $events;
+        $this->settings = $settings;
     }
 
     /**
@@ -84,7 +89,10 @@ class DownloadHandler
         }
 
         if ($response->getStatusCode() == 200) {
-            $download = $this->files->downloadedEntry($file, $command);
+
+            if ($this->settings->get('disableDownloadLogging') != 1) {
+                $download = $this->files->downloadedEntry($file, $command);
+            }
 
             $response = $this->mutateHeaders($response, $file);
 
@@ -112,7 +120,8 @@ class DownloadHandler
         $response = $response->withHeader('Content-Transfer-Encoding', 'binary');
 
         $response = $response->withHeader(
-            sprintf('Content-Disposition', 'attachment; filename="%s"', $file->base_name)
+            'Content-Disposition',
+            sprintf('attachment; filename="%s"', $file->base_name)
         );
 
         return $response;
