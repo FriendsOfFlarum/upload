@@ -8,6 +8,7 @@ use Flarum\Event\ConfigureFormatterParser;
 use Flarum\Event\ConfigureFormatterRenderer;
 use Flarum\Forum\UrlGenerator;
 use Illuminate\Events\Dispatcher;
+use s9e\TextFormatter\Configurator\Items\Tag;
 
 class AddPostDownloadTag
 {
@@ -52,8 +53,8 @@ class AddPostDownloadTag
 
         $tag->template =
             '<div class="flagrow-download-button ButtonGroup" data-uuid="{@uuid}">'.
-                '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
                 '<div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>'.
+                '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
                 '<div class="Button"><xsl:value-of select="@downloads"/></div>'.
             '</div>';
 
@@ -77,11 +78,11 @@ class AddPostDownloadTag
      * @param FileRepository $files
      * @return bool
      */
-    public static function addAttributes($tag, FileRepository $files)
+    public static function addAttributes(Tag $tag, FileRepository $files)
     {
         $file = $files->findByUuid($tag->getAttribute('uuid'));
-        $tag->setAttribute('base_name', $file->base_name);
         $tag->setAttribute('downloads', $file->downloads->count());
+        $tag->setAttribute('base_name', $file->base_name);
         return true;
     }
 }
