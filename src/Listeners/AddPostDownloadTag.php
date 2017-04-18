@@ -50,11 +50,13 @@ class AddPostDownloadTag
         $tag->attributes->add('uuid');
         $tag->attributes->add('base_name');
         $tag->attributes->add('downloads')->filterChain->append('#uint');
+        $tag->attributes->add('size')->filterChain->append('#uint');
 
         $tag->template =
             '<div class="flagrow-download-button ButtonGroup" data-uuid="{@uuid}">'.
                 '<div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>'.
                 '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
+                '<div class="Button"><xsl:value-of select="@size"/><xsl:text>b</xsl:text></div>'.
                 '<div class="Button"><xsl:value-of select="@downloads"/></div>'.
             '</div>';
 
@@ -81,8 +83,9 @@ class AddPostDownloadTag
     public static function addAttributes(Tag $tag, FileRepository $files)
     {
         $file = $files->findByUuid($tag->getAttribute('uuid'));
-        $tag->setAttribute('downloads', $file->downloads->count());
         $tag->setAttribute('base_name', $file->base_name);
+        $tag->setAttribute('downloads', $file->downloads->count());
+        $tag->setAttribute('size', $file->size);
         return true;
     }
 }
