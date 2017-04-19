@@ -2,6 +2,7 @@
 
 namespace Flagrow\Upload\Commands;
 
+use Flagrow\Upload\Contracts\Downloader;
 use Flagrow\Upload\Events\File\WasLoaded;
 use Flagrow\Upload\Events\File\WillBeDownloaded;
 use Flagrow\Upload\Exceptions\InvalidDownloadException;
@@ -13,12 +14,15 @@ use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Repository\DiscussionRepository;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 use Psr\Http\Message\ResponseInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class DownloadHandler
 {
     use AssertPermissionTrait;
+
+    protected static $downloader = [];
 
     /**
      * @var FileRepository
@@ -82,48 +86,50 @@ class DownloadHandler
             new WasLoaded($file)
         );
 
-        try {
-            $response = $this->api->get($file->url);
-        } catch (\Exception $e) {
-            throw new InvalidDownloadException($e->getMessage());
-        }
+        foreach (static::downloader() as $downloader) {
+            if ($downloader->for($file)) {
+                $response = $downloader->download($file);
 
-        if ($response->getStatusCode() == 200) {
+                if (!$response) {
+                    continue;
+                }
 
-            if ($this->settings->get('disableDownloadLogging') != 1) {
-                $download = $this->files->downloadedEntry($file, $command);
+                if ($this->settings->get('disableDownloadLogging') != 1) {
+                    $download = $this->files->downloadedEntry($file, $command);
+                }
+
+                $this->events->fire(
+                    new WillBeDownloaded($file, $response, $download)
+                );
+
+                return $response;
             }
-
-            $response = $this->mutateHeaders($response, $file);
-
-            $this->events->fire(
-                new WillBeDownloaded($file, $response, $download)
-            );
-
-            return $response;
         }
 
         throw new InvalidDownloadException();
     }
 
     /**
-     * @param ResponseInterface $response
-     * @param File $file
-     * @return ResponseInterface
+     * @param Downloader $downloader
      */
-    protected function mutateHeaders(ResponseInterface $response, File $file)
+    public static function prependDownloader(Downloader $downloader)
     {
-        $response = $response->withHeader('Content-Type', 'application/force-download');
-        $response = $response->withAddedHeader('Content-Type', 'application/octet-stream');
-        $response = $response->withAddedHeader('Content-Type', 'application/download');
+        Arr::prepend(static::$downloader, $downloader);
+    }
 
-        $response = $response->withHeader('Content-Transfer-Encoding', 'binary');
+    /**
+     * @param Downloader $downloader
+     */
+    public static function addDownloader(Downloader $downloader)
+    {
+        Arr::add(static::$downloader, $downloader);
+    }
 
-        $response = $response->withHeader(
-            'Content-Disposition',
-            sprintf('attachment; filename="%s"', $file->base_name)
-        );
-
-        return $response;
+    /**
+     * @return array
+     */
+    public static function downloader()
+    {
+        return static::$downloader;
     }
 }
