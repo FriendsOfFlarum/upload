@@ -30,6 +30,9 @@ use Illuminate\Support\Str;
  * @property string $url
  * @property string $type
  * @property int $size
+ * @property string $uuid
+ *
+ * @property string $humanSize
  *
  * @property string $upload_method
  * @property string $remote_id
@@ -51,6 +54,8 @@ use Illuminate\Support\Str;
 class File extends AbstractModel
 {
     protected $table = 'flagrow_files';
+
+    protected $appends = ['humanSize'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -94,5 +99,24 @@ class File extends AbstractModel
         }
 
         $this->attributes['upload_method'] = $value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHumanSizeAttribute()
+    {
+        return $this->human_filesize($this->size);
+    }
+
+    /**
+     * @param $bytes
+     * @param int $decimals
+     * @return string
+     */
+    public function human_filesize($bytes, $decimals = 0) {
+        $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
     }
 }

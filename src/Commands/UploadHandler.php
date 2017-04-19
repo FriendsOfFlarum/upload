@@ -20,6 +20,7 @@ use Flagrow\Upload\Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
+use Flagrow\Upload\Templates\FileTemplate;
 use Flarum\Core\Access\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
@@ -111,7 +112,8 @@ class UploadHandler
                 $file = $response;
 
                 $file->upload_method = $adapter;
-                $file->tag = 'file';
+                // Set the default tag for the template.
+                $file->tag = (new FileTemplate())->tag();
 
                 $this->events->fire(
                     new Events\File\WillBeSaved($command->actor, $file, $upload)

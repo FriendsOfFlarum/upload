@@ -219,14 +219,13 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function success(response) {
                         var _this2 = this;
 
-                        var downloadButtons = [];
                         var appendToTextarea = '';
 
                         for (var i = 0; i < response.data.length; i++) {
 
                             var file = response.data[i].attributes;
 
-                            appendToTextarea += '\n$file-' + file.uuid + '\n';
+                            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
                         }
 
                         this.textAreaObj.insertAtCursor(appendToTextarea);
@@ -249,6 +248,42 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
 
             _export("default", UploadButton);
         }
+    };
+});;
+'use strict';
+
+System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'flarum/components/Post'], function (_export, _context) {
+    "use strict";
+
+    var extend, Post;
+
+    _export('default', function () {
+        extend(Post.prototype, 'config', function (isInitialized) {
+            var _this = this;
+
+            if (isInitialized) return;
+
+            this.$('.flagrow-download-button[data-uuid]').click('.download', function (e) {
+                e.preventDefault();
+
+                var url = app.forum.attribute('apiUrl') + '/flagrow/download';
+
+                url += '/' + $(e.currentTarget).attr('data-uuid');
+                url += '/' + _this.props.post.id();
+                url += '/' + app.session.csrfToken;
+
+                window.open(url);
+            });
+        });
+    });
+
+    return {
+        setters: [function (_flarumExtend) {
+            extend = _flarumExtend.extend;
+        }, function (_flarumComponentsPost) {
+            Post = _flarumComponentsPost.default;
+        }],
+        execute: function () {}
     };
 });;
 "use strict";
@@ -313,41 +348,5 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                 downloadButtonInteraction();
             });
         }
-    };
-});;
-'use strict';
-
-System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'flarum/components/Post'], function (_export, _context) {
-    "use strict";
-
-    var extend, Post;
-
-    _export('default', function () {
-        extend(Post.prototype, 'config', function (isInitialized) {
-            var _this = this;
-
-            if (isInitialized) return;
-
-            this.$('.flagrow-download-button[data-uuid]').click('.download', function (e) {
-                e.preventDefault();
-
-                var url = app.forum.attribute('apiUrl') + '/flagrow/download';
-
-                url += '/' + $(e.currentTarget).attr('data-uuid');
-                url += '/' + _this.props.post.id();
-                url += '/' + app.session.csrfToken;
-
-                window.open(url);
-            });
-        });
-    });
-
-    return {
-        setters: [function (_flarumExtend) {
-            extend = _flarumExtend.extend;
-        }, function (_flarumComponentsPost) {
-            Post = _flarumComponentsPost.default;
-        }],
-        execute: function () {}
     };
 });

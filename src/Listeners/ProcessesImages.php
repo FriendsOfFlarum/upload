@@ -16,6 +16,7 @@ namespace Flagrow\Upload\Listeners;
 use Flagrow\Upload\Events\File\WillBeSaved;
 use Flagrow\Upload\Events\File\WillBeUploaded;
 use Flagrow\Upload\Processors\ImageProcessor;
+use Flagrow\Upload\Templates\ImageTemplate;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class ProcessesImages
@@ -26,7 +27,7 @@ class ProcessesImages
     public function subscribe(Dispatcher $events)
     {
         $events->listen(WillBeUploaded::class, [$this, 'processor']);
-        $events->listen(WillBeSaved::class, [$this, 'modifyMarkdown']);
+        $events->listen(WillBeSaved::class, [$this, 'tag']);
     }
 
     /**
@@ -42,10 +43,10 @@ class ProcessesImages
     /**
      * @param WillBeSaved $event
      */
-    public function modifyMarkdown(WillBeSaved $event)
+    public function tag(WillBeSaved $event)
     {
         if ($this->validateMime($event->file->type)) {
-            $event->file->markdown_string = "![image {$event->file->base_name}]({$event->file->url})";
+            $event->file->tag = (new ImageTemplate())->tag();
         }
     }
 

@@ -9,7 +9,7 @@ use Flarum\Forum\UrlGenerator;
 use Illuminate\Events\Dispatcher;
 use s9e\TextFormatter\Configurator\Items\Tag;
 
-class AddPostDownloadTag
+class AddPostDownloadFileTag
 {
     /**
      * @var UrlGenerator

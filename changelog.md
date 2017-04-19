@@ -83,6 +83,10 @@
   - Fixed allowing mutation of adapter and uploaded file from event.
 - 0.5.0
   - WasUploaded event is removed. It was a duplicate for WillBeSaved.
+  - Adds download entries on posts, with preview functionality.
+  - Added WillBeDownloaded and WasLoaded events used in the downloading functionality.
+  - Removed markdown string generation and dependency. Now using raw xsl documents.
+  - Added ability to inject a custom downloader instance, mutating how downloads are handled.
   - Refactored uploading by separating code into repository.
   - Added a PHP proxy, by which:
     - The extension can now track the uploads.

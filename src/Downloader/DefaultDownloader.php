@@ -40,7 +40,6 @@ class DefaultDownloader implements Downloader
      */
     public function download(File $file, Download $command)
     {
-
         try {
             $response = $this->api->get($file->url);
         } catch (\Exception $e) {

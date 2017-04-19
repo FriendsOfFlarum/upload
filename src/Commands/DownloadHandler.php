@@ -6,7 +6,6 @@ use Flagrow\Upload\Contracts\Downloader;
 use Flagrow\Upload\Events\File\WasLoaded;
 use Flagrow\Upload\Events\File\WillBeDownloaded;
 use Flagrow\Upload\Exceptions\InvalidDownloadException;
-use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Validators\DownloadValidator;
@@ -15,7 +14,6 @@ use Flarum\Core\Repository\DiscussionRepository;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
-use Psr\Http\Message\ResponseInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class DownloadHandler
@@ -88,7 +86,7 @@ class DownloadHandler
 
         foreach (static::downloader() as $downloader) {
             if ($downloader->for($file)) {
-                $response = $downloader->download($file);
+                $response = $downloader->download($file, $command);
 
                 if (!$response) {
                     continue;
@@ -122,7 +120,7 @@ class DownloadHandler
      */
     public static function addDownloader(Downloader $downloader)
     {
-        Arr::add(static::$downloader, $downloader);
+        static::$downloader[] = $downloader;
     }
 
     /**

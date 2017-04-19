@@ -41,6 +41,7 @@ class FileRepository
     public function findByUuid($uuid)
     {
         return File::query()
+            ->with('downloads')
             ->where('uuid', $uuid)
             ->first();
     }

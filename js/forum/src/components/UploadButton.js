@@ -87,14 +87,13 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        var downloadButtons = [];
         var appendToTextarea = '';
 
         for (var i = 0; i < response.data.length; i++) {
 
             let file = response.data[i].attributes;
 
-            appendToTextarea += '\n$file-' + file.uuid + '\n';
+            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
         }
 
         this.textAreaObj.insertAtCursor(appendToTextarea);
