@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
  *
  * @property string $upload_method
  * @property string $remote_id
- * @property string $markdown_string
+ * @property string $tag
  *
  * @property int $post_id
  * @property Post $post

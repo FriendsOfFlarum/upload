@@ -111,7 +111,7 @@ class UploadHandler
                 $file = $response;
 
                 $file->upload_method = $adapter;
-                $file->markdown_string = $this->markdownString($file);
+                $file->tag = 'file';
 
                 $this->events->fire(
                     new Events\File\WillBeSaved($command->actor, $file, $upload)
@@ -138,18 +138,6 @@ class UploadHandler
         });
 
         return $savedFiles->filter();
-    }
-
-    /**
-     * @param File $file
-     * @return string
-     */
-    public function markdownString(File $file)
-    {
-        $label = "[$file->base_name]";
-        $url = "({$file->url})";
-
-        return $label . $url;
     }
 
     /**

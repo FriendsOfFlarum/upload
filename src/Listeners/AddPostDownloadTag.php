@@ -5,7 +5,6 @@ namespace Flagrow\Upload\Listeners;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flarum\Event\ConfigureFormatter;
 use Flarum\Event\ConfigureFormatterParser;
-use Flarum\Event\ConfigureFormatterRenderer;
 use Flarum\Forum\UrlGenerator;
 use Illuminate\Events\Dispatcher;
 use s9e\TextFormatter\Configurator\Items\Tag;
