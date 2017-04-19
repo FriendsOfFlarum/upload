@@ -4,10 +4,13 @@ import UploadButton from "flagrow/upload/components/UploadButton";
 import DragAndDrop from "flagrow/upload/components/DragAndDrop";
 import PasteClipboard from "flagrow/upload/components/PasteClipboard";
 
+import downloadButtonInteraction from 'flagrow/upload/downloadButtonInteraction';
+
 app.initializers.add('flagrow-upload', app => {
-    var uploadButton,
+    let uploadButton,
         drag,
         clipboard;
+
 
     extend(TextEditor.prototype, 'controlItems', function (items) {
         // check whether the user can upload images. If not, returns.
@@ -31,6 +34,7 @@ app.initializers.add('flagrow-upload', app => {
             }
         );
     });
+
     extend(TextEditor.prototype, 'configTextarea', function() {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
@@ -42,4 +46,6 @@ app.initializers.add('flagrow-upload', app => {
             clipboard = new PasteClipboard(uploadButton);
         }
     });
+
+    downloadButtonInteraction();
 });

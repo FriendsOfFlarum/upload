@@ -14,5 +14,10 @@ app.initializers.add('flagrow-upload', app => {
             label: app.translator.trans('flagrow-upload.admin.permissions.upload_label'),
             permission: 'flagrow.upload'
         });
+        items.add('download', {
+            icon: 'file-o',
+            label: app.translator.trans('flagrow-upload.admin.permissions.download_label'),
+            permission: 'flagrow.upload.download'
+        });
     });
 });

@@ -1,6 +1,7 @@
 import Component from "flarum/Component";
 import icon from "flarum/helpers/icon";
 import LoadingIndicator from "flarum/components/LoadingIndicator";
+import DownloadButton from 'flagrow/upload/components/DownloadButton';
 
 export default class UploadButton extends Component {
 
@@ -86,24 +87,16 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        var markdownString = '';
-        var file;
+        var appendToTextarea = '';
 
         for (var i = 0; i < response.data.length; i++) {
 
-            file = response.data[i].attributes;
+            let file = response.data[i].attributes;
 
-            // create a markdown string that holds the image link
-
-            if (file.markdown_string) {
-                markdownString += '\n' + file.markdown_string + '\n';
-            } else {
-                markdownString += '\n[' + file.base_name + '](' + file.url + ')\n';
-            }
+            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
         }
 
-        // place the Markdown image link in the Composer
-        this.textAreaObj.insertAtCursor(markdownString);
+        this.textAreaObj.insertAtCursor(appendToTextarea);
 
         // if we are not starting a new discussion, the variable is defined
         if (typeof this.textAreaObj.props.preview !== 'undefined') {

@@ -17,7 +17,7 @@ namespace Flagrow\Upload\Validators;
 use Flagrow\Upload\Helpers\Settings;
 use Flarum\Core\Validator\AbstractValidator;
 
-class FileValidator extends AbstractValidator
+class UploadValidator extends AbstractValidator
 {
     protected function getRules()
     {

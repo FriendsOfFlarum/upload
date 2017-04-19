@@ -32,6 +32,6 @@ class Upload
     public function __construct(Collection $files, User $actor)
     {
         $this->files = $files;
-        $this->actor        = $actor;
+        $this->actor = $actor;
     }
 }
