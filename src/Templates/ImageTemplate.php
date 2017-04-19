@@ -21,13 +21,15 @@ class ImageTemplate extends AbstractTemplate
     public function template()
     {
         return
-            '<div class="flagrow-download-button" data-uuid="{@uuid}">'.
+            '<div class="flagrow-download-button hasImage" data-uuid="{@uuid}">'.
                 '<img src="{@url}" alt="{@base_name}" />'.
-                '<div class="ButtonGroup">'.
-                    '<div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>'.
-                    '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
-                    '<div class="Button"><xsl:value-of select="@size"/></div>'.
-                    '<div class="Button"><xsl:value-of select="@downloads"/></div>'.
+                '<div class="hasButtons">'.
+                    '<div class="ButtonGroup">'.
+                        '<div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>'.
+                        '<div class="Button"><xsl:value-of select="@base_name"/></div>'.
+                        '<div class="Button"><xsl:value-of select="@size"/></div>'.
+//                        '<div class="Button"><xsl:value-of select="@downloads"/></div>'.
+                    '</div>'.
                 '</div>'.
             '</div>';
     }

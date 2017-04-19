@@ -2,12 +2,34 @@
     clear: both;
     width: 100%;
     text-align: center;
+    position: relative;
 
-    > img {
-        max-width: 100%;
-        height: auto;
-        padding: 2px;
-        border: 1px solid @muted-color;
-        border-radius: 4px;
+    &.hasImage {
+        display: inline-block;
+
+        .hasButtons {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            display: none;
+            background: @overlay-bg;
+
+            .ButtonGroup {
+                margin: 50% auto 0 auto;
+            }
+        }
+        &:hover .hasButtons {
+            display: block;
+        }
+        > img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid @overlay-bg;
+            border-radius: 4px;
+            background: @overlay-bg;
+            .box-shadow(0 0 4px @overlay-bg);
+        }
     }
 }
