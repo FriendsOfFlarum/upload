@@ -3,6 +3,7 @@
 namespace Flagrow\Upload\Templates;
 
 use Flagrow\Upload\Repositories\FileRepository;
+use Illuminate\Contracts\View\Factory;
 use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
 
@@ -21,6 +22,16 @@ abstract class AbstractTemplate
     public function tag()
     {
         return $this->tag;
+    }
+
+    /**
+     * @param string $view
+     * @param array $arguments
+     * @return string
+     */
+    protected function getView($view, $arguments = [])
+    {
+        return app(Factory::class)->make($view, $arguments);
     }
 
     /**

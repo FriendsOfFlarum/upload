@@ -13,5 +13,7 @@ class DownloadProvider extends AbstractServiceProvider
         DownloadHandler::addDownloader(
             $this->app->make(DefaultDownloader::class)
         );
+
+        $this->loadViewsFrom(__DIR__ . '/../../assets/templates', 'flagrow.download.templates');
     }
 }
