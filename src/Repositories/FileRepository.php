@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Flagrow\Upload\Commands\Download as DownloadCommand;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Download;
+use Flagrow\Upload\Exceptions\InvalidUploadException;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Validators\UploadValidator;
 use Flarum\Core\User;
@@ -75,6 +76,8 @@ class FileRepository
      */
     public function moveUploadedFileToTemp(UploadedFileInterface $upload)
     {
+        $this->handleUploadError($upload->getError());
+
         // Move the file to a temporary location first.
         $tempFile = tempnam($this->path . '/tmp', 'flagrow.upload.');
         $upload->moveTo($tempFile);
@@ -91,6 +94,35 @@ class FileRepository
         $this->validator->assertValid(compact('file'));
 
         return $file;
+    }
+
+    protected function handleUploadError($code)
+    {
+        switch ($code) {
+            case UPLOAD_ERR_INI_SIZE:
+                throw new InvalidUploadException('Upload max filesize limit reached from php.ini.');
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                throw new InvalidUploadException('Upload max filesize limit reached from form.');
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                throw new InvalidUploadException('Partial upload.');
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                throw new InvalidUploadException('No file uploaded.');
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                throw new InvalidUploadException('No tmp folder for uploading files.');
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                throw new InvalidUploadException('Cannot write to disk');
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                throw new InvalidUploadException('A php extension blocked the upload.');
+                break;
+            case UPLOAD_ERR_OK:
+                break;
+        }
     }
 
     /**

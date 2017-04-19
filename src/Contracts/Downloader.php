@@ -14,7 +14,7 @@ interface Downloader
      * @param File $file
      * @return bool
      */
-    public function for(File $file);
+    public function forFile(File $file);
 
     /**
      * @param File $file

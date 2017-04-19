@@ -27,7 +27,7 @@ class DefaultDownloader implements Downloader
      * @param File $file
      * @return bool
      */
-    public function for(File $file)
+    public function forFile(File $file)
     {
         return true;
     }
