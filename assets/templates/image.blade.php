@@ -11,7 +11,7 @@
                     <h4 class="title">
                         <xsl:value-of select="@base_name"/>
                     </h4>
-                    <div class="flagrow-download-button Button Button--primary Button-icon" data-uuid="{@uuid}"><i class="fa fa-download"></i></div>
+                    <div class="flagrow-download-button Button Button--primary Button-icon Button--block" data-uuid="{@uuid}"><i class="fa fa-download"></i></div>
                 </div>
             </div>
         </div>

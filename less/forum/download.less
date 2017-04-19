@@ -1,38 +1,4 @@
-.flagrow-download-button {
-    clear: both;
-    width: 100%;
-    text-align: center;
-    position: relative;
 
-    &.hasImage {
-        display: inline-block;
-
-        .hasButtons {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            display: none;
-            background: @overlay-bg;
-
-            .ButtonGroup {
-                margin: 50% auto 0 auto;
-            }
-        }
-        &:hover .hasButtons {
-            display: block;
-        }
-        > img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid @overlay-bg;
-            border-radius: 4px;
-            background: @overlay-bg;
-            .box-shadow(0 0 4px @overlay-bg);
-        }
-    }
-}
 .flagrow-download.row {
 
     margin: 10px auto 0;
@@ -86,12 +52,16 @@
 
             &:hover {
                 .data {
+                    background-color: @body-bg;
                     transform: translateY(0);
                 }
-                .menu-content {
-                    span {
-                        transform: translate(-50%, -10px);
-                        opacity: 1;
+                .header {
+                    background-color: @body-bg;
+                    .menu-content {
+                        span {
+                            transform: translate(-50%, -10px);
+                            opacity: 1;
+                        }
                     }
                 }
             }
@@ -112,7 +82,8 @@
         }
 
         .title {
-            margin-top: 10px;
+            margin-top: 2px;
+            text-align: center;
         }
 
         .header {
@@ -125,7 +96,7 @@
                 clear: both;
             }
             color: white;
-            padding: 1em;
+            padding: 1em 1em 0.1em;
         }
     }
 }

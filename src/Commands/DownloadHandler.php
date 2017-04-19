@@ -85,7 +85,7 @@ class DownloadHandler
         );
 
         foreach (static::downloader() as $downloader) {
-            if ($downloader->for($file)) {
+            if ($downloader->forFile($file)) {
                 $response = $downloader->download($file, $command);
 
                 if (!$response) {
