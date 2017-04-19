@@ -83,12 +83,13 @@
   - Fixed allowing mutation of adapter and uploaded file from event.
 - 0.5.0
   - WasUploaded event is removed. It was a duplicate for WillBeSaved.
-  - Adds download entries on posts, with preview functionality.
+  - Adds file download templates; a button as default and an image preview. Includes file size.
   - Added WillBeDownloaded and WasLoaded events used in the downloading functionality.
   - Removed markdown string generation and dependency. Now using raw xsl documents.
   - Added ability to inject a custom downloader instance, mutating how downloads are handled.
-  - Refactored uploading by separating code into repository.
+  - Refactored uploading by separating code into repository. Catching errors properly now.
   - Added a PHP proxy, by which:
-    - The extension can now track the uploads.
-    - Understands where files are located.
-    - Streams remote files, so automatically upgrades to https in case your forum has SSL.
+    - The extension can now track downloads, enabled by default (disable in the admin settings page).
+    - The extension can prevent hotlinking, enabled by default (disable in the admin settings page).
+    - Understands where files are located in your forum once downloads are tracked.
+    - Streams remote files, which automatically upgrades downloads to https in case your forum has SSL.
