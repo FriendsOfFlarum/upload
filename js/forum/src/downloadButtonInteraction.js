@@ -5,7 +5,7 @@ export default function () {
     extend(Post.prototype, 'config', function (isInitialized) {
         if (isInitialized) return;
 
-        this.$('.flagrow-download-button[data-uuid]').unbind().click('.download', (e) => {
+        this.$('.flagrow-download-button[data-uuid]').unbind('click').one('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
 
