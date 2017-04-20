@@ -394,7 +394,8 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/app", "flarum/c
                     items.add('download', {
                         icon: 'file-o',
                         label: app.translator.trans('flagrow-upload.admin.permissions.download_label'),
-                        permission: 'flagrow.upload.download'
+                        permission: 'flagrow.upload.download',
+                        allowGuest: true
                     });
                 });
             });

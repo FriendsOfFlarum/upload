@@ -17,7 +17,8 @@ app.initializers.add('flagrow-upload', app => {
         items.add('download', {
             icon: 'file-o',
             label: app.translator.trans('flagrow-upload.admin.permissions.download_label'),
-            permission: 'flagrow.upload.download'
+            permission: 'flagrow.upload.download',
+            allowGuest: true
         });
     });
 });
