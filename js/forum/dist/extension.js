@@ -263,7 +263,7 @@ System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'f
 
             if (isInitialized) return;
 
-            this.$('.flagrow-download-button[data-uuid]').click('.download', function (e) {
+            this.$('.flagrow-download-button[data-uuid]').unbind().click('.download', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
