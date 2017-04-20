@@ -98,3 +98,6 @@
   - Fixed error on download when download logging was disabled.
   - Fixed triggering download multiple times on files in firefox by disabling propagation.
   - Allowing downloads by everyone again.
+- 0.5.2
+  - Fixed public downloads.
+  - Possible solution for multiple download triggering on firefox.
