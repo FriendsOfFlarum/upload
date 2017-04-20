@@ -64,12 +64,9 @@ class DownloadHandler
      */
     public function handle(Download $command)
     {
-        $discussion = $this->discussions->query()->find($command->discussionId);
-
         $this->assertCan(
             $command->actor,
-            'flagrow.upload.download',
-            $discussion
+            'flagrow.upload.download'
         );
 
         $file = $this->files->findByUuid($command->uuid);
