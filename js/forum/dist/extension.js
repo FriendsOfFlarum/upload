@@ -265,6 +265,7 @@ System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'f
 
             this.$('.flagrow-download-button[data-uuid]').click('.download', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
 
                 var url = app.forum.attribute('apiUrl') + '/flagrow/download';
 

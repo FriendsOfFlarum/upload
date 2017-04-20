@@ -7,6 +7,7 @@ export default function () {
 
         this.$('.flagrow-download-button[data-uuid]').click('.download', (e) => {
             e.preventDefault();
+            e.stopPropagation();
 
             let url = app.forum.attribute('apiUrl') + '/flagrow/download';
 
