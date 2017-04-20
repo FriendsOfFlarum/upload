@@ -69,7 +69,7 @@ class DownloadHandler
         $this->assertCan(
             $command->actor,
             'flagrow.upload.download',
-            $discussion ?: []
+            $discussion
         );
 
         $file = $this->files->findByUuid($command->uuid);
