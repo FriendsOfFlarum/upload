@@ -96,3 +96,5 @@
     - Streams remote files, which automatically upgrades downloads to https in case your forum has SSL.
 - 0.5.1
   - Fixed error on download when download logging was disabled.
+  - Fixed triggering download multiple times on files in firefox by disabling propagation.
+  - Allowing downloads by everyone again.
