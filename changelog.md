@@ -88,8 +88,11 @@
   - Removed markdown string generation and dependency. Now using raw xsl documents.
   - Added ability to inject a custom downloader instance, mutating how downloads are handled.
   - Refactored uploading by separating code into repository. Catching errors properly now.
+  - Added a download permission.
   - Added a PHP proxy, by which:
     - The extension can now track downloads, enabled by default (disable in the admin settings page).
     - The extension can prevent hotlinking, enabled by default (disable in the admin settings page).
     - Understands where files are located in your forum once downloads are tracked.
     - Streams remote files, which automatically upgrades downloads to https in case your forum has SSL.
+- 0.5.1
+  - Fixed error on download when download logging was disabled.

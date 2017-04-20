@@ -92,6 +92,8 @@ class DownloadHandler
                     continue;
                 }
 
+                $download = null;
+
                 if ($this->settings->get('disableDownloadLogging') != 1) {
                     $download = $this->files->downloadedEntry($file, $command);
                 }

@@ -17,7 +17,7 @@ class WillBeDownloaded
      */
     public $download;
 
-    function __construct(File $file, &$response, Download $download)
+    function __construct(File $file, &$response, Download $download = null)
     {
         $this->file = $file;
         $this->response = $response;
