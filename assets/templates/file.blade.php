@@ -1,5 +1,5 @@
-<div class="flagrow-download-button ButtonGroup" data-uuid="{@uuid}">
-    <div class="Button hasIcon Button--icon Button--primary download"><i class="fa fa-download"></i></div>
+<div class="ButtonGroup">
+    <div class="Button hasIcon Button--icon Button--primary flagrow-download-button" data-uuid="{@uuid}"><i class="fa fa-download"></i></div>
     <div class="Button">
         <xsl:value-of select="@base_name"/>
     </div>
