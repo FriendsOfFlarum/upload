@@ -75,5 +75,4 @@ Check [future milestones](https://github.com/flagrow/upload/milestones).
 
 ## FAQ
 
--  __AWS S3__: you will need to install the league AWS s3 adapter: `composer require league/flysystem-aws-s3-v3`, the aws-s3 choice will now pop up in the admin settings page.
--  __flarum-ext- prefix__: I am aware that the convention is to prefix an extension with `flarum-ext-`, after considerate investigation I came to the conclusion that using the exact package name flarum-ext-upload prevented me to enable the extension in the admin panel with an error "route not found".
+-  __AWS S3__: read the [AWS S3 configuration page](https://github.com/flagrow/upload/wiki/AWS-S3).
