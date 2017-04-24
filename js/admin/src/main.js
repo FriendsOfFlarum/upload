@@ -15,4 +15,14 @@ app.initializers.add('flagrow-upload', app => {
             permission: 'flagrow.upload'
         });
     });
+
+    // add the permission option to the relative pane
+    extend(PermissionGrid.prototype, 'viewItems', items => {
+        items.add('download', {
+            icon: 'download',
+            label: app.translator.trans('flagrow-upload.admin.permissions.download_label'),
+            permission: 'flagrow.upload.download',
+            allowGuest: true
+        });
+    });
 });

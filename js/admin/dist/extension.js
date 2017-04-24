@@ -72,8 +72,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                 babelHelpers.createClass(UploadPage, [{
                     key: "init",
                     value: function init() {
-                        var _watermarkPositions,
-                            _this2 = this;
+                        var _this2 = this;
 
                         // whether we are saving the settings or not right now
                         this.loading = false;
@@ -92,15 +91,23 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         'ovhUsername', 'ovhPassword', 'ovhTenantId', 'ovhContainer', 'ovhRegion'];
 
                         // the checkboxes we need to watch and to save.
-                        this.checkboxes = ['mustResize', 'overrideAvatarUpload'];
+                        this.checkboxes = ['mustResize', 'overrideAvatarUpload', 'disableHotlinkProtection', 'disableDownloadLogging'];
 
                         // fields that are objects
                         this.objects = ['mimeTypes'];
 
                         // watermark positions
-                        this.watermarkPositions = (_watermarkPositions = {
-                            'top-right': 'top-left'
-                        }, babelHelpers.defineProperty(_watermarkPositions, "top-right", 'top-right'), babelHelpers.defineProperty(_watermarkPositions, 'bottom-left', 'bottom-left'), babelHelpers.defineProperty(_watermarkPositions, 'bottom-right', 'bottom-right'), babelHelpers.defineProperty(_watermarkPositions, 'center', 'center'), babelHelpers.defineProperty(_watermarkPositions, 'left', 'left'), babelHelpers.defineProperty(_watermarkPositions, 'top', 'top'), babelHelpers.defineProperty(_watermarkPositions, 'right', 'right'), babelHelpers.defineProperty(_watermarkPositions, 'bottom', 'bottom'), _watermarkPositions);
+                        this.watermarkPositions = {
+                            'top-left': 'top-left',
+                            'top-right': 'top-right',
+                            'bottom-left': 'bottom-left',
+                            'bottom-right': 'bottom-right',
+                            'center': 'center',
+                            'left': 'left',
+                            'top': 'top',
+                            'right': 'right',
+                            'bottom': 'bottom'
+                        };
 
                         // options for the dropdown menu
                         this.uploadMethodOptions = {};
@@ -190,7 +197,15 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             options: this.watermarkPositions,
                             onchange: this.values.watermarkPosition,
                             value: this.values.watermarkPosition() || 'bottom-right'
-                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, { name: "flagrow/watermark" })]), m('fieldset', {
+                        })]), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.watermark.file')), m(UploadImageButton, { name: "flagrow/watermark" })]), m('fieldset', { className: 'UploadPage-downloading' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.disable-hotlink-protection.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.disable-hotlink-protection')), Switch.component({
+                            state: this.values.disableHotlinkProtection() || false,
+                            children: app.translator.trans('flagrow-upload.admin.labels.disable-hotlink-protection.toggle'),
+                            onchange: this.values.disableHotlinkProtection
+                        }), m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.disable-download-logging.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.disable-download-logging')), Switch.component({
+                            state: this.values.disableDownloadLogging() || false,
+                            children: app.translator.trans('flagrow-upload.admin.labels.disable-download-logging.toggle'),
+                            onchange: this.values.disableDownloadLogging
+                        })]), m('fieldset', {
                             className: 'UploadPage-local'
                         }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.local.title')), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.local.cdn_url')), m('input', {
                             className: 'FormControl',
@@ -375,6 +390,16 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/app", "flarum/c
                         icon: 'file-o',
                         label: app.translator.trans('flagrow-upload.admin.permissions.upload_label'),
                         permission: 'flagrow.upload'
+                    });
+                });
+
+                // add the permission option to the relative pane
+                extend(PermissionGrid.prototype, 'viewItems', function (items) {
+                    items.add('download', {
+                        icon: 'download',
+                        label: app.translator.trans('flagrow-upload.admin.permissions.download_label'),
+                        permission: 'flagrow.upload.download',
+                        allowGuest: true
                     });
                 });
             });

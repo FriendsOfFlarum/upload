@@ -72,6 +72,9 @@ class Settings
         'ovhContainer',
         'ovhRegion',
 
+        // Downloads
+        'disableHotlinkProtection',
+        'disableDownloadLogging',
     ];
 
     protected $prefix = 'flagrow.upload.';

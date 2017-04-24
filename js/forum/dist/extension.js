@@ -77,12 +77,61 @@ System.register('flagrow/upload/components/DragAndDrop', [], function (_export, 
         }
     };
 });;
-"use strict";
+'use strict';
 
-System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator"], function (_export, _context) {
+System.register('flagrow/upload/components/PasteClipboard', [], function (_export, _context) {
     "use strict";
 
-    var Component, icon, LoadingIndicator, UploadButton;
+    var PasteClipboard;
+    return {
+        setters: [],
+        execute: function () {
+            PasteClipboard = function () {
+                function PasteClipboard(uploadButton) {
+                    babelHelpers.classCallCheck(this, PasteClipboard);
+
+                    if (this.initialized) return;
+
+                    this.uploadButton = uploadButton;
+
+                    document.addEventListener('paste', this.paste.bind(this));
+                }
+
+                babelHelpers.createClass(PasteClipboard, [{
+                    key: 'paste',
+                    value: function paste(e) {
+                        if (e.clipboardData && e.clipboardData.items) {
+                            var items = e.clipboardData.items;
+
+                            var files = [];
+
+                            for (var i = 0; i < items.length; i++) {
+                                if (items[i].type.indexOf('image') !== -1) {
+                                    files.push(items[i].getAsFile());
+                                }
+                            }
+
+                            if (files.length > 0) {
+                                m.redraw();
+
+                                this.uploadButton.uploadFiles(files);
+                            }
+                        }
+                    }
+                }]);
+                return PasteClipboard;
+            }();
+
+            _export('default', PasteClipboard);
+        }
+    };
+});;
+"use strict";
+
+System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "flarum/helpers/icon", "flarum/components/LoadingIndicator", "flagrow/upload/components/DownloadButton"], function (_export, _context) {
+    "use strict";
+
+    var Component, icon, LoadingIndicator, DownloadButton, UploadButton;
     return {
         setters: [function (_flarumComponent) {
             Component = _flarumComponent.default;
@@ -90,6 +139,8 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
             icon = _flarumHelpersIcon.default;
         }, function (_flarumComponentsLoadingIndicator) {
             LoadingIndicator = _flarumComponentsLoadingIndicator.default;
+        }, function (_flagrowUploadComponentsDownloadButton) {
+            DownloadButton = _flagrowUploadComponentsDownloadButton.default;
         }],
         execute: function () {
             UploadButton = function (_Component) {
@@ -168,24 +219,16 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function success(response) {
                         var _this2 = this;
 
-                        var markdownString = '';
-                        var file;
+                        var appendToTextarea = '';
 
                         for (var i = 0; i < response.data.length; i++) {
 
-                            file = response.data[i].attributes;
+                            var file = response.data[i].attributes;
 
-                            // create a markdown string that holds the image link
-
-                            if (file.markdown_string) {
-                                markdownString += '\n' + file.markdown_string + '\n';
-                            } else {
-                                markdownString += '\n[' + file.base_name + '](' + file.url + ')\n';
-                            }
+                            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
                         }
 
-                        // place the Markdown image link in the Composer
-                        this.textAreaObj.insertAtCursor(markdownString);
+                        this.textAreaObj.insertAtCursor(appendToTextarea);
 
                         // if we are not starting a new discussion, the variable is defined
                         if (typeof this.textAreaObj.props.preview !== 'undefined') {
@@ -207,12 +250,49 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
         }
     };
 });;
-"use strict";
+'use strict';
 
-System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop"], function (_export, _context) {
+System.register('flagrow/upload/downloadButtonInteraction', ['flarum/extend', 'flarum/components/Post'], function (_export, _context) {
     "use strict";
 
-    var extend, TextEditor, UploadButton, DragAndDrop;
+    var extend, Post;
+
+    _export('default', function () {
+        extend(Post.prototype, 'config', function (isInitialized) {
+            var _this = this;
+
+            if (isInitialized) return;
+
+            this.$('.flagrow-download-button[data-uuid]').unbind('click').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var url = app.forum.attribute('apiUrl') + '/flagrow/download';
+
+                url += '/' + $(e.currentTarget).attr('data-uuid');
+                url += '/' + _this.props.post.id();
+                url += '/' + app.session.csrfToken;
+
+                window.open(url);
+            });
+        });
+    });
+
+    return {
+        setters: [function (_flarumExtend) {
+            extend = _flarumExtend.extend;
+        }, function (_flarumComponentsPost) {
+            Post = _flarumComponentsPost.default;
+        }],
+        execute: function () {}
+    };
+});;
+"use strict";
+
+System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/TextEditor", "flagrow/upload/components/UploadButton", "flagrow/upload/components/DragAndDrop", "flagrow/upload/components/PasteClipboard", "flagrow/upload/downloadButtonInteraction"], function (_export, _context) {
+    "use strict";
+
+    var extend, TextEditor, UploadButton, DragAndDrop, PasteClipboard, downloadButtonInteraction;
     return {
         setters: [function (_flarumExtend) {
             extend = _flarumExtend.extend;
@@ -222,12 +302,18 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
             UploadButton = _flagrowUploadComponentsUploadButton.default;
         }, function (_flagrowUploadComponentsDragAndDrop) {
             DragAndDrop = _flagrowUploadComponentsDragAndDrop.default;
+        }, function (_flagrowUploadComponentsPasteClipboard) {
+            PasteClipboard = _flagrowUploadComponentsPasteClipboard.default;
+        }, function (_flagrowUploadDownloadButtonInteraction) {
+            downloadButtonInteraction = _flagrowUploadDownloadButtonInteraction.default;
         }],
         execute: function () {
 
             app.initializers.add('flagrow-upload', function (app) {
-                var uploadButton;
-                var drag;
+                var uploadButton = void 0,
+                    drag = void 0,
+                    clipboard = void 0;
+
                 extend(TextEditor.prototype, 'controlItems', function (items) {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
@@ -247,6 +333,7 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                         $(this).addClass('Button--icon');
                     });
                 });
+
                 extend(TextEditor.prototype, 'configTextarea', function () {
                     // check whether the user can upload images. If not, returns.
                     if (!app.forum.attribute('canUpload')) return;
@@ -254,7 +341,12 @@ System.register("flagrow/upload/main", ["flarum/extend", "flarum/components/Text
                     if (!drag) {
                         drag = new DragAndDrop(uploadButton);
                     }
+                    if (!clipboard) {
+                        clipboard = new PasteClipboard(uploadButton);
+                    }
                 });
+
+                downloadButtonInteraction();
             });
         }
     };

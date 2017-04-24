@@ -28,6 +28,8 @@ interface UploadAdapter
     public function forMime($mime);
 
     /**
+     * Whether the upload supports a stream.
+     *
      * @return bool
      */
     public function supportsStreams();

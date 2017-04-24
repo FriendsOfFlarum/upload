@@ -64,3 +64,40 @@
   - Fixed multiple uploads of file with filenames in foreign characters.
 - 0.4.6
   - Imgur links are now without protocol, allowing loading via http & https.
+- 0.4.7
+  - Pasting from clipboard implemented.
+- 0.4.8
+  - Fixed unable to paste by removing preventDefault.
+- 0.4.9
+  - Updated Italian locale.
+- 0.4.10
+  - Fixed triggering an internal server error in case no upload adapter was found for an uploaded file.
+- 0.4.11
+  - Fixed introduced error from 0.4.10.
+- 0.4.12
+  - Naming convention altered for files, now using timestamp.
+  - Event dispatching now works.
+- 0.4.13
+  - Allows svg images to be parsed as images.
+  - Added CS locale.
+  - Fixed allowing mutation of adapter and uploaded file from event.
+- 0.5.0
+  - WasUploaded event is removed. It was a duplicate for WillBeSaved.
+  - Adds file download templates; a button as default and an image preview. Includes file size.
+  - Added WillBeDownloaded and WasLoaded events used in the downloading functionality.
+  - Removed markdown string generation and dependency. Now using raw xsl documents.
+  - Added ability to inject a custom downloader instance, mutating how downloads are handled.
+  - Refactored uploading by separating code into repository. Catching errors properly now.
+  - Added a download permission.
+  - Added a PHP proxy, by which:
+    - The extension can now track downloads, enabled by default (disable in the admin settings page).
+    - The extension can prevent hotlinking, enabled by default (disable in the admin settings page).
+    - Understands where files are located in your forum once downloads are tracked.
+    - Streams remote files, which automatically upgrades downloads to https in case your forum has SSL.
+- 0.5.1
+  - Fixed error on download when download logging was disabled.
+  - Fixed triggering download multiple times on files in firefox by disabling propagation.
+  - Allowing downloads by everyone again.
+- 0.5.2
+  - Fixed public downloads.
+  - Possible solution for multiple download triggering on firefox.

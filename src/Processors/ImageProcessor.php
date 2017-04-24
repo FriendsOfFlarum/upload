@@ -43,7 +43,8 @@ class ImageProcessor implements Processable
      */
     public function process(File &$file, UploadedFile &$upload)
     {
-        if ($upload->getMimeType() != 'image/gif') {
+        $mimeType = $upload->getMimeType();
+        if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             $image = (new ImageManager())->make($upload->getRealPath());
 
             if ($this->settings->get('mustResize')) {
@@ -61,6 +62,9 @@ class ImageProcessor implements Processable
         }
     }
 
+    /**
+     * @param Image $manager
+     */
     protected function resize(Image $manager)
     {
         $manager->resize(
@@ -72,6 +76,9 @@ class ImageProcessor implements Processable
             });
     }
 
+    /**
+     * @param Image $image
+     */
     protected function watermark(Image $image)
     {
         if ($this->settings->get('watermark')) {
