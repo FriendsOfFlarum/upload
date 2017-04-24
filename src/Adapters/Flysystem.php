@@ -17,7 +17,9 @@ namespace Flagrow\Upload\Adapters;
 use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
+use Illuminate\Support\Arr;
 use League\Flysystem\AdapterInterface;
+use League\Flysystem\Config;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Flysystem implements UploadAdapter
@@ -53,7 +55,7 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        $meta = $this->adapter->{$method}($file->path, $contents);
+        $meta = $this->adapter->{$method}($file->path, $contents, new Config());
 
         if (!$meta) {
             return false;

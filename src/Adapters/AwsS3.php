@@ -15,20 +15,24 @@ namespace Flagrow\Upload\Adapters;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
+use Illuminate\Support\Arr;
 
 class AwsS3 extends Flysystem implements UploadAdapter
 {
     protected function generateUrl(File $file)
     {
+        $region = $this->adapter->getClient()->getRegion();
+        $bucket = $this->adapter->getBucket();
+
         $baseUrl =
-            in_array($this->filesystem->getAdapter()->getClient()->getRegion(), [null, 'us-east-1']) ?
+            in_array($region, [null, 'us-east-1']) ?
                 'https://s3.amazonaws.com/' :
-                sprintf('https://s3.%s.amazonaws.com/', $this->filesystem->getAdapter()->getClient()->getRegion());
+                sprintf('https://s3.%s.amazonaws.com/', $region);
 
         $file->url = sprintf(
             $baseUrl . '%s/%s',
-            $this->filesystem->getAdapter()->getBucket(),
-            $file->path
+            $bucket,
+            Arr::get($this->meta, 'path', $file->path)
         );
     }
 }
