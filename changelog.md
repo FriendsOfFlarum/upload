@@ -98,6 +98,9 @@
   - Fixed error on download when download logging was disabled.
   - Fixed triggering download multiple times on files in firefox by disabling propagation.
   - Allowing downloads by everyone again.
-- 0.5.2
+- 0.5.2, 0.5.3
   - Fixed public downloads.
   - Possible solution for multiple download triggering on firefox.
+- 0.5.4
+  - Modified Flysystem based upload adapters to use native Flysystem instead of the Illuminate Filesystem implementation.
+  - Patched up the AWS S3 implementation to allow for preview of images.
