@@ -17,19 +17,26 @@ namespace Flagrow\Upload\Adapters;
 use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
-use League\Flysystem\Filesystem;
+use Illuminate\Support\Arr;
+use League\Flysystem\AdapterInterface;
+use League\Flysystem\Config;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var Filesystem
+     * @var AdapterInterface
      */
-    protected $filesystem;
+    protected $adapter;
 
-    public function __construct(Filesystem $filesystem)
+    /**
+     * @var array|false
+     */
+    protected $meta;
+
+    public function __construct(AdapterInterface $adapter)
     {
-        $this->filesystem = $filesystem;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -48,13 +55,13 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        if (!$this->filesystem->{$method}(
-            $file->path,
-            $contents
-        )
-        ) {
+        $meta = $this->adapter->{$method}($file->path, $contents, new Config());
+
+        if (!$meta) {
             return false;
         }
+
+        $this->meta = $meta;
 
         $this->generateUrl($file);
 
@@ -114,13 +121,5 @@ abstract class Flysystem implements UploadAdapter
     public function supportsStreams()
     {
         return true;
-    }
-
-    /**
-     * @return Filesystem
-     */
-    public function getFilesystem()
-    {
-        return $this->filesystem;
     }
 }

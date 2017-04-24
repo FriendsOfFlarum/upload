@@ -96,12 +96,4 @@ class Imgur implements UploadAdapter
     {
         // TODO: Implement delete() method.
     }
-
-    /**
-     * @return Filesystem
-     */
-    public function getFilesystem()
-    {
-        // TODO: Implement getFilesystem() method.
-    }
 }

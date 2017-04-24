@@ -29,7 +29,7 @@ class Local extends Flysystem implements UploadAdapter
         $file->url = str_replace(
             public_path(),
             '',
-            $this->filesystem->getAdapter()->getPathPrefix() . $file->path
+            $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
         /** @var Settings $settings */
