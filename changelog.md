@@ -104,5 +104,5 @@
 - 0.5.4
   - Modified Flysystem based upload adapters to use native Flysystem instead of the Illuminate Filesystem implementation.
   - Patched up the AWS S3 implementation to allow for preview of images.
-- 0.5.5
+- 0.5.6
   - Fixed issue on Windows server with created URLs.
