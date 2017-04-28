@@ -27,8 +27,8 @@ class Local extends Flysystem implements UploadAdapter
     protected function generateUrl(File $file)
     {
         $file->url = str_replace(
-            public_path(),
-            '',
+            [public_path(), DIRECTORY_SEPARATOR],
+            ['', '/'],
             $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
