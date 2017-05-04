@@ -38,8 +38,8 @@
             "title": "Flagrow Upload",
             "icon": {
                 "name": "files-o",
-                "backgroundColor": "#000",
-                "color": "#87d37c"
+                "backgroundColor": "#f4f4f4",
+                "color": "#5f4bb6"
             }
         }
     },
