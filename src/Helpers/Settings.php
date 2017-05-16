@@ -113,7 +113,7 @@ class Settings
     {
         $definition = $this->definition;
 
-        if ($only) {
+        if ($only !== null) {
             $definition = Arr::only($definition, $only);
         }
 
