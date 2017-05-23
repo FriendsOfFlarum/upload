@@ -7,6 +7,18 @@ flagrow-upload:
             success: Success
             error: Error
     admin:
+        templates:
+            image: Default image download template
+            image_description: >
+                Shows a thumbnail of the image and proxies download through php.
+                Allowing statistics to be gathered and hotlink protection.
+            file: Default file download template
+            file_description: >
+                Shows the file name and some general information. Proxies downloads
+                through php, allowing for statistics gathering and hotlink protection.
+            image-preview: Complete image preview template
+            image-preview_description: >
+                Shows the complete image in-line.
         permissions:
             upload_label: Upload files
             download_label: Download files

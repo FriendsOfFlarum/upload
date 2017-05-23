@@ -2,10 +2,9 @@
 
 namespace Flagrow\Upload\Listeners;
 
+use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Templates\AbstractTemplate;
-use Flagrow\Upload\Templates\FileTemplate;
-use Flagrow\Upload\Templates\ImageTemplate;
 use Flarum\Event\ConfigureFormatter;
 use Flarum\Event\ConfigureFormatterParser;
 use Flarum\Forum\UrlGenerator;
@@ -26,15 +25,13 @@ class AddPostDownloadTags
     /**
      * @var array|AbstractTemplate[]
      */
-    protected static $templates = [];
+    protected $templates = [];
 
-    function __construct(UrlGenerator $url, FileRepository $files)
+    function __construct(UrlGenerator $url, FileRepository $files, Settings $settings)
     {
         $this->url = $url;
         $this->files = $files;
-
-        static::addTemplate(app()->make(FileTemplate::class));
-        static::addTemplate(app()->make(ImageTemplate::class));
+        $this->templates = $settings->getRenderTemplates();
     }
 
     /**
@@ -51,7 +48,7 @@ class AddPostDownloadTags
      */
     public function configure(ConfigureFormatter $event)
     {
-        foreach (static::$templates as $name => $template) {
+        foreach ($this->templates as $name => $template) {
             $this->createTag($event->configurator, $name, $template);
         }
     }
@@ -88,13 +85,5 @@ class AddPostDownloadTags
     public function parse(ConfigureFormatterParser $event)
     {
         $event->parser->registeredVars['fileRepository'] = $this->files;
-    }
-
-    /**
-     * @param AbstractTemplate $template
-     */
-    public static function addTemplate(AbstractTemplate $template)
-    {
-        static::$templates[$template->tag()] = $template;
     }
 }

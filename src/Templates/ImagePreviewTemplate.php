@@ -6,20 +6,19 @@ use Flagrow\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
 
-class ImageTemplate extends AbstractTemplate
+class ImagePreviewTemplate extends AbstractTemplate
 {
     /**
      * @var string
      */
-    protected $tag = 'image';
-
+    protected $tag = 'image-preview';
 
     /**
      * {@inheritdoc}
      */
     public function name()
     {
-        return $this->trans('flagrow-upload.admin.templates.image');
+        return $this->trans('flagrow-upload.admin.templates.image-preview');
     }
 
     /**
@@ -27,8 +26,9 @@ class ImageTemplate extends AbstractTemplate
      */
     public function description()
     {
-        return $this->trans('flagrow-upload.admin.templates.image_description');
+        return $this->trans('flagrow-upload.admin.templates.image-preview_description');
     }
+
     /**
      * The xsl template to use with this tag.
      *
@@ -36,7 +36,7 @@ class ImageTemplate extends AbstractTemplate
      */
     public function template()
     {
-        return $this->getView('flagrow.download.templates::image');
+        return $this->getView('flagrow.download.templates::image-preview');
     }
 
     /**

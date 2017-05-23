@@ -109,19 +109,18 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             'bottom': 'bottom'
                         };
 
-                        // options for the dropdown menu
-                        this.uploadMethodOptions = {};
-
-                        this.values = {};
+                        // get the saved settings from the database
+                        var settings = app.data.settings;
 
                         // our package prefix (to be added to every field and checkbox in the setting table)
                         this.settingsPrefix = 'flagrow.upload';
 
-                        // get the saved settings from the database
-                        var settings = app.data.settings;
+                        // Options for the Upload methods dropdown menu.
+                        this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
+                        this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
-                        // set the upload methods
-                        this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')];
+                        // Contains current values.
+                        this.values = {};
                         // bind the values of the fields and checkboxes to the getter/setter functions
                         this.fields.forEach(function (key) {
                             return _this2.values[key] = m.prop(settings[_this2.addPrefix(key)]);
@@ -133,6 +132,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             return _this2.values[key] = settings[_this2.addPrefix(key)] ? m.prop(JSON.parse(settings[_this2.addPrefix(key)])) : m.prop();
                         });
 
+                        // Set a sane default in case no mimeTypes have been configured yet.
                         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
                             '^image\\/.*': 'local'
                         }));

@@ -65,19 +65,18 @@ export default class UploadPage extends Component {
             'bottom': 'bottom'
         };
 
-        // options for the dropdown menu
-        this.uploadMethodOptions = {};
-
-        this.values = {};
+        // get the saved settings from the database
+        const settings = app.data.settings;
 
         // our package prefix (to be added to every field and checkbox in the setting table)
         this.settingsPrefix = 'flagrow.upload';
 
-        // get the saved settings from the database
-        const settings = app.data.settings;
+        // Options for the Upload methods dropdown menu.
+        this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
+        this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
-        // set the upload methods
-        this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')];
+        // Contains current values.
+        this.values = {};
         // bind the values of the fields and checkboxes to the getter/setter functions
         this.fields.forEach(key =>
             this.values[key] = m.prop(settings[this.addPrefix(key)])
@@ -89,6 +88,7 @@ export default class UploadPage extends Component {
             this.values[key] = settings[this.addPrefix(key)] ? m.prop(JSON.parse(settings[this.addPrefix(key)])) : m.prop()
         );
 
+        // Set a sane default in case no mimeTypes have been configured yet.
         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
             '^image\\/.*': 'local'
         }));

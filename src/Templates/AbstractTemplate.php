@@ -3,6 +3,7 @@
 namespace Flagrow\Upload\Templates;
 
 use Flagrow\Upload\Repositories\FileRepository;
+use Flarum\Locale\Translator;
 use Illuminate\Contracts\View\Factory;
 use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
@@ -14,6 +15,19 @@ abstract class AbstractTemplate
      */
     protected $tag;
 
+    /**
+     * The human readable name of the template.
+     *
+     * @return string
+     */
+    abstract public function name();
+
+    /**
+     * A clarification of how this template works.
+     *
+     * @return string
+     */
+    abstract public function description();
     /**
      * The unique tag for this template.
      *
@@ -32,6 +46,16 @@ abstract class AbstractTemplate
     protected function getView($view, $arguments = [])
     {
         return app(Factory::class)->make($view, $arguments);
+    }
+
+    /**
+     * @param $key
+     * @param array $params
+     * @return mixed
+     */
+    protected function trans($key, array $params = [])
+    {
+        return app(Translator::class)->trans($key, $params);
     }
 
     /**
