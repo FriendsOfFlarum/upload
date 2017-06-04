@@ -9,20 +9,20 @@ flagrow-upload:
     admin:
         permissions:
             upload_label: Prześlij pliki
+            download_label: Pobierz pliki
         upload_methods:
             local: Lokalnie
             aws-s3: Amazon S3
             imgur: Imgur
             ovh-svfs: OVH SVFS
         labels:
-            upload_method: Metoda przesyłania
             preferences:
                 title: Preferencje ogólne
                 max_file_size: Maksymalna wielkość pliku (w kilobajtach)
-                mime_types_allowed: Uściśl na jakie typy mime chcesz pozwolić używając wyrażenia regularnego
+                mime_types: Skonfiguruj typy MIME i mapowanie adapteru przesyłu
             resize:
-                title: Zmiana wielkości obrazów
-                toggle: Zmieniaj wielkości obrazów
+                title: Zmiana rozmiaru obrazów
+                toggle: Zmieniaj rozmiar obrazów
                 max_width: Maksymalna szerokość obrazu
                 max_height: Maksymalna wysokość obrazu
             watermark:
