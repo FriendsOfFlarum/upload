@@ -17,7 +17,7 @@ flagrow-upload:
         labels:
             upload_method: Metoda przesyłania
             preferences:
-                title: Generalne preferencje
+                title: Preferencje ogólne
                 max_file_size: Maksymalna wielkość pliku (w kilobajtach)
                 mime_types_allowed: Uściśl na jakie typy mime chcesz pozwolić używając wyrażenia regularnego
             resize:
