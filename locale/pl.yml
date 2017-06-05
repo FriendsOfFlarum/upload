@@ -19,7 +19,7 @@ flagrow-upload:
             preferences:
                 title: Preferencje ogólne
                 max_file_size: Maksymalna wielkość pliku (w kilobajtach)
-                mime_types: Skonfiguruj typy MIME i mapowanie adapteru przesyłu
+                mime_types: Skonfiguruj typy MIME i mapowania adaptera przesyłania
             resize:
                 title: Zmiana rozmiaru obrazów
                 toggle: Zmieniaj rozmiar obrazów
@@ -53,7 +53,7 @@ flagrow-upload:
                 title: Wyłącz ochronę przed hotlinkowaniem
                 toggle: Wyłącz
             disable-download-logging:
-                title: Wyłącz logi pobierania obrazów
+                title: Wyłącz rejestrowanie pobierania obrazów
                 toggle: Wyłącz
         buttons:
             save: Zapisz ustawienia
@@ -76,6 +76,6 @@ flagrow-upload:
                 Ochrona przed hotlinkowaniem zapobiega otwieraniu tutejszych grafik na innych stronach.
                 Obecna metoda wymaga tokenu CSRF i identyfikatora postu.
             disable-download-logging: >
-                Wyłącz logi pobierania grafiki przez użytkowników twojego forum.
+                Wyłącz rejestrowanie pobierania grafiki przez użytkowników twojego forum.
                 Pozostawienie tej opcji włączonej pozwoli ci na zobaczenie ilości
                 pobrań i innych statystyk w niedalekiej przyszłości.
