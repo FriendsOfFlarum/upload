@@ -73,6 +73,7 @@ export default class UploadPage extends Component {
 
         // Options for the Upload methods dropdown menu.
         this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
+        // Options for the Template dropown menu.
         this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
         // Contains current values.
@@ -90,12 +91,16 @@ export default class UploadPage extends Component {
 
         // Set a sane default in case no mimeTypes have been configured yet.
         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
-            '^image\\/.*': 'local'
+            '^image\\/.*': {
+                processor: 'local',
+                template: 'image-preview'
+            }
         }));
 
         this.newMimeType = {
-            'regex': m.prop(''),
-            'adapter': m.prop('local')
+            regex: m.prop(''),
+            adapter: m.prop('local'),
+            template: m.prop('file')
         };
     }
 
@@ -120,6 +125,15 @@ export default class UploadPage extends Component {
                             m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types')),
                             m('div', {className: 'MimeTypes--Container'},
                                 Object.keys(this.values.mimeTypes()).map(mime => {
+                                    let config = this.values.mimeTypes()[mime];
+                                    // Compatibility for older versions.
+                                    if (typeof config !== 'object') {
+                                        config = {
+                                            processor: config,
+                                            template: 'file'
+                                        }
+                                    }
+
                                     return m('div', {}, [
                                         m('input', {
                                             className: 'FormControl MimeTypes',
@@ -128,8 +142,13 @@ export default class UploadPage extends Component {
                                         }),
                                         Select.component({
                                             options: this.uploadMethodOptions,
-                                            onchange: this.updateMimeTypeValue.bind(this, mime),
-                                            value: this.values.mimeTypes()[mime] || 'local'
+                                            onchange: this.updateMimeTypeProcessor.bind(this, mime, config),
+                                            value: config.processor || 'local'
+                                        }),
+                                        Select.component({
+                                            options: this.templateOptions.each(template => {return template.name}),
+                                            onchange: this.updateMimeTypeTemplate.bind(this, mime, config),
+                                            value: config.template || 'local'
                                         }),
                                         Button.component({
                                             type: 'button',
@@ -151,6 +170,12 @@ export default class UploadPage extends Component {
                                         className: 'add-MimeType-value',
                                         oninput: m.withAttr('value', this.newMimeType.adapter),
                                         value: this.newMimeType.adapter()
+                                    }),
+                                    Select.component({
+                                        options: this.templateOptions,
+                                        className: 'add-MimeType-value',
+                                        oninput: m.withAttr('value', this.newMimeType.template),
+                                        value: this.newMimeType.template()
                                     }),
                                     Button.component({
                                         type: 'button',
@@ -318,8 +343,14 @@ export default class UploadPage extends Component {
         this.deleteMimeType(mime);
     }
 
-    updateMimeTypeValue(mime, value) {
-        this.values.mimeTypes()[mime] = value;
+    updateMimeTypeProcessor(mime, config, value) {
+        config.processor = value;
+        this.values.mimeTypes()[mime] = config;
+    }
+
+    updateMimeTypeTemplate(mime, config, value) {
+        config.template = value;
+        this.values.mimeTypes()[mime] = config;
     }
 
     deleteMimeType(mime) {

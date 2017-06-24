@@ -3,7 +3,6 @@
 namespace Flagrow\Upload\Templates;
 
 use Flagrow\Upload\Repositories\FileRepository;
-use Flarum\Locale\Translator;
 use Illuminate\Contracts\View\Factory;
 use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
@@ -55,7 +54,7 @@ abstract class AbstractTemplate
      */
     protected function trans($key, array $params = [])
     {
-        return app(Translator::class)->trans($key, $params);
+        return app('translator')->trans($key, $params);
     }
 
     /**

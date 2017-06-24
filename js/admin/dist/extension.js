@@ -117,6 +117,7 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // Options for the Upload methods dropdown menu.
                         this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
+                        // Options for the Template dropown menu.
                         this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
                         // Contains current values.
@@ -134,12 +135,16 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
 
                         // Set a sane default in case no mimeTypes have been configured yet.
                         this.values.mimeTypes() || (this.values.mimeTypes = m.prop({
-                            '^image\\/.*': 'local'
+                            '^image\\/.*': {
+                                processor: 'local',
+                                template: 'image-preview'
+                            }
                         }));
 
                         this.newMimeType = {
-                            'regex': m.prop(''),
-                            'adapter': m.prop('local')
+                            regex: m.prop(''),
+                            adapter: m.prop('local'),
+                            template: m.prop('file')
                         };
                     }
                 }, {
@@ -152,14 +157,29 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             value: this.values.maxFileSize() || 2048,
                             oninput: m.withAttr('value', this.values.maxFileSize)
                         }), m('label', {}, app.translator.trans('flagrow-upload.admin.labels.preferences.mime_types')), m('div', { className: 'MimeTypes--Container' }, Object.keys(this.values.mimeTypes()).map(function (mime) {
+                            var config = _this3.values.mimeTypes()[mime];
+                            // Compatibility for older versions.
+                            if ((typeof config === "undefined" ? "undefined" : babelHelpers.typeof(config)) !== 'object') {
+                                config = {
+                                    processor: config,
+                                    template: 'file'
+                                };
+                            }
+
                             return m('div', {}, [m('input', {
                                 className: 'FormControl MimeTypes',
                                 value: mime,
                                 oninput: m.withAttr('value', _this3.updateMimeTypeKey.bind(_this3, mime))
                             }), Select.component({
                                 options: _this3.uploadMethodOptions,
-                                onchange: _this3.updateMimeTypeValue.bind(_this3, mime),
-                                value: _this3.values.mimeTypes()[mime] || 'local'
+                                onchange: _this3.updateMimeTypeProcessor.bind(_this3, mime, config),
+                                value: config.processor || 'local'
+                            }), Select.component({
+                                options: _this3.templateOptions.each(function (template) {
+                                    return template.name;
+                                }),
+                                onchange: _this3.updateMimeTypeTemplate.bind(_this3, mime, config),
+                                value: config.template || 'local'
                             }), Button.component({
                                 type: 'button',
                                 className: 'Button Button--warning',
@@ -175,6 +195,11 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                             className: 'add-MimeType-value',
                             oninput: m.withAttr('value', this.newMimeType.adapter),
                             value: this.newMimeType.adapter()
+                        }), Select.component({
+                            options: this.templateOptions,
+                            className: 'add-MimeType-value',
+                            oninput: m.withAttr('value', this.newMimeType.template),
+                            value: this.newMimeType.template()
                         }), Button.component({
                             type: 'button',
                             className: 'Button Button--warning',
@@ -273,9 +298,16 @@ System.register("flagrow/upload/components/UploadPage", ["flarum/Component", "fl
                         this.deleteMimeType(mime);
                     }
                 }, {
-                    key: "updateMimeTypeValue",
-                    value: function updateMimeTypeValue(mime, value) {
-                        this.values.mimeTypes()[mime] = value;
+                    key: "updateMimeTypeProcessor",
+                    value: function updateMimeTypeProcessor(mime, config, value) {
+                        config.processor = value;
+                        this.values.mimeTypes()[mime] = config;
+                    }
+                }, {
+                    key: "updateMimeTypeTemplate",
+                    value: function updateMimeTypeTemplate(mime, config, value) {
+                        config.template = value;
+                        this.values.mimeTypes()[mime] = config;
                     }
                 }, {
                     key: "deleteMimeType",

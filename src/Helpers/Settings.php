@@ -259,7 +259,7 @@ class Settings
     {
         return $this->getJsonValue(
             'mimeTypes',
-            collect(['^image\/.*' => 'local'])
+            collect(['^image\/.*' => ['processor' => 'local', 'template' => 'image-preview']])
         );
     }
 
