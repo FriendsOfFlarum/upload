@@ -84,8 +84,6 @@ class AddPostDownloadTags
             '/' . preg_quote('$' . $name . '-') . '(?<uuid>[a-z0-9-]{36})/',
             $tagName
         );
-
-        app('log')->info("Added $name with $tagName");
     }
 
     /**
