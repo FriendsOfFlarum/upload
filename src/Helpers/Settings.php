@@ -182,27 +182,6 @@ class Settings
     /**
      * @return Collection
      */
-    public function getAvailableTemplates()
-    {
-        $collect = [];
-
-        /**
-         * @var string $tag
-         * @var AbstractTemplate $template
-         */
-        foreach ($this->renderTemplates as $tag => $template) {
-            $collect[$tag] = [
-                'name' => $template->name(),
-                'description' => $template->description()
-            ];
-        }
-
-        return collect($collect);
-    }
-
-    /**
-     * @return Collection
-     */
     public function getAvailableUploadMethods()
     {
         /** @var Collection $methods */
@@ -259,8 +238,8 @@ class Settings
     {
         return $this->getJsonValue(
             'mimeTypes',
-            collect(['^image\/.*' => ['processor' => 'local', 'template' => 'image-preview']])
-        );
+            collect(['^image\/.*' => ['adapter' => 'local', 'template' => 'image-preview']])
+        )->filter();
     }
 
     /**
@@ -285,5 +264,35 @@ class Settings
     public function setRenderTemplates(array $templates)
     {
         $this->renderTemplates = $templates;
+    }
+
+    /**
+     * @return Collection|AbstractTemplate[]
+     */
+    public function getAvailableTemplates()
+    {
+        $collect = [];
+
+        /**
+         * @var string $tag
+         * @var AbstractTemplate $template
+         */
+        foreach ($this->renderTemplates as $tag => $template) {
+            $collect[$tag] = [
+                'name' => $template->name(),
+                'description' => $template->description()
+            ];
+        }
+
+        return collect($collect);
+    }
+
+    /**
+     * @param string $template
+     * @return AbstractTemplate|null
+     */
+    public function getTemplate($template)
+    {
+        return Arr::get($this->renderTemplates, $template);
     }
 }

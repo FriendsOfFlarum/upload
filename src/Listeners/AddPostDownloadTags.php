@@ -26,12 +26,16 @@ class AddPostDownloadTags
      * @var array|AbstractTemplate[]
      */
     protected $templates = [];
+    /**
+     * @var Settings
+     */
+    private $settings;
 
     function __construct(UrlGenerator $url, FileRepository $files, Settings $settings)
     {
         $this->url = $url;
         $this->files = $files;
-        $this->templates = $settings->getRenderTemplates();
+        $this->settings = $settings;
     }
 
     /**
@@ -48,7 +52,7 @@ class AddPostDownloadTags
      */
     public function configure(ConfigureFormatter $event)
     {
-        foreach ($this->templates as $name => $template) {
+        foreach ($this->settings->getRenderTemplates() as $name => $template) {
             $this->createTag($event->configurator, $name, $template);
         }
     }
@@ -60,7 +64,10 @@ class AddPostDownloadTags
      */
     protected function createTag(Configurator &$configurator, $name, AbstractTemplate $template)
     {
-        $tagName = strtoupper("FLAGROW_FILE_$name");
+        $tagName = sprintf(
+            "FLAGROW_FILE_%s",
+            str_replace(['-'], ['_'], strtoupper($name))
+        );
 
         $tag = $configurator->tags->add($tagName);
 
@@ -77,6 +84,8 @@ class AddPostDownloadTags
             '/' . preg_quote('$' . $name . '-') . '(?<uuid>[a-z0-9-]{36})/',
             $tagName
         );
+
+        app('log')->info("Added $name with $tagName");
     }
 
     /**

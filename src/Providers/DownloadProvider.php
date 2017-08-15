@@ -14,12 +14,6 @@ class DownloadProvider extends AbstractServiceProvider
 {
     public function boot()
     {
-        /** @var Settings $settings */
-        $settings = $this->app->make(Settings::class);
-
-        $settings->addRenderTemplate($this->app->make(FileTemplate::class));
-        $settings->addRenderTemplate($this->app->make(ImageTemplate::class));
-        $settings->addRenderTemplate($this->app->make(ImagePreviewTemplate::class));
     }
 
     public function register()
@@ -29,5 +23,12 @@ class DownloadProvider extends AbstractServiceProvider
         );
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/templates', 'flagrow.download.templates');
+
+        /** @var Settings $settings */
+        $settings = $this->app->make(Settings::class);
+
+        $settings->addRenderTemplate($this->app->make(FileTemplate::class));
+        $settings->addRenderTemplate($this->app->make(ImageTemplate::class));
+        $settings->addRenderTemplate($this->app->make(ImagePreviewTemplate::class));
     }
 }
