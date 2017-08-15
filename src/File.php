@@ -102,6 +102,9 @@ class File extends AbstractModel
         $this->attributes['upload_method'] = $value;
     }
 
+    /**
+     * @param AbstractTemplate $template
+     */
     public function setTagAttribute(AbstractTemplate $template)
     {
         $this->attributes['tag'] = $template->tag();
