@@ -138,7 +138,7 @@ class UploadHandler
                 throw $e;
             }
 
-            return $file;
+            return $template->preview($file);
         });
 
         return $savedFiles->filter();

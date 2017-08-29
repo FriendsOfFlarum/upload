@@ -2,6 +2,7 @@
 
 namespace Flagrow\Upload\Templates;
 
+use Flagrow\Upload\File;
 use Illuminate\Contracts\View\Factory;
 
 abstract class AbstractTemplate
@@ -67,4 +68,24 @@ abstract class AbstractTemplate
      * @return string
      */
     abstract public function bbcode();
+
+    public function preview(File $file)
+    {
+        $bbcode = $this->bbcode();
+
+        return preg_replace_callback_array([
+            '/\](?<find>.*)\[/' => function ($m) use ($file) {
+                return str_replace($m['find'], $file->base_name, $m[0]);
+            },
+            '/size=(?<find>{.*})/' => function ($m) use ($file) {
+                return str_replace($m['find'], $file->size, $m[0]);
+            },
+            '/uuid=(?<find>{.*})/' => function ($m) use ($file) {
+                return str_replace($m['find'], $file->uuid, $m[0]);
+            },
+            '/url=(?<find>{.*})/' => function ($m) use ($file) {
+                return str_replace($m['find'], $file->url, $m[0]);
+            }
+        ], $bbcode);
+    }
 }
