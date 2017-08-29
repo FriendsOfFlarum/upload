@@ -9,7 +9,9 @@ use Flarum\Event\ConfigureFormatter;
 use Flarum\Event\ConfigureFormatterParser;
 use Flarum\Forum\UrlGenerator;
 use Illuminate\Events\Dispatcher;
+use InvalidArgumentException;
 use s9e\TextFormatter\Configurator;
+use s9e\TextFormatter\Configurator\Exceptions\UnsafeTemplateException;
 
 class AddPostDownloadTags
 {
@@ -64,11 +66,17 @@ class AddPostDownloadTags
      */
     protected function createTag(Configurator &$configurator, $name, AbstractTemplate $template)
     {
-        $tagName = sprintf(
-            "FLAGROW_FILE_%s",
-            str_replace(['-'], ['_'], strtoupper($name))
-        );
-
+        try {
+            $configurator->BBCodes->addCustom(
+                $template->bbcode(),
+                $template->template()
+            );
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException("Failed importing $name due to {$e->getMessage()}");
+        } catch (UnsafeTemplateException $e) {
+            throw new UnsafeTemplateException("Failed importing $name due to {$e->getMessage()}", $e->getNode());
+        }
+        /*
         $tag = $configurator->tags->add($tagName);
 
         $template->configureAttributes($tag);
@@ -84,6 +92,7 @@ class AddPostDownloadTags
             '/' . preg_quote('$' . $name . '-') . '(?<uuid>[a-z0-9-]{36})/',
             $tagName
         );
+        */
     }
 
     /**

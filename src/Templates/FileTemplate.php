@@ -2,10 +2,6 @@
 
 namespace Flagrow\Upload\Templates;
 
-use Flagrow\Upload\Repositories\FileRepository;
-use s9e\TextFormatter\Parser\Tag as ParserTag;
-use s9e\TextFormatter\Configurator\Items\Tag as Tag;
-
 class FileTemplate extends AbstractTemplate
 {
     /**
@@ -40,27 +36,12 @@ class FileTemplate extends AbstractTemplate
     }
 
     /**
-     * @param Tag $tag
+     * The bbcode to be parsed.
+     *
+     * @return string
      */
-    public function configureAttributes(Tag &$tag)
+    public function bbcode()
     {
-        $tag->attributes->add('uuid');
-        $tag->attributes->add('base_name');
-        $tag->attributes->add('downloads')->filterChain->append('#uint');
-        $tag->attributes->add('size');
-    }
-
-    /**
-     * @param ParserTag $tag
-     * @param FileRepository $files
-     * @return bool
-     */
-    public static function addAttributes(ParserTag $tag, FileRepository $files)
-    {
-        $file = $files->findByUuid($tag->getAttribute('uuid'));
-        $tag->setAttribute('base_name', $file->base_name);
-        $tag->setAttribute('downloads', $file->downloads->count());
-        $tag->setAttribute('size', $file->humanSize);
-        return true;
+        return '[upl-file uuid={IDENTIFIER} size={INT}]{TEXT}[/upl-file]';
     }
 }
