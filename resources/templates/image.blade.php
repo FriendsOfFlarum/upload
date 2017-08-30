@@ -9,7 +9,7 @@
             <div class="data">
                 <div class="content">
                     <h4 class="title">
-                        <xsl:value-of select="@base_name"/>
+                        {SIMPLETEXT1}
                     </h4>
                     <div class="flagrow-download-button Button Button--primary Button-icon Button--block" data-uuid="{@uuid}"><i class="fa fa-download"></i></div>
                 </div>

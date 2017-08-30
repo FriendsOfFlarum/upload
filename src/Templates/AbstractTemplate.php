@@ -84,7 +84,7 @@ abstract class AbstractTemplate
                 return str_replace($m['find'], $file->base_name, $m[0]);
             },
             '/size=(?<find>{.*?})/' => function ($m) use ($file) {
-                return str_replace($m['find'], $file->size, $m[0]);
+                return str_replace($m['find'], $file->humanSize, $m[0]);
             },
             '/uuid=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->uuid, $m[0]);

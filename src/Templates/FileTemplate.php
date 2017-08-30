@@ -42,6 +42,6 @@ class FileTemplate extends AbstractTemplate
      */
     public function bbcode()
     {
-        return '[upl-file uuid={IDENTIFIER} size={INT}]{TEXT}[/upl-file]';
+        return '[upl-file uuid={IDENTIFIER} size={SIMPLETEXT2}]{SIMPLETEXT1}[/upl-file]';
     }
 }
