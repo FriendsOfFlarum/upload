@@ -219,16 +219,9 @@ System.register("flagrow/upload/components/UploadButton", ["flarum/Component", "
                     value: function success(response) {
                         var _this2 = this;
 
-                        var appendToTextarea = '';
-
-                        for (var i = 0; i < response.data.length; i++) {
-
-                            var file = response.data[i].attributes;
-
-                            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
-                        }
-
-                        this.textAreaObj.insertAtCursor(appendToTextarea);
+                        response.forEach(function (bbcode) {
+                            _this2.textAreaObj.insertAtCursor(bbcode + '\n');
+                        });
 
                         // if we are not starting a new discussion, the variable is defined
                         if (typeof this.textAreaObj.props.preview !== 'undefined') {

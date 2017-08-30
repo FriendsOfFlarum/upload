@@ -87,16 +87,9 @@ export default class UploadButton extends Component {
      * @param file
      */
     success(response) {
-        var appendToTextarea = '';
-
-        for (var i = 0; i < response.data.length; i++) {
-
-            let file = response.data[i].attributes;
-
-            appendToTextarea += '\n$' + file.tag + '-' + file.uuid + '\n';
-        }
-
-        this.textAreaObj.insertAtCursor(appendToTextarea);
+        response.forEach((bbcode) => {
+          this.textAreaObj.insertAtCursor(bbcode + '\n');
+        })
 
         // if we are not starting a new discussion, the variable is defined
         if (typeof this.textAreaObj.props.preview !== 'undefined') {
