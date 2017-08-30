@@ -20,7 +20,6 @@ export default class UploadPage extends Component {
       'maxFileSize',
       'overrideAvatarUpload',
       // watermark
-      'addsWatermarks',
       'watermark',
       'watermarkPosition',
       // Imgur
@@ -42,6 +41,7 @@ export default class UploadPage extends Component {
     this.checkboxes = [
       'mustResize',
       'overrideAvatarUpload',
+      'addsWatermarks',
 
       'disableHotlinkProtection',
       'disableDownloadLogging',

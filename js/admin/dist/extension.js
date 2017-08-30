@@ -82,7 +82,7 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
             // image
             'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'overrideAvatarUpload',
             // watermark
-            'addsWatermarks', 'watermark', 'watermarkPosition',
+            'watermark', 'watermarkPosition',
             // Imgur
             'imgurClientId',
             // AWS
@@ -91,7 +91,7 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
             'ovhUsername', 'ovhPassword', 'ovhTenantId', 'ovhContainer', 'ovhRegion'];
 
             // the checkboxes we need to watch and to save.
-            this.checkboxes = ['mustResize', 'overrideAvatarUpload', 'disableHotlinkProtection', 'disableDownloadLogging'];
+            this.checkboxes = ['mustResize', 'overrideAvatarUpload', 'addsWatermarks', 'disableHotlinkProtection', 'disableDownloadLogging'];
 
             // fields that are objects
             this.objects = ['mimeTypes'];
