@@ -43,6 +43,6 @@ class ImagePreviewTemplate extends AbstractTemplate
      */
     public function bbcode()
     {
-        return '[upl-image-preview url={URL}]{TEXT}[/upl-image-preview]';
+        return '[upl-image-preview url={URL}]';
     }
 }

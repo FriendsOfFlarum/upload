@@ -69,6 +69,12 @@ abstract class AbstractTemplate
      */
     abstract public function bbcode();
 
+    /**
+     * Generates a preview bbcode string.
+     *
+     * @param File $file
+     * @return string
+     */
     public function preview(File $file)
     {
         $bbcode = $this->bbcode();
@@ -77,13 +83,13 @@ abstract class AbstractTemplate
             '/\](?<find>.*)\[/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->base_name, $m[0]);
             },
-            '/size=(?<find>{.*})/' => function ($m) use ($file) {
+            '/size=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->size, $m[0]);
             },
-            '/uuid=(?<find>{.*})/' => function ($m) use ($file) {
+            '/uuid=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->uuid, $m[0]);
             },
-            '/url=(?<find>{.*})/' => function ($m) use ($file) {
+            '/url=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->url, $m[0]);
             }
         ], $bbcode);

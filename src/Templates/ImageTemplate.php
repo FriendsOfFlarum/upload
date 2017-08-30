@@ -42,6 +42,6 @@ class ImageTemplate extends AbstractTemplate
      */
     public function bbcode()
     {
-        return '[upl-image uuid={IDENTIFIER} size={INT} url={URL}]{TEXT}[/upl-image]';
+        return '[upl-image uuid={IDENTIFIER} size={INT} url={URL}]';
     }
 }
