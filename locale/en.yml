@@ -18,7 +18,8 @@ flagrow-upload:
                 through php, allowing for statistics gathering and hotlink protection.
             image-preview: Complete image preview template
             image-preview_description: >
-                Shows the complete image in-line.
+                Shows the complete image in-line. No download functionality, no statistics
+                are gathered and hotlink protection is ignored.
         permissions:
             upload_label: Upload files
             download_label: Download files
@@ -76,7 +77,10 @@ flagrow-upload:
             mime_types: >
                 Please configure your mapping here. Each mime type
                 regular expression will be handled by a specific
-                upload adapter.
+                upload adapter and download template.
+            download_templates: >
+                Download templates are how uploads are shown on your forum,
+                eg like previews, buttons. Currently available:
             resize: >
                 Choose whether you want to resize your images before
                 they get uploaded. You can choose a maximum width

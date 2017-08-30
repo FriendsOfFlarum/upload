@@ -117,7 +117,7 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
 
             // Options for the Upload methods dropdown menu.
             this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
-            // Options for the Template dropown menu.
+            // Options for the Template dropdown menu.
             this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
             // Contains current values.
@@ -146,6 +146,8 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
               adapter: m.prop('local'),
               template: m.prop('file')
             };
+
+            console.log(this.templateOptions);
           }
         }, {
           key: 'view',
@@ -203,7 +205,7 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
               className: 'Button Button--warning',
               children: '+',
               onclick: this.addMimeType.bind(this)
-            })])), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types'))]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
+            })])), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.download_templates')), this.templateOptionsDescriptions()]), m('fieldset', { className: 'UploadPage-resize' }, [m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')), m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.resize')), Switch.component({
               state: this.values.mustResize() || false,
               children: app.translator.trans('flagrow-upload.admin.labels.resize.toggle'),
               onchange: this.values.mustResize
@@ -322,6 +324,16 @@ System.register('flagrow/upload/components/UploadPage', ['flarum/Component', 'fl
           key: 'deleteMimeType',
           value: function deleteMimeType(mime) {
             delete this.values.mimeTypes()[mime];
+          }
+        }, {
+          key: 'templateOptionsDescriptions',
+          value: function templateOptionsDescriptions() {
+            var children = [];
+            for (var template in this.templateOptions) {
+              children.push(m('li', this.templateOptions[template].name + ": " + this.templateOptions[template].description));
+            }
+
+            return m('ul', children);
           }
         }, {
           key: 'addMimeType',

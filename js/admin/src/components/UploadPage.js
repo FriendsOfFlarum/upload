@@ -73,7 +73,7 @@ export default class UploadPage extends Component {
 
     // Options for the Upload methods dropdown menu.
     this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
-    // Options for the Template dropown menu.
+    // Options for the Template dropdown menu.
     this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
 
     // Contains current values.
@@ -103,6 +103,8 @@ export default class UploadPage extends Component {
       adapter: m.prop('local'),
       template: m.prop('file')
     };
+
+    console.log(this.templateOptions)
   }
 
   /**
@@ -188,6 +190,8 @@ export default class UploadPage extends Component {
                 ])
               ),
               m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.mime_types')),
+              m('div', { className: 'helpText' }, app.translator.trans('flagrow-upload.admin.help_texts.download_templates')),
+              this.templateOptionsDescriptions()
             ]),
             m('fieldset', { className: 'UploadPage-resize' }, [
               m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.resize.title')),
@@ -375,6 +379,15 @@ export default class UploadPage extends Component {
 
   deleteMimeType(mime) {
     delete this.values.mimeTypes()[mime];
+  }
+
+  templateOptionsDescriptions() {
+    const children = [];
+    for (let template in this.templateOptions) {
+      children.push(m('li', this.templateOptions[template].name + ": " + this.templateOptions[template].description));
+    }
+
+    return m('ul', children);
   }
 
   addMimeType() {
