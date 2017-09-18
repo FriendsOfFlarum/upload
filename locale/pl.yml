@@ -7,6 +7,19 @@ flagrow-upload:
             success: Sukces
             error: Błąd
     admin:
+        templates:
+            image: Domyślny szablon grafik
+            image_description: >
+                Wyświetla miniaturę grafiki i przekierowuje pobieranie przez php.
+                Pozwala na zbieranie statystyk i ochronę przed hotlinkowaniem.
+            file: Domyślny szablon pobierania pliku
+            file_description: >
+                Wyświetla nazwę pliku i kilka informacji o nim. Przekierowuje pobieranie
+                przez php, zezwalając na zbieranie statystyk i ochronę przed hotlinkowaniem.
+            image-preview: Szablon podglądu całej grafiki
+            image-preview_description: >
+                Wyświetla całe zdjęcie w jednej linii. Brak funkcjonalności pobierania,
+                statystyki nie są zbierane i hotlinkowanie nie będzie blokowane.
         permissions:
             upload_label: Prześlij pliki
             download_label: Pobierz pliki
@@ -59,11 +72,14 @@ flagrow-upload:
             save: Zapisz ustawienia
         help_texts:
             description: >
-                Ustaw usługi przesyłania.
-            upload_method: >
-                Tutaj możesz wybrać metodę, którą chcesz użyć
-                do przesłania swoich plików. Kiedy wybierzesz jedną
-                z nich pojawi się karta ustawień.
+                Ustaw usługi i preferencje przesyłania plików.
+            mime_types: >
+                Proszę skonfiguruj poniżej mapowanie. Każde wyrażenie
+                regularne typu mime będzie obsłużone przez odpowiedni
+                adapter przesyłu i szablon pobierania.
+            download_templates: >
+                Szablony pobierania decydują o tym jak przesłane pliki są wyświetlane na twoim forum.
+                na przykład podgląd miniatury, przyciski. Obecnie dostępne:
             resize: >
                 Wybierz czy chcesz zmienić rozmiar swoich obrazów zanim
                 zostaną przesłane. Możesz wybrać maksymalną szerokość
