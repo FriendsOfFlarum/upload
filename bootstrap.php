@@ -28,4 +28,6 @@ return function (Dispatcher $events, Application $app) {
     $events->subscribe(Listeners\AddUploadsApi::class);
     $events->subscribe(Listeners\LoadSettingsFromDatabase::class);
     $events->subscribe(Listeners\ProcessesImages::class);
+
+    $events->subscribe(Listeners\AddDeprecatedTemplates::class);
 };
