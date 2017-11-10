@@ -19,7 +19,7 @@ class FileTemplate extends AbstractTemplate
      */
     public function template()
     {
-        return $this->getView('flagrow.download.templates.deprecated::file');
+        return $this->getView('flagrow.download.templates::deprecated.file');
     }
 
     /**
