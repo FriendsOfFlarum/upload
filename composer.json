@@ -54,5 +54,10 @@
         "files": [
             "src/Helpers/functions.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Flagrow\\Upload\\Tests\\": "tests/"
+        }
     }
 }
