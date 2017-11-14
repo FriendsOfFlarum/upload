@@ -109,3 +109,7 @@
 - 0.6.0-beta
   - Added template functionality, allowing to configure per mime type / adapter how files are shown in your forum.
   - Vietnamese, Polish, Korean and Chinese translations are updated or added. Thanks to tdtgit, Rylat, Comocozy and BeefOnionDumplings. 
+- 0.6.0
+  - Added backward compatibility for 0.5 and lower.
+  - Updated Polish locale.
+  - Added Slovak locale.
