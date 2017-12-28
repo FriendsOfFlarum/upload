@@ -3,9 +3,9 @@
 namespace Flagrow\Upload;
 
 use Carbon\Carbon;
-use Flarum\Core\Discussion;
-use Flarum\Core\Post;
-use Flarum\Core\User;
+use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
+use Flarum\User\User;
 use Flarum\Database\AbstractModel;
 
 /**

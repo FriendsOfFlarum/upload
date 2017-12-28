@@ -23,6 +23,11 @@ use Illuminate\Contracts\Events\Dispatcher;
 class LoadSettingsFromDatabase
 {
     /**
+     * @var Settings
+     */
+    protected $settings;
+
+    /**
      * Gets the settings variable. Called on Object creation.
      *
      * @param Settings $settings

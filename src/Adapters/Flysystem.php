@@ -95,7 +95,7 @@ abstract class Flysystem implements UploadAdapter
      */
     public function delete(File $file)
     {
-        if ($this->filesystem->delete($file->path)) {
+        if ($this->adapter->delete($file->path)) {
             return $file;
         }
 
