@@ -113,3 +113,5 @@
   - Added backward compatibility for 0.5 and lower.
   - Updated Polish locale.
   - Added Slovak locale.
+- 0.7.0
+  - Flarum beta 8 compatibility.

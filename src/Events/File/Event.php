@@ -15,7 +15,7 @@
 namespace Flagrow\Upload\Events\File;
 
 use Flagrow\Upload\File;
-use Flarum\Core\User;
+use Flarum\User\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Event

@@ -17,7 +17,7 @@ namespace Flagrow\Upload\Adapters;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
-use Flarum\Forum\UrlGenerator;
+use Flarum\Http\UrlGenerator;
 
 class Local extends Flysystem implements UploadAdapter
 {
@@ -34,11 +34,13 @@ class Local extends Flysystem implements UploadAdapter
 
         /** @var Settings $settings */
         $settings = app()->make(Settings::class);
+        /** @var UrlGenerator $generator */
+        $generator = app()->make(UrlGenerator::class);
 
         if ($settings->get('cdnUrl')) {
             $file->url = $settings->get('cdnUrl') . $file->url;
         } else {
-            $file->url = app(UrlGenerator::class)->toPath(ltrim($file->url, '/'));
+            $file->url = $generator->to('forum')->path(ltrim($file->url, '/'));
         }
     }
 }

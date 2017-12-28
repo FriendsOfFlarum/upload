@@ -2,7 +2,7 @@
 
 namespace Flagrow\Upload\Commands;
 
-use Flarum\Core\User;
+use Flarum\User\User;
 
 class Download
 {

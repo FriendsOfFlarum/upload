@@ -9,7 +9,7 @@ use Flagrow\Upload\Download;
 use Flagrow\Upload\Exceptions\InvalidUploadException;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Validators\UploadValidator;
-use Flarum\Core\User;
+use Flarum\User\User;
 use Flarum\Foundation\Application;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
@@ -25,7 +25,7 @@ class FileRepository
      */
     protected $path;
     /**
-     * @var FileValidator
+     * @var UploadValidator
      */
     private $validator;
 

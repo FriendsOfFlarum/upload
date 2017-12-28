@@ -17,7 +17,7 @@ namespace Flagrow\Upload\Listeners;
 use Flagrow\Upload\Api\Controllers;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Event\ConfigureApiRoutes;
-use Flarum\Event\PrepareApiAttributes;
+use Flarum\Api\Event\Serializing;
 use Illuminate\Events\Dispatcher;
 
 class AddUploadsApi
@@ -30,7 +30,7 @@ class AddUploadsApi
     public function subscribe(Dispatcher $events)
     {
         $events->listen(ConfigureApiRoutes::class, [$this, 'configureApiRoutes']);
-        $events->listen(PrepareApiAttributes::class, [$this, 'prepareApiAttributes']);
+        $events->listen(Serializing::class, [$this, 'prepareApiAttributes']);
     }
 
     /**
@@ -48,9 +48,9 @@ class AddUploadsApi
     /**
      * Gets the api attributes and makes them available to the forum.
      *
-     * @param PrepareApiAttributes $event
+     * @param Serializing $event
      */
-    public function prepareApiAttributes(PrepareApiAttributes $event)
+    public function prepareApiAttributes(Serializing $event)
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             $event->attributes['canUpload'] = $event->actor->can('flagrow.upload');

@@ -5,9 +5,8 @@ namespace Flagrow\Upload\Listeners;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Templates\AbstractTemplate;
-use Flarum\Event\ConfigureFormatter;
-use Flarum\Event\ConfigureFormatterParser;
-use Flarum\Forum\UrlGenerator;
+use Flarum\Formatter\Event\Configuring;
+use Flarum\Formatter\Event\Parsing;
 use Illuminate\Events\Dispatcher;
 use InvalidArgumentException;
 use s9e\TextFormatter\Configurator;
@@ -15,10 +14,6 @@ use s9e\TextFormatter\Configurator\Exceptions\UnsafeTemplateException;
 
 class AddPostDownloadTags
 {
-    /**
-     * @var UrlGenerator
-     */
-    protected $url;
     /**
      * @var FileRepository
      */
@@ -33,9 +28,8 @@ class AddPostDownloadTags
      */
     private $settings;
 
-    function __construct(UrlGenerator $url, FileRepository $files, Settings $settings)
+    function __construct(FileRepository $files, Settings $settings)
     {
-        $this->url = $url;
         $this->files = $files;
         $this->settings = $settings;
     }
@@ -45,14 +39,14 @@ class AddPostDownloadTags
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(ConfigureFormatter::class, [$this, 'configure']);
-        $events->listen(ConfigureFormatterParser::class, [$this, 'parse']);
+        $events->listen(Configuring::class, [$this, 'configure']);
+        $events->listen(Parsing::class, [$this, 'parse']);
     }
 
     /**
-     * @param ConfigureFormatter $event
+     * @param Configuring $event
      */
-    public function configure(ConfigureFormatter $event)
+    public function configure(Configuring $event)
     {
         foreach ($this->settings->getRenderTemplates() as $name => $template) {
             $this->createTag($event->configurator, $name, $template);
@@ -79,9 +73,9 @@ class AddPostDownloadTags
     }
 
     /**
-     * @param ConfigureFormatterParser $event
+     * @param Parsing $event
      */
-    public function parse(ConfigureFormatterParser $event)
+    public function parse(Parsing $event)
     {
         $event->parser->registeredVars['fileRepository'] = $this->files;
     }

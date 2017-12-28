@@ -3,7 +3,7 @@
 namespace Flagrow\Upload\Events\Adapter;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
-use Flarum\Core\User;
+use Flarum\User\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Identified
