@@ -28,12 +28,11 @@ class AwsS3 extends Flysystem implements UploadAdapter
         $bucket = $this->adapter->getBucket();
 
         $baseUrl = in_array($region, [null, 'us-east-1']) ?
-            'https://s3.amazonaws.com/' :
-            sprintf('https://s3-%s.amazonaws.com/', $region);
+            sprintf('http://%s.s3-website-us-east-1.amazonaws.com/', $bucket) :
+            sprintf('http://%s.s3-website-%s.amazonaws.com/', $bucket, $region);
 
         $file->url = sprintf(
-            $baseUrl . '%s/%s',
-            $bucket,
+            $baseUrl . '%s',
             Arr::get($this->meta, 'path', $file->path)
         );
     }
