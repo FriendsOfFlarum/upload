@@ -17,9 +17,9 @@ namespace Flagrow\Upload;
 use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Templates\AbstractTemplate;
-use Flarum\Core\Discussion;
+use Flarum\Discussion\Discussion;
 use Flarum\Core\Post;
-use Flarum\Core\User;
+use Flarum\User\User;
 use Flarum\Database\AbstractModel;
 use Illuminate\Support\Str;
 

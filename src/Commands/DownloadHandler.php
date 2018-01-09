@@ -9,7 +9,7 @@ use Flagrow\Upload\Exceptions\InvalidDownloadException;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Validators\DownloadValidator;
-use Flarum\Core\Access\AssertPermissionTrait;
+use Flarum\User\AssertPermissionTrait;
 use Flarum\Core\Repository\DiscussionRepository;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

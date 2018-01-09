@@ -15,7 +15,7 @@
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\UploadFaviconController;
-use Flarum\Core\Group;
+use Flarum\Group\Group;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;

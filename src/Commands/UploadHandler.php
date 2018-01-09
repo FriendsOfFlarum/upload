@@ -20,7 +20,7 @@ use Flagrow\Upload\Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
-use Flarum\Core\Access\AssertPermissionTrait;
+use Flarum\User\AssertPermissionTrait;
 use Flarum\Core\Exception\ValidationException;
 use Flarum\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
