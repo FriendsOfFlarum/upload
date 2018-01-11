@@ -20,12 +20,13 @@ class OVH extends Local
 {
     protected function generateUrl(File $file)
     {
+        /** @var Settings $settings */
         $settings = app()->make(Settings::class);
-        
+
         $baseUrl = empty($settings->get('ovhRegion')) ?
             'https://storage.bhs1.cloud.ovh.net/v1/AUTH_' :
             sprintf('https://storage.%s.cloud.ovh.net/v1/AUTH_', $settings->get('ovhRegion'));
-        
+
         $file->url = sprintf(
             $baseUrl . '%s/%s/%s',
             $settings->get('ovhTenantId'),

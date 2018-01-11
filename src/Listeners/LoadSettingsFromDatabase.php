@@ -16,12 +16,17 @@ namespace Flagrow\Upload\Listeners;
 
 use Flagrow\Upload\Helpers\Settings;
 use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Event\PrepareApiAttributes;
-use Flarum\Event\PrepareUnserializedSettings;
+use Flarum\Api\Event\Serializing;
+use Flarum\Settings\Event\Deserializing;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class LoadSettingsFromDatabase
 {
+    /**
+     * @var Settings
+     */
+    protected $settings;
+
     /**
      * Gets the settings variable. Called on Object creation.
      *
@@ -39,18 +44,18 @@ class LoadSettingsFromDatabase
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(PrepareUnserializedSettings::class, [$this, 'addUploadMethods']);
-        $events->listen(PrepareUnserializedSettings::class, [$this, 'addTemplates']);
-        $events->listen(PrepareApiAttributes::class, [$this, 'prepareApiAttributes']);
+        $events->listen(Deserializing::class, [$this, 'addUploadMethods']);
+        $events->listen(Deserializing::class, [$this, 'addTemplates']);
+        $events->listen(Serializing::class, [$this, 'prepareApiAttributes']);
     }
 
     /**
      * Get the setting values from the database and make them available
      * in the forum.
      *
-     * @param PrepareApiAttributes $event
+     * @param Serializing $event
      */
-    public function prepareApiAttributes(PrepareApiAttributes $event)
+    public function prepareApiAttributes(Serializing $event)
     {
         if ($event->isSerializer(ForumSerializer::class)) {
             $event->attributes = array_merge($event->attributes, $this->settings->toArrayFrontend());
@@ -58,17 +63,17 @@ class LoadSettingsFromDatabase
     }
 
     /**
-     * @param PrepareUnserializedSettings $event
+     * @param Deserializing $event
      */
-    public function addUploadMethods(PrepareUnserializedSettings $event)
+    public function addUploadMethods(Deserializing $event)
     {
         $event->settings['flagrow.upload.availableUploadMethods'] = $this->settings->getAvailableUploadMethods()->toArray();
     }
 
     /**
-     * @param PrepareUnserializedSettings $event
+     * @param Deserializing $event
      */
-    public function addTemplates(PrepareUnserializedSettings $event)
+    public function addTemplates(Deserializing $event)
     {
         $event->settings['flagrow.upload.availableTemplates'] = $this->settings->getAvailableTemplates()->toArray();
     }

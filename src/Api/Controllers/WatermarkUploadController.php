@@ -45,7 +45,7 @@ class WatermarkUploadController extends UploadFaviconController
             $mount->delete($file);
         }
 
-        $uploadName = 'watermark-' . Str::lower(Str::quickRandom(8));
+        $uploadName = 'watermark-' . Str::lower(Str::random(8));
 
         $mount->move('source://' . pathinfo($tmpFile, PATHINFO_BASENAME), "target://$uploadName");
 

@@ -18,8 +18,8 @@ use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Templates\AbstractTemplate;
 use Flarum\Discussion\Discussion;
-use Flarum\Core\Post;
 use Flarum\User\User;
+use Flarum\Post\Post;
 use Flarum\Database\AbstractModel;
 use Illuminate\Support\Str;
 

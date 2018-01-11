@@ -25,7 +25,7 @@ class FileRepository
      */
     protected $path;
     /**
-     * @var FileValidator
+     * @var UploadValidator
      */
     private $validator;
 

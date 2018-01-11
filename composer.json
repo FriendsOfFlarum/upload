@@ -21,7 +21,7 @@
         "source": "https://github.com/flagrow/upload"
     },
     "require": {
-        "flarum/core": "^0.1.0-beta.6",
+        "flarum/core": "dev-master as 0.1.0-beta.999",
         "ramsey/uuid": "^3.5.2"
     },
     "suggest": {

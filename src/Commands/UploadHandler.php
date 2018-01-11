@@ -21,7 +21,7 @@ use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
 use Flarum\User\AssertPermissionTrait;
-use Flarum\Core\Exception\ValidationException;
+use Flarum\Foundation\ValidationException;
 use Flarum\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -172,7 +172,7 @@ class UploadHandler
      */
     protected function getMimeConfiguration($mime)
     {
-        return $this->settings->getMimeTypesConfiguration()->first(function ($regex) use ($mime) {
+        return $this->settings->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
             return preg_match("/$regex/", $mime);
         });
     }

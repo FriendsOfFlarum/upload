@@ -6,18 +6,13 @@ use Flagrow\Upload\Repositories\FileRepository;
 use Flagrow\Upload\Templates\Deprecated\AbstractTemplate;
 use Flagrow\Upload\Templates\Deprecated\FileTemplate;
 use Flagrow\Upload\Templates\Deprecated\ImageTemplate;
-use Flarum\Event\ConfigureFormatter;
-use Flarum\Event\ConfigureFormatterParser;
-use Flarum\Forum\UrlGenerator;
+use Flarum\Formatter\Event\Configuring;
+use Flarum\Formatter\Event\Parsing;
 use Illuminate\Events\Dispatcher;
 use s9e\TextFormatter\Configurator;
 
 class AddDeprecatedTemplates
 {
-    /**
-     * @var UrlGenerator
-     */
-    protected $url;
     /**
      * @var FileRepository
      */
@@ -28,9 +23,8 @@ class AddDeprecatedTemplates
      */
     protected static $templates = [];
 
-    function __construct(UrlGenerator $url, FileRepository $files)
+    function __construct(FileRepository $files)
     {
-        $this->url = $url;
         $this->files = $files;
 
         static::addTemplate(app()->make(FileTemplate::class));
@@ -42,14 +36,14 @@ class AddDeprecatedTemplates
      */
     public function subscribe(Dispatcher $events)
     {
-        $events->listen(ConfigureFormatter::class, [$this, 'configure']);
-        $events->listen(ConfigureFormatterParser::class, [$this, 'parse']);
+        $events->listen(Configuring::class, [$this, 'configure']);
+        $events->listen(Parsing::class, [$this, 'parse']);
     }
 
     /**
-     * @param ConfigureFormatter $event
+     * @param Configuring $event
      */
-    public function configure(ConfigureFormatter $event)
+    public function configure(Configuring $event)
     {
         foreach (static::$templates as $name => $template) {
             $this->createTag($event->configurator, $name, $template);
@@ -83,9 +77,9 @@ class AddDeprecatedTemplates
     }
 
     /**
-     * @param ConfigureFormatterParser $event
+     * @param Parsing $event
      */
-    public function parse(ConfigureFormatterParser $event)
+    public function parse(Parsing $event)
     {
         $event->parser->registeredVars['fileRepository'] = $this->files;
     }

@@ -13,7 +13,6 @@
 
 namespace Flagrow\Upload\Adapters;
 
-use Flagrow\Upload\Contracts\Filesystem;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
 use GuzzleHttp\Client as Guzzle;
