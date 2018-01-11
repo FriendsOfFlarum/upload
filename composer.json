@@ -38,9 +38,11 @@
         "flarum-extension": {
             "title": "Flagrow Upload",
             "icon": {
-                "name": "files-o",
-                "backgroundColor": "#f4f4f4",
-                "color": "#5f4bb6"
+                "image": "resources/logo.svg",
+                "backgroundColor": "#5f4bb6",
+                "backgroundSize": "90%",
+                "backgroundRepeat": "no-repeat",
+                "backgroundPosition": "center"
             }
         },
         "flagrow": {
