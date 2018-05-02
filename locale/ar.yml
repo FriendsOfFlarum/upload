@@ -1,0 +1,87 @@
+flagrow-upload:
+    forum:
+        buttons:
+            attach: إضـــافة
+        states:
+            loading: تحميــــل
+            success: نجــــاح
+            error: خطــــأ
+    admin:
+        templates:
+            image: قالب تحميل الصورة الافتراضية
+            image_description: >
+                عرض صورة مصغرة لتنزيل الصور والبروكسيات من خلال php.
+                السماح بجمع الإحصاءات وحماية الخط الساخن.
+            file: قالب تنزيل الملف الافتراضي.
+            file_description: >
+                عرض اسم الملف وبعض المعلومات العامة. تنزيلات البروكسي
+                من خلال php ، مما يسمح بجمع الإحصائيات وحماية hotlink.
+            image-preview: القالب الكلي لمعاينة الصورة
+            image-preview_description: >
+                عرض الصورة كاملة في الخط. لا توجد وظيفة تنزيل ، لا إحصاءات للتجميع ويتم تجاهل  hotlinks
+        permissions:
+            upload_label: تحميـــل الملفات
+            download_label: تنزيـــل الملفات
+        upload_methods:
+            local: محليــا
+            aws-s3: Amazon S3
+            imgur: Imgur
+            ovh-svfs: OVH SVFS
+        labels:
+            preferences:
+                title: الاعدادات العامة
+                max_file_size: أكبر حجم للملفات المرفوعة (in kilobytes)
+                mime_types: تعديل ال mime تحميل adapter mapping.
+            resize:
+                title: تعديـــل الصور
+                toggle: تعديل الصور
+                max_width: أقصى عرض للصورة
+                max_height: أقصى طول للصورة
+            watermark:
+                title: العلامة المائية للصورة
+                toggle: العلامة المائية للصور
+                position: تحديد مكان العلامة المائية
+                file: تحميل علامة مائية
+            local:
+                title: اعدادات التخزين المحلية
+                cdn_url: رابط توزيع المحتوى
+            imgur:
+                title: إعدادات التخزين الخاصة ب Imgur
+                client_id: رقم هوية مستخدم Imgur
+            aws-s3:
+                title: إعدادات التخزين ل aws
+                key: المفتـــاح
+                secret: الرقم السري
+                bucket: Bucket
+                region: المنطقة
+            ovh-svfs:
+                title: إعدادات التخزين ل OVH SVFS
+                container: الكونتينر
+                tenantid: رقم التعريف
+                username: اسم المستخدم
+                password: الرقم السري
+                region: المنطقة
+            disable-hotlink-protection:
+                title: تحطيل حماية ال hotlinks
+                toggle: تعطيل
+            disable-download-logging:
+                title: تعطيل تسجيل التحميلات
+                toggle: تعطيل
+
+        buttons:
+            save: تثبيت الاعدادات
+        help_texts:
+            description: >
+                تثبيـــت خدمة التحميل و الاعدادات
+            mime_types: >
+                يرجى تكوين الخرائط الخاصة بك هنا. كل نوع mime (التعابير المنطقية) سيتم معالجته عن طريق معامل رفع خاص وتنزيل القالب.
+            download_templates: >
+                تنزيل القوالب هي كيفية عرض التحميلات في منتداك ، على سبيل المثال مثل معاينات ، أزرار. متاح حاليا
+            resize: >
+                اختر ما إذا كنت تريد تغيير حجم صورك قبل التحميل . يمكنك اختيار الحد الأقصى للعرض  والطول بالبكسل. تحافظ عملية تغيير الحجم على نسبة العرض إلى الارتفاع للصور.
+            watermark: >
+                اختر ما إذا كان سيتم إضافة علامة مائية خلال  تحميل الصور . تتم إضافة العلامات المائية ماعدا ال gifs استنادا إلى  التفضيلات أدناه
+            disable-hotlink-protection: >
+                حماية Hotlink يمنع فتح التنزيلات من المواقع الأخرى. تتطلب الطريقة الحالية رمز مميز csrf ومعرف آخر
+            disable-download-logging: >
+                قم بتعطيل تسجيل كل تنزيل قام به مستخدمو المنتدى الخاص بك. ابقائها  تتيح لك إمكانية عرض عدد التنزيلات والمقاييس الأخرى في المستقبل القريب.
