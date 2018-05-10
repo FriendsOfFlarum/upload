@@ -1,0 +1,96 @@
+flagrow-upload:
+    forum:
+        buttons:
+            attach: Anhängen
+        states:
+            loading: Laden
+            success: Erfolg
+            error: Fehler
+    admin:
+        templates:
+            image: Standard Bild-Download Vorlage
+            image_description: >
+                Zeigt eine Miniaturansicht des Bildes and vertritt den Download durch PHP.
+                Erlaubt es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
+            file: Standard Bild-Download Vorlage
+            file_description: >
+                Zeigt den Dateinamen einige generelle Informationen. Vertritt den Download durch PHP,
+                Erlaubt es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
+            image-preview: Vollständige Bild-Vorschau Vorlage
+            image-preview_description: >
+                Zeigt das vollständige Bild in-line. Keine Download-Funktion, keine Statistiken
+                werden aufgezeichnet und Hotlink-Schutz wird ignoriert
+        permissions:
+            upload_label: Dateien hochladen
+            download_label: Dateien runterladen
+        upload_methods:
+            local: Lokal
+            aws-s3: Amazon S3
+            imgur: Imgur
+            ovh-svfs: OVH SVFS
+        labels:
+            preferences:
+                title: Allgemeine Einstellungen
+                max_file_size: Maximale Dateigrösse (in kilobytes)
+                mime_types: Konfiguriere deinen mime type, lade ein adapter mapping hoch
+            resize:
+                title: Bildgrösse anpassen
+                toggle: Bildgrösse anpassen
+                max_width: Maximale Bildbreite
+                max_height: Maximale Bildhöhe
+            watermark:
+                title: Wasserzeichen Bilder
+                toggle:  Wasserzeichen Bilder
+                position: Wasserzeichen Position
+                file: Lade dein Wasserzeichen Bild hoch
+            local:
+                title: Einstellungen lokaler Speicherplatz
+                cdn_url: Content Versand-URL (fügt Präfix zu Dateien hinzu)
+            imgur:
+                title: Imgur Bildspeicher Einstellungen
+                client_id: Imgur client ID
+            aws-s3:
+                title: AWS S3 Speicherplatz Einstellungen
+                key: Key
+                secret: Secret
+                bucket: Bucket
+                region: Region
+            ovh-svfs:
+                title: OVH SVFS Speicherplatz Einstellungen
+                container: Container
+                tenantid: Tenant ID
+                username: Benutzername
+                password: Passwort
+                region: Region
+            disable-hotlink-protection:
+                title: Hotlink-Schutz deaktivieren
+                toggle: Deaktivieren
+            disable-download-logging:
+                title: Download Logging deaktivieren
+                toggle: Deaktivieren
+
+        buttons:
+            save: Einstellungen speichern
+        help_texts:
+            description: >
+                Hochlad-Services und Einstellungen aufsetzen.
+            mime_types: >
+                Bitte konfiguriere dein mapping hier. Jede mime type
+                regular expression wird von einem spezifischen
+                Upload-Adapter und einer spezifischen Download-Vorlage behandelt.
+            download_templates: >
+                Download-Vorlagen definieren, wie Uploads in deinem Forum angezeigt werden,
+                z.B. Previews, Knöpfe. Aktuell verfügbar:
+            resize: >
+                Entscheide, ob du die Grösse von Bildern vor dem hochladen
+                jeweils bearbeiten möchtest. Du kannst eine Maximal-Höhe und Maximal-Breite in Pixeln angeben.
+                Dieser Prozess behält das Verhältnis von Höhe und Breite bei.
+            watermark: >
+                Entscheide, ob den Bildern während des Hochladens ein Wasserzeichen hinzugefügt werden soll.
+                Wasserzeichen werden den Einstellungen unten entsprechend zu nicht-GIFs hinzugefügt.
+            disable-hotlink-protection: >
+                Der Hotlink-Schutz verhindert, dass Downloads von anderen Seiten geöffnet werden.
+                Die aktuelle Methode verlangt ein CSRF-Token und eine Post-Id.
+            disable-download-logging: >
+                Deaktiviere das Logging für jeden Download eines Benutzers deines Forums. Wenn du es aktiviert lässt, erlaubt dies
+                das zukünftige Ansehen der Anzahl Downloads und anderer Metriken.
