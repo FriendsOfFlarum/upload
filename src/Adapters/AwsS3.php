@@ -24,16 +24,21 @@ class AwsS3 extends Flysystem implements UploadAdapter
      */
     protected function generateUrl(File $file)
     {
-        $region = $this->adapter->getClient()->getRegion();
-        $bucket = $this->adapter->getBucket();
+        /** @var Settings $settings */
+        $settings = app()->make(Settings::class);
 
-        $baseUrl = in_array($region, [null, 'us-east-1']) ?
-            sprintf('https://%s.s3-website-us-east-1.amazonaws.com/', $bucket) :
-            sprintf('https://%s.s3-website-%s.amazonaws.com/', $bucket, $region);
+        if ($cdnUrl = $settings->get('cdnUrl')) {
+            $file->url = sprintf('%s/%s', $cdnUrl, $file->url);
+        } else {
+            $region = $this->adapter->getClient()->getRegion();
+            $bucket = $this->adapter->getBucket();
+            
+            $baseUrl = sprintf('https://%s.s3-website-%s.amazonaws.com/', $bucket, $region ?: 'us-east-1');
 
-        $file->url = sprintf(
-            $baseUrl . '%s',
-            Arr::get($this->meta, 'path', $file->path)
-        );
+            $file->url = sprintf(
+                $baseUrl . '%s',
+                Arr::get($this->meta, 'path', $file->path)
+            );
+        }
     }
 }
