@@ -36,6 +36,7 @@ class Imgur implements UploadAdapter
      * Whether the upload adapter works on a specific mime type.
      *
      * @param string $mime
+     *
      * @return bool
      */
     public function forMime($mime)
@@ -54,18 +55,19 @@ class Imgur implements UploadAdapter
     /**
      * Attempt to upload to the (remote) filesystem.
      *
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
-     * @param string $contents
+     * @param string       $contents
+     *
      * @return File|bool
      */
     public function upload(File $file, UploadedFile $upload, $contents)
     {
         $response = $this->api->post('upload', [
             'json' => [
-                'type' => 'base64',
-                'image' => base64_encode($contents)
-            ]
+                'type'  => 'base64',
+                'image' => base64_encode($contents),
+            ],
         ]);
 
         // successful upload, let's get the generated URL
@@ -89,6 +91,7 @@ class Imgur implements UploadAdapter
      * In case deletion is not possible, return false.
      *
      * @param File $file
+     *
      * @return File|bool
      */
     public function delete(File $file)

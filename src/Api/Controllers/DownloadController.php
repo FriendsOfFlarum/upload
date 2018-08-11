@@ -39,6 +39,7 @@ class DownloadController implements RequestHandlerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -62,4 +63,3 @@ class DownloadController implements RequestHandlerInterface
         );
     }
 }
-

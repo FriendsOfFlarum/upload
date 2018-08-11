@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload;
 
 use Flarum\Extend;
@@ -24,13 +23,13 @@ return [
         ->post('/flagrow/watermark', 'flagrow.watermark', Api\Controllers\WatermarkUploadController::class)
         ->get('/flagrow/download/{uuid}/{post}/{csrf}', 'flagrow.upload.download', Api\Controllers\DownloadController::class),
     (new Extend\Frontend('admin'))
-        ->css(__DIR__ . '/resources/less/admin/settingsPage.less')
-        ->js(__DIR__ . '/js/dist/admin.js'),
+        ->css(__DIR__.'/resources/less/admin/settingsPage.less')
+        ->js(__DIR__.'/js/dist/admin.js'),
     (new Extend\Frontend('forum'))
-        ->css(__DIR__ . '/resources/less/forum/download.less')
-        ->css(__DIR__ . '/resources/less/forum/upload.less')
-        ->js(__DIR__ . '/js/dist/forum.js'),
-    new Extend\Locales(__DIR__ . '/resources/locale'),
+        ->css(__DIR__.'/resources/less/forum/download.less')
+        ->css(__DIR__.'/resources/less/forum/upload.less')
+        ->js(__DIR__.'/js/dist/forum.js'),
+    new Extend\Locales(__DIR__.'/resources/locale'),
     function (Dispatcher $events, Application $app) {
         $app->register(Providers\SettingsProvider::class);
 

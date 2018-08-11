@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Adapters;
 
 use Carbon\Carbon;
@@ -39,9 +38,10 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
-     * @param string $contents
+     * @param string       $contents
+     *
      * @return File
      */
     public function upload(File $file, UploadedFile $upload, $contents)
@@ -75,10 +75,10 @@ abstract class Flysystem implements UploadAdapter
         $today = (new Carbon());
 
         $file->path = sprintf(
-            "%s%s%s",
+            '%s%s%s',
             $today->toDateString(),
             $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
-            $today->timestamp .'-' . $today->micro . '-' . $file->base_name
+            $today->timestamp.'-'.$today->micro.'-'.$file->base_name
         );
     }
 
@@ -91,6 +91,7 @@ abstract class Flysystem implements UploadAdapter
      * In case deletion is not possible, return false.
      *
      * @param File $file
+     *
      * @return File|bool
      */
     public function delete(File $file)
@@ -106,6 +107,7 @@ abstract class Flysystem implements UploadAdapter
      * Whether the upload adapter works on a specific mime type.
      *
      * @param string $mime
+     *
      * @return bool
      */
     public function forMime($mime)

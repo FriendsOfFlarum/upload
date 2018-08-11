@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Commands\Upload;
@@ -38,8 +37,10 @@ class UploadController implements RequestHandlerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
+     *
      * @throws \Flagrow\Upload\Exceptions\InvalidUploadException
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

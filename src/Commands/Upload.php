@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Commands;
 
 use Flarum\User\User;

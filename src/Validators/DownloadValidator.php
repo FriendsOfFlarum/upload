@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Validators;
 
 use Flagrow\Upload\Helpers\Settings;
@@ -25,8 +24,8 @@ class DownloadValidator extends AbstractValidator
         $settings = app(Settings::class);
 
         $rules = [
-            'url' => ['required', 'url'],
-            'base_name' => ['required', 'string']
+            'url'       => ['required', 'url'],
+            'base_name' => ['required', 'string'],
         ];
 
         return $rules;

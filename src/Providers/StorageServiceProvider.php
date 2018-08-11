@@ -27,7 +27,6 @@ use Techyah\Flysystem\OVH\OVHClient;
 
 class StorageServiceProvider extends ServiceProvider
 {
-
     /**
      * Register the service provider.
      *
@@ -86,6 +85,7 @@ class StorageServiceProvider extends ServiceProvider
 
     /**
      * @param Settings $settings
+     *
      * @return Adapters\AwsS3
      */
     protected function awsS3(Settings $settings)
@@ -94,10 +94,10 @@ class StorageServiceProvider extends ServiceProvider
             new AwsS3Adapter(
                 new S3Client([
                     'credentials' => [
-                        'key' => $settings->get('awsS3Key'),
+                        'key'    => $settings->get('awsS3Key'),
                         'secret' => $settings->get('awsS3Secret'),
                     ],
-                    'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
+                    'region'  => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
                     'version' => 'latest',
                 ]),
                 $settings->get('awsS3Bucket')
@@ -107,16 +107,17 @@ class StorageServiceProvider extends ServiceProvider
 
     /**
      * @param Settings $settings
+     *
      * @return Adapters\OVH
      */
     protected function ovh(Settings $settings)
     {
         $client = new OVHClient([
-            'username' => $settings->get('ovhUsername'),
-            'password' => $settings->get('ovhPassword'),
-            'tenantId' => $settings->get('ovhTenantId'),
+            'username'  => $settings->get('ovhUsername'),
+            'password'  => $settings->get('ovhPassword'),
+            'tenantId'  => $settings->get('ovhTenantId'),
             'container' => $settings->get('ovhContainer'),
-            'region' => empty($settings->get('ovhRegion')) ? 'BHS1' : $settings->get('ovhRegion'),
+            'region'    => empty($settings->get('ovhRegion')) ? 'BHS1' : $settings->get('ovhRegion'),
         ]);
 
         return new Adapters\OVH(
@@ -126,6 +127,7 @@ class StorageServiceProvider extends ServiceProvider
 
     /**
      * @param Settings $settings
+     *
      * @return Adapters\Imgur
      */
     protected function imgur(Settings $settings)
@@ -133,15 +135,16 @@ class StorageServiceProvider extends ServiceProvider
         return new Adapters\Imgur(
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
-                'headers' => [
-                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId')
-                ]
+                'headers'  => [
+                    'Authorization' => 'Client-ID '.$settings->get('imgurClientId'),
+                ],
             ])
         );
     }
 
     /**
      * @param Settings $settings
+     *
      * @return Adapters\Local
      */
     protected function local(Settings $settings)

@@ -11,11 +11,10 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Listeners;
 
-use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Event\Serializing;
+use Flarum\Api\Serializer\ForumSerializer;
 use Illuminate\Events\Dispatcher;
 
 class AddUploadsApi

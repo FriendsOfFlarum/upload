@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Adapters;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
@@ -38,7 +37,7 @@ class Local extends Flysystem implements UploadAdapter
         $generator = app()->make(UrlGenerator::class);
 
         if ($settings->get('cdnUrl')) {
-            $file->url = $settings->get('cdnUrl') . $file->url;
+            $file->url = $settings->get('cdnUrl').$file->url;
         } else {
             $file->url = $generator->to('forum')->path(ltrim($file->url, '/'));
         }

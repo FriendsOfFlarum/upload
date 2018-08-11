@@ -27,7 +27,6 @@ class ImageProcessor implements Processable
      */
     protected $settings;
 
-
     /**
      * @param Settings $settings
      */
@@ -37,8 +36,9 @@ class ImageProcessor implements Processable
     }
 
     /**
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
+     *
      * @return File
      */
     public function process(File &$file, UploadedFile &$upload)

@@ -100,22 +100,23 @@ class Settings
 
     public function __get($name)
     {
-        return $this->settings->get($this->prefix . $name);
+        return $this->settings->get($this->prefix.$name);
     }
 
     public function __set($name, $value)
     {
-        $this->settings->set($this->prefix . $name, $value);
+        $this->settings->set($this->prefix.$name, $value);
     }
 
     public function __isset($name)
     {
-        return $this->settings->get($this->prefix . $name) !== null;
+        return $this->settings->get($this->prefix.$name) !== null;
     }
 
     /**
-     * @param bool $prefixed
+     * @param bool       $prefixed
      * @param array|null $only
+     *
      * @return array
      */
     public function toArray($prefixed = true, array $only = null)
@@ -130,7 +131,7 @@ class Settings
 
         foreach ($definition as $property) {
             if ($prefixed) {
-                $result[$this->prefix . $property] = $this->get($property);
+                $result[$this->prefix.$property] = $this->get($property);
             } else {
                 $result[$property] = $this->get($property);
             }
@@ -142,8 +143,9 @@ class Settings
     /**
      * Loads only settings used in the frontend.
      *
-     * @param bool $prefixed
+     * @param bool       $prefixed
      * @param array|null $only
+     *
      * @return array
      */
     public function toArrayFrontend($prefixed = true, array $only = [])
@@ -156,6 +158,7 @@ class Settings
     /**
      * @param $name
      * @param null $default
+     *
      * @return null
      */
     public function get($name, $default = null)
@@ -204,7 +207,7 @@ class Settings
                 return $item;
             })
             ->map(function ($item) {
-                return app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item);
+                return app('translator')->trans('flagrow-upload.admin.upload_methods.'.$item);
             });
     }
 
@@ -212,6 +215,7 @@ class Settings
      * @param $field
      * @param null $default
      * @param null $attribute
+     *
      * @return Collection|mixed|null
      */
     public function getJsonValue($field, $default = null, $attribute = null)
@@ -274,13 +278,13 @@ class Settings
         $collect = [];
 
         /**
-         * @var string $tag
+         * @var string
          * @var AbstractTemplate $template
          */
         foreach ($this->renderTemplates as $tag => $template) {
             $collect[$tag] = [
-                'name' => $template->name(),
-                'description' => $template->description()
+                'name'        => $template->name(),
+                'description' => $template->description(),
             ];
         }
 
@@ -289,6 +293,7 @@ class Settings
 
     /**
      * @param string $template
+     *
      * @return AbstractTemplate|null
      */
     public function getTemplate($template)

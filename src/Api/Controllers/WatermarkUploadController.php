@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\UploadFaviconController;
@@ -29,10 +28,9 @@ class WatermarkUploadController extends UploadFaviconController
     {
         $this->assertAdmin($request->getAttribute('actor'));
 
-
         $file = array_get($request->getUploadedFiles(), 'flagrow/watermark');
 
-        $tmpFile = tempnam($this->app->storagePath() . '/tmp', 'flagrow.watermark');
+        $tmpFile = tempnam($this->app->storagePath().'/tmp', 'flagrow.watermark');
 
         $file->moveTo($tmpFile);
 
@@ -45,14 +43,14 @@ class WatermarkUploadController extends UploadFaviconController
             $mount->delete($file);
         }
 
-        $uploadName = 'watermark-' . Str::lower(Str::random(8));
+        $uploadName = 'watermark-'.Str::lower(Str::random(8));
 
-        $mount->move('source://' . pathinfo($tmpFile, PATHINFO_BASENAME), "target://$uploadName");
+        $mount->move('source://'.pathinfo($tmpFile, PATHINFO_BASENAME), "target://$uploadName");
 
         $this->settings->set('flagrow.upload.watermark', $uploadName);
 
         return [
-            'groups' => Group::whereVisibleTo($request->getAttribute('actor'))->get()
+            'groups' => Group::whereVisibleTo($request->getAttribute('actor'))->get(),
         ];
     }
 }

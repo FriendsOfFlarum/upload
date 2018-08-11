@@ -39,6 +39,7 @@ class ProcessesImages
 
     /**
      * @param $mime
+     *
      * @return bool
      */
     protected function validateMime($mime)

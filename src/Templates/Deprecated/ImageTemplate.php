@@ -3,8 +3,8 @@
 namespace Flagrow\Upload\Templates\Deprecated;
 
 use Flagrow\Upload\Repositories\FileRepository;
-use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
+use s9e\TextFormatter\Parser\Tag as ParserTag;
 
 class ImageTemplate extends AbstractTemplate
 {
@@ -36,8 +36,9 @@ class ImageTemplate extends AbstractTemplate
     }
 
     /**
-     * @param ParserTag $tag
+     * @param ParserTag      $tag
      * @param FileRepository $files
+     *
      * @return bool
      */
     public static function addAttributes(ParserTag $tag, FileRepository $files)
@@ -47,6 +48,7 @@ class ImageTemplate extends AbstractTemplate
         $tag->setAttribute('downloads', $file->downloads->count());
         $tag->setAttribute('size', $file->humanSize);
         $tag->setAttribute('url', $file->url);
+
         return true;
     }
 }

@@ -11,45 +11,36 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload;
 
 use Carbon\Carbon;
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\Templates\AbstractTemplate;
-use Flarum\Discussion\Discussion;
-use Flarum\User\User;
-use Flarum\Post\Post;
 use Flarum\Database\AbstractModel;
+use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
+use Flarum\User\User;
 use Illuminate\Support\Str;
 
 /**
  * @property int $id
- *
  * @property string $base_name
  * @property string $path
  * @property string $url
  * @property string $type
  * @property int $size
  * @property string $uuid
- *
  * @property string $humanSize
- *
  * @property string $upload_method
  * @property string $remote_id
  * @property string $tag
- *
  * @property int $post_id
  * @property Post $post
- *
  * @property int $discussion_id
  * @property Discussion $discussion
- *
  * @property int $actor_id
  * @property User $actor
- *
  * @property \Illuminate\Database\Eloquent\Collection|Download[] $downloads
- *
  * @property Carbon $created_at
  */
 class File extends AbstractModel
@@ -121,11 +112,14 @@ class File extends AbstractModel
     /**
      * @param $bytes
      * @param int $decimals
+     *
      * @return string
      */
-    public function human_filesize($bytes, $decimals = 0) {
-        $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+    public function human_filesize($bytes, $decimals = 0)
+    {
+        $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$size[$factor];
     }
 }
