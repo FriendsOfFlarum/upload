@@ -58,9 +58,11 @@ class DownloadHandler
     }
 
     /**
-     * @param Download $command
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws InvalidDownloadException
+     * @param \Flagrow\Upload\Commands\Download $command
+     * @return mixed
+     * @throws \Flagrow\Upload\Exceptions\InvalidDownloadException
+     * @throws \Flarum\User\Exception\PermissionDeniedException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function handle(Download $command)
     {

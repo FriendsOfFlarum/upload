@@ -1,10 +1,10 @@
 import {extend} from "flarum/extend";
 import TextEditor from "flarum/components/TextEditor";
-import UploadButton from "flagrow/upload/components/UploadButton";
-import DragAndDrop from "flagrow/upload/components/DragAndDrop";
-import PasteClipboard from "flagrow/upload/components/PasteClipboard";
+import UploadButton from "./components/UploadButton";
+import DragAndDrop from "./components/DragAndDrop";
+import PasteClipboard from "./components/PasteClipboard";
 
-import downloadButtonInteraction from 'flagrow/upload/downloadButtonInteraction';
+import downloadButtonInteraction from './downloadButtonInteraction';
 
 app.initializers.add('flagrow-upload', app => {
     let uploadButton,
