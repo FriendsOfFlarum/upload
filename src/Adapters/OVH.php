@@ -28,7 +28,7 @@ class OVH extends Local
             sprintf('https://storage.%s.cloud.ovh.net/v1/AUTH_', $settings->get('ovhRegion'));
 
         $file->url = sprintf(
-            $baseUrl . '%s/%s/%s',
+            $baseUrl.'%s/%s/%s',
             $settings->get('ovhTenantId'),
             $settings->get('ovhContainer'),
             $file->path

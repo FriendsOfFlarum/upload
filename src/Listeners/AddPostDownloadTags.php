@@ -28,7 +28,7 @@ class AddPostDownloadTags
      */
     private $settings;
 
-    function __construct(FileRepository $files, Settings $settings)
+    public function __construct(FileRepository $files, Settings $settings)
     {
         $this->files = $files;
         $this->settings = $settings;
@@ -54,8 +54,8 @@ class AddPostDownloadTags
     }
 
     /**
-     * @param Configurator $configurator
-     * @param string $name
+     * @param Configurator     $configurator
+     * @param string           $name
      * @param AbstractTemplate $template
      */
     protected function createTag(Configurator &$configurator, $name, AbstractTemplate $template)

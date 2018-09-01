@@ -25,6 +25,7 @@ abstract class AbstractTemplate
      * @return string
      */
     abstract public function description();
+
     /**
      * The unique tag for this template.
      *
@@ -37,7 +38,8 @@ abstract class AbstractTemplate
 
     /**
      * @param string $view
-     * @param array $arguments
+     * @param array  $arguments
+     *
      * @return string
      */
     protected function getView($view, $arguments = [])
@@ -48,6 +50,7 @@ abstract class AbstractTemplate
     /**
      * @param $key
      * @param array $params
+     *
      * @return mixed
      */
     protected function trans($key, array $params = [])
@@ -73,6 +76,7 @@ abstract class AbstractTemplate
      * Generates a preview bbcode string.
      *
      * @param File $file
+     *
      * @return string
      */
     public function preview(File $file)
@@ -91,7 +95,7 @@ abstract class AbstractTemplate
             },
             '/url=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->url, $m[0]);
-            }
+            },
         ], $bbcode);
     }
 }

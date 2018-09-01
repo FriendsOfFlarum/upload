@@ -9,7 +9,6 @@ class ImageTemplate extends AbstractTemplate
      */
     protected $tag = 'image';
 
-
     /**
      * {@inheritdoc}
      */
@@ -25,6 +24,7 @@ class ImageTemplate extends AbstractTemplate
     {
         return $this->trans('flagrow-upload.admin.templates.image_description');
     }
+
     /**
      * The xsl template to use with this tag.
      *

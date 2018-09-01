@@ -1,7 +1,6 @@
 import Component from "flarum/Component";
 import icon from "flarum/helpers/icon";
 import LoadingIndicator from "flarum/components/LoadingIndicator";
-import DownloadButton from 'flagrow/upload/components/DownloadButton';
 
 export default class UploadButton extends Component {
 
@@ -23,7 +22,7 @@ export default class UploadButton extends Component {
      */
     view() {
         return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [
-            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('file-o', {className: 'Button-icon'}),
+            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('far fa-file', {className: 'Button-icon'}),
             m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')),
             m('form#flagrow-upload-form', [
                 m('input', {

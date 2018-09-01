@@ -4,8 +4,8 @@ namespace Flagrow\Upload\Templates\Deprecated;
 
 use Flagrow\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\View\Factory;
-use s9e\TextFormatter\Parser\Tag as ParserTag;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
+use s9e\TextFormatter\Parser\Tag as ParserTag;
 
 abstract class AbstractTemplate
 {
@@ -26,7 +26,8 @@ abstract class AbstractTemplate
 
     /**
      * @param string $view
-     * @param array $arguments
+     * @param array  $arguments
+     *
      * @return string
      */
     protected function getView($view, $arguments = [])
@@ -54,8 +55,9 @@ abstract class AbstractTemplate
     /**
      * Can be used to inject more file attributes into the template.
      *
-     * @param ParserTag $tag
+     * @param ParserTag      $tag
      * @param FileRepository $files
+     *
      * @return bool
      */
     public static function addAttributes(ParserTag $tag, FileRepository $files)

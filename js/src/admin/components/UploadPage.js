@@ -103,8 +103,6 @@ export default class UploadPage extends Component {
       adapter: m.prop('local'),
       template: m.prop('file')
     };
-
-    console.log(this.templateOptions)
   }
 
   /**

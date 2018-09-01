@@ -11,19 +11,19 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Api\Controllers;
 
 use Flagrow\Upload\Commands\Upload;
 use Flagrow\Upload\Exceptions\InvalidUploadException;
-use Flarum\Http\Controller\ControllerInterface;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
 
-class UploadController implements ControllerInterface
+class UploadController implements RequestHandlerInterface
 {
     /**
      * @var Dispatcher
@@ -36,11 +36,13 @@ class UploadController implements ControllerInterface
     }
 
     /**
-     * @param ServerRequestInterface $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @throws \Flagrow\Upload\Exceptions\InvalidUploadException
+     *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws InvalidUploadException
      */
-    public function handle(ServerRequestInterface $request)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $actor = $request->getAttribute('actor');
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));

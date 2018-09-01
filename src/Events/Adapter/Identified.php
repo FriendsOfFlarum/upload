@@ -24,8 +24,8 @@ class Identified
     public $adapter;
 
     /**
-     * @param User $actor
-     * @param UploadedFile $upload
+     * @param User               $actor
+     * @param UploadedFile       $upload
      * @param UploadAdapter|null $adapter
      */
     public function __construct(User $actor, UploadedFile &$upload, UploadAdapter &$adapter = null)

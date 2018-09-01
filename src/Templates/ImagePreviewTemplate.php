@@ -2,7 +2,6 @@
 
 namespace Flagrow\Upload\Templates;
 
-
 class ImagePreviewTemplate extends AbstractTemplate
 {
     /**

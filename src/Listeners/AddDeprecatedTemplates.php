@@ -23,7 +23,7 @@ class AddDeprecatedTemplates
      */
     protected static $templates = [];
 
-    function __construct(FileRepository $files)
+    public function __construct(FileRepository $files)
     {
         $this->files = $files;
 
@@ -51,8 +51,8 @@ class AddDeprecatedTemplates
     }
 
     /**
-     * @param Configurator $configurator
-     * @param string $name
+     * @param Configurator     $configurator
+     * @param string           $name
      * @param AbstractTemplate $template
      */
     protected function createTag(Configurator &$configurator, $name, AbstractTemplate $template)
@@ -67,11 +67,10 @@ class AddDeprecatedTemplates
 
         $tag->filterChain->prepend([$template, 'addAttributes'])
             ->addParameterByName('fileRepository')
-            ->setJS('function() { return true; }')
-        ;
+            ->setJS('function() { return true; }');
 
         $configurator->Preg->match(
-            '/' . preg_quote('$' . $name . '-') . '(?<uuid>[a-z0-9-]{36})/',
+            '/'.preg_quote('$'.$name.'-').'(?<uuid>[a-z0-9-]{36})/',
             $tagName
         );
     }

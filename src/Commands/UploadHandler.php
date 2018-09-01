@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Commands;
 
 use Exception;
@@ -20,9 +19,9 @@ use Flagrow\Upload\Events;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Helpers\Settings;
 use Flagrow\Upload\Repositories\FileRepository;
-use Flarum\User\AssertPermissionTrait;
-use Flarum\Foundation\ValidationException;
 use Flarum\Foundation\Application;
+use Flarum\Foundation\ValidationException;
+use Flarum\User\AssertPermissionTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
@@ -64,6 +63,7 @@ class UploadHandler
 
     /**
      * @param Upload $command
+     *
      * @return \Illuminate\Support\Collection
      */
     public function handle(Upload $command)
@@ -74,7 +74,6 @@ class UploadHandler
         );
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
-
             try {
                 $upload = $this->files->moveUploadedFileToTemp($file);
 
@@ -128,9 +127,7 @@ class UploadHandler
                 $this->events->fire(
                     new Events\File\WasSaved($command->actor, $file, $upload)
                 );
-
             } catch (Exception $e) {
-
                 if (isset($upload)) {
                     $this->files->removeFromTemp($upload);
                 }
@@ -146,12 +143,13 @@ class UploadHandler
 
     /**
      * @param $adapter
+     *
      * @return UploadAdapter|null
      */
     protected function getAdapter($adapter)
     {
         if (!$adapter) {
-            return null;
+            return;
         }
 
         return app("flagrow.upload-adapter.$adapter");
@@ -159,6 +157,7 @@ class UploadHandler
 
     /**
      * @param $template
+     *
      * @return \Flagrow\Upload\Templates\AbstractTemplate|null
      */
     protected function getTemplate($template)
@@ -168,6 +167,7 @@ class UploadHandler
 
     /**
      * @param $mime
+     *
      * @return mixed
      */
     protected function getMimeConfiguration($mime)

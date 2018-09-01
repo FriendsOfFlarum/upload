@@ -9,8 +9,8 @@ use Flagrow\Upload\Download;
 use Flagrow\Upload\Exceptions\InvalidUploadException;
 use Flagrow\Upload\File;
 use Flagrow\Upload\Validators\UploadValidator;
-use Flarum\User\User;
 use Flarum\Foundation\Application;
+use Flarum\User\User;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -29,7 +29,7 @@ class FileRepository
      */
     private $validator;
 
-    function __construct(Application $app, UploadValidator $validator)
+    public function __construct(Application $app, UploadValidator $validator)
     {
         $this->path = $app->storagePath();
         $this->validator = $validator;
@@ -37,6 +37,7 @@ class FileRepository
 
     /**
      * @param $uuid
+     *
      * @return File
      */
     public function findByUuid($uuid)
@@ -49,29 +50,31 @@ class FileRepository
 
     /**
      * @param Upload $file
-     * @param User $actor
+     * @param User   $actor
+     *
      * @return File
      */
     public function createFileFromUpload(Upload $file, User $actor)
     {
         // Generate a guaranteed unique Uuid.
-        while($uuid = Uuid::uuid4()->toString()) {
-            if (! $this->findByUuid($uuid)) {
+        while ($uuid = Uuid::uuid4()->toString()) {
+            if (!$this->findByUuid($uuid)) {
                 break;
             }
         }
 
-        return (new File)->forceFill([
-            'uuid' => $uuid,
+        return (new File())->forceFill([
+            'uuid'      => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
-            'size' => $file->getSize(),
-            'type' => $file->getMimeType(),
-            'actor_id' => $actor->id,
+            'size'      => $file->getSize(),
+            'type'      => $file->getMimeType(),
+            'actor_id'  => $actor->id,
         ]);
     }
 
     /**
      * @param UploadedFileInterface $upload
+     *
      * @return Upload
      */
     public function moveUploadedFileToTemp(UploadedFileInterface $upload)
@@ -79,7 +82,7 @@ class FileRepository
         $this->handleUploadError($upload->getError());
 
         // Move the file to a temporary location first.
-        $tempFile = tempnam($this->path . '/tmp', 'flagrow.upload.');
+        $tempFile = tempnam($this->path.'/tmp', 'flagrow.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -129,6 +132,7 @@ class FileRepository
      * Deletes a file from the temporary file location.
      *
      * @param Upload $file
+     *
      * @return bool
      */
     public function removeFromTemp(Upload $file)
@@ -140,6 +144,7 @@ class FileRepository
      * Retrieves a filesystem manager for the temporary file location.
      *
      * @param string $path
+     *
      * @return Filesystem
      */
     protected function getTempFilesystem($path)
@@ -150,6 +155,7 @@ class FileRepository
     /**
      * @param Upload $upload
      * @param string $uuid
+     *
      * @return string
      */
     protected function getBasename(Upload $upload, $uuid)
@@ -158,15 +164,16 @@ class FileRepository
 
         $slug = trim(Str::slug($name));
 
-        return sprintf("%s.%s",
+        return sprintf('%s.%s',
             empty($slug) ? $uuid : $slug,
             $upload->guessExtension() ?: $upload->getClientOriginalExtension()
         );
     }
 
     /**
-     * @param Upload $upload
+     * @param Upload        $upload
      * @param UploadAdapter $adapter
+     *
      * @return bool|false|resource|string
      */
     public function readUpload(Upload $upload, UploadAdapter $adapter)
@@ -179,8 +186,9 @@ class FileRepository
     }
 
     /**
-     * @param File $file
+     * @param File            $file
      * @param DownloadCommand $command
+     *
      * @return Download
      */
     public function downloadedEntry(File $file, DownloadCommand $command)
@@ -188,10 +196,10 @@ class FileRepository
         $download = new Download();
 
         $download->forceFill([
-            'file_id' => $file->id,
+            'file_id'       => $file->id,
             'discussion_id' => $command->discussionId,
-            'post_id' => $command->postId,
-            'downloaded_at' => new Carbon
+            'post_id'       => $command->postId,
+            'downloaded_at' => new Carbon(),
         ]);
 
         if ($command->actor && !$command->actor->isGuest()) {

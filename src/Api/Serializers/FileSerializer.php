@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Api\Serializers;
 
 use Flagrow\Upload\File;
@@ -42,6 +41,7 @@ class FileSerializer extends AbstractSerializer
      * Get the default set of serialized attributes for a model.
      *
      * @param File $model
+     *
      * @return array
      */
     protected function getDefaultAttributes($model)

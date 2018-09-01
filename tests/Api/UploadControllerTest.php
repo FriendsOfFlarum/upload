@@ -11,6 +11,5 @@ class UploadControllerTest extends TestCase
      */
     public function upload_requires_permission()
     {
-
     }
 }

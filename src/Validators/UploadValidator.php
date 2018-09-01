@@ -11,7 +11,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Flagrow\Upload\Validators;
 
 use Flagrow\Upload\Helpers\Settings;
@@ -27,8 +26,8 @@ class UploadValidator extends AbstractValidator
         return [
             'file' => [
                 'required',
-                'max:' . $settings->get('maxFileSize', Settings::DEFAULT_MAX_FILE_SIZE)
-            ]
+                'max:'.$settings->get('maxFileSize', Settings::DEFAULT_MAX_FILE_SIZE),
+            ],
         ];
     }
 }

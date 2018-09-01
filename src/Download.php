@@ -3,10 +3,10 @@
 namespace Flagrow\Upload;
 
 use Carbon\Carbon;
+use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\User\User;
-use Flarum\Database\AbstractModel;
 
 /**
  * @property int $id
