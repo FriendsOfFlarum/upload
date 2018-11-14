@@ -67,7 +67,7 @@ class FileRepository
             'uuid'      => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
             'size'      => $file->getSize(),
-            'type'      => $file->getMimeType(),
+            'type'      => $file->getClientMimeType(),
             'actor_id'  => $actor->id,
         ]);
     }

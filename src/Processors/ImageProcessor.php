@@ -43,7 +43,7 @@ class ImageProcessor implements Processable
      */
     public function process(File &$file, UploadedFile &$upload)
     {
-        $mimeType = $upload->getMimeType();
+        $mimeType = $upload->getClientMimeType();
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             $image = (new ImageManager())->make($upload->getRealPath());
 
@@ -57,7 +57,7 @@ class ImageProcessor implements Processable
 
             @file_put_contents(
                 $upload->getRealPath(),
-                $image->encode($upload->getMimeType())
+                $image->encode($upload->getClientMimeType())
             );
         }
     }

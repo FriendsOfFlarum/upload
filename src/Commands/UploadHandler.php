@@ -77,7 +77,7 @@ class UploadHandler
             try {
                 $upload = $this->files->moveUploadedFileToTemp($file);
 
-                $mimeConfiguration = $this->getMimeConfiguration($upload->getMimeType());
+                $mimeConfiguration = $this->getMimeConfiguration($upload->getClientMimeType());
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
@@ -89,8 +89,8 @@ class UploadHandler
                     throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
                 }
 
-                if (!$adapter->forMime($upload->getMimeType())) {
-                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getMimeType()}."]);
+                if (!$adapter->forMime($upload->getClientMimeType())) {
+                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getClientMimeType()}."]);
                 }
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor);

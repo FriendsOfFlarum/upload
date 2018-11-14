@@ -11,7 +11,6 @@ app.initializers.add('flagrow-upload', app => {
         drag,
         clipboard;
 
-
     extend(TextEditor.prototype, 'controlItems', function (items) {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
