@@ -46,7 +46,7 @@
             }
         },
         "flagrow": {
-            "discuss": "https://discuss.flarum.org/d/4154-flagrow-upload-the-intelligent-file-attachment-extension"
+            "discuss": "https://discuss.flarum.org/d/4154"
         }
     },
     "autoload": {
