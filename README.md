@@ -20,10 +20,10 @@ For a complete overview of our releases, please visit the [milestones tracker](h
 
 ## Installation
 
-Use [Bazaar](https://discuss.flarum.org/d/5151-flagrow-bazaar-the-extension-marketplace) or install manually:
+Use [Bazaar](https://discuss.flarum.org/d/5151) or install manually:
 
 ```bash
-composer require flagrow/upload
+composer require "flagrow/upload:*"
 ```
 
 ## Updating
@@ -55,18 +55,13 @@ is like a more detailed specification, eg `png`, `pdf` etc. These two are divide
 
 ## Changelog
 
-Please visit the [thread](https://discuss.flarum.org/d/4154-flagrow-file-upload-the-intelligent-file-attachment-extension).
+Please visit the [thread](https://discuss.flarum.org/d/4154).
 
 Check [future milestones](https://github.com/flagrow/upload/milestones).
 
-## Support our work
-
-We prefer to keep our work available to everyone.
-In order to do so we rely on voluntary contributions on [Patreon](https://www.patreon.com/flagrow).
-
 ## Security
 
-If you discover a security vulnerability within Upload, please send an email to the Gravure team at security@gravure.io. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within Upload, please send an email to the Flagrow team at security@flagrow.io. All security vulnerabilities will be promptly addressed.
 
 Please include as many details as possible. You can use `php flarum info` to get the PHP, Flarum and extension versions installed.
 
@@ -76,10 +71,10 @@ Please include as many details as possible. You can use `php flarum info` to get
 
 ## Links
 
-- [Flarum Discuss post](https://discuss.flarum.org/d/4154-flagrow-upload-the-intelligent-file-attachment-extension)
+- [Flarum Discuss post](https://discuss.flarum.org/d/4154)
 - [Source code on GitHub](https://github.com/flagrow/upload)
 - [Changelog](https://github.com/flagrow/upload/blob/master/CHANGELOG.md)
 - [Report an issue](https://github.com/flagrow/upload/issues)
 - [Download via Packagist](https://packagist.org/packages/flagrow/upload)
 
-An extension by [Flagrow](https://flagrow.io/), a project of [Gravure](https://gravure.io/).
+An extension by [Flagrow](https://flagrow.io/).
