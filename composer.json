@@ -36,7 +36,7 @@
     },
     "extra": {
         "flarum-extension": {
-            "title": "Flagrow Upload",
+            "title": "Upload",
             "icon": {
                 "image": "resources/logo.svg",
                 "backgroundColor": "#5f4bb6",
