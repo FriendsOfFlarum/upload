@@ -15,6 +15,7 @@ namespace Flagrow\Upload\Adapters;
 
 use Flagrow\Upload\Contracts\UploadAdapter;
 use Flagrow\Upload\File;
+use Flagrow\Upload\Helpers\Settings;
 use Illuminate\Support\Arr;
 
 class AwsS3 extends Flysystem implements UploadAdapter
