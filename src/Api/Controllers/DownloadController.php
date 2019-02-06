@@ -7,6 +7,7 @@ use Flagrow\Upload\Commands\Download;
 use Flagrow\Upload\Helpers\Settings;
 use Flarum\Post\PostRepository;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ResponseInterface;
@@ -52,9 +53,10 @@ class DownloadController implements RequestHandlerInterface
         $post = $this->posts->findOrFail($postId, $actor);
         $discussion = $post->discussion_id;
 
+        /** @var Session $session */
         $session = $request->getAttribute('session');
 
-        if ($this->settings->get('disableHotlinkProtection') != 1 && $csrf !== $session->get('csrf_token')) {
+        if ($this->settings->get('disableHotlinkProtection') != 1 && $csrf !== $session->token()) {
             throw new ModelNotFoundException();
         }
 
