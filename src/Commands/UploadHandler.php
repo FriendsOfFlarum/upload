@@ -115,6 +115,7 @@ class UploadHandler
 
                 $file->upload_method = $adapter;
                 $file->tag = $template;
+                $file->actor_id = $command->actor->id;
 
                 $this->events->fire(
                     new Events\File\WillBeSaved($command->actor, $file, $upload)
