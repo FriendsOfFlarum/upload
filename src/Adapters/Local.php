@@ -31,6 +31,12 @@ class Local extends Flysystem implements UploadAdapter
             $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
+        $file->url = str_replace(
+            '/home/forum/public_html/shared/public/',
+            '',
+            $file->url
+        );
+
         /** @var Settings $settings */
         $settings = app()->make(Settings::class);
         /** @var UrlGenerator $generator */
