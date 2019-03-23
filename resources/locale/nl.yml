@@ -7,10 +7,24 @@ flagrow-upload:
             success: Gelukt
             error: Mislukt
     admin:
+        templates:
+            image: Standaard afbeelding downloadsjabloon
+            image_description: >
+                Toon een thumbnail van de afbeelding.
+                Proxies downloads via php, waardoor statistische gegevens kunnen worden verzameld en hotlinkbeveiliging mogelijk is.
+            file: Standaard downloadsjabloon voor bestanden
+            file_description: >
+                Toont de bestandsnaam en enige algemene informatie.
+                Proxies downloads via php, waardoor statistische gegevens kunnen worden verzameld en hotlinkbeveiliging mogelijk is.
+            image-preview: Volledige afbeelding voorvertoning template
+            image-preview_description: >
+                Toont het volledige beeld in de rij.
+                Geen downloadfunctionaliteit, geen statistieken worden verzameld en hotlinkbeveiliging is niet mogelijk.
         permissions:
-            upload_label: Bestanden uploaden
+            upload_label: Upload bestanden
+            download_label: Download bestanden
         upload_methods:
-            local: Lokaal
+            local: Local
             aws-s3: Amazon S3
             imgur: Imgur
             ovh-svfs: OVH SVFS
@@ -20,10 +34,10 @@ flagrow-upload:
                 max_file_size: Maximale bestandsgrootte (in kilobytes)
                 mime_types: Configureer je mime type, upload adapter instellingen
             resize:
-                title: Plaatjes verkleinen
-                toggle: Verkleinen
-                max_width: Maximale breedte
-                max_height: Maximale hoogte
+                title: Afbeeldingen verkleinen
+                toggle: Verklein
+                max_width: Minimale breedte
+                max_height: Maximale breedte
             watermark:
                 title: Watermerk
                 toggle: Watermerk toevoegen
@@ -31,23 +45,30 @@ flagrow-upload:
                 file: Upload je watermerk
             local:
                 title: Instellingen lokale opslag
-                cdn_url: Content Delivery URL
+                cdn_url: Content Delivery URL (prefixes files)
             imgur:
-                title: Imgur opslag instellingen
+            title: Imgur opslag instellingen
                 client_id: Imgur client ID
             aws-s3:
                 title: AWS S3 opslag instellingen
-                key: Sleutel (key)
-                secret: Geheim (secret)
+                key: Key
+                secret: Secret
                 bucket: Bucket
-                region: Gebied (region)
+                region: Region
             ovh-svfs:
-                title: OVH SVFS opslag instellingen
+                title: OVH SVFS storage settings
                 container: Container
                 tenantid: Tenant ID
-                username: Gebruikersnaam
-                password: Wachtwoord
-                region: Gebied
+                username: Username
+                password: Password
+                region: Region
+            disable-hotlink-protection:
+                title: Schakel hotlink beveiliging uit
+                toggle: Uitschakelen
+            disable-download-logging:
+                title: Schakeling download-logging uit
+                toggle: Uitschakelen
+
         buttons:
             save: Instellingen opslaan
         help_texts:
@@ -57,6 +78,9 @@ flagrow-upload:
                 Configureer je voorkeur hier. Ieder mime type (op
                 basis van reguliere expressies) wordt afgehandeld
                 door een specifieke upload adapter.
+            download_templates: >
+                Downloadsjablonen zijn hoe uploads worden getoond op uw forum,
+                bijvoorbeeld zoals voorbeelden, knoppen. Nu verkrijgbaar:
             resize: >
                 Kies hier of je je plaatjes wilt laten verkleinen
                 voordat ze geupload worden. Je kan een maximale hoogte
@@ -66,3 +90,9 @@ flagrow-upload:
                 Bepaal of plaatjes automatisch een watermerk krijgen
                 tijdens het uploaden. Watermerken worden automatisch op alle
                 plaatjes toegevoegd, behalve bij gif-bestanden.
+            disable-hotlink-protection: >
+                Hotlink-beveiliging voorkomt het openen van downloads van andere sites.
+                De huidige methode vereist een csrf-token en een post-ID.
+            disable-download-logging: >
+                Schakel logboekregistratie elke download door gebruikers van uw forum uit.
+                Inschakelen stelt u in staat om het aantal downloads en andere statistieken te bekijken in de nabije toekomst.
