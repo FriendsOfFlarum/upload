@@ -47,7 +47,7 @@ flagrow-upload:
                 title: Instellingen lokale opslag
                 cdn_url: Content Delivery URL (prefixes files)
             imgur:
-            title: Imgur opslag instellingen
+                title: Imgur opslag instellingen
                 client_id: Imgur client ID
             aws-s3:
                 title: AWS S3 opslag instellingen
@@ -68,7 +68,6 @@ flagrow-upload:
             disable-download-logging:
                 title: Schakeling download-logging uit
                 toggle: Uitschakelen
-
         buttons:
             save: Instellingen opslaan
         help_texts:
