@@ -1,3 +1,4 @@
+import legalModal from './legalModal';
 import Component from "flarum/Component";
 import icon from "flarum/helpers/icon";
 import LoadingIndicator from "flarum/components/LoadingIndicator";
@@ -40,16 +41,30 @@ export default class UploadButton extends Component {
      * @param e
      */
     process(e) {
-        // get the file from the input field
+      var files = $(e.target)[0].files;
+      var _this = this;
+      var check;
 
-        var files = $(e.target)[0].files;
+      delete app.legalupload;
+      legalModal();
 
-        // set the button in the loading state (and redraw the element!)
-        this.loading = true;
-        m.redraw();
+      (function _check() {
+        if (app.legalupload === void(0) && app.modal.component) {
+          check = setTimeout(function () {
+            _check();
+          }, 1000);
+          return;
+        }
 
-        this.uploadFiles(files, this.success, this.failure);
-    }
+        if (app.legalupload) {
+          // set the button in the loading state (and redraw the element!)
+          _this.loading = true;
+          m.redraw();
+
+          _this.uploadFiles(files, _this.success, _this.failure);
+        }
+      })();
+    };
 
     uploadFiles(files, successCallback, failureCallback) {
         const data = new FormData;
@@ -77,7 +92,8 @@ export default class UploadButton extends Component {
      * @param message
      */
     failure(message) {
-        // todo show popup
+      app.modal.close();
+      alert(message.response.errors[0].detail);
     }
 
     /**
@@ -88,7 +104,9 @@ export default class UploadButton extends Component {
     success(response) {
         response.forEach((bbcode) => {
           this.textAreaObj.insertAtCursor(bbcode + '\n');
-        })
+        });
+
+        app.modal.close();
 
         // if we are not starting a new discussion, the variable is defined
         if (typeof this.textAreaObj.props.preview !== 'undefined') {
