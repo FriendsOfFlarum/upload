@@ -7,14 +7,28 @@ flagrow-upload:
             success: Succès
             error: Erreur
     admin:
+        templates:
+            image: 31/5000
+Modèle de téléchargement d'image par défaut
+            image_description: >
+                Affiche une miniature de l'image et procure son téléchargement via php.
+                Permettre la collecte de statistiques et la protection par hyperlien.
+            file: Modèle de téléchargement de fichier par défaut
+            file_description: >
+                Affiche le nom du fichier et des informations générales. Procurer les téléchargements
+                via php, permettant la collecte de statistiques et la protection des liens hypertextes.
+            image-preview: Modèle complet d'aperçu de l'image
+            image-preview_description: >
+                Affiche l'image complète en ligne. Aucune fonctionnalité de téléchargement, aucune statistique n'est collectée et la protection par lien hypertexte est ignorée.
         permissions:
             upload_label: Joindre des fichiers
+            download_label: Télécharger des fichiers
         upload_methods:
             local: Local
             aws-s3: Amazon S3
             imgur: Imgur
+            ovh-svfs: OVH SVFS
         labels:
-            upload_method: Méthode de téléchargement
             preferences:
                 title: Préférences générales
                 max_file_size: Taille maximale du fichier (en kilobytes)
@@ -41,6 +55,20 @@ flagrow-upload:
                 secret: Secret
                 bucket: Bucket
                 region: Région
+            ovh-svfs:
+                title: OVH SVFS storage settings
+                container: Container
+                tenantid: ID de locataire
+                username: Nom d'utilisateur
+                password: Mot de passe
+                region: Région
+            disable-hotlink-protection:
+                title: Désactiver la protection hotlink
+                toggle: Désactiver
+            disable-download-logging:
+                title: Désactiver les téléchargements de journalisation
+                toggle: Désactiver
+
         buttons:
             save: Sauvegarder les paramètres
         help_texts:
@@ -49,10 +77,15 @@ flagrow-upload:
             mime_types: >
                 Configurez la correspondance entre le type de données et le stockage. Chaque type mime représenté par une expression régulière sera géré
                 par le service de stockage correspondant.
-            upload_method: >
-                Vous pouvez sélectionner la méthode que vous souhaitez utiliser pour joindre vos fichiers. Lorsque vous en sélectionner une, the
-                relative setting card is going to be displayed.
+            download_templates: >
+                Les modèles de téléchargement sont la façon dont les téléchargements sont affichés sur votre forum. Ex.: comme des aperçus, des boutons. Actuellement disponible:
             resize: >
                 Choisir si vous voulez redimensionner les images avant leur téléchargement. Vous pouvez choisir une largeur et hauteur maximales, en pixels. Le processus de redimensionnement conserve le rapport d’aspect des images.
             watermark: >
                 Choisir si les images possèderont une image en filigrane pendant le téléchargement. Les images en filigrane sont ajoutées sur des images (sauf .gif) basées sur vos préférences ci-dessous.
+            disable-hotlink-protection: >
+                La protection Hotlink empêche l’ouverture de téléchargements depuis d’autres sites.
+                La méthode actuelle nécessite un jeton csrf et un identifiant de publication.
+            disable-download-logging: >
+                Désactivez la journalisation de chaque téléchargement effectué par les utilisateurs de votre forum. 
+                Le garder activé vous permet d’afficher le nombre de téléchargements et d’autres statistiques, dans un avenir proche.
