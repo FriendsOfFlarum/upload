@@ -12,7 +12,7 @@ export default class UploadButton extends Component {
         this.textAreaObj = null;
 
         // initial state of the button
-        this.loading = false;
+        this.loading = sessionStorage.getItem('flagrow-upload.loading') || false;
     }
 
     /**
@@ -46,6 +46,7 @@ export default class UploadButton extends Component {
 
         // set the button in the loading state (and redraw the element!)
         this.loading = true;
+        sessionStorage.setItem('flagrow-upload.loading', true);
         m.redraw();
 
         this.uploadFiles(files, this.success, this.failure);
@@ -78,6 +79,8 @@ export default class UploadButton extends Component {
      */
     failure(message) {
         // todo show popup
+
+        this.reset();
     }
 
     /**
@@ -96,10 +99,12 @@ export default class UploadButton extends Component {
             this.textAreaObj.props.preview();
         }
 
-        // reset the button for a new upload
-        setTimeout(() => {
-            document.getElementById("flagrow-upload-form").reset();
-            this.loading = false;
-        }, 1000);
+        this.reset();
+    }
+
+    reset(){
+        document.getElementById("flagrow-upload-form").reset();
+        this.loading = false;
+        sessionStorage.removeItem('flagrow-upload.loading');
     }
 }
