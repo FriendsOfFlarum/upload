@@ -26,12 +26,14 @@
     },
     "suggest": {
         "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
-        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API."
+        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API.",
+		"mhetreramesh/flysystem-backblaze": "Uploads to Backblaze B2 using API."
     },
     "require-dev": {
         "league/flysystem": "^1.0.32",
         "league/flysystem-aws-s3-v3": "^1.0",
         "techyah/flysystem-ovh": "^1.0",
+		"mhetreramesh/flysystem-backblaze": "^1.5",
         "flagrow/steamroller": "dev-master"
     },
     "extra": {
