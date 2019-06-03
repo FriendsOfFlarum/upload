@@ -14,6 +14,8 @@
 namespace Flagrow\Upload\Providers;
 
 use Aws\S3\S3Client;
+use BackblazeB2\Client as B2Client;
+use BackblazeB2\Bucket as B2Bucket;
 use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Helpers\Settings;
 use GuzzleHttp\Client as Guzzle;
@@ -24,6 +26,7 @@ use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use Techyah\Flysystem\OVH\OVHAdapter;
 use Techyah\Flysystem\OVH\OVHClient;
+use Mhetreramesh\Flysystem\BackblazeAdapter;
 
 class StorageServiceProvider extends ServiceProvider
 {
@@ -72,6 +75,10 @@ class StorageServiceProvider extends ServiceProvider
                         case 'ovh-svfs':
                             if (class_exists(OVHClient::class)) {
                                 return $this->ovh($settings);
+                            }
+                        case 'backblaze-b2':
+                            if (class_exists(B2Client::class)) {
+                                return $this->backblazeB2($settings);
                             }
                         case 'imgur':
                             return $this->imgur($settings);
@@ -122,6 +129,24 @@ class StorageServiceProvider extends ServiceProvider
 
         return new Adapters\OVH(
             new OVHAdapter($client->getContainer())
+        );
+    }
+
+    /**
+     * @param Settings $settings
+     *
+     * @return Adapters\BackblazeB2
+     */
+    protected function backblazeB2(Settings $settings)
+    {
+        return new Adapters\BackblazeB2(
+            new BackblazeAdapter(
+                new B2Client(
+                    $settings->get('b2AccountId'), 
+                    $settings->get('b2ApplicationKey')
+                ),
+                $settings->get('b2BucketName')
+            )
         );
     }
 

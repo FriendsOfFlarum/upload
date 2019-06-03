@@ -35,6 +35,11 @@ export default class UploadPage extends Component {
       'ovhTenantId',
       'ovhContainer',
       'ovhRegion',
+      // Backblaze
+      'b2AccountId',
+      'b2ApplicationKey',
+      'b2BucketName',
+      'b2DownloadUrl',
     ];
 
     // the checkboxes we need to watch and to save.
@@ -334,6 +339,35 @@ export default class UploadPage extends Component {
                 className: 'FormControl',
                 value: this.values.ovhRegion() || '',
                 oninput: m.withAttr('value', this.values.ovhRegion)
+              }),
+            ]),
+            m('fieldset', {
+              className: 'UploadPage-backblaze-b2',
+            }, [
+              m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.backblaze-b2.title')),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.backblaze-b2.accountid')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.b2AccountId() || '',
+                oninput: m.withAttr('value', this.values.b2AccountId)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.backblaze-b2.applicationkey')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.b2ApplicationKey() || '',
+                oninput: m.withAttr('value', this.values.b2ApplicationKey)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.backblaze-b2.bucketname')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.b2BucketName() || '',
+                oninput: m.withAttr('value', this.values.b2BucketName)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.backblaze-b2.downloadurl')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.b2DownloadUrl() || '',
+                oninput: m.withAttr('value', this.values.b2DownloadUrl)
               }),
             ]),
             Button.component({

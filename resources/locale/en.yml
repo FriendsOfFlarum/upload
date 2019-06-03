@@ -43,6 +43,12 @@ flagrow-upload:
         tenantid: Tenant ID
         title: OVH SVFS storage settings
         username: Username
+      backblaze-b2:
+        title: Backblaze B2 storage settings
+        accountid: Account ID (Master keyID)
+        applicationkey: Application Key (ApplicationKey is not supported yet, please use MasterKey only)
+        bucketname: Bucket Name
+        downloadurl: Base download url (ex f000.backblazeb2.com)
       preferences:
         max_file_size: Maximum file size (in kilobytes)
         mime_types: 'Configure your mime type, upload adapter mapping'
@@ -75,6 +81,7 @@ flagrow-upload:
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS
+      backblaze-b2: Backblaze B2
   forum:
     buttons:
       attach: Attach

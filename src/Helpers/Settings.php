@@ -14,11 +14,13 @@
 namespace Flagrow\Upload\Helpers;
 
 use Aws\AwsClient;
+use BackblazeB2\Client as B2Client;
 use Flagrow\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Techyah\Flysystem\OVH\OVHClient;
+use Mhetreramesh\Flysystem\BackblazeAdapter;
 
 /**
  * @property int $maxFileSize
@@ -80,6 +82,12 @@ class Settings
         'ovhTenantId',
         'ovhContainer',
         'ovhRegion',
+
+        // Backblaze
+        'b2AccountId',
+        'b2ApplicationKey',
+        'b2BucketName',
+        'b2DownloadUrl',
 
         // Downloads
         'disableHotlinkProtection',
@@ -198,6 +206,10 @@ class Settings
 
         if (class_exists(OVHClient::class)) {
             $methods[] = 'ovh-svfs';
+        }
+
+        if (class_exists(B2Client::class)) {
+            $methods[] = 'backblaze-b2';
         }
 
         $methods[] = 'imgur';
