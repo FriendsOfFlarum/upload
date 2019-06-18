@@ -10,16 +10,16 @@ flagrow-upload:
         templates:
             image: Standard Bild-Download Vorlage
             image_description: >
-                Zeigt eine Miniaturansicht des Bildes and vertritt den Download durch PHP.
-                Erlaubt es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
+                Zeigt eine Miniaturansicht des Bildes und leitet den Download durch PHP.
+                Ermöglicht es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
             file: Standard Bild-Download Vorlage
             file_description: >
-                Zeigt den Dateinamen einige generelle Informationen. Vertritt den Download durch PHP,
-                Erlaubt es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
+                Zeigt den Dateinamen und einige generelle Informationen an. Leitet den Download durch PHP.
+                Ermöglicht es, Statistiken zu erfassen und Hotlink-Schutz zu integrieren.
             image-preview: Vollständige Bild-Vorschau Vorlage
             image-preview_description: >
                 Zeigt das vollständige Bild in-line. Keine Download-Funktion, keine Statistiken
-                werden aufgezeichnet und Hotlink-Schutz wird ignoriert
+                werden erfasst und Hotlink-Schutz wird ignoriert.
         permissions:
             upload_label: Dateien hochladen
             download_label: Dateien runterladen
@@ -31,32 +31,32 @@ flagrow-upload:
         labels:
             preferences:
                 title: Allgemeine Einstellungen
-                max_file_size: Maximale Dateigrösse (in kilobytes)
-                mime_types: Konfiguriere deinen mime type, lade ein adapter mapping hoch
+                max_file_size: Maximale Dateigrösse (in Kilobytes)
+                mime_types: Konfiguriere die Zuordnung von MIME-Types und Upload-Adaptern
             resize:
                 title: Bildgrösse anpassen
                 toggle: Bildgrösse anpassen
                 max_width: Maximale Bildbreite
                 max_height: Maximale Bildhöhe
             watermark:
-                title: Wasserzeichen Bilder
-                toggle:  Wasserzeichen Bilder
-                position: Wasserzeichen Position
-                file: Lade dein Wasserzeichen Bild hoch
+                title: Wasserzeichen
+                toggle:  Wasserzeichen
+                position: Wasserzeichen-Position
+                file: Lade dein Wasserzeichen hoch
             local:
                 title: Einstellungen lokaler Speicherplatz
-                cdn_url: Content Versand-URL (fügt Präfix zu Dateien hinzu)
+                cdn_url: Content-Delivery-URL (fügt Präfix zu Dateien hinzu)
             imgur:
-                title: Imgur Bildspeicher Einstellungen
-                client_id: Imgur client ID
+                title: Imgur Einstellungen
+                client_id: Imgur Client ID
             aws-s3:
-                title: AWS S3 Speicherplatz Einstellungen
+                title: AWS S3 Einstellungen
                 key: Key
                 secret: Secret
                 bucket: Bucket
                 region: Region
             ovh-svfs:
-                title: OVH SVFS Speicherplatz Einstellungen
+                title: OVH SVFS Einstellungen
                 container: Container
                 tenantid: Tenant ID
                 username: Benutzername
@@ -66,25 +66,24 @@ flagrow-upload:
                 title: Hotlink-Schutz deaktivieren
                 toggle: Deaktivieren
             disable-download-logging:
-                title: Download Logging deaktivieren
+                title: Download-Logging deaktivieren
                 toggle: Deaktivieren
 
         buttons:
             save: Einstellungen speichern
         help_texts:
             description: >
-                Hochlad-Services und Einstellungen aufsetzen.
+                Upload-Services und Einstellungen.
             mime_types: >
-                Bitte konfiguriere dein mapping hier. Jede mime type
-                regular expression wird von einem spezifischen
-                Upload-Adapter und einer spezifischen Download-Vorlage behandelt.
+                Bitte konfiguriere dein Mapping hier. Jede MIME-Type-Regular-Expression wird einem spezifischen
+                Upload-Adapter und einer spezifischen Download-Vorlage zugewiesen.
             download_templates: >
                 Download-Vorlagen definieren, wie Uploads in deinem Forum angezeigt werden,
                 z.B. Previews, Knöpfe. Aktuell verfügbar:
             resize: >
-                Entscheide, ob du die Grösse von Bildern vor dem hochladen
-                jeweils bearbeiten möchtest. Du kannst eine Maximal-Höhe und Maximal-Breite in Pixeln angeben.
-                Dieser Prozess behält das Verhältnis von Höhe und Breite bei.
+                Entscheide, ob du die Grösse von Bildern vor dem Hochladen
+                anpassen möchtest. Du kannst eine Maximal-Höhe und Maximal-Breite in Pixeln angeben.
+                Dieser Prozess behält das Seitenverhältnis bei.
             watermark: >
                 Entscheide, ob den Bildern während des Hochladens ein Wasserzeichen hinzugefügt werden soll.
                 Wasserzeichen werden den Einstellungen unten entsprechend zu nicht-GIFs hinzugefügt.
@@ -93,4 +92,4 @@ flagrow-upload:
                 Die aktuelle Methode verlangt ein CSRF-Token und eine Post-Id.
             disable-download-logging: >
                 Deaktiviere das Logging für jeden Download eines Benutzers deines Forums. Wenn du es aktiviert lässt, erlaubt dies
-                das zukünftige Ansehen der Anzahl Downloads und anderer Metriken.
+                das zukünftige Ansehen der Downloadanzahl und anderer Metriken.
