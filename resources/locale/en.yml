@@ -18,6 +18,11 @@ flagrow-upload:
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
     labels:
+      google-cloud-storage:
+        project_id: Project ID
+        credentials_file: Credentials file
+        bucket: Bucket
+        title: Google Cloud Storage settings
       aws-s3:
         bucket: Bucket
         key: Key
@@ -72,6 +77,7 @@ flagrow-upload:
         Shows a thumbnail of the image and proxies download through php. Allowing statistics to be gathered and hotlink protection.
     upload_methods:
       aws-s3: Amazon S3
+      google-cloud-storage: Google Cloud Storage
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS

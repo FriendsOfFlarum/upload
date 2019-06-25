@@ -13,6 +13,7 @@
 
 namespace Flagrow\Upload\Helpers;
 
+use Google\Cloud\Storage\StorageClient;
 use Aws\AwsClient;
 use Flagrow\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -73,6 +74,11 @@ class Settings
         'awsS3Secret',
         'awsS3Bucket',
         'awsS3Region',
+
+        // Google Cloud Storage        
+        'googleCloudStorageProjectId',
+        'googleCloudStorageCredentialsFile',
+        'googleCloudStorageBucket',
 
         // OVH
         'ovhUsername',
@@ -194,6 +200,10 @@ class Settings
 
         if (class_exists(AwsClient::class)) {
             $methods[] = 'aws-s3';
+        }        
+
+        if (class_exists(StorageClient::class)) {
+            $methods[] = 'google-cloud-storage';
         }
 
         if (class_exists(OVHClient::class)) {

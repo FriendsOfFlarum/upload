@@ -1,5 +1,6 @@
 {
     "name": "flagrow/upload",
+    "version": "1.0.0",
     "description": "The file upload extension for the Flarum forum with insane intelligence.",
     "keywords": [
         "upload",
@@ -22,17 +23,18 @@
     },
     "require": {
         "flarum/core": "^0.1.0-beta.8",
-        "ramsey/uuid": "^3.5.2"
+        "ramsey/uuid": "^3.5.2",
+        "superbalist/flysystem-google-storage": "^7.2.1"
     },
     "suggest": {
         "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
         "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API."
     },
-    "require-dev": {
+    "require-dev": {        
         "league/flysystem": "^1.0.32",
         "league/flysystem-aws-s3-v3": "^1.0",
         "techyah/flysystem-ovh": "^1.0",
-        "flagrow/steamroller": "dev-master"
+        "flagrow/steamroller": "dev-master"        
     },
     "extra": {
         "flarum-extension": {

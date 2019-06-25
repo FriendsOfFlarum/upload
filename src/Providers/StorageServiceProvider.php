@@ -13,6 +13,8 @@
 
 namespace Flagrow\Upload\Providers;
 
+use Google\Cloud\Storage\StorageClient;
+use Superbalist\Flysystem\GoogleStorage\GoogleStorageAdapter;
 use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Helpers\Settings;
@@ -69,6 +71,10 @@ class StorageServiceProvider extends ServiceProvider
                             if (class_exists(S3Client::class)) {
                                 return $this->awsS3($settings);
                             }
+                        case 'google-cloud-storage':
+                            if (class_exists(StorageClient::class)) {
+                                return $this->googleCloudStorage($settings);
+                            }
                         case 'ovh-svfs':
                             if (class_exists(OVHClient::class)) {
                                 return $this->ovh($settings);
@@ -103,6 +109,23 @@ class StorageServiceProvider extends ServiceProvider
                 $settings->get('awsS3Bucket')
             )
         );
+    }
+
+    /**
+     * @param Settings $settings
+     *
+     * @return Adapters\GoogleCloudStorage
+     */
+    protected function googleCloudStorage(Settings $settings)
+    {
+        $storageClient = new StorageClient([
+            'projectId' => $settings->get('googleCloudStorageProjectId'),
+            'keyFilePath' => $settings->get('googleCloudStorageCredentialsFile')
+        ]);
+        $bucket = $storageClient->bucket($settings->get('googleCloudStorageBucket'));
+        $adapter = new GoogleStorageAdapter($storageClient, $bucket);
+
+        return new Adapters\GoogleCloudStorage($adapter);
     }
 
     /**

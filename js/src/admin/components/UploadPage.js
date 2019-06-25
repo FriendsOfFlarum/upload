@@ -24,6 +24,10 @@ export default class UploadPage extends Component {
       'watermarkPosition',
       // Imgur
       'imgurClientId',
+      // Google Cloud Storage
+      'googleCloudStorageProjectId',
+      'googleCloudStorageCredentialsFile',
+      'googleCloudStorageBucket',
       // AWS
       'awsS3Key',
       'awsS3Secret',
@@ -270,6 +274,33 @@ export default class UploadPage extends Component {
                 oninput: m.withAttr('value', this.values.imgurClientId)
               }),
             ]),
+
+
+            m('fieldset', {
+              className: 'UploadPage-google-cloud-storage',
+            }, [
+              m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.google-cloud-storage.title')),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.google-cloud-storage.project_id')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.googleCloudStorageProjectId() || '',
+                oninput: m.withAttr('value', this.values.googleCloudStorageProjectId)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.google-cloud-storage.credentials_file')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.googleCloudStorageCredentialsFile() || '',
+                oninput: m.withAttr('value', this.values.googleCloudStorageCredentialsFile)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.google-cloud-storage.bucket')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.googleCloudStorageBucket() || '',
+                oninput: m.withAttr('value', this.values.googleCloudStorageBucket)
+              }),              
+            ]),
+
+
             m('fieldset', {
               className: 'UploadPage-aws-s3',
             }, [
