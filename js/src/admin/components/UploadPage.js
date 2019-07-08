@@ -24,6 +24,11 @@ export default class UploadPage extends Component {
       'watermarkPosition',
       // Imgur
       'imgurClientId',
+      // Aliyun
+      'aliyunAppid',
+      'aliyunKey',
+      'aliyunBucket',
+      'aliyunEndPoint',
       // AWS
       'awsS3Key',
       'awsS3Secret',
@@ -269,6 +274,35 @@ export default class UploadPage extends Component {
                 value: this.values.imgurClientId() || '',
                 oninput: m.withAttr('value', this.values.imgurClientId)
               }),
+            ]),
+            m('fieldset', {
+                className: 'UploadPage-aliyun',
+            }, [
+                m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.aliyun.title')),
+                m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aliyun.appid')),
+                m('input', {
+                    className: 'FormControl',
+                    value: this.values.aliyunAppid() || '',
+                    oninput: m.withAttr('value', this.values.aliyunAppid)
+                }),
+                m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aliyun.key')),
+                m('input', {
+                    className: 'FormControl',
+                    value: this.values.aliyunKey() || '',
+                    oninput: m.withAttr('value', this.values.aliyunKey)
+                }),
+                m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aliyun.bucket')),
+                m('input', {
+                    className: 'FormControl',
+                    value: this.values.aliyunBucket() || '',
+                    oninput: m.withAttr('value', this.values.aliyunBucket)
+                }),
+                m('label', {}, app.translator.trans('flagrow-upload.admin.labels.aliyun.endpoint')),
+                m('input', {
+                    className: 'FormControl',
+                    value: this.values.aliyunEndPoint() || '',
+                    oninput: m.withAttr('value', this.values.aliyunEndPoint)
+                }),
             ]),
             m('fieldset', {
               className: 'UploadPage-aws-s3',

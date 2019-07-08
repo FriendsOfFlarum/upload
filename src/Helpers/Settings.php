@@ -13,6 +13,7 @@
 
 namespace Flagrow\Upload\Helpers;
 
+use OSS\OssClient;
 use Aws\AwsClient;
 use Flagrow\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -67,6 +68,12 @@ class Settings
 
         // Imgur
         'imgurClientId',
+
+        // Aliyun
+        'aliyunAppid',
+        'aliyunKey',
+        'aliyunBucket',
+        'aliyunEndPoint',
 
         // AWS
         'awsS3Key',
@@ -191,6 +198,10 @@ class Settings
         $methods = [
             'local',
         ];
+
+        if (class_exists(OssClient::class)) {
+            $methods[] = 'aliyun';
+        }
 
         if (class_exists(AwsClient::class)) {
             $methods[] = 'aws-s3';

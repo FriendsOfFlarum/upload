@@ -18,6 +18,12 @@ flagrow-upload:
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
     labels:
+      aliyun:
+        title: Aliyun OSS Setting
+        appid: AppId
+        key: AppKey
+        bucket: Bucket
+        endpoint: EndPoint
       aws-s3:
         bucket: Bucket
         key: Key

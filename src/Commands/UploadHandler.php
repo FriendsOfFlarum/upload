@@ -86,7 +86,7 @@ class UploadHandler
                 );
 
                 if (!$adapter) {
-                    throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
+                    throw new ValidationException(['upload' => 'Uploading files of this type ('.$upload->getClientMimeType().') ('.$upload->getClientMimeType().') ('.$upload->getClientMimeType().') is not allowed.']);
                 }
 
                 if (!$adapter->forMime($upload->getClientMimeType())) {

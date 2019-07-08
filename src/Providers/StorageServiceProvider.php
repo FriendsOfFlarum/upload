@@ -13,6 +13,7 @@
 
 namespace Flagrow\Upload\Providers;
 
+use OSS\OssClient;
 use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
 use Flagrow\Upload\Helpers\Settings;
@@ -22,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use Aliyun\Flysystem\AliyunOss\AliyunOssAdapter;
 use Techyah\Flysystem\OVH\OVHAdapter;
 use Techyah\Flysystem\OVH\OVHClient;
 
@@ -65,6 +67,10 @@ class StorageServiceProvider extends ServiceProvider
 
                 $app->bind("flagrow.upload-adapter.$adapter", function () use ($settings, $adapter) {
                     switch ($adapter) {
+                        case 'aliyun':
+                            if (class_exists(OssClient::class)) {
+                                return $this->aliyun($settings);
+                            }
                         case 'aws-s3':
                             if (class_exists(S3Client::class)) {
                                 return $this->awsS3($settings);
@@ -81,6 +87,21 @@ class StorageServiceProvider extends ServiceProvider
                     }
                 });
             });
+    }
+
+    /**
+     * @param Settings $settings
+     *
+     * @return Adapters\AliyunOSS
+     */
+    protected function aliyun(Settings $settings)
+    {
+        return new Adapters\AliyunOss(
+            new AliyunOssAdapter(
+                new OssClient($settings->get('aliyunAppid'),$settings->get('aliyunKey'),$settings->get('aliyunEndPoint')),
+                $settings->get('aliyunBucket')
+            )
+        );
     }
 
     /**

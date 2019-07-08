@@ -36,6 +36,12 @@ flagrow-upload:
       imgur:
         title: Imgur 图片存储设定
         client_id: Imgur 客户ID
+      aliyun:
+        title: 阿里云OSS 存储设定
+        appid: AppId
+        key: AppKey
+        bucket: Bucket
+        endpoint: EndPoint
       aws-s3:
         title: AWS S3 存储设定
         key: Key
