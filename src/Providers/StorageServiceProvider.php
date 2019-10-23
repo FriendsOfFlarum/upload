@@ -15,6 +15,7 @@ namespace Flagrow\Upload\Providers;
 
 use Aws\S3\S3Client;
 use Flagrow\Upload\Adapters;
+use Flagrow\Upload\Adapters\Qiniu;
 use Flagrow\Upload\Helpers\Settings;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Container\Container;
@@ -22,6 +23,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use Overtrue\Flysystem\Qiniu\QiniuAdapter;
+use Qiniu\Http\Client as QiniuClient;
 use Techyah\Flysystem\OVH\OVHAdapter;
 use Techyah\Flysystem\OVH\OVHClient;
 
@@ -51,6 +54,7 @@ class StorageServiceProvider extends ServiceProvider
      */
     protected function instantiateUploadAdapters(Container $app)
     {
+
         /** @var Settings $settings */
         $settings = $app->make(Settings::class);
 
@@ -64,6 +68,7 @@ class StorageServiceProvider extends ServiceProvider
                 }
 
                 $app->bind("flagrow.upload-adapter.$adapter", function () use ($settings, $adapter) {
+
                     switch ($adapter) {
                         case 'aws-s3':
                             if (class_exists(S3Client::class)) {
@@ -75,6 +80,12 @@ class StorageServiceProvider extends ServiceProvider
                             }
                         case 'imgur':
                             return $this->imgur($settings);
+                        case 'qiniu':
+
+                            if (class_exists(QiniuClient::class)) {
+
+                                return $this->qiniu($settings);
+                            }
 
                         default:
                             return $this->local($settings);
@@ -97,12 +108,32 @@ class StorageServiceProvider extends ServiceProvider
                         'key'    => $settings->get('awsS3Key'),
                         'secret' => $settings->get('awsS3Secret'),
                     ],
-                    'region'  => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
-                    'version' => 'latest',
+                    'region'      => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
+                    'version'     => 'latest',
                 ]),
                 $settings->get('awsS3Bucket')
             )
         );
+    }
+
+    /**
+     * [qiniu]
+     * @Author   王文凡
+     * @DateTime 2019-10-23
+     * @version  1.0
+     * @param    Settings   $settings [description]
+     * @return   Adapters\Qiniu
+     */
+    protected function qiniu(Settings $settings)
+    {
+
+        $client = new QiniuAdapter(
+            $settings->get('qiniuKey'),
+            $settings->get('qiniuSecret'),
+            $settings->get('qiniuBucket'),
+            $settings->get('cdnUrl')
+        );
+        return new Qiniu($client);
     }
 
     /**
@@ -136,7 +167,7 @@ class StorageServiceProvider extends ServiceProvider
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers'  => [
-                    'Authorization' => 'Client-ID '.$settings->get('imgurClientId'),
+                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId'),
                 ],
             ])
         );

@@ -18,6 +18,7 @@ use Flagrow\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Qiniu\Http\Client as QiniuClient;
 use Techyah\Flysystem\OVH\OVHClient;
 
 /**
@@ -25,7 +26,7 @@ use Techyah\Flysystem\OVH\OVHClient;
  */
 class Settings
 {
-    const DEFAULT_MAX_FILE_SIZE = 2048;
+    const DEFAULT_MAX_FILE_SIZE   = 2048;
     const DEFAULT_MAX_IMAGE_WIDTH = 100;
 
     /**
@@ -100,17 +101,17 @@ class Settings
 
     public function __get($name)
     {
-        return $this->settings->get($this->prefix.$name);
+        return $this->settings->get($this->prefix . $name);
     }
 
     public function __set($name, $value)
     {
-        $this->settings->set($this->prefix.$name, $value);
+        $this->settings->set($this->prefix . $name, $value);
     }
 
     public function __isset($name)
     {
-        return $this->settings->get($this->prefix.$name) !== null;
+        return $this->settings->get($this->prefix . $name) !== null;
     }
 
     /**
@@ -131,7 +132,7 @@ class Settings
 
         foreach ($definition as $property) {
             if ($prefixed) {
-                $result[$this->prefix.$property] = $this->get($property);
+                $result[$this->prefix . $property] = $this->get($property);
             } else {
                 $result[$property] = $this->get($property);
             }
@@ -199,6 +200,9 @@ class Settings
         if (class_exists(OVHClient::class)) {
             $methods[] = 'ovh-svfs';
         }
+        if (class_exists(QiniuClient::class)) {
+            $methods[] = 'qiniu';
+        }
 
         $methods[] = 'imgur';
 
@@ -207,7 +211,7 @@ class Settings
                 return $item;
             })
             ->map(function ($item) {
-                return app('translator')->trans('flagrow-upload.admin.upload_methods.'.$item);
+                return app('translator')->trans('flagrow-upload.admin.upload_methods.' . $item);
             });
     }
 

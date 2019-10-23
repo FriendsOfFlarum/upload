@@ -29,6 +29,10 @@ export default class UploadPage extends Component {
       'awsS3Secret',
       'awsS3Bucket',
       'awsS3Region',
+      'qiniuKey',
+      // QIniu
+      'qiniuSecret',
+      'qiniuBucket',
       // OVH
       'ovhUsername',
       'ovhPassword',
@@ -270,6 +274,32 @@ export default class UploadPage extends Component {
                 oninput: m.withAttr('value', this.values.imgurClientId)
               }),
             ]),
+
+              m('fieldset', {
+              className: 'UploadPage-qiniu',
+            }, [
+              m('legend', {}, app.translator.trans('flagrow-upload.admin.labels.qiniu.title')),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.qiniu.key')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.qiniuKey() || '',
+                oninput: m.withAttr('value', this.values.qiniuKey)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.qiniu.secret')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.qiniuSecret() || '',
+                oninput: m.withAttr('value', this.values.qiniuSecret)
+              }),
+              m('label', {}, app.translator.trans('flagrow-upload.admin.labels.qiniu.bucket')),
+              m('input', {
+                className: 'FormControl',
+                value: this.values.qiniuBucket() || '',
+                oninput: m.withAttr('value', this.values.qiniuBucket)
+              }),
+        
+            ]), 
+
             m('fieldset', {
               className: 'UploadPage-aws-s3',
             }, [
