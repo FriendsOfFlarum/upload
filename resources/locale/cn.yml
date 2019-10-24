@@ -11,6 +11,7 @@ flagrow-upload:
       upload_label: 文件上传设定
       download_label: 下载文件
     upload_methods:
+      qiniu: 七牛
       local: 本地
       aws-s3: 亚马逊 S3
       imgur: Imgur
