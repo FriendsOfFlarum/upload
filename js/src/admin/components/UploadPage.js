@@ -29,16 +29,16 @@ export default class UploadPage extends Component {
       'awsS3Secret',
       'awsS3Bucket',
       'awsS3Region',
-      'qiniuKey',
-      // QIniu
-      'qiniuSecret',
-      'qiniuBucket',
       // OVH
       'ovhUsername',
       'ovhPassword',
       'ovhTenantId',
       'ovhContainer',
       'ovhRegion',
+      // QIniu
+      'qiniuKey',
+      'qiniuSecret',
+      'qiniuBucket',
     ];
 
     // the checkboxes we need to watch and to save.
