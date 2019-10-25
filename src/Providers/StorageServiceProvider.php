@@ -22,8 +22,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use Overtrue\Flysystem\Qiniu\QiniuAdapter;
 use Techyah\Flysystem\OVH\OVHAdapter;
 use Techyah\Flysystem\OVH\OVHClient;
+use Flagrow\Upload\Adapters\Qiniu;
+use Qiniu\Http\Client as QiniuClient;
 
 class StorageServiceProvider extends ServiceProvider
 {
@@ -75,7 +78,10 @@ class StorageServiceProvider extends ServiceProvider
                             }
                         case 'imgur':
                             return $this->imgur($settings);
-
+                        case 'qiniu':
+                            if (class_exists(QiniuClient::class)) {
+                                return $this->qiniu($settings);
+                            }
                         default:
                             return $this->local($settings);
                     }
@@ -152,5 +158,21 @@ class StorageServiceProvider extends ServiceProvider
         return new Adapters\Local(
             new FlyAdapters\Local(public_path('assets/files'))
         );
+    }
+
+    /**
+     * @param  Settings $settings
+     * @return Adapters\Qiniu
+     */
+    protected function qiniu(Settings $settings)
+    {
+
+        $client = new QiniuAdapter(
+            $settings->get('qiniuKey'),
+            $settings->get('qiniuSecret'),
+            $settings->get('qiniuBucket'),
+            $settings->get('cdnUrl')
+        );
+        return new Qiniu($client);
     }
 }

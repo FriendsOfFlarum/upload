@@ -26,13 +26,15 @@
     },
     "suggest": {
         "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
-        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API."
+        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API.",
+        "overtrue/flysystem-qiniu":"Uploads to QiNiu using API."
     },
     "require-dev": {
         "league/flysystem": "^1.0.32",
         "league/flysystem-aws-s3-v3": "^1.0",
         "techyah/flysystem-ovh": "^1.0",
-        "flagrow/steamroller": "dev-master"
+        "flagrow/steamroller": "dev-master",
+        "overtrue/flysystem-qiniu":"1.0.4"
     },
     "extra": {
         "flarum-extension": {

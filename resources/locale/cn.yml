@@ -11,6 +11,7 @@ flagrow-upload:
       upload_label: 文件上传设定
       download_label: 下载文件
     upload_methods:
+      qiniu: 七牛
       local: 本地
       aws-s3: 亚马逊 S3
       imgur: Imgur
@@ -49,6 +50,11 @@ flagrow-upload:
         username: 用户名
         password: 密码
         region: 地区
+      qiniu:
+        title: 七牛 存储设置
+        key: Key
+        secret: Secret
+        bucket: Bucket
       disable-hotlink-protection:
           title: 禁用防盗链保护
           toggle: 禁用

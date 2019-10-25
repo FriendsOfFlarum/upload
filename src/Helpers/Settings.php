@@ -19,6 +19,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Techyah\Flysystem\OVH\OVHClient;
+use Qiniu\Http\Client as QiniuClient;
 
 /**
  * @property int $maxFileSize
@@ -84,6 +85,11 @@ class Settings
         // Downloads
         'disableHotlinkProtection',
         'disableDownloadLogging',
+
+        //QiNiu
+        'qiniuKey',
+        'qiniuSecret',
+        'qiniuBucket',
     ];
 
     protected $prefix = 'flagrow.upload.';
@@ -198,6 +204,10 @@ class Settings
 
         if (class_exists(OVHClient::class)) {
             $methods[] = 'ovh-svfs';
+        }
+
+        if (class_exists(QiniuClient::class)) {
+            $methods[] = 'qiniu';
         }
 
         $methods[] = 'imgur';
