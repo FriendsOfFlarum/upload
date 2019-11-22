@@ -54,6 +54,8 @@ class ImageProcessor implements Processable
             if ($this->settings->get('addsWatermarks')) {
                 $this->watermark($image);
             }
+            
+            $image->orientate();
 
             @file_put_contents(
                 $upload->getRealPath(),
