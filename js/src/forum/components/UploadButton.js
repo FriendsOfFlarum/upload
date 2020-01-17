@@ -9,26 +9,47 @@ export default class UploadButton extends Component {
      */
     init() {
         // the service type handling uploads
-        this.textAreaObj = null;
+        this.textAreaObj = this.props.textAreaObj;
 
         // initial state of the button
         this.loading = false;
+    }
+
+    // replaces button label
+    title() {
+        return this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach');
+    }
+
+    /** 
+     *  Tooltip shouldn't trigger on focus while open file dialog is open (hover only)
+     */
+    config(isInitialized) {
+        if (isInitialized) return;
+        this.$().tooltip({trigger: 'hover'}); // 
+    }
+
+    /**
+     *  Button click fix also addresses tooltip issues with open dialog
+     */
+    clicked() {
+        this.$().tooltip('hide');
     }
 
     /**
      * Show the actual Upload Button.
      *
      * @returns {*}
-     */
+     */ 
     view() {
-        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [
-            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('far fa-file', {className: 'Button-icon'}),
-            m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')),
+        return m('button', { className: 'Button Button--icon flagrow-upload-button Button--link', title: this.title()}, [
+            this.loading ? LoadingIndicator.component({className: 'flagrow-small-loading'}) : icon('far fa-file'),
             m('form#flagrow-upload-form', [
                 m('input', {
                     type: 'file',
                     multiple: true,
-                    onchange: this.process.bind(this)
+                    onchange: this.process.bind(this),
+                    onclick: this.clicked.bind(this),
+                    disabled: this.loading  // prevent users from interrupting upload
                 })
             ])
         ]);
@@ -40,8 +61,8 @@ export default class UploadButton extends Component {
      * @param e
      */
     process(e) {
-        // get the file from the input field
 
+        // get the file from the input field
         var files = $(e.target)[0].files;
 
         // set the button in the loading state (and redraw the element!)
@@ -100,6 +121,7 @@ export default class UploadButton extends Component {
         setTimeout(() => {
             document.getElementById("flagrow-upload-form").reset();
             this.loading = false;
+            m.redraw(); // stops loading icon getting stuck after upload
         }, 1000);
     }
 }
