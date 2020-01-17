@@ -11,29 +11,6 @@ app.initializers.add('flagrow-upload', app => {
         drag,
         clipboard;
 
-    extend(TextEditor.prototype, 'controlItems', function (items) {
-        // check whether the user can upload images. If not, returns.
-        if (!app.forum.attribute('canUpload')) return;
-
-        // create and add the button
-        uploadButton = new UploadButton;
-        uploadButton.textAreaObj = this;
-        items.add('flagrow-upload', uploadButton, 0);
-
-        // animate the button on hover: shows the label
-        $('.Button-label', '.item-flagrow-upload > div').hide();
-        $('.item-flagrow-upload > div').hover(
-            function () {
-                $('.Button-label', this).show();
-                $(this).removeClass('Button--icon')
-            },
-            function () {
-                $('.Button-label', this).hide();
-                $(this).addClass('Button--icon')
-            }
-        );
-    });
-
     extend(TextEditor.prototype, 'configTextarea', function() {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
@@ -43,6 +20,30 @@ app.initializers.add('flagrow-upload', app => {
         }
         if (!clipboard) {
             clipboard = new PasteClipboard(uploadButton);
+        }
+    });
+
+    extend(TextEditor.prototype, 'toolbarItems', function (items) {
+        // check whether the user can upload images, or has no markdown extension installed.
+        if ((!app.forum.attribute('canUpload') || (!items.has('markdown')))) return;
+
+        // scan markdown props via image icon identifier 
+        let markdown = items.get('markdown'), markdownButtons, imageButton;
+        markdownButtons = markdown.props.children; 
+
+        markdownButtons.forEach(btn => {
+            if ((typeof btn.props !== 'undefined') && (btn.props !== null) &&
+                (typeof btn.props.icon !== 'undefined') && (btn.props.icon !== null) &&
+                (btn.props.icon === 'fas fa-image')) {
+                    imageButton = btn;
+                }
+        });
+
+        let imageButtonIndex = markdownButtons.indexOf(imageButton); 
+        if (imageButtonIndex > 0) {     
+            // create the new button and pass this input to props
+            uploadButton =  UploadButton.component({title: app.translator.trans('flagrow-upload.forum.buttons.attach'), textAreaObj: this }); 
+            markdownButtons[imageButtonIndex] = uploadButton;
         }
     });
 
