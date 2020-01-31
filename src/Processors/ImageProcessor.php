@@ -55,6 +55,8 @@ class ImageProcessor implements Processable
                 $this->watermark($image);
             }
 
+            $image->orientate();
+            
             @file_put_contents(
                 $upload->getRealPath(),
                 $image->encode($upload->getClientMimeType())
