@@ -12,7 +12,7 @@ export default class UploadButton extends Component {
         this.textAreaObj = null;
 
         // initial state of the button
-        this.loading = false;
+        this.uploading = m.prop(false);
     }
 
     /**
@@ -21,9 +21,15 @@ export default class UploadButton extends Component {
      * @returns {*}
      */
     view() {
-        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon'}, [
-            this.loading ? LoadingIndicator.component({className: 'Button-icon'}) : icon('far fa-file', {className: 'Button-icon'}),
-            m('span', {className: 'Button-label'}, this.loading ? app.translator.trans('flagrow-upload.forum.states.loading') : app.translator.trans('flagrow-upload.forum.buttons.attach')),
+        let button = m('span', {className: 'Button-label'}, app.translator.trans('flagrow-upload.forum.buttons.attach'));
+
+        if (this.uploading()) {
+            button = m('span', {className: 'Button-label uploading'}, app.translator.trans('flagrow-upload.forum.states.loading'));
+        }
+
+        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon ' + (this.uploading() ? 'uploading' : '')}, [
+            this.uploading() ? LoadingIndicator.component({className: 'Button-icon'}) : icon('fas fa-file-upload', {className: 'Button-icon'}),
+            button,
             m('form#flagrow-upload-form', [
                 m('input', {
                     type: 'file',
@@ -41,20 +47,18 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-
-        var files = $(e.target)[0].files;
+        let files = $('form#flagrow-upload-form input').prop('files');
 
         // set the button in the loading state (and redraw the element!)
-        this.loading = true;
-        m.redraw();
+        this.uploading(true);
 
-        this.uploadFiles(files, this.success, this.failure);
+        this.uploadFiles(files);
     }
 
-    uploadFiles(files, successCallback, failureCallback) {
+    uploadFiles(files) {
         const data = new FormData;
 
-        for (var i = 0; i < files.length; i++) {
+        for (let i = 0; i < files.length; i++) {
             data.append('files[]', files[i]);
         }
 
@@ -99,7 +103,7 @@ export default class UploadButton extends Component {
         // reset the button for a new upload
         setTimeout(() => {
             document.getElementById("flagrow-upload-form").reset();
-            this.loading = false;
+            this.uploading(false);
         }, 1000);
     }
 }

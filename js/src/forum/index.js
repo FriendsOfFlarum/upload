@@ -21,8 +21,8 @@ app.initializers.add('flagrow-upload', app => {
         items.add('flagrow-upload', uploadButton, 0);
 
         // animate the button on hover: shows the label
-        $('.Button-label', '.item-flagrow-upload > div').hide();
-        $('.item-flagrow-upload > div').hover(
+        $('.Button-label', '.item-flagrow-upload > div:not(.uploading)').hide();
+        $('.item-flagrow-upload > div:not(.uploading)').hover(
             function () {
                 $('.Button-label', this).show();
                 $(this).removeClass('Button--icon')
