@@ -47,7 +47,7 @@ for help on the official Flarum forums.
 In case you want to allow all regular file types including video, music, compressed files and images, use this:
 
 ```text
-(video\/(3gpp|mp4|mpeg|quicktime|webm))|(audio\/(aiff|midi|mpeg|mp4))|(image\/(gif|jpeg|png))|(application\/(x-(7z|rar)-compressed|zip|arj|x-(bzip2|gzip|lha|stuffit|tar)|pdf))
+(video\/(3gpp|mp4|mpeg|quicktime|webm))|(audio\/(aiff|midi|mpeg|mp4))|(image\/(gif|jpeg|png))|(application\/(x-(7z|rar|zip)-compressed|zip|arj|x-(bzip2|gzip|lha|stuffit|tar)|pdf))
 ```
 
 A mimetype consists of a primary and secondary type. The primary type can be `image`, `video` and `application` for instance. The secondary
