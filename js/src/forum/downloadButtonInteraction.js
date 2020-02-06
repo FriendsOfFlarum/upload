@@ -8,7 +8,7 @@ export default function () {
     extend(Post.prototype, 'config', function (isInitialized) {
         if (isInitialized) return;
 
-        this.$('.fof-download-button[data-uuid]').unbind('click').on('click', (e) => {
+        this.$('[data-fof-upload-download-uuid]').unbind('click').on('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -19,7 +19,7 @@ export default function () {
 
             let url = app.forum.attribute('apiUrl') + '/fof/download';
 
-            url += '/' + $(e.currentTarget).attr('data-uuid');
+            url += '/' + e.currentTarget.dataset.fofUploadDownloadUuid;
             url += '/' + this.props.post.id();
             url += '/' + app.session.csrfToken;
 

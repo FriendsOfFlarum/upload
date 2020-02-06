@@ -1,4 +1,4 @@
-<div class="fof-download row">
+<div class="fof-download row" data-fof-upload-download-uuid="{@uuid}">
     <div class="card">
         <div class="wrapper" style="background: url({@url}) center / cover no-repeat">
             <div class="header">
@@ -11,8 +11,7 @@
                     <h4 class="title">
                         {SIMPLETEXT1}
                     </h4>
-                    <div class="fof-download-button Button Button--primary Button-icon Button--block"
-                         data-uuid="{@uuid}"><i class="fas fa-download"></i></div>
+                    <div class="Button Button--primary Button-icon Button--block"><i class="fas fa-download"></i></div>
                 </div>
             </div>
         </div>
