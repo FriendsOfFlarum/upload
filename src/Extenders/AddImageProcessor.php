@@ -1,24 +1,21 @@
 <?php
 
-namespace FoF\Upload\Listeners;
+namespace FoF\Upload\Extenders;
 
+use Flarum\Extend\ExtenderInterface;
+use Flarum\Extension\Extension;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Processors\ImageProcessor;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 
-class ProcessesImages
+class AddImageProcessor implements ExtenderInterface
 {
-    /**
-     * @param Dispatcher $events
-     */
-    public function subscribe(Dispatcher $events)
+    public function extend(Container $container, Extension $extension = null)
     {
-        $events->listen(WillBeUploaded::class, [$this, 'processor']);
+        $container->make(Dispatcher::class)->listen(WillBeUploaded::class, [$this, 'processor']);
     }
 
-    /**
-     * @param WillBeUploaded $event
-     */
     public function processor(WillBeUploaded $event)
     {
         if ($this->validateMime($event->file->type)) {
@@ -26,12 +23,7 @@ class ProcessesImages
         }
     }
 
-    /**
-     * @param $mime
-     *
-     * @return bool
-     */
-    protected function validateMime($mime)
+    protected function validateMime($mime): bool
     {
         if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
             return true;

@@ -9,9 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Qiniu\Http\Client as QiniuClient;
 
-/**
- * @property int $maxFileSize
- */
 class Settings
 {
     const DEFAULT_MAX_FILE_SIZE = 2048;
@@ -23,56 +20,6 @@ class Settings
      * @var array
      */
     protected $renderTemplates = [];
-
-    /**
-     * The settings shared with the frontend.
-     *
-     * @var array
-     */
-    protected $frontend = [
-    ];
-
-    /**
-     * All setting options of this extension.
-     *
-     * @var array
-     */
-    protected $definition = [
-        'maxFileSize',
-        'mimeTypes',
-        'templates',
-
-        // Images
-        'mustResize',
-        'resizeMaxWidth',
-        'cdnUrl',
-
-        // Watermarks
-        'addsWatermarks',
-        'watermarkPosition',
-        'watermark',
-
-        // Override avatar upload
-        'overrideAvatarUpload',
-
-        // Imgur
-        'imgurClientId',
-
-        // AWS
-        'awsS3Key',
-        'awsS3Secret',
-        'awsS3Bucket',
-        'awsS3Region',
-
-        // Downloads
-        'disableHotlinkProtection',
-        'disableDownloadLogging',
-
-        //QiNiu
-        'qiniuKey',
-        'qiniuSecret',
-        'qiniuBucket',
-    ];
 
     protected $prefix = 'fof-upload.';
 
@@ -102,48 +49,6 @@ class Settings
     }
 
     /**
-     * @param bool $prefixed
-     * @param array|null $only
-     *
-     * @return array
-     */
-    public function toArray($prefixed = true, array $only = null)
-    {
-        $definition = $this->definition;
-
-        if ($only !== null) {
-            $definition = Arr::only($definition, $only);
-        }
-
-        $result = [];
-
-        foreach ($definition as $property) {
-            if ($prefixed) {
-                $result[$this->prefix . $property] = $this->get($property);
-            } else {
-                $result[$property] = $this->get($property);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Loads only settings used in the frontend.
-     *
-     * @param bool $prefixed
-     * @param array|null $only
-     *
-     * @return array
-     */
-    public function toArrayFrontend($prefixed = true, array $only = [])
-    {
-        $only = array_merge($only, $this->frontend);
-
-        return $this->toArray($prefixed, $only);
-    }
-
-    /**
      * @param $name
      * @param null $default
      *
@@ -151,23 +56,7 @@ class Settings
      */
     public function get($name, $default = null)
     {
-        return $this->{$name} ? $this->{$name} : $default;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
+        return $this->{$name} ?: $default;
     }
 
     /**
