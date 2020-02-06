@@ -1,6 +1,9 @@
-import Component from "flarum/Component";
-import icon from "flarum/helpers/icon";
-import LoadingIndicator from "flarum/components/LoadingIndicator";
+import app from 'flarum/app';
+import Component from 'flarum/Component';
+import icon from 'flarum/helpers/icon';
+import LoadingIndicator from 'flarum/components/LoadingIndicator';
+
+/* global m */
 
 export default class UploadButton extends Component {
 
@@ -21,16 +24,16 @@ export default class UploadButton extends Component {
      * @returns {*}
      */
     view() {
-        let button = m('span', {className: 'Button-label'}, app.translator.trans('flagrow-upload.forum.buttons.attach'));
+        let button = m('span', {className: 'Button-label'}, app.translator.trans('fof-upload.forum.buttons.attach'));
 
         if (this.uploading()) {
-            button = m('span', {className: 'Button-label uploading'}, app.translator.trans('flagrow-upload.forum.states.loading'));
+            button = m('span', {className: 'Button-label uploading'}, app.translator.trans('fof-upload.forum.states.loading'));
         }
 
-        return m('div', {className: 'Button hasIcon flagrow-upload-button Button--icon ' + (this.uploading() ? 'uploading' : '')}, [
+        return m('div', {className: 'Button hasIcon fof-upload-button Button--icon ' + (this.uploading() ? 'uploading' : '')}, [
             this.uploading() ? LoadingIndicator.component({className: 'Button-icon'}) : icon('fas fa-file-upload', {className: 'Button-icon'}),
             button,
-            m('form#flagrow-upload-form', [
+            m('form#fof-upload-form', [
                 m('input', {
                     type: 'file',
                     multiple: true,
@@ -47,7 +50,7 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        let files = $('form#flagrow-upload-form input').prop('files');
+        let files = $('form#fof-upload-form input').prop('files');
 
         // set the button in the loading state (and redraw the element!)
         this.uploading(true);
@@ -65,7 +68,7 @@ export default class UploadButton extends Component {
         // send a POST request to the api
         return app.request({
             method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/flagrow/upload',
+            url: app.forum.attribute('apiUrl') + '/fof/upload',
             // prevent JSON.stringify'ing the form data in the XHR call
             serialize: raw => raw,
             data
@@ -91,8 +94,8 @@ export default class UploadButton extends Component {
      */
     success(response) {
         response.forEach((bbcode) => {
-          this.textAreaObj.insertAtCursor(bbcode + '\n');
-        })
+            this.textAreaObj.insertAtCursor(bbcode + '\n');
+        });
 
         // if we are not starting a new discussion, the variable is defined
         if (typeof this.textAreaObj.props.preview !== 'undefined') {
@@ -102,7 +105,7 @@ export default class UploadButton extends Component {
 
         // reset the button for a new upload
         setTimeout(() => {
-            document.getElementById("flagrow-upload-form").reset();
+            document.getElementById('fof-upload-form').reset();
             this.uploading(false);
         }, 1000);
     }

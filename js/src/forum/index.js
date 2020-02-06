@@ -1,12 +1,12 @@
-import {extend} from "flarum/extend";
-import TextEditor from "flarum/components/TextEditor";
-import UploadButton from "./components/UploadButton";
-import DragAndDrop from "./components/DragAndDrop";
-import PasteClipboard from "./components/PasteClipboard";
+import {extend} from 'flarum/extend';
+import TextEditor from 'flarum/components/TextEditor';
+import UploadButton from './components/UploadButton';
+import DragAndDrop from './components/DragAndDrop';
+import PasteClipboard from './components/PasteClipboard';
 
 import downloadButtonInteraction from './downloadButtonInteraction';
 
-app.initializers.add('flagrow-upload', app => {
+app.initializers.add('fof-upload', app => {
     let uploadButton,
         drag,
         clipboard;
@@ -18,11 +18,11 @@ app.initializers.add('flagrow-upload', app => {
         // create and add the button
         uploadButton = new UploadButton;
         uploadButton.textAreaObj = this;
-        items.add('flagrow-upload', uploadButton, 0);
+        items.add('fof-upload', uploadButton, 0);
 
         // animate the button on hover: shows the label
-        $('.Button-label', '.item-flagrow-upload > div:not(.uploading)').hide();
-        $('.item-flagrow-upload > div:not(.uploading)').hover(
+        $('.Button-label', '.item-fof-upload > div:not(.uploading)').hide();
+        $('.item-fof-upload > div:not(.uploading)').hover(
             function () {
                 $('.Button-label', this).show();
                 $(this).removeClass('Button--icon')
@@ -34,7 +34,7 @@ app.initializers.add('flagrow-upload', app => {
         );
     });
 
-    extend(TextEditor.prototype, 'configTextarea', function() {
+    extend(TextEditor.prototype, 'configTextarea', function () {
         // check whether the user can upload images. If not, returns.
         if (!app.forum.attribute('canUpload')) return;
 

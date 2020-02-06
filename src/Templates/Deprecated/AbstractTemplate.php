@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Upload\Templates\Deprecated;
+namespace FoF\Upload\Templates\Deprecated;
 
-use Flagrow\Upload\Repositories\FileRepository;
+use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\View\Factory;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
 use s9e\TextFormatter\Parser\Tag as ParserTag;

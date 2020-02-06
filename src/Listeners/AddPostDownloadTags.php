@@ -1,10 +1,10 @@
 <?php
 
-namespace Flagrow\Upload\Listeners;
+namespace FoF\Upload\Listeners;
 
-use Flagrow\Upload\Helpers\Settings;
-use Flagrow\Upload\Repositories\FileRepository;
-use Flagrow\Upload\Templates\AbstractTemplate;
+use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Repositories\FileRepository;
+use FoF\Upload\Templates\AbstractTemplate;
 use Flarum\Formatter\Event\Configuring;
 use Flarum\Formatter\Event\Parsing;
 use Illuminate\Events\Dispatcher;

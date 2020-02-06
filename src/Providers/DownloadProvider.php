@@ -1,28 +1,24 @@
 <?php
 
-namespace Flagrow\Upload\Providers;
+namespace FoF\Upload\Providers;
 
-use Flagrow\Upload\Commands\DownloadHandler;
-use Flagrow\Upload\Downloader\DefaultDownloader;
-use Flagrow\Upload\Helpers\Settings;
-use Flagrow\Upload\Templates\FileTemplate;
-use Flagrow\Upload\Templates\ImagePreviewTemplate;
-use Flagrow\Upload\Templates\ImageTemplate;
+use FoF\Upload\Commands\DownloadHandler;
+use FoF\Upload\Downloader\DefaultDownloader;
+use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Templates\FileTemplate;
+use FoF\Upload\Templates\ImagePreviewTemplate;
+use FoF\Upload\Templates\ImageTemplate;
 use Flarum\Foundation\AbstractServiceProvider;
 
 class DownloadProvider extends AbstractServiceProvider
 {
-    public function boot()
-    {
-    }
-
     public function register()
     {
         DownloadHandler::addDownloader(
             $this->app->make(DefaultDownloader::class)
         );
 
-        $this->loadViewsFrom(__DIR__.'/../../resources/templates', 'flagrow.download.templates');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/templates', 'fof-upload.templates');
 
         /** @var Settings $settings */
         $settings = $this->app->make(Settings::class);

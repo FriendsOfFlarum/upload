@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Upload\Commands;
+namespace FoF\Upload\Commands;
 
 use Flarum\User\User;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Flagrow\Upload\Listeners;
+namespace FoF\Upload\Listeners;
 
-use Flagrow\Upload\Repositories\FileRepository;
-use Flagrow\Upload\Templates\Deprecated\AbstractTemplate;
-use Flagrow\Upload\Templates\Deprecated\FileTemplate;
-use Flagrow\Upload\Templates\Deprecated\ImageTemplate;
+use FoF\Upload\Repositories\FileRepository;
+use FoF\Upload\Templates\Deprecated\AbstractTemplate;
+use FoF\Upload\Templates\Deprecated\FileTemplate;
+use FoF\Upload\Templates\Deprecated\ImageTemplate;
 use Flarum\Formatter\Event\Configuring;
 use Flarum\Formatter\Event\Parsing;
 use Illuminate\Events\Dispatcher;

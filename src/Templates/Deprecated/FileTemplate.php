@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Upload\Templates\Deprecated;
+namespace FoF\Upload\Templates\Deprecated;
 
-use Flagrow\Upload\Repositories\FileRepository;
+use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Configurator\Items\Tag as Tag;
 use s9e\TextFormatter\Parser\Tag as ParserTag;
 
@@ -20,7 +20,7 @@ class FileTemplate extends AbstractTemplate
      */
     public function template()
     {
-        return $this->getView('flagrow.download.templates::deprecated.file');
+        return $this->getView('fof-upload.templates::deprecated.file');
     }
 
     /**

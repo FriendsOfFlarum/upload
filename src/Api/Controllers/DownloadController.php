@@ -1,10 +1,10 @@
 <?php
 
-namespace Flagrow\Upload\Api\Controllers;
+namespace FoF\Upload\Api\Controllers;
 
-use Flagrow\Upload\Api\Serializers\FileSerializer;
-use Flagrow\Upload\Commands\Download;
-use Flagrow\Upload\Helpers\Settings;
+use FoF\Upload\Api\Serializers\FileSerializer;
+use FoF\Upload\Commands\Download;
+use FoF\Upload\Helpers\Settings;
 use Flarum\Post\PostRepository;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Session\Session;

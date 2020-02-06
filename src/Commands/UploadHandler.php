@@ -1,24 +1,13 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
-
-namespace Flagrow\Upload\Commands;
+namespace FoF\Upload\Commands;
 
 use Exception;
-use Flagrow\Upload\Contracts\UploadAdapter;
-use Flagrow\Upload\Events;
-use Flagrow\Upload\File;
-use Flagrow\Upload\Helpers\Settings;
-use Flagrow\Upload\Repositories\FileRepository;
+use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\Events;
+use FoF\Upload\File;
+use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Repositories\FileRepository;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
 use Flarum\User\AssertPermissionTrait;
@@ -54,7 +43,8 @@ class UploadHandler
         Dispatcher $events,
         Settings $settings,
         FileRepository $files
-    ) {
+    )
+    {
         $this->app = $app;
         $this->settings = $settings;
         $this->events = $events;
@@ -65,12 +55,13 @@ class UploadHandler
      * @param Upload $command
      *
      * @return \Illuminate\Support\Collection
+     * @throws \Flarum\User\Exception\PermissionDeniedException
      */
     public function handle(Upload $command)
     {
         $this->assertCan(
             $command->actor,
-            'flagrow.upload'
+            'fof-upload.upload'
         );
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
@@ -153,7 +144,7 @@ class UploadHandler
             return;
         }
 
-        return app("flagrow.upload-adapter.$adapter");
+        return app("fof.upload-adapter.$adapter");
     }
 
     /**

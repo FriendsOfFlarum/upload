@@ -1,19 +1,8 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Listeners;
 
-namespace Flagrow\Upload\Listeners;
-
-use Flagrow\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Settings;
 use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Settings\Event\Deserializing;
@@ -66,7 +55,7 @@ class LoadSettingsFromDatabase
      */
     public function addUploadMethods(Deserializing $event)
     {
-        $event->settings['flagrow.upload.availableUploadMethods'] = $this->settings->getAvailableUploadMethods()->toArray();
+        $event->settings['fof-upload.availableUploadMethods'] = $this->settings->getAvailableUploadMethods()->toArray();
     }
 
     /**
@@ -74,6 +63,6 @@ class LoadSettingsFromDatabase
      */
     public function addTemplates(Deserializing $event)
     {
-        $event->settings['flagrow.upload.availableTemplates'] = $this->settings->getAvailableTemplates()->toArray();
+        $event->settings['fof-upload.availableTemplates'] = $this->settings->getAvailableTemplates()->toArray();
     }
 }

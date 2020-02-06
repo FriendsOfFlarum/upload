@@ -1,28 +1,14 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Adapters;
 
-namespace Flagrow\Upload\Adapters;
-
-use Flagrow\Upload\Contracts\UploadAdapter;
-use Flagrow\Upload\File;
-use Flagrow\Upload\Helpers\Settings;
+use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\File;
+use FoF\Upload\Helpers\Settings;
 use Illuminate\Support\Arr;
 
 class AwsS3 extends Flysystem implements UploadAdapter
 {
-    /**
-     * @param File $file
-     */
     protected function generateUrl(File $file)
     {
         /** @var Settings $settings */
@@ -37,7 +23,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
             $baseUrl = sprintf('https://%s.s3.%s.amazonaws.com/', $bucket, $region ?: 'us-east-1');
 
             $file->url = sprintf(
-                $baseUrl.'%s',
+                $baseUrl . '%s',
                 Arr::get($this->meta, 'path', $file->path)
             );
         }

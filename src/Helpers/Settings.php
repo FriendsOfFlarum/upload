@@ -1,24 +1,12 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Helpers;
 
-namespace Flagrow\Upload\Helpers;
-
-use Aws\AwsClient;
-use Flagrow\Upload\Templates\AbstractTemplate;
+use Aws\S3\S3Client;
+use FoF\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Techyah\Flysystem\OVH\OVHClient;
 use Qiniu\Http\Client as QiniuClient;
 
 /**
@@ -50,6 +38,7 @@ class Settings
      * @var array
      */
     protected $definition = [
+        'maxFileSize',
         'mimeTypes',
         'templates',
 
@@ -75,13 +64,6 @@ class Settings
         'awsS3Bucket',
         'awsS3Region',
 
-        // OVH
-        'ovhUsername',
-        'ovhPassword',
-        'ovhTenantId',
-        'ovhContainer',
-        'ovhRegion',
-
         // Downloads
         'disableHotlinkProtection',
         'disableDownloadLogging',
@@ -92,7 +74,7 @@ class Settings
         'qiniuBucket',
     ];
 
-    protected $prefix = 'flagrow.upload.';
+    protected $prefix = 'fof-upload.';
 
     /**
      * @var SettingsRepositoryInterface
@@ -106,21 +88,21 @@ class Settings
 
     public function __get($name)
     {
-        return $this->settings->get($this->prefix.$name);
+        return $this->settings->get($this->prefix . $name);
     }
 
     public function __set($name, $value)
     {
-        $this->settings->set($this->prefix.$name, $value);
+        $this->settings->set($this->prefix . $name, $value);
     }
 
     public function __isset($name)
     {
-        return $this->settings->get($this->prefix.$name) !== null;
+        return $this->settings->get($this->prefix . $name) !== null;
     }
 
     /**
-     * @param bool       $prefixed
+     * @param bool $prefixed
      * @param array|null $only
      *
      * @return array
@@ -137,7 +119,7 @@ class Settings
 
         foreach ($definition as $property) {
             if ($prefixed) {
-                $result[$this->prefix.$property] = $this->get($property);
+                $result[$this->prefix . $property] = $this->get($property);
             } else {
                 $result[$property] = $this->get($property);
             }
@@ -149,7 +131,7 @@ class Settings
     /**
      * Loads only settings used in the frontend.
      *
-     * @param bool       $prefixed
+     * @param bool $prefixed
      * @param array|null $only
      *
      * @return array
@@ -198,12 +180,8 @@ class Settings
             'local',
         ];
 
-        if (class_exists(AwsClient::class)) {
+        if (class_exists(S3Client::class)) {
             $methods[] = 'aws-s3';
-        }
-
-        if (class_exists(OVHClient::class)) {
-            $methods[] = 'ovh-svfs';
         }
 
         if (class_exists(QiniuClient::class)) {
@@ -217,7 +195,7 @@ class Settings
                 return $item;
             })
             ->map(function ($item) {
-                return app('translator')->trans('flagrow-upload.admin.upload_methods.'.$item);
+                return app('translator')->trans('fof-upload.admin.upload_methods.' . $item);
             });
     }
 
@@ -293,7 +271,7 @@ class Settings
          */
         foreach ($this->renderTemplates as $tag => $template) {
             $collect[$tag] = [
-                'name'        => $template->name(),
+                'name' => $template->name(),
                 'description' => $template->description(),
             ];
         }

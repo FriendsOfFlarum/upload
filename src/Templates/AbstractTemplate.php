@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Upload\Templates;
+namespace FoF\Upload\Templates;
 
-use Flagrow\Upload\File;
+use FoF\Upload\File;
 use Illuminate\Contracts\View\Factory;
 
 abstract class AbstractTemplate
