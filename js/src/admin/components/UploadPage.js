@@ -21,7 +21,6 @@ export default class UploadPage extends Component {
             'resizeMaxWidth',
             'cdnUrl',
             'maxFileSize',
-            'overrideAvatarUpload',
             // watermark
             'watermark',
             'watermarkPosition',
@@ -41,7 +40,6 @@ export default class UploadPage extends Component {
         // the checkboxes we need to watch and to save.
         this.checkboxes = [
             'mustResize',
-            'overrideAvatarUpload',
             'addsWatermarks',
 
             'disableHotlinkProtection',
