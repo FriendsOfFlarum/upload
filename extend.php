@@ -19,6 +19,7 @@ return [
         ->css(__DIR__ . '/resources/less/forum/upload.less')
         ->js(__DIR__ . '/js/dist/forum.js'),
     new Extend\Locales(__DIR__ . '/resources/locale'),
+    new Extenders\AddForumAttributes(),
     new Extenders\AddPostDownloadTags(),
     new Extenders\ReplaceDeprecatedTemplates(),
     function (Dispatcher $events, Application $app) {
@@ -27,7 +28,6 @@ return [
         $app->register(Providers\StorageServiceProvider::class);
         $app->register(Providers\DownloadProvider::class);
 
-        $events->subscribe(Listeners\AddUploadsApi::class);
         $events->subscribe(Listeners\LoadSettingsFromDatabase::class);
         $events->subscribe(Listeners\ProcessesImages::class);
     },

@@ -12,6 +12,11 @@ export default function () {
             e.preventDefault();
             e.stopPropagation();
 
+            if (!app.forum.attribute('fof-upload.canDownload')) {
+                alert(app.translator.trans('fof-upload.forum.states.unauthorized'));
+                return;
+            }
+
             let url = app.forum.attribute('apiUrl') + '/fof/download';
 
             url += '/' + $(e.currentTarget).attr('data-uuid');

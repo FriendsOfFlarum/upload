@@ -6,10 +6,6 @@ import LoadingIndicator from 'flarum/components/LoadingIndicator';
 /* global m */
 
 export default class UploadButton extends Component {
-
-    /**
-     * Load the configured remote uploader service.
-     */
     init() {
         // the service type handling uploads
         this.textAreaObj = null;
@@ -18,28 +14,24 @@ export default class UploadButton extends Component {
         this.uploading = m.prop(false);
     }
 
-    /**
-     * Show the actual Upload Button.
-     *
-     * @returns {*}
-     */
     view() {
-        let button = m('span', {className: 'Button-label'}, app.translator.trans('fof-upload.forum.buttons.attach'));
+        const buttonText = this.uploading() ? app.translator.trans('fof-upload.forum.states.loading') : app.translator.trans('fof-upload.forum.buttons.attach');
 
-        if (this.uploading()) {
-            button = m('span', {className: 'Button-label uploading'}, app.translator.trans('fof-upload.forum.states.loading'));
-        }
-
-        return m('div', {className: 'Button hasIcon fof-upload-button Button--icon ' + (this.uploading() ? 'uploading' : '')}, [
-            this.uploading() ? LoadingIndicator.component({className: 'Button-icon'}) : icon('fas fa-file-upload', {className: 'Button-icon'}),
-            button,
-            m('form#fof-upload-form', [
+        return m('.Button.hasIcon.fof-upload-button.Button--icon', {
+            className: this.uploading() ? 'uploading' : '',
+        }, [
+            this.uploading() ? LoadingIndicator.component({
+                size: 'tiny',
+                className: 'LoadingIndicator--inline Button-icon',
+            }) : icon('fas fa-file-upload', {className: 'Button-icon'}),
+            m('span.Button-label', buttonText),
+            m('form', [
                 m('input', {
                     type: 'file',
                     multiple: true,
-                    onchange: this.process.bind(this)
-                })
-            ])
+                    onchange: this.process.bind(this),
+                }),
+            ]),
         ]);
     }
 
@@ -50,15 +42,15 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        let files = $('form#fof-upload-form input').prop('files');
-
-        // set the button in the loading state (and redraw the element!)
-        this.uploading(true);
+        const files = this.$('input').prop('files');
 
         this.uploadFiles(files);
     }
 
     uploadFiles(files) {
+        this.uploading(true);
+        m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
+
         const data = new FormData;
 
         for (let i = 0; i < files.length; i++) {
@@ -84,13 +76,11 @@ export default class UploadButton extends Component {
      * @param message
      */
     failure(message) {
-        // todo show popup
+        alert(app.translator.trans('fof-upload.forum.states.error'));
     }
 
     /**
      * Appends the file's link to the body of the composer.
-     *
-     * @param file
      */
     success(response) {
         response.forEach((bbcode) => {
@@ -105,8 +95,9 @@ export default class UploadButton extends Component {
 
         // reset the button for a new upload
         setTimeout(() => {
-            document.getElementById('fof-upload-form').reset();
+            this.$('form')[0].reset();
             this.uploading(false);
+            m.redraw();
         }, 1000);
     }
 }

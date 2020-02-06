@@ -1,50 +1,9 @@
-import {extend} from 'flarum/extend';
-import TextEditor from 'flarum/components/TextEditor';
-import UploadButton from './components/UploadButton';
-import DragAndDrop from './components/DragAndDrop';
-import PasteClipboard from './components/PasteClipboard';
+import app from 'flarum/app';
 
 import downloadButtonInteraction from './downloadButtonInteraction';
+import addUploadButton from './addUploadButton';
 
-app.initializers.add('fof-upload', app => {
-    let uploadButton,
-        drag,
-        clipboard;
-
-    extend(TextEditor.prototype, 'controlItems', function (items) {
-        // check whether the user can upload images. If not, returns.
-        if (!app.forum.attribute('canUpload')) return;
-
-        // create and add the button
-        uploadButton = new UploadButton;
-        uploadButton.textAreaObj = this;
-        items.add('fof-upload', uploadButton, 0);
-
-        // animate the button on hover: shows the label
-        $('.Button-label', '.item-fof-upload > div:not(.uploading)').hide();
-        $('.item-fof-upload > div:not(.uploading)').hover(
-            function () {
-                $('.Button-label', this).show();
-                $(this).removeClass('Button--icon')
-            },
-            function () {
-                $('.Button-label', this).hide();
-                $(this).addClass('Button--icon')
-            }
-        );
-    });
-
-    extend(TextEditor.prototype, 'configTextarea', function () {
-        // check whether the user can upload images. If not, returns.
-        if (!app.forum.attribute('canUpload')) return;
-
-        if (!drag) {
-            drag = new DragAndDrop(uploadButton);
-        }
-        if (!clipboard) {
-            clipboard = new PasteClipboard(uploadButton);
-        }
-    });
-
+app.initializers.add('fof-upload', () => {
+    addUploadButton();
     downloadButtonInteraction();
 });

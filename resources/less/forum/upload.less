@@ -13,6 +13,25 @@
         opacity: 0;
         filter: alpha(opacity=0);
     }
+
+    .Button-label {
+        display: none;
+    }
+
+    &:hover, &.uploading {
+        // Cancel the effects of .Button--icon
+        width: auto;
+        padding: 8px 13px;
+
+        // Cancel the effects of .Button--icon
+        .Button-icon {
+            margin-right: 7px;
+        }
+
+        .Button-label {
+            display: inline-block;
+        }
+    }
 }
 
 .Composer.fof-upload-dragging {
