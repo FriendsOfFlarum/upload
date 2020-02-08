@@ -1,9 +1,9 @@
 <?php
 
-namespace Flagrow\Upload\Events\File;
+namespace FoF\Upload\Events\File;
 
-use Flagrow\Upload\Download;
-use Flagrow\Upload\File;
+use FoF\Upload\Download;
+use FoF\Upload\File;
 
 class WillBeDownloaded
 {

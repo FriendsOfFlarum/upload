@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Upload\Exceptions;
+namespace FoF\Upload\Exceptions;
 
 class InvalidUploadException extends \Exception
 {

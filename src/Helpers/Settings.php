@@ -1,29 +1,14 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Helpers;
 
-namespace Flagrow\Upload\Helpers;
-
-use Aws\AwsClient;
-use Flagrow\Upload\Templates\AbstractTemplate;
+use Aws\S3\S3Client;
+use FoF\Upload\Templates\AbstractTemplate;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Techyah\Flysystem\OVH\OVHClient;
 use Qiniu\Http\Client as QiniuClient;
 
-/**
- * @property int $maxFileSize
- */
 class Settings
 {
     const DEFAULT_MAX_FILE_SIZE = 2048;
@@ -36,63 +21,7 @@ class Settings
      */
     protected $renderTemplates = [];
 
-    /**
-     * The settings shared with the frontend.
-     *
-     * @var array
-     */
-    protected $frontend = [
-    ];
-
-    /**
-     * All setting options of this extension.
-     *
-     * @var array
-     */
-    protected $definition = [
-        'mimeTypes',
-        'templates',
-
-        // Images
-        'mustResize',
-        'resizeMaxWidth',
-        'cdnUrl',
-
-        // Watermarks
-        'addsWatermarks',
-        'watermarkPosition',
-        'watermark',
-
-        // Override avatar upload
-        'overrideAvatarUpload',
-
-        // Imgur
-        'imgurClientId',
-
-        // AWS
-        'awsS3Key',
-        'awsS3Secret',
-        'awsS3Bucket',
-        'awsS3Region',
-
-        // OVH
-        'ovhUsername',
-        'ovhPassword',
-        'ovhTenantId',
-        'ovhContainer',
-        'ovhRegion',
-
-        // Downloads
-        'disableHotlinkProtection',
-        'disableDownloadLogging',
-
-        //QiNiu
-        'qiniuKey',
-        'qiniuSecret',
-        'qiniuBucket',
-    ];
-
-    protected $prefix = 'flagrow.upload.';
+    protected $prefix = 'fof-upload.';
 
     /**
      * @var SettingsRepositoryInterface
@@ -106,59 +35,17 @@ class Settings
 
     public function __get($name)
     {
-        return $this->settings->get($this->prefix.$name);
+        return $this->settings->get($this->prefix . $name);
     }
 
     public function __set($name, $value)
     {
-        $this->settings->set($this->prefix.$name, $value);
+        $this->settings->set($this->prefix . $name, $value);
     }
 
     public function __isset($name)
     {
-        return $this->settings->get($this->prefix.$name) !== null;
-    }
-
-    /**
-     * @param bool       $prefixed
-     * @param array|null $only
-     *
-     * @return array
-     */
-    public function toArray($prefixed = true, array $only = null)
-    {
-        $definition = $this->definition;
-
-        if ($only !== null) {
-            $definition = Arr::only($definition, $only);
-        }
-
-        $result = [];
-
-        foreach ($definition as $property) {
-            if ($prefixed) {
-                $result[$this->prefix.$property] = $this->get($property);
-            } else {
-                $result[$property] = $this->get($property);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Loads only settings used in the frontend.
-     *
-     * @param bool       $prefixed
-     * @param array|null $only
-     *
-     * @return array
-     */
-    public function toArrayFrontend($prefixed = true, array $only = [])
-    {
-        $only = array_merge($only, $this->frontend);
-
-        return $this->toArray($prefixed, $only);
+        return $this->settings->get($this->prefix . $name) !== null;
     }
 
     /**
@@ -169,23 +56,7 @@ class Settings
      */
     public function get($name, $default = null)
     {
-        return $this->{$name} ? $this->{$name} : $default;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
+        return $this->{$name} ?: $default;
     }
 
     /**
@@ -198,12 +69,8 @@ class Settings
             'local',
         ];
 
-        if (class_exists(AwsClient::class)) {
+        if (class_exists(S3Client::class)) {
             $methods[] = 'aws-s3';
-        }
-
-        if (class_exists(OVHClient::class)) {
-            $methods[] = 'ovh-svfs';
         }
 
         if (class_exists(QiniuClient::class)) {
@@ -217,7 +84,7 @@ class Settings
                 return $item;
             })
             ->map(function ($item) {
-                return app('translator')->trans('flagrow-upload.admin.upload_methods.'.$item);
+                return app('translator')->trans('fof-upload.admin.upload_methods.' . $item);
             });
     }
 
@@ -293,7 +160,7 @@ class Settings
          */
         foreach ($this->renderTemplates as $tag => $template) {
             $collect[$tag] = [
-                'name'        => $template->name(),
+                'name' => $template->name(),
                 'description' => $template->description(),
             ];
         }

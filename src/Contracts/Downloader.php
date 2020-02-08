@@ -1,9 +1,9 @@
 <?php
 
-namespace Flagrow\Upload\Contracts;
+namespace FoF\Upload\Contracts;
 
-use Flagrow\Upload\Commands\Download;
-use Flagrow\Upload\File;
+use FoF\Upload\Commands\Download;
+use FoF\Upload\File;
 use Psr\Http\Message\ResponseInterface;
 
 interface Downloader

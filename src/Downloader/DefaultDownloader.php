@@ -1,11 +1,11 @@
 <?php
 
-namespace Flagrow\Upload\Downloader;
+namespace FoF\Upload\Downloader;
 
-use Flagrow\Upload\Commands\Download;
-use Flagrow\Upload\Contracts\Downloader;
-use Flagrow\Upload\Exceptions\InvalidDownloadException;
-use Flagrow\Upload\File;
+use FoF\Upload\Commands\Download;
+use FoF\Upload\Contracts\Downloader;
+use FoF\Upload\Exceptions\InvalidDownloadException;
+use FoF\Upload\File;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 

@@ -1,58 +1,60 @@
 export default class DragAndDrop {
-
-    constructor(uploadButton) {
-
-        if (this.initialized) return;
-
+    constructor(uploadButton, composerElement) {
         this.uploadButton = uploadButton;
+        this.composerElement = composerElement;
 
-        this.textarea = $("#composer .Composer");
+        // Keep references to the bound methods so we can remove the event listeners later
+        this.handlers = {};
 
-        $(this.textarea).on('dragover', this.in.bind(this));
+        this.composerElement.addEventListener('dragover', this.handlers.in = this.in.bind(this));
 
-        $(this.textarea).on('dragleave', this.out.bind(this));
-        $(this.textarea).on('dragend', this.out.bind(this));
+        this.composerElement.addEventListener('dragleave', this.handlers.out = this.out.bind(this));
+        this.composerElement.addEventListener('dragend', this.handlers.out);
 
-        $(this.textarea).on('drop', this.dropping.bind(this));
+        this.composerElement.addEventListener('drop', this.handlers.dropping = this.dropping.bind(this));
 
         this.isDropping = this.over = false;
-        this.initialized = true;
     }
 
-    in(e) {
-        e.preventDefault();
+    unload() {
+        this.composerElement.removeEventListener('dragover', this.handlers.in);
+
+        this.composerElement.removeEventListener('dragleave', this.handlers.out);
+        this.composerElement.removeEventListener('dragend', this.handlers.out);
+
+        this.composerElement.removeEventListener('drop', this.handlers.dropping);
+    }
+
+    in(event) {
+        event.preventDefault();
 
         if (!this.over) {
-            this.textarea.toggleClass('flagrow-upload-dragging', true);
+            this.composerElement.classList.add('fof-upload-dragging');
             this.over = true;
         }
     }
 
-    out(e) {
-        e.preventDefault();
+    out(event) {
+        event.preventDefault();
 
         if (this.over) {
-            this.textarea.toggleClass('flagrow-upload-dragging', false);
+            this.composerElement.classList.remove('fof-upload-dragging');
             this.over = false;
         }
     }
 
-    dropping(e) {
-        e.preventDefault();
+    dropping(event) {
+        event.preventDefault();
 
         if (!this.isDropping) {
-
             this.isDropping = true;
-            this.textarea.addClass('flagrow-dropping');
+            this.composerElement.classList.add('fof-upload-dropping');
 
-            m.redraw();
-
-            this.uploadButton.uploadFiles(e.originalEvent.dataTransfer.files)
+            this.uploadButton.uploadFiles(event.dataTransfer.files)
                 .then(() => {
-                    this.textarea.removeClass('flagrow-dropping');
+                    this.composerElement.classList.remove('fof-upload-dropping');
                     this.isDropping = false;
                 });
         }
-
     }
 }

@@ -1,1 +1,1 @@
-<img src="{@url}" title="{@base_name}" />
+<img src="{@url}" title="{@base_name}"/>

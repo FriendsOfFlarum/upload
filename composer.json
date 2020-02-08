@@ -1,10 +1,9 @@
 {
-    "name": "flagrow/upload",
+    "name": "fof/upload",
     "description": "The file upload extension for the Flarum forum with insane intelligence.",
     "keywords": [
         "upload",
         "flarum",
-        "flagrow",
         "file"
     ],
     "type": "flarum-extension",
@@ -13,35 +12,34 @@
         {
             "name": "Daniël Klabbers",
             "email": "daniel@klabbers.email",
-            "homepage": "http://luceos.com"
+            "homepage": "https://luceos.com/"
         }
     ],
     "support": {
-        "issues": "https://github.com/flagrow/upload/issues",
-        "source": "https://github.com/flagrow/upload"
+        "issues": "https://github.com/FriendsOfFlarum/upload/issues",
+        "source": "https://github.com/FriendsOfFlarum/upload"
     },
     "require": {
-        "flarum/core": "^0.1.0-beta.8",
+        "flarum/core": ">=0.1.0-beta.11 <0.1.0-beta.13",
         "ramsey/uuid": "^3.5.2"
+    },
+    "replace": {
+        "flagrow/upload": "*"
     },
     "suggest": {
         "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
-        "techyah/flysystem-ovh": "Uploads to OVH Swift vfs using API.",
-        "overtrue/flysystem-qiniu":"Uploads to QiNiu using API."
+        "overtrue/flysystem-qiniu": "Uploads to QiNiu using API."
     },
     "require-dev": {
-        "league/flysystem": "^1.0.32",
         "league/flysystem-aws-s3-v3": "^1.0",
-        "techyah/flysystem-ovh": "^1.0",
-        "flagrow/steamroller": "dev-master",
-        "overtrue/flysystem-qiniu":"1.0.4"
+        "overtrue/flysystem-qiniu": "1.0.4"
     },
     "extra": {
         "flarum-extension": {
-            "title": "Upload",
+            "title": "FoF Upload",
             "icon": {
                 "image": "resources/logo.svg",
-                "backgroundColor": "#5f4bb6",
+                "backgroundColor": "#e74c3c",
                 "backgroundSize": "90%",
                 "backgroundRepeat": "no-repeat",
                 "backgroundPosition": "center"
@@ -53,15 +51,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Flagrow\\Upload\\": "src/"
-        },
-        "files": [
-            "src/Helpers/functions.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Flagrow\\Upload\\Tests\\": "tests/"
+            "FoF\\Upload\\": "src/"
         }
     }
 }

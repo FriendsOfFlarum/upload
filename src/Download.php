@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Upload;
+namespace FoF\Upload;
 
 use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
@@ -22,7 +22,7 @@ use Flarum\User\User;
  */
 class Download extends AbstractModel
 {
-    protected $table = 'flagrow_file_downloads';
+    protected $table = 'fof_upload_downloads';
 
     public $timestamps = false;
 

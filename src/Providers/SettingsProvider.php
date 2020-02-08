@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Upload\Providers;
+namespace FoF\Upload\Providers;
 
-use Flagrow\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Settings;
 use Flarum\Foundation\AbstractServiceProvider;
 
 class SettingsProvider extends AbstractServiceProvider

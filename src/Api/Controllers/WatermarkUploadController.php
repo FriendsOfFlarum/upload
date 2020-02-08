@@ -1,20 +1,9 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Api\Controllers;
 
-namespace Flagrow\Upload\Api\Controllers;
-
+use Flarum\Api\Controller\ShowForumController;
 use Flarum\Api\Controller\UploadFaviconController;
-use Flarum\Group\Group;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -28,9 +17,9 @@ class WatermarkUploadController extends UploadFaviconController
     {
         $this->assertAdmin($request->getAttribute('actor'));
 
-        $file = array_get($request->getUploadedFiles(), 'flagrow/watermark');
+        $file = array_get($request->getUploadedFiles(), 'fof/watermark');
 
-        $tmpFile = tempnam($this->app->storagePath().'/tmp', 'flagrow.watermark');
+        $tmpFile = tempnam($this->app->storagePath().'/tmp', 'fof-watermark');
 
         $file->moveTo($tmpFile);
 
@@ -39,18 +28,16 @@ class WatermarkUploadController extends UploadFaviconController
             'target' => new Filesystem(new Local($this->app->storagePath())),
         ]);
 
-        if (($path = $this->settings->get('flagrow.upload.watermark')) && $mount->has($file = "target://$path")) {
+        if (($path = $this->settings->get('fof-upload.watermark')) && $mount->has($file = "target://$path")) {
             $mount->delete($file);
         }
 
-        $uploadName = 'watermark-'.Str::lower(Str::random(8));
+        $uploadName = 'fof-upload-watermark-'.Str::lower(Str::random(8));
 
         $mount->move('source://'.pathinfo($tmpFile, PATHINFO_BASENAME), "target://$uploadName");
 
-        $this->settings->set('flagrow.upload.watermark', $uploadName);
+        $this->settings->set('fof-upload.watermark', $uploadName);
 
-        return [
-            'groups' => Group::whereVisibleTo($request->getAttribute('actor'))->get(),
-        ];
+        return ShowForumController::data($request, $document);
     }
 }

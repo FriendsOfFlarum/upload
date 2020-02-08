@@ -1,20 +1,9 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
+namespace FoF\Upload\Api\Controllers;
 
-namespace Flagrow\Upload\Api\Controllers;
-
-use Flagrow\Upload\Commands\Upload;
-use Flagrow\Upload\Exceptions\InvalidUploadException;
+use FoF\Upload\Commands\Upload;
+use FoF\Upload\Exceptions\InvalidUploadException;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -38,7 +27,7 @@ class UploadController implements RequestHandlerInterface
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @throws \Flagrow\Upload\Exceptions\InvalidUploadException
+     * @throws InvalidUploadException
      *
      * @return \Psr\Http\Message\ResponseInterface
      */

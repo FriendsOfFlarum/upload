@@ -1,21 +1,10 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
-
-namespace Flagrow\Upload;
+namespace FoF\Upload;
 
 use Carbon\Carbon;
-use Flagrow\Upload\Contracts\UploadAdapter;
-use Flagrow\Upload\Templates\AbstractTemplate;
+use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\Templates\AbstractTemplate;
 use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
@@ -45,7 +34,7 @@ use Illuminate\Support\Str;
  */
 class File extends AbstractModel
 {
-    protected $table = 'flagrow_files';
+    protected $table = 'fof_upload_files';
 
     protected $appends = ['humanSize'];
 

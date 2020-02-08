@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Upload\Templates;
+namespace FoF\Upload\Templates;
 
 class ImagePreviewTemplate extends AbstractTemplate
 {
@@ -14,7 +14,7 @@ class ImagePreviewTemplate extends AbstractTemplate
      */
     public function name()
     {
-        return $this->trans('flagrow-upload.admin.templates.image-preview');
+        return $this->trans('fof-upload.admin.templates.image-preview');
     }
 
     /**
@@ -22,7 +22,7 @@ class ImagePreviewTemplate extends AbstractTemplate
      */
     public function description()
     {
-        return $this->trans('flagrow-upload.admin.templates.image-preview_description');
+        return $this->trans('fof-upload.admin.templates.image-preview_description');
     }
 
     /**
@@ -32,7 +32,7 @@ class ImagePreviewTemplate extends AbstractTemplate
      */
     public function template()
     {
-        return $this->getView('flagrow.download.templates::image-preview');
+        return $this->getView('fof-upload.templates::image-preview');
     }
 
     /**

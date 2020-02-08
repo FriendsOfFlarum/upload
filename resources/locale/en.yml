@@ -1,4 +1,4 @@
-flagrow-upload:
+fof-upload:
   admin:
     buttons:
       save: Save settings
@@ -36,13 +36,6 @@ flagrow-upload:
       local:
         cdn_url: Content Delivery URL (prefixes files)
         title: Local storage settings
-      ovh-svfs:
-        container: Container
-        password: Password
-        region: Region
-        tenantid: Tenant ID
-        title: OVH SVFS storage settings
-        username: Username
       qiniu:
         title: Qiniu storage settings
         key: Key
@@ -53,7 +46,6 @@ flagrow-upload:
         mime_types: 'Configure your mime type, upload adapter mapping'
         title: General preferences
       resize:
-        max_height: Maximum image height
         max_width: Maximum image width
         title: Image resize
         toggle: Resize images
@@ -86,5 +78,5 @@ flagrow-upload:
       attach: Attach
     states:
       error: Error
-      loading: Loading
-      success: Success
+      loading: Uploading
+      unauthorized: You are not allowed to download files

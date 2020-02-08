@@ -1,21 +1,10 @@
 <?php
 
-/*
- * This file is part of flagrow/upload.
- *
- * Copyright (c) Flagrow.
- *
- * http://flagrow.github.io
- *
- * For the full copyright and license information, please view the license.md
- * file that was distributed with this source code.
- */
-
-namespace Flagrow\Upload\Adapters;
+namespace FoF\Upload\Adapters;
 
 use Carbon\Carbon;
-use Flagrow\Upload\Contracts\UploadAdapter;
-use Flagrow\Upload\File;
+use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\File;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -38,9 +27,9 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
-     * @param File         $file
+     * @param File $file
      * @param UploadedFile $upload
-     * @param string       $contents
+     * @param string $contents
      *
      * @return File
      */
@@ -67,9 +56,6 @@ abstract class Flysystem implements UploadAdapter
         return $file;
     }
 
-    /**
-     * @param File $file
-     */
     protected function generateFilename(File $file)
     {
         $today = (new Carbon());
@@ -78,13 +64,10 @@ abstract class Flysystem implements UploadAdapter
             '%s%s%s',
             $today->toDateString(),
             $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
-            $today->timestamp.'-'.$today->micro.'-'.$file->base_name
+            $today->timestamp . '-' . $today->micro . '-' . $file->base_name
         );
     }
 
-    /**
-     * @param File $file
-     */
     abstract protected function generateUrl(File $file);
 
     /**
