@@ -1,0 +1,82 @@
+fof-upload:
+  admin:
+    buttons:
+      save: Save settings
+    help_texts:
+      description: |
+        Set up uploading services and preferences.
+      disable-download-logging: |
+        Disable logging every download made by users of your forum. Keeping it enabled allows you to view the number of downloads and other metrics in the nearby future.
+      disable-hotlink-protection: |
+        Hotlink protection prevents opening downloads from other sites. Current method requires a csrf token and post id.
+      download_templates: |
+        Download templates are how uploads are shown on your forum, eg like previews, buttons. Currently available:
+      mime_types: |
+        Please configure your mapping here. Each mime type regular expression will be handled by a specific upload adapter and download template.
+      resize: |
+        Choose whether you want to resize your images before they get uploaded. You can choose a maximum width and height, in pixels. The resizing process keeps the aspect ratio of the images.
+      watermark: |
+        Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
+    labels:
+      aws-s3:
+        bucket: Bucket
+        key: Key
+        region: Region
+        secret: Secret
+        title: AWS S3 storage settings
+      disable-download-logging:
+        title: Disable logging downloads
+        toggle: Disable
+      disable-hotlink-protection:
+        title: Disable hotlink protection
+        toggle: Disable
+      imgur:
+        client_id: Imgur client ID
+        title: Imgur image storage settings
+      local:
+        cdn_url: Content Delivery URL (prefixes files)
+        title: Local storage settings
+      qiniu:
+        title: Qiniu storage settings
+        key: Key
+        secret: Secret
+        bucket: Bucket
+      preferences:
+        max_file_size: Maximum file size (in kilobytes)
+        mime_types: 'Configure your mime type, upload adapter mapping'
+        title: General preferences
+      resize:
+        max_width: Maximum image width
+        title: Image resize
+        toggle: Resize images
+      watermark:
+        file: Upload your watermark image
+        position: Watermark position
+        title: Watermark images
+        toggle: Watermark images
+    permissions:
+      download_label: Download files
+      upload_label: Upload files
+    templates:
+      file: Default file download template
+      file_description: |
+        Shows the file name and some general information. Proxies downloads through php, allowing for statistics gathering and hotlink protection.
+      image: Default image download template
+      image-preview: Complete image preview template
+      image-preview_description: |
+        Shows the complete image in-line. No download functionality, no statistics are gathered and hotlink protection is ignored.
+      image_description: |
+        Shows a thumbnail of the image and proxies download through php. Allowing statistics to be gathered and hotlink protection.
+    upload_methods:
+      aws-s3: Amazon S3
+      imgur: Imgur
+      local: Local
+      ovh-svfs: OVH SVFS
+      qiniu: QiNiu
+  forum:
+    buttons:
+      attach: Attach
+    states:
+      error: Error
+      loading: Uploading
+      unauthorized: You are not allowed to download files
