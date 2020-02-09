@@ -1,16 +1,16 @@
 fof-upload:
   admin:
     buttons:
-      save: Save settings
+      save:داداتحفظ الإع
     help_texts:
       description: |
-        Set up uploading services and preferences.
+        إعداد تحميل الخدمات والتفضيلات.
       disable-download-logging: |
-        Disable logging every download made by users of your forum. Keeping it enabled allows you to view the number of downloads and other metrics in the nearby future.
+        قم بتعطيل تسجيل كل تنزيل يتم بواسطة مستخدمي منتداك. يتيح لك تمكينه عرض عدد التنزيلات والمقاييس الأخرى في المستقبل القريب.
       disable-hotlink-protection: |
-        Hotlink protection prevents opening downloads from other sites. Current method requires a csrf token and post id.
+        حماية Hotlink تمنع فتح التنزيلات من المواقع الأخرى. تتطلب الطريقة الحالية رمز csrf ورمز المشاركة.
       download_templates: |
-        Download templates are how uploads are shown on your forum, eg like previews, buttons. Currently available:
+        تتمثل قوالب التنزيل في كيفية عرض التحميلات في منتداك ، مثل المعاينات والأزرار. متاح حاليا:
       mime_types: |
         Please configure your mapping here. Each mime type regular expression will be handled by a specific upload adapter and download template.
       resize: |
