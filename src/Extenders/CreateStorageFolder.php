@@ -2,11 +2,12 @@
 
 namespace FoF\Upload\Extenders;
 
+use Flarum\Extend\ExtenderInterface;
 use Flarum\Extend\LifecycleInterface;
 use Flarum\Extension\Extension;
 use Illuminate\Contracts\Container\Container;
 
-class CreateStorageFolder implements LifecycleInterface
+class CreateStorageFolder implements LifecycleInterface, ExtenderInterface
 {
     /**
      * @var string
@@ -26,5 +27,10 @@ class CreateStorageFolder implements LifecycleInterface
     public function onDisable(Container $container, Extension $extension)
     {
         // Nee, no, nein, nada, pas de rein.
+    }
+
+    public function extend(Container $container, Extension $extension = null)
+    {
+        // TODO: Implement extend() method.
     }
 }
