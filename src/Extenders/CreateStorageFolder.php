@@ -7,7 +7,7 @@ use Flarum\Extend\LifecycleInterface;
 use Flarum\Extension\Extension;
 use Illuminate\Contracts\Container\Container;
 
-class CreateStorageFolder implements LifecycleInterface, ExtenderInterface
+class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
 {
     /**
      * @var string
@@ -31,6 +31,8 @@ class CreateStorageFolder implements LifecycleInterface, ExtenderInterface
 
     public function extend(Container $container, Extension $extension = null)
     {
-        // TODO: Implement extend() method.
+        // TODO: Clark thinks that this line should be removed.
+        // Debating with him is tiring, because he's right.
+        // So here it is, if you close your eyes, it's gone.
     }
 }
