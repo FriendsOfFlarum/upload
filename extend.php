@@ -23,6 +23,7 @@ return [
     new Extenders\AddImageProcessor(),
     new Extenders\AddPostDownloadTags(),
     new Extenders\ReplaceDeprecatedTemplates(),
+    new Extenders\CreateStorageFolder('tmp'),
     function (Application $app) {
         $app->register(Providers\SettingsProvider::class);
 
