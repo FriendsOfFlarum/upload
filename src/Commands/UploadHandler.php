@@ -15,6 +15,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
 use SoftCreatR\MimeDetector\MimeDetector;
+use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class UploadHandler
 {
@@ -39,6 +40,9 @@ class UploadHandler
      */
     protected $files;
 
+    /**
+     * @var MimeDetector
+     */
     protected $mimeDetector;
 
     public function __construct(
@@ -47,8 +51,7 @@ class UploadHandler
         Settings $settings,
         FileRepository $files,
         MimeDetector $mimeDetector
-    )
-    {
+    ) {
         $this->app = $app;
         $this->settings = $settings;
         $this->events = $events;
@@ -73,10 +76,15 @@ class UploadHandler
             try {
                 $upload = $this->files->moveUploadedFileToTemp($file);
 
-                $this->mimeDetector->setFile($upload->getPathname());
-                $fileData = $this->mimeDetector->getFileType();
+                try {
+                    $this->mimeDetector->setFile($upload->getPathname());
+                } catch (MimeDetectorException $e) {
+                    throw new ValidationException(['upload' => 'Could not validate the file, please try again.']);
+                }
 
-                $mimeConfiguration = $this->getMimeConfiguration($fileData->mime);
+                $uploadFileData = $this->mimeDetector->getFileType();
+
+                $mimeConfiguration = $this->getMimeConfiguration($uploadFileData->mime);
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
@@ -88,7 +96,7 @@ class UploadHandler
                     throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
                 }
 
-                if (!$adapter->forMime($upload->getClientMimeType())) {
+                if (!$adapter->forMime($uploadFileData->mime)) {
                     throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getClientMimeType()}."]);
                 }
 
