@@ -14,6 +14,7 @@ use Flarum\User\AssertPermissionTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
+use SoftCreatR\MimeDetector\MimeDetector;
 
 class UploadHandler
 {
@@ -38,17 +39,21 @@ class UploadHandler
      */
     protected $files;
 
+    protected $mimeDetector;
+
     public function __construct(
         Application $app,
         Dispatcher $events,
         Settings $settings,
-        FileRepository $files
+        FileRepository $files,
+        MimeDetector $mimeDetector
     )
     {
         $this->app = $app;
         $this->settings = $settings;
         $this->events = $events;
         $this->files = $files;
+        $this->mimeDetector = $mimeDetector;
     }
 
     /**
@@ -68,7 +73,10 @@ class UploadHandler
             try {
                 $upload = $this->files->moveUploadedFileToTemp($file);
 
-                $mimeConfiguration = $this->getMimeConfiguration($upload->getClientMimeType());
+                $this->mimeDetector->setFile($upload->getPathname());
+                $fileData = $this->mimeDetector->getFileType();
+
+                $mimeConfiguration = $this->getMimeConfiguration($fileData->mime);
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
