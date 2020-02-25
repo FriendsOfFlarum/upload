@@ -64,7 +64,7 @@ class FileRepository
      * @return File
      * @throws \Exception
      */
-    public function createFileFromUpload(Upload $file, User $actor)
+    public function createFileFromUpload(Upload $file, User $actor, String $mime)
     {
         // Generate a guaranteed unique Uuid.
         while ($uuid = Uuid::uuid4()->toString()) {
@@ -73,15 +73,11 @@ class FileRepository
             }
         }
 
-        // Check the mime against the magic byte
-        $this->mimeDetector->setFile($file->getPathname());
-        $uploadFileData = $this->mimeDetector->getFileType();
-
         return (new File())->forceFill([
             'uuid'      => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
             'size'      => $file->getSize(),
-            'type'      => $uploadFileData['mime'],
+            'type'      => $mime,
             'actor_id'  => $actor->id,
         ]);
     }

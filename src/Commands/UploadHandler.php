@@ -83,6 +83,14 @@ class UploadHandler
                 }
 
                 $uploadFileData = $this->mimeDetector->getFileType();
+                
+                if ($uploadFileData['mime'] === null) {
+                    try {
+                        $uploadFileData['mime'] = mime_content_type($upload->getPathname());
+                    } catch (Exception $e) {
+                        throw new ValidationException(['upload' => 'Could not validate the file, please try again.']);
+                    }
+                }
 
                 $mimeConfiguration = $this->getMimeConfiguration($uploadFileData['mime']);
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
@@ -100,7 +108,7 @@ class UploadHandler
                     throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$uploadFileData['mime']}."]);
                 }
 
-                $file = $this->files->createFileFromUpload($upload, $command->actor);
+                $file = $this->files->createFileFromUpload($upload, $command->actor, $uploadFileData['mime']);
 
                 $this->events->fire(
                     new Events\File\WillBeUploaded($command->actor, $file, $upload, $uploadFileData['mime'])
