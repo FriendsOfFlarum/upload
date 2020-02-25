@@ -10,8 +10,9 @@ interface Processable
     /**
      * @param File         $file
      * @param UploadedFile $upload
+     * @param String $mime
      *
      * @return File
      */
-    public function process(File $file, UploadedFile $upload);
+    public function process(File $file, UploadedFile $upload, String $mime);
 }

@@ -84,7 +84,7 @@ class UploadHandler
 
                 $uploadFileData = $this->mimeDetector->getFileType();
 
-                $mimeConfiguration = $this->getMimeConfiguration($uploadFileData->mime);
+                $mimeConfiguration = $this->getMimeConfiguration($uploadFileData['mime']);
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
@@ -96,14 +96,14 @@ class UploadHandler
                     throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
                 }
 
-                if (!$adapter->forMime($uploadFileData->mime)) {
-                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getClientMimeType()}."]);
+                if (!$adapter->forMime($uploadFileData['mime'])) {
+                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$uploadFileData['mime']}."]);
                 }
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor);
 
                 $this->events->fire(
-                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
+                    new Events\File\WillBeUploaded($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
                 $response = $adapter->upload(
@@ -125,7 +125,7 @@ class UploadHandler
                 $file->actor_id = $command->actor->id;
 
                 $this->events->fire(
-                    new Events\File\WillBeSaved($command->actor, $file, $upload)
+                    new Events\File\WillBeSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
                 if ($file->isDirty() || !$file->exists) {
@@ -133,7 +133,7 @@ class UploadHandler
                 }
 
                 $this->events->fire(
-                    new Events\File\WasSaved($command->actor, $file, $upload)
+                    new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
             } catch (Exception $e) {
                 if (isset($upload)) {

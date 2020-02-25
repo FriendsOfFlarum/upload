@@ -18,8 +18,8 @@ class AddImageProcessor implements ExtenderInterface
 
     public function processor(WillBeUploaded $event)
     {
-        if ($this->validateMime($event->file->type)) {
-            app(ImageProcessor::class)->process($event->file, $event->uploadedFile);
+        if ($this->validateMime($event->mime)) {
+            app(ImageProcessor::class)->process($event->file, $event->uploadedFile, $event->mime);
         }
     }
 

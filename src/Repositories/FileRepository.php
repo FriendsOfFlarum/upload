@@ -17,6 +17,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
+use SoftCreatR\MimeDetector\MimeDetector;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 
 class FileRepository
@@ -30,10 +31,17 @@ class FileRepository
      */
     private $validator;
 
-    public function __construct(Application $app, UploadValidator $validator)
+    /**
+     *
+     * @var MimeDetector
+     */
+    private $mimeDetector;
+
+    public function __construct(Application $app, UploadValidator $validator, MimeDetector $mimeDetector)
     {
         $this->path = $app->storagePath();
         $this->validator = $validator;
+        $this->mimeDetector = $mimeDetector;
     }
 
     /**
@@ -65,11 +73,15 @@ class FileRepository
             }
         }
 
+        // Check the mime against the magic byte
+        $this->mimeDetector->setFile($file->getPathname());
+        $uploadFileData = $this->mimeDetector->getFileType();
+
         return (new File())->forceFill([
             'uuid'      => $uuid,
             'base_name' => $this->getBasename($file, $uuid),
             'size'      => $file->getSize(),
-            'type'      => $file->getClientMimeType(),
+            'type'      => $uploadFileData['mime'],
             'actor_id'  => $actor->id,
         ]);
     }
