@@ -14,6 +14,8 @@ use Flarum\User\AssertPermissionTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
+use SoftCreatR\MimeDetector\MimeDetector;
+use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class UploadHandler
 {
@@ -38,17 +40,23 @@ class UploadHandler
      */
     protected $files;
 
+    /**
+     * @var MimeDetector
+     */
+    protected $mimeDetector;
+
     public function __construct(
         Application $app,
         Dispatcher $events,
         Settings $settings,
-        FileRepository $files
-    )
-    {
+        FileRepository $files,
+        MimeDetector $mimeDetector
+    ) {
         $this->app = $app;
         $this->settings = $settings;
         $this->events = $events;
         $this->files = $files;
+        $this->mimeDetector = $mimeDetector;
     }
 
     /**
@@ -68,7 +76,15 @@ class UploadHandler
             try {
                 $upload = $this->files->moveUploadedFileToTemp($file);
 
-                $mimeConfiguration = $this->getMimeConfiguration($upload->getClientMimeType());
+                try {
+                    $this->mimeDetector->setFile($upload->getPathname());
+                } catch (MimeDetectorException $e) {
+                    throw new ValidationException(['upload' => 'Could not validate the file, please try again.']);
+                }
+
+                $uploadFileData = $this->mimeDetector->getFileType();
+
+                $mimeConfiguration = $this->getMimeConfiguration($uploadFileData['mime']);
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
@@ -80,14 +96,14 @@ class UploadHandler
                     throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
                 }
 
-                if (!$adapter->forMime($upload->getClientMimeType())) {
-                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$upload->getClientMimeType()}."]);
+                if (!$adapter->forMime($uploadFileData['mime'])) {
+                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$uploadFileData['mime']}."]);
                 }
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor);
 
                 $this->events->fire(
-                    new Events\File\WillBeUploaded($command->actor, $file, $upload)
+                    new Events\File\WillBeUploaded($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
                 $response = $adapter->upload(
@@ -109,7 +125,7 @@ class UploadHandler
                 $file->actor_id = $command->actor->id;
 
                 $this->events->fire(
-                    new Events\File\WillBeSaved($command->actor, $file, $upload)
+                    new Events\File\WillBeSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
                 if ($file->isDirty() || !$file->exists) {
@@ -117,7 +133,7 @@ class UploadHandler
                 }
 
                 $this->events->fire(
-                    new Events\File\WasSaved($command->actor, $file, $upload)
+                    new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
             } catch (Exception $e) {
                 if (isset($upload)) {

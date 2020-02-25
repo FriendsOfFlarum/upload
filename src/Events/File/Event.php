@@ -24,14 +24,21 @@ abstract class Event
     public $uploadedFile;
 
     /**
+     *
+     * @var String
+     */
+    public $mime;
+
+    /**
      * @param User         $actor
      * @param File         $file
      * @param UploadedFile $uploadedFile
      */
-    public function __construct(User $actor, File $file, UploadedFile $uploadedFile)
+    public function __construct(User $actor, File $file, UploadedFile $uploadedFile, String $mime)
     {
         $this->actor = $actor;
         $this->file = $file;
         $this->uploadedFile = $uploadedFile;
+        $this->mime = $mime;
     }
 }
