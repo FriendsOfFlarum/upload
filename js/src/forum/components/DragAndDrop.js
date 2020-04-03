@@ -6,6 +6,7 @@ export default class DragAndDrop {
         // Keep references to the bound methods so we can remove the event listeners later
         this.handlers = {};
 
+        this.composerElement.addEventListener('dragstart', this.handlers.start = this.start.bind(this));
         this.composerElement.addEventListener('dragover', this.handlers.in = this.in.bind(this));
 
         this.composerElement.addEventListener('dragleave', this.handlers.out = this.out.bind(this));
@@ -14,9 +15,15 @@ export default class DragAndDrop {
         this.composerElement.addEventListener('drop', this.handlers.dropping = this.dropping.bind(this));
 
         this.isDropping = this.over = false;
+        this.isChar = true;
+    }
+
+    start() {
+        this.isChar = false;
     }
 
     unload() {
+        this.composerElement.removeEventListener('dragstart', this.handlers.start);
         this.composerElement.removeEventListener('dragover', this.handlers.in);
 
         this.composerElement.removeEventListener('dragleave', this.handlers.out);
@@ -26,6 +33,8 @@ export default class DragAndDrop {
     }
 
     in(event) {
+        if (!this.isChar) return;
+        console.log('over')
         event.preventDefault();
 
         if (!this.over) {
@@ -35,6 +44,7 @@ export default class DragAndDrop {
     }
 
     out(event) {
+        if (!this.isChar) return;
         event.preventDefault();
 
         if (this.over) {
@@ -44,6 +54,11 @@ export default class DragAndDrop {
     }
 
     dropping(event) {
+        console.log('dropping');
+        if (!this.isChar) {
+            this.isChar = true;
+            return;
+        }
         event.preventDefault();
 
         if (!this.isDropping) {
