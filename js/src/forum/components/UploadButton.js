@@ -2,6 +2,8 @@ import app from 'flarum/app';
 import Component from 'flarum/Component';
 import icon from 'flarum/helpers/icon';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import ReplyComposer from 'flarum/components/ReplyComposer';
+import EditPostComposer from 'flarum/components/EditPostComposer';
 
 /* global m */
 
@@ -87,10 +89,15 @@ export default class UploadButton extends Component {
             this.textAreaObj.insertAtCursor(bbcode + '\n');
         });
 
-        // if we are not starting a new discussion, the variable is defined
-        if (typeof this.textAreaObj.props.preview !== 'undefined') {
-            // show what we just uploaded
-            this.textAreaObj.props.preview();
+        // Scroll the preview into view
+        // We don't call this.textAreaObj.props.preview() because that would close the composer on mobile
+        // Instead we just directly perform the same scrolling and skip the part about minimizing the composer
+        if (app.composer.component instanceof ReplyComposer) {
+            m.route(app.route.discussion(app.composer.component.props.discussion, 'reply'));
+        }
+
+        if (app.composer.component instanceof EditPostComposer) {
+            m.route(app.route.post(app.composer.component.props.post));
         }
 
         // reset the button for a new upload
