@@ -79,16 +79,16 @@ class UploadHandler
                 try {
                     $this->mimeDetector->setFile($upload->getPathname());
                 } catch (MimeDetectorException $e) {
-                    throw new ValidationException(['upload' => 'Could not validate the file, please try again.']);
+                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                 }
 
                 $uploadFileData = $this->mimeDetector->getFileType();
-                
+
                 if ($uploadFileData['mime'] === null) {
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
                     } catch (Exception $e) {
-                        throw new ValidationException(['upload' => 'Could not validate the file, please try again.']);
+                        throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                     }
                 }
 
@@ -101,11 +101,11 @@ class UploadHandler
                 );
 
                 if (!$adapter) {
-                    throw new ValidationException(['upload' => 'Uploading files of this type is not allowed.']);
+                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.forbidden_type')]);
                 }
 
                 if (!$adapter->forMime($uploadFileData['mime'])) {
-                    throw new ValidationException(['upload' => "Upload adapter does not support the provided mime type: {$uploadFileData['mime']}."]);
+                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.unsupported_type', ['mime' => $uploadFileData['mime']])]);
                 }
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor, $uploadFileData['mime']);
