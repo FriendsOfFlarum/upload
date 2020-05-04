@@ -20,7 +20,7 @@
         "source": "https://github.com/FriendsOfFlarum/upload"
     },
     "require": {
-        "flarum/core": ">=0.1.0-beta.11 <0.1.0-beta.13",
+        "flarum/core": ">=0.1.0-beta.12 <0.1.0-beta.14",
         "ramsey/uuid": "^3.5.2",
         "softcreatr/php-mime-detector": "^3.0",
         "guzzlehttp/guzzle": "^6.0"
