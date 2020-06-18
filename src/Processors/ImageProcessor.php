@@ -61,9 +61,10 @@ class ImageProcessor implements Processable
      */
     protected function resize(Image $manager)
     {
+        $maxSize = $this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH);
         $manager->resize(
-            $this->settings->get('resizeMaxWidth', Settings::DEFAULT_MAX_IMAGE_WIDTH),
-            null,
+            $maxSize,
+            $maxSize,
             function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
