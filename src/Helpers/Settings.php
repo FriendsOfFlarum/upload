@@ -12,7 +12,7 @@ use Qiniu\Http\Client as QiniuClient;
 class Settings
 {
     const DEFAULT_MAX_FILE_SIZE = 2048;
-    const DEFAULT_MAX_IMAGE_WIDTH = 100;
+    const DEFAULT_MAX_IMAGE_SIZE = 100;
 
     /**
      * The templates used to render files.

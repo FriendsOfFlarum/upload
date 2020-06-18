@@ -46,7 +46,7 @@ fof-upload:
         mime_types: 'Configure your mime type, upload adapter mapping'
         title: General preferences
       resize:
-        max_width: Maximum image width
+        max_size: Maximum image size
         title: Image resize
         toggle: Resize images
       watermark:

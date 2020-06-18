@@ -18,7 +18,7 @@ export default class UploadPage extends Component {
         // the fields we need to watch and to save
         this.fields = [
             // image
-            'resizeMaxWidth',
+            'resizeMaxSize',
             'cdnUrl',
             'maxFileSize',
             // watermark
@@ -197,11 +197,11 @@ export default class UploadPage extends Component {
                                 children: app.translator.trans('fof-upload.admin.labels.resize.toggle'),
                                 onchange: this.values.mustResize,
                             }),
-                            m('label', app.translator.trans('fof-upload.admin.labels.resize.max_width')),
+                            m('label', app.translator.trans('fof-upload.admin.labels.resize.max_size')),
                             m('input', {
                                 className: 'FormControl',
-                                value: this.values.resizeMaxWidth() || 100,
-                                oninput: m.withAttr('value', this.values.resizeMaxWidth),
+                                value: this.values.resizeMaxSize() || 100,
+                                oninput: m.withAttr('value', this.values.resizeMaxSize),
                                 disabled: !this.values.mustResize(),
                             }),
                         ]),
