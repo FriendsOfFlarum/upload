@@ -3,8 +3,8 @@
 namespace FoF\Upload;
 
 use Carbon\Carbon;
+use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
-use FoF\Upload\Templates\AbstractTemplate;
 use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
@@ -83,9 +83,9 @@ class File extends AbstractModel
     }
 
     /**
-     * @param AbstractTemplate $template
+     * @param Template $template
      */
-    public function setTagAttribute(AbstractTemplate $template)
+    public function setTagAttribute(Template $template)
     {
         $this->attributes['tag'] = $template->tag();
     }

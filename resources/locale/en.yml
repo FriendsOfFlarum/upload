@@ -73,6 +73,9 @@ fof-upload:
         Shows the complete image in-line. No download functionality, no statistics are gathered and hotlink protection is ignored.
       image_description: |
         Shows a thumbnail of the image and proxies download through php. Allowing statistics to be gathered and hotlink protection.
+      just-url: Just URL
+      just-url_description: |
+        Inserts just the URL. Rendering can be handled by other extensions with auto-link ability. No download functionality, no statistics are gathered and hotlink protection is ignored.
     upload_methods:
       aws-s3: Amazon S3
       imgur: Imgur

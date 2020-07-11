@@ -3,7 +3,7 @@
 namespace FoF\Upload\Helpers;
 
 use Aws\S3\S3Client;
-use FoF\Upload\Templates\AbstractTemplate;
+use FoF\Upload\Contracts\Template;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -124,15 +124,15 @@ class Settings
     }
 
     /**
-     * @param AbstractTemplate $template
+     * @param Template $template
      */
-    public function addRenderTemplate(AbstractTemplate $template)
+    public function addRenderTemplate(Template $template)
     {
         $this->renderTemplates[$template->tag()] = $template;
     }
 
     /**
-     * @return array
+     * @return Template[]
      */
     public function getRenderTemplates()
     {
@@ -140,7 +140,7 @@ class Settings
     }
 
     /**
-     * @param array $templates
+     * @param Template[] $templates
      */
     public function setRenderTemplates(array $templates)
     {
@@ -148,7 +148,7 @@ class Settings
     }
 
     /**
-     * @return Collection|AbstractTemplate[]
+     * @return Collection|Template[]
      */
     public function getAvailableTemplates()
     {
@@ -156,7 +156,7 @@ class Settings
 
         /**
          * @var string
-         * @var AbstractTemplate $template
+         * @var Template $template
          */
         foreach ($this->renderTemplates as $tag => $template) {
             $collect[$tag] = [
@@ -171,7 +171,7 @@ class Settings
     /**
      * @param string $template
      *
-     * @return AbstractTemplate|null
+     * @return Template|null
      */
     public function getTemplate($template)
     {

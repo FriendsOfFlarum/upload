@@ -2,13 +2,14 @@
 
 namespace FoF\Upload\Providers;
 
+use Flarum\Foundation\AbstractServiceProvider;
 use FoF\Upload\Commands\DownloadHandler;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Templates\FileTemplate;
 use FoF\Upload\Templates\ImagePreviewTemplate;
 use FoF\Upload\Templates\ImageTemplate;
-use Flarum\Foundation\AbstractServiceProvider;
+use FoF\Upload\Templates\JustUrlTemplate;
 
 class DownloadProvider extends AbstractServiceProvider
 {
@@ -26,5 +27,6 @@ class DownloadProvider extends AbstractServiceProvider
         $settings->addRenderTemplate($this->app->make(FileTemplate::class));
         $settings->addRenderTemplate($this->app->make(ImageTemplate::class));
         $settings->addRenderTemplate($this->app->make(ImagePreviewTemplate::class));
+        $settings->addRenderTemplate($this->app->make(JustUrlTemplate::class));
     }
 }

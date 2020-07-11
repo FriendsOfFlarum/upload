@@ -2,7 +2,7 @@
 
 namespace FoF\Upload\Templates;
 
-class FileTemplate extends AbstractTemplate
+class FileTemplate extends AbstractTextFormatterTemplate
 {
     /**
      * @var string
@@ -12,7 +12,7 @@ class FileTemplate extends AbstractTemplate
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->trans('fof-upload.admin.templates.file');
     }
@@ -20,27 +20,23 @@ class FileTemplate extends AbstractTemplate
     /**
      * {@inheritdoc}
      */
-    public function description()
+    public function description(): string
     {
         return $this->trans('fof-upload.admin.templates.file_description');
     }
 
     /**
-     * The xsl template to use with this tag.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function template()
+    public function template(): string
     {
         return $this->getView('fof-upload.templates::file');
     }
 
     /**
-     * The bbcode to be parsed.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function bbcode()
+    public function bbcode(): string
     {
         return '[upl-file uuid={IDENTIFIER} size={SIMPLETEXT2}]{SIMPLETEXT1}[/upl-file]';
     }
