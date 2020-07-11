@@ -21,6 +21,7 @@ export default class UploadPage extends Component {
             'resizeMaxWidth',
             'cdnUrl',
             'maxFileSize',
+            'whitelistedClientExtensions',
             // watermark
             'watermark',
             'watermarkPosition',
@@ -203,6 +204,15 @@ export default class UploadPage extends Component {
                                 value: this.values.resizeMaxWidth() || 100,
                                 oninput: m.withAttr('value', this.values.resizeMaxWidth),
                                 disabled: !this.values.mustResize(),
+                            }),
+                        ]),
+                        m('fieldset', [
+                            m('legend', app.translator.trans('fof-upload.admin.labels.client_extension.title')),
+                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.client_extension')),
+                            m('input', {
+                                className: 'FormControl',
+                                value: this.values.whitelistedClientExtensions() || '',
+                                oninput: m.withAttr('value', this.values.whitelistedClientExtensions),
                             }),
                         ]),
                         m('fieldset', [
