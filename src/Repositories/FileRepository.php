@@ -8,6 +8,7 @@ use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
+use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Validators\UploadValidator;
 use Flarum\Foundation\Application;
 use Flarum\User\User;
@@ -36,12 +37,18 @@ class FileRepository
      * @var MimeDetector
      */
     private $mimeDetector;
+    /**
+     *
+     * @var Settings
+     */
+    private $settings;
 
-    public function __construct(Application $app, UploadValidator $validator, MimeDetector $mimeDetector)
+    public function __construct(Application $app, UploadValidator $validator, MimeDetector $mimeDetector, Settings $settings)
     {
         $this->path = $app->storagePath();
         $this->validator = $validator;
         $this->mimeDetector = $mimeDetector;
+        $this->settings = $settings;
     }
 
     /**
@@ -170,6 +177,31 @@ class FileRepository
     }
 
     /**
+     * Chooses a file extension for the upload
+     * @param Upload $upload
+     * @return string
+     */
+    protected function determineExtension(Upload $upload): string
+    {
+        $whitelistedClientExtensions = explode(',', $this->settings->get('whitelistedClientExtensions', ''));
+
+        $originalClientExtension = $upload->getClientOriginalExtension();
+
+        // Check the extension is not blank and is in the whitelist
+        if ($originalClientExtension && in_array($originalClientExtension, $whitelistedClientExtensions)) {
+            return $originalClientExtension;
+        }
+
+        $guessed = $upload->guessExtension();
+
+        if ($guessed) {
+            return $guessed;
+        }
+
+        return 'bin';
+    }
+
+    /**
      * @param Upload $upload
      * @param string $uuid
      *
@@ -183,7 +215,7 @@ class FileRepository
 
         return sprintf('%s.%s',
             empty($slug) ? $uuid : $slug,
-            $upload->guessExtension() ?: $upload->getClientOriginalExtension()
+            $this->determineExtension($upload)
         );
     }
 

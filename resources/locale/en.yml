@@ -15,6 +15,10 @@ fof-upload:
         Please configure your mapping here. Each mime type regular expression will be handled by a specific upload adapter and download template.
       resize: |
         Choose whether you want to resize your images before they get uploaded. You can choose a maximum width and height, in pixels. The resizing process keeps the aspect ratio of the images.
+      client_extension: |
+        By default Upload will choose a safe file extension based on the MIME type.
+        For some file types based around ZIP or binary data this can result in generic extensions being used instead of the expected one.
+        Here you can enter a comma-separated list of file extensions that will be kept verbatim.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
     labels:
@@ -49,6 +53,8 @@ fof-upload:
         max_width: Maximum image width
         title: Image resize
         toggle: Resize images
+      client_extension:
+        title: User-provided file extensions
       watermark:
         file: Upload your watermark image
         position: Watermark position
