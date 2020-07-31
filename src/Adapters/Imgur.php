@@ -53,7 +53,7 @@ class Imgur implements UploadAdapter
     public function upload(File $file, UploadedFile $upload, $contents)
     {
         $response = $this->api->post('upload', [
-            'json' => [
+            'form_params' => [
                 'type' => 'base64',
                 'image' => base64_encode($contents),
             ],
