@@ -87,6 +87,7 @@ The secondary is like a more detailed specification, eg `png`, `pdf` etc. These 
 ## FAQ
 
 -  __AWS S3__: read the [AWS S3 configuration page](https://github.com/FriendsOfFlarum/upload/wiki/aws-s3).
+-  __Adding Templates__: read the [Custom Templates wiki page](https://github.com/FriendsOfFlarum/upload/wiki/Custom-Templates).
 
 ## Links
 
