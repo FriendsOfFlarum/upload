@@ -21,6 +21,10 @@ fof-upload:
         Here you can enter a comma-separated list of file extensions that will be kept verbatim.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
+      s3_compatible_storage: |
+        The following settings are only required when using S3 compatible storage. If you use AWS, you can leave them blank.
+      s3_acl: |
+        The ACL that should be applied to the uploaded object (default: private). For possible values, see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
     labels:
       aws-s3:
         bucket: Bucket
@@ -28,6 +32,10 @@ fof-upload:
         region: Region
         secret: Secret
         title: AWS S3 storage settings
+        advanced_title: Advanced S3 storage settings
+        endpoint: Endpoint
+        use_path_style_endpoint: Use path style endpoint
+        acl: Access Control List (ACL)
       disable-download-logging:
         title: Disable logging downloads
         toggle: Disable

@@ -5,6 +5,7 @@ namespace FoF\Upload\Adapters;
 use Carbon\Carbon;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
+use FoF\Upload\Helpers\Settings;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,6 +28,16 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
+     * Define adapter-specific configuration
+     *
+     * @return Config
+     */
+    protected function getConfig()
+    {
+        return new Config();
+    }
+
+    /**
      * @param File $file
      * @param UploadedFile $upload
      * @param string $contents
@@ -43,7 +54,7 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        $meta = $this->adapter->{$method}($file->path, $contents, new Config());
+        $meta = $this->adapter->{$method}($file->path, $contents, $this->getConfig());
 
         if (!$meta) {
             return false;

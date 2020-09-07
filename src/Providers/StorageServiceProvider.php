@@ -96,6 +96,8 @@ class StorageServiceProvider extends ServiceProvider
                     ],
                     'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
                     'version' => 'latest',
+                    'endpoint' => empty($settings->get('awsS3Endpoint')) ? null : $settings->get('awsS3Endpoint'),
+                    'use_path_style_endpoint' => empty($settings->get('awsS3UsePathStyleEndpoint')) ? null : $settings->get('awsS3UsePathStyleEndpoint'),
                 ]),
                 $settings->get('awsS3Bucket')
             )

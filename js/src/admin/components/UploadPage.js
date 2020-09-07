@@ -32,6 +32,8 @@ export default class UploadPage extends Component {
             'awsS3Secret',
             'awsS3Bucket',
             'awsS3Region',
+            'awsS3Endpoint',
+            'awsS3ACL',
             // QIniu
             'qiniuKey',
             'qiniuSecret',
@@ -45,6 +47,8 @@ export default class UploadPage extends Component {
 
             'disableHotlinkProtection',
             'disableDownloadLogging',
+
+            'awsS3UsePathStyleEndpoint',
         ];
 
         // fields that are objects
@@ -309,6 +313,26 @@ export default class UploadPage extends Component {
                                 value: this.values.awsS3Region() || '',
                                 oninput: m.withAttr('value', this.values.awsS3Region),
                             }),
+                        ]),
+                        m('fieldset', [
+                            m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
+                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
+                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
+                            m('input.FormControl', {
+                                value: this.values.awsS3Endpoint() || '',
+                                oninput: m.withAttr('value', this.values.awsS3Endpoint),
+                            }),
+                            Switch.component({
+                                state: this.values.awsS3UsePathStyleEndpoint() || false,
+                                children: app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint'),
+                                onchange: this.values.awsS3UsePathStyleEndpoint,
+                            }),
+                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
+                            m('input.FormControl', {
+                                value: this.values.awsS3ACL() || '',
+                                oninput: m.withAttr('value', this.values.awsS3ACL),
+                            }),
+                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
                         ]),
                         Button.component({
                             type: 'submit',
