@@ -4,45 +4,43 @@ import TextEditor from 'flarum/components/TextEditor';
 import UploadButton from './components/UploadButton';
 import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
+import Uploader from "./handler/Uploader";
 
 export default function () {
-    // extend(TextEditor.prototype, 'oninit', function () {
-    //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-    // });
-
+    extend(TextEditor.prototype, 'oninit', function () {
+        this.uploader = new Uploader();
+    })
     extend(TextEditor.prototype, 'controlItems', function (items) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        this.fofUploadButton = UploadButton.component({
-            textAreaObj: this
+        let button = UploadButton.component({
+            upload: files => this.uploader.upload(files)
         });
 
-        items.add('fof-upload', this.fofUploadButton);
+        this.uploader.on('uploaded', () => button.success());
+
+        items.add('fof-upload', button);
     });
 
-    // extend(TextEditor.prototype, 'config', function (output, isInitialized, context) {
-    //     if (isInitialized) return;
-    //
-    //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-    //
-    //     const dragAndDrop = new DragAndDrop(this.fofUploadButton, this.$().parents('.Composer')[0]);
-    //
-    //     const unloadHandler = () => {
-    //         dragAndDrop.unload();
-    //     };
-    //
-    //     if (context.onunload) {
-    //         extend(context, 'onunload', unloadHandler);
-    //     } else {
-    //         context.onunload = unloadHandler;
-    //     }
-    // });
-    //
-    // extend(TextEditor.prototype, 'configTextarea', function (output, element, isInitialized) {
-    //     if (isInitialized) return;
-    //
-    //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-    //
-    //     new PasteClipboard(this.fofUploadButton, element);
-    // });
+    extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {
+        if (!app.forum.attribute('fof-upload.canUpload')) return;
+
+        this.uploader.on('success', image => this.attrs.composer.editor.insertAtCursor(image + '\n'));
+
+        const dragAndDrop = new DragAndDrop(
+            files => this.uploader.upload(files),
+            this.$().parents('.Composer')[0]
+        );
+
+        const unloadHandler = () => {
+            dragAndDrop.unload();
+        };
+
+        this.$('textarea').bind('onunload', unloadHandler);
+
+        new PasteClipboard(
+            files => this.uploader.upload(files),
+            this.$('textarea')[0]
+        );
+    });
 }

@@ -1,6 +1,6 @@
 export default class PasteClipboard {
-    constructor(uploadButton, textAreaElement) {
-        this.uploadButton = uploadButton;
+    constructor(upload, textAreaElement) {
+        this.upload = upload;
 
         // We don't need to remove the events listeners, because they are bound to the textarea when it's created,
         // and need to stay as long as the textarea exists in the DOM
@@ -22,7 +22,7 @@ export default class PasteClipboard {
             if (files.length > 0) {
                 e.preventDefault();
 
-                this.uploadButton.uploadFiles(files);
+                this.upload(files);
             }
         }
     }

@@ -8,9 +8,7 @@ import Stream from 'flarum/utils/Stream'
 
 export default class UploadButton extends Component {
     oninit(vnode) {
-        super.oninit();
-        // the service type handling uploads
-        this.textAreaObj = vnode.attrs.textAreaObj;
+        super.oninit(vnode);
         // initial state of the button
         this.uploading = Stream(false);
     }
@@ -45,49 +43,16 @@ export default class UploadButton extends Component {
         // get the file from the input field
         const files = this.$('input').prop('files');
 
-        this.uploadFiles(files);
-    }
+        const upload = this.attrs.upload;
 
-    uploadFiles(files) {
-        this.uploading(true);
-        m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
-
-        const data = new FormData;
-
-        for (let i = 0; i < files.length; i++) {
-            data.append('files[]', files[i]);
-        }
-
-        // send a POST request to the api
-        return app.request({
-            method: 'POST',
-            url: app.forum.attribute('apiUrl') + '/fof/upload',
-            // prevent JSON.stringify'ing the form data in the XHR call
-            serialize: raw => raw,
-            data
-        }).then(
-            this.success.bind(this),
-            this.failure.bind(this)
-        );
-    }
-
-    /**
-     * Handles errors.
-     *
-     * @param message
-     */
-    failure(message) {
-        alert(app.translator.trans('fof-upload.forum.states.error'));
+        upload(files);
     }
 
     /**
      * Appends the file's link to the body of the composer.
      */
-    success(response) {
-        response.forEach((bbcode) => {
-            this.textAreaObj.insertAtCursor(bbcode + '\n');
-        });
-
+    success() {
+        console.log('success hit')
         // Scroll the preview into view
         // We don't call this.textAreaObj.props.preview() because that would close the composer on mobile
         // Instead we just directly perform the same scrolling and skip the part about minimizing the composer

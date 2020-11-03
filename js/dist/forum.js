@@ -137,6 +137,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_UploadButton__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/UploadButton */ "./src/forum/components/UploadButton.js");
 /* harmony import */ var _components_DragAndDrop__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/DragAndDrop */ "./src/forum/components/DragAndDrop.js");
 /* harmony import */ var _components_PasteClipboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/PasteClipboard */ "./src/forum/components/PasteClipboard.js");
+/* harmony import */ var _handler_Uploader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./handler/Uploader */ "./src/forum/handler/Uploader.js");
+
 
 
 
@@ -144,40 +146,43 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = (function () {
-  // extend(TextEditor.prototype, 'oninit', function () {
-  //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-  // });
+  Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_TextEditor__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'oninit', function () {
+    this.uploader = new _handler_Uploader__WEBPACK_IMPORTED_MODULE_6__["default"]();
+  });
   Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_TextEditor__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'controlItems', function (items) {
+    var _this = this;
+
     if (!flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.forum.attribute('fof-upload.canUpload')) return;
-    this.fofUploadButton = _components_UploadButton__WEBPACK_IMPORTED_MODULE_3__["default"].component({
-      textAreaObj: this
+    var button = _components_UploadButton__WEBPACK_IMPORTED_MODULE_3__["default"].component({
+      upload: function upload(files) {
+        return _this.uploader.upload(files);
+      }
     });
-    items.add('fof-upload', this.fofUploadButton);
-  }); // extend(TextEditor.prototype, 'config', function (output, isInitialized, context) {
-  //     if (isInitialized) return;
-  //
-  //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-  //
-  //     const dragAndDrop = new DragAndDrop(this.fofUploadButton, this.$().parents('.Composer')[0]);
-  //
-  //     const unloadHandler = () => {
-  //         dragAndDrop.unload();
-  //     };
-  //
-  //     if (context.onunload) {
-  //         extend(context, 'onunload', unloadHandler);
-  //     } else {
-  //         context.onunload = unloadHandler;
-  //     }
-  // });
-  //
-  // extend(TextEditor.prototype, 'configTextarea', function (output, element, isInitialized) {
-  //     if (isInitialized) return;
-  //
-  //     if (!app.forum.attribute('fof-upload.canUpload')) return;
-  //
-  //     new PasteClipboard(this.fofUploadButton, element);
-  // });
+    this.uploader.on('uploaded', function () {
+      return button.success();
+    });
+    items.add('fof-upload', button);
+  });
+  Object(flarum_extend__WEBPACK_IMPORTED_MODULE_1__["extend"])(flarum_components_TextEditor__WEBPACK_IMPORTED_MODULE_2___default.a.prototype, 'oncreate', function (f_, vnode) {
+    var _this2 = this;
+
+    if (!flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.forum.attribute('fof-upload.canUpload')) return;
+    this.uploader.on('success', function (image) {
+      return _this2.attrs.composer.editor.insertAtCursor(image + '\n');
+    });
+    var dragAndDrop = new _components_DragAndDrop__WEBPACK_IMPORTED_MODULE_4__["default"](function (files) {
+      return _this2.uploader.upload(files);
+    }, this.$().parents('.Composer')[0]);
+
+    var unloadHandler = function unloadHandler() {
+      dragAndDrop.unload();
+    };
+
+    this.$('textarea').bind('onunload', unloadHandler);
+    new _components_PasteClipboard__WEBPACK_IMPORTED_MODULE_5__["default"](function (files) {
+      return _this2.uploader.upload(files);
+    }, this.$('textarea')[0]);
+  });
 });
 
 /***/ }),
@@ -193,8 +198,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DragAndDrop; });
 var DragAndDrop = /*#__PURE__*/function () {
-  function DragAndDrop(uploadButton, composerElement) {
-    this.uploadButton = uploadButton;
+  function DragAndDrop(upload, composerElement) {
+    this.upload = upload;
     this.composerElement = composerElement; // Keep references to the bound methods so we can remove the event listeners later
 
     this.handlers = {};
@@ -282,7 +287,7 @@ var DragAndDrop = /*#__PURE__*/function () {
     if (!this.isDropping) {
       this.isDropping = true;
       this.composerElement.classList.add('fof-upload-dropping');
-      this.uploadButton.uploadFiles(event.dataTransfer.files).then(function () {
+      this.upload(event.dataTransfer.files, function () {
         _this.composerElement.classList.remove('fof-upload-dropping');
 
         _this.isDropping = false;
@@ -308,8 +313,8 @@ var DragAndDrop = /*#__PURE__*/function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PasteClipboard; });
 var PasteClipboard = /*#__PURE__*/function () {
-  function PasteClipboard(uploadButton, textAreaElement) {
-    this.uploadButton = uploadButton; // We don't need to remove the events listeners, because they are bound to the textarea when it's created,
+  function PasteClipboard(upload, textAreaElement) {
+    this.upload = upload; // We don't need to remove the events listeners, because they are bound to the textarea when it's created,
     // and need to stay as long as the textarea exists in the DOM
 
     textAreaElement.addEventListener('paste', this.paste.bind(this));
@@ -330,7 +335,7 @@ var PasteClipboard = /*#__PURE__*/function () {
 
       if (files.length > 0) {
         e.preventDefault();
-        this.uploadButton.uploadFiles(files);
+        this.upload(files);
       }
     }
   };
@@ -386,10 +391,8 @@ var UploadButton = /*#__PURE__*/function (_Component) {
   var _proto = UploadButton.prototype;
 
   _proto.oninit = function oninit(vnode) {
-    _Component.prototype.oninit.call(this); // the service type handling uploads
+    _Component.prototype.oninit.call(this, vnode); // initial state of the button
 
-
-    this.textAreaObj = vnode.attrs.textAreaObj; // initial state of the button
 
     this.uploading = flarum_utils_Stream__WEBPACK_IMPORTED_MODULE_7___default()(false);
   };
@@ -419,51 +422,18 @@ var UploadButton = /*#__PURE__*/function (_Component) {
   _proto.process = function process(e) {
     // get the file from the input field
     var files = this.$('input').prop('files');
-    this.uploadFiles(files);
-  };
-
-  _proto.uploadFiles = function uploadFiles(files) {
-    this.uploading(true);
-    m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
-
-    var data = new FormData();
-
-    for (var i = 0; i < files.length; i++) {
-      data.append('files[]', files[i]);
-    } // send a POST request to the api
-
-
-    return flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.request({
-      method: 'POST',
-      url: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.forum.attribute('apiUrl') + '/fof/upload',
-      // prevent JSON.stringify'ing the form data in the XHR call
-      serialize: function serialize(raw) {
-        return raw;
-      },
-      data: data
-    }).then(this.success.bind(this), this.failure.bind(this));
-  }
-  /**
-   * Handles errors.
-   *
-   * @param message
-   */
-  ;
-
-  _proto.failure = function failure(message) {
-    alert(flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.forum.states.error'));
+    var upload = this.attrs.upload;
+    upload(files);
   }
   /**
    * Appends the file's link to the body of the composer.
    */
   ;
 
-  _proto.success = function success(response) {
+  _proto.success = function success() {
     var _this = this;
 
-    response.forEach(function (bbcode) {
-      _this.textAreaObj.insertAtCursor(bbcode + '\n');
-    }); // Scroll the preview into view
+    console.log('success hit'); // Scroll the preview into view
     // We don't call this.textAreaObj.props.preview() because that would close the composer on mobile
     // Instead we just directly perform the same scrolling and skip the part about minimizing the composer
 
@@ -534,6 +504,76 @@ __webpack_require__.r(__webpack_exports__);
     });
   });
 });
+
+/***/ }),
+
+/***/ "./src/forum/handler/Uploader.js":
+/*!***************************************!*\
+  !*** ./src/forum/handler/Uploader.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Uploader; });
+var Uploader = /*#__PURE__*/function () {
+  function Uploader() {
+    this.callbacks = {
+      'success': [],
+      'failure': [],
+      'uploading': [],
+      'uploaded': []
+    };
+  }
+
+  var _proto = Uploader.prototype;
+
+  _proto.on = function on(type, callback) {
+    this.callbacks[type].push(callback);
+  };
+
+  _proto.dispatch = function dispatch(type, response) {
+    this.callbacks[type].forEach(function (callback) {
+      return callback(response);
+    });
+  };
+
+  _proto.upload = function upload(files) {
+    this.dispatch('uploading', files);
+    m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
+
+    var body = new FormData();
+
+    for (var i = 0; i < files.length; i++) {
+      body.append('files[]', files[i]);
+    } // send a POST request to the api
+
+
+    return app.request({
+      method: 'POST',
+      url: app.forum.attribute('apiUrl') + '/fof/upload',
+      // prevent JSON.stringify'ing the form data in the XHR call
+      serialize: function serialize(raw) {
+        return raw;
+      },
+      body: body
+    }).then(this.uploaded.bind(this));
+  };
+
+  _proto.uploaded = function uploaded(files) {
+    var _this = this;
+
+    files.forEach(function (file) {
+      return _this.dispatch('success', file);
+    });
+    this.dispatch('uploaded');
+  };
+
+  return Uploader;
+}();
+
+
 
 /***/ }),
 
