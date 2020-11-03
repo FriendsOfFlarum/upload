@@ -3,6 +3,7 @@
 namespace FoF\Upload\Helpers;
 
 use Aws\S3\S3Client;
+use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
@@ -64,26 +65,11 @@ class Settings
      */
     public function getAvailableUploadMethods()
     {
-        /** @var Collection $methods */
-        $methods = [
-            'local',
-        ];
+        /** @var Manager $manager */
+        $manager = app(Manager::class);
 
-        if (class_exists(S3Client::class)) {
-            $methods[] = 'aws-s3';
-        }
-
-        if (class_exists(QiniuClient::class)) {
-            $methods[] = 'qiniu';
-        }
-
-        $methods[] = 'imgur';
-
-        return collect($methods)
-            ->keyBy(function ($item) {
-                return $item;
-            })
-            ->map(function ($item) {
+        return $manager->adapters()
+            ->map(function ($available, $item) {
                 return app('translator')->trans('fof-upload.admin.upload_methods.' . $item);
             });
     }
@@ -117,9 +103,11 @@ class Settings
      */
     public function getMimeTypesConfiguration()
     {
+        $adapters = $this->getAvailableUploadMethods();
+
         return $this->getJsonValue(
             'mimeTypes',
-            collect(['^image\/.*' => ['adapter' => 'local', 'template' => 'image-preview']])
+            collect(['^image\/.*' => ['adapter' => $adapters->flip()->last(), 'template' => 'image-preview']])
         )->filter();
     }
 

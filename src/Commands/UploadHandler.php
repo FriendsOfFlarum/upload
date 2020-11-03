@@ -3,6 +3,7 @@
 namespace FoF\Upload\Commands;
 
 use Exception;
+use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
@@ -96,7 +97,7 @@ class UploadHandler
                 $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
-                $this->events->fire(
+                $this->events->dispatch(
                     new Events\Adapter\Identified($command->actor, $upload, $adapter)
                 );
 
@@ -110,7 +111,7 @@ class UploadHandler
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor, $uploadFileData['mime']);
 
-                $this->events->fire(
+                $this->events->dispatch(
                     new Events\File\WillBeUploaded($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
@@ -132,7 +133,7 @@ class UploadHandler
                 $file->tag = $template;
                 $file->actor_id = $command->actor->id;
 
-                $this->events->fire(
+                $this->events->dispatch(
                     new Events\File\WillBeSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
 
@@ -140,7 +141,7 @@ class UploadHandler
                     $file->save();
                 }
 
-                $this->events->fire(
+                $this->events->dispatch(
                     new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
             } catch (Exception $e) {
@@ -168,7 +169,10 @@ class UploadHandler
             return;
         }
 
-        return app("fof.upload-adapter.$adapter");
+        /** @var Manager $manager */
+        $manager = app(Manager::class);
+
+        return $manager->instantiate()->get($adapter);
     }
 
     /**

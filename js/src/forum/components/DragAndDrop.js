@@ -1,6 +1,6 @@
 export default class DragAndDrop {
-    constructor(uploadButton, composerElement) {
-        this.uploadButton = uploadButton;
+    constructor(upload, composerElement) {
+        this.upload = upload;
         this.composerElement = composerElement;
 
         // Keep references to the bound methods so we can remove the event listeners later
@@ -92,11 +92,10 @@ export default class DragAndDrop {
             this.isDropping = true;
             this.composerElement.classList.add('fof-upload-dropping');
 
-            this.uploadButton.uploadFiles(event.dataTransfer.files)
-                .then(() => {
-                    this.composerElement.classList.remove('fof-upload-dropping');
-                    this.isDropping = false;
-                });
+            this.upload(event.dataTransfer.files, () => {
+                this.composerElement.classList.remove('fof-upload-dropping');
+                this.isDropping = false;
+            })
         }
     }
 }
