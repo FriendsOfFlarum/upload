@@ -4,16 +4,15 @@ import icon from 'flarum/helpers/icon';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
 import ReplyComposer from 'flarum/components/ReplyComposer';
 import EditPostComposer from 'flarum/components/EditPostComposer';
-
-/* global m */
+import Stream from 'flarum/utils/Stream'
 
 export default class UploadButton extends Component {
-    init() {
+    oninit(vnode) {
+        super.oninit();
         // the service type handling uploads
-        this.textAreaObj = null;
-
+        this.textAreaObj = vnode.attrs.textAreaObj;
         // initial state of the button
-        this.uploading = m.prop(false);
+        this.uploading = Stream(false);
     }
 
     view() {
@@ -93,11 +92,11 @@ export default class UploadButton extends Component {
         // We don't call this.textAreaObj.props.preview() because that would close the composer on mobile
         // Instead we just directly perform the same scrolling and skip the part about minimizing the composer
         if (app.composer.component instanceof ReplyComposer) {
-            m.route(app.route.discussion(app.composer.component.props.discussion, 'reply'));
+            m.route.set(app.route.discussion(app.composer.component.props.discussion, 'reply'));
         }
 
         if (app.composer.component instanceof EditPostComposer) {
-            m.route(app.route.post(app.composer.component.props.post));
+            m.route.set(app.route.post(app.composer.component.props.post));
         }
 
         // reset the button for a new upload
