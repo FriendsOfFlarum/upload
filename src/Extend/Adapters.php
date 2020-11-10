@@ -1,6 +1,6 @@
 <?php
 
-namespace FoF\Upload;
+namespace FoF\Upload\Extend;
 
 use Flarum\Extend\ExtenderInterface;
 use Flarum\Extension\Extension;
@@ -33,11 +33,11 @@ class Adapters implements ExtenderInterface
         /** @var Dispatcher $events */
         $events = $container->make(Dispatcher::class);
 
-        $events->listen(Collecting::class, function (Collection &$adapters) {
+        $events->listen(Collecting::class, function (Collecting $event) {
             if ($force = $this->force) {
-                $adapters = $adapters->only($force);
+                $event->adapters = $event->adapters->only($force);
             } else {
-                $adapters->forget($this->disabling);
+                $event->adapters->forget($this->disabling);
             }
         });
     }

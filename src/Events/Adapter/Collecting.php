@@ -11,7 +11,7 @@ class Collecting
      */
     public $adapters;
 
-    public function __construct(Collection $adapters)
+    public function __construct(Collection &$adapters)
     {
         $this->adapters = &$adapters;
     }

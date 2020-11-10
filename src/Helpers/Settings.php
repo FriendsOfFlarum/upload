@@ -69,6 +69,9 @@ class Settings
         $manager = app(Manager::class);
 
         return $manager->adapters()
+            ->filter(function ($available) {
+                return $available;
+            })
             ->map(function ($available, $item) {
                 return app('translator')->trans('fof-upload.admin.upload_methods.' . $item);
             });
