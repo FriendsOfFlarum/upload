@@ -40,7 +40,7 @@ class Manager
 
     public function adapters(): Collection
     {
-        $adapters = collect([
+        $adapters = Collection::make([
             'aws-s3' => class_exists(S3Client::class),
             'imgur' => true,
             'qiniu' => class_exists(QiniuClient::class),
