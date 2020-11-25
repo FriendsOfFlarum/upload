@@ -5,9 +5,7 @@ import Post from 'flarum/components/Post';
 /* global $ */
 
 export default function () {
-    extend(Post.prototype, 'config', function (isInitialized) {
-        if (isInitialized) return;
-
+    extend(Post.prototype, 'oncreate', function () {
         this.$('[data-fof-upload-download-uuid]').unbind('click').on('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -20,7 +18,7 @@ export default function () {
             let url = app.forum.attribute('apiUrl') + '/fof/download';
 
             url += '/' + e.currentTarget.dataset.fofUploadDownloadUuid;
-            url += '/' + this.props.post.id();
+            url += '/' + this.attrs.post.id();
             url += '/' + app.session.csrfToken;
 
             window.open(url);

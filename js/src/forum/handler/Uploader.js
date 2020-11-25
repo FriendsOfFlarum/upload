@@ -6,6 +6,7 @@ export default class Uploader {
             'uploading': [],
             'uploaded': []
         };
+        this.uploading = false;
     }
 
     on(type, callback) {
@@ -17,6 +18,7 @@ export default class Uploader {
     }
 
     upload(files) {
+        this.uploading = true;
         this.dispatch('uploading', files);
 
         m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
@@ -35,10 +37,18 @@ export default class Uploader {
             serialize: raw => raw,
             body
         })
-            .then(this.uploaded.bind(this));
+            .then(this.uploaded.bind(this))
+            .catch(error => {
+                this.uploading = false;
+                m.redraw();
+
+                throw error;
+            });
     }
 
     uploaded(files) {
+        this.uploading = false;
+
         files.forEach(file => this.dispatch('success', file));
 
         this.dispatch('uploaded');

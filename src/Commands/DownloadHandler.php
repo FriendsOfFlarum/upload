@@ -73,7 +73,7 @@ class DownloadHandler
             throw new ModelNotFoundException();
         }
 
-        $this->events->fire(
+        $this->events->dispatch(
             new WasLoaded($file)
         );
 
@@ -91,7 +91,7 @@ class DownloadHandler
                     $download = $this->files->downloadedEntry($file, $command);
                 }
 
-                $this->events->fire(
+                $this->events->dispatch(
                     new WillBeDownloaded($file, $response, $download)
                 );
 
