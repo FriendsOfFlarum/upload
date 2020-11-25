@@ -23,7 +23,7 @@
         "flarum/core": ">=0.1.0-beta.14 <0.1.0-beta.16",
         "ramsey/uuid": "^3.5.2",
         "softcreatr/php-mime-detector": "^3.0",
-        "guzzlehttp/guzzle": "^6.0"
+        "guzzlehttp/guzzle": "^6.0 || ^7.0"
     },
     "replace": {
         "flagrow/upload": "*"
