@@ -5,6 +5,7 @@ namespace FoF\Upload\Extenders;
 use Flarum\Extend\ExtenderInterface;
 use Flarum\Extend\LifecycleInterface;
 use Flarum\Extension\Extension;
+use Flarum\Foundation\Paths;
 use Illuminate\Contracts\Container\Container;
 
 class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
@@ -21,7 +22,7 @@ class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
 
     public function onEnable(Container $container, Extension $extension)
     {
-        @mkdir(storage_path($this->path));
+        @mkdir($container->make(Paths::class)->storage . DIRECTORY_SEPARATOR . $this->path);
     }
 
     public function onDisable(Container $container, Extension $extension)

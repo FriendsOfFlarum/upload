@@ -3,9 +3,9 @@
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\ShowForumController;
-use Flarum\Foundation\Application;
+use Flarum\Foundation\Paths;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\User\AssertPermissionTrait;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -15,30 +15,28 @@ use Tobscure\JsonApi\Document;
 
 class WatermarkUploadController extends ShowForumController
 {
-    use AssertPermissionTrait;
-
     protected $settings;
-    protected $app;
+    protected $paths;
 
-    public function __construct(SettingsRepositoryInterface $settings, Application $app)
+    public function __construct(SettingsRepositoryInterface $settings, Paths $paths)
     {
         $this->settings = $settings;
-        $this->app = $app;
+        $this->paths = $paths;
     }
 
     public function data(ServerRequestInterface $request, Document $document)
     {
-        $this->assertAdmin($request->getAttribute('actor'));
+        $request->getAttribute('actor')->assertAdmin();
 
-        $file = array_get($request->getUploadedFiles(), 'fof/watermark');
+        $file = Arr::get($request->getUploadedFiles(), 'fof/watermark');
 
-        $tmpFile = tempnam($this->app->storagePath().'/tmp', 'fof-watermark');
+        $tmpFile = tempnam($this->paths->storage.'/tmp', 'fof-watermark');
 
         $file->moveTo($tmpFile);
 
         $mount = new MountManager([
             'source' => new Filesystem(new Local(pathinfo($tmpFile, PATHINFO_DIRNAME))),
-            'target' => new Filesystem(new Local($this->app->storagePath())),
+            'target' => new Filesystem(new Local($this->paths->storage)),
         ]);
 
         if (($path = $this->settings->get('fof-upload.watermark')) && $mount->has($file = "target://$path")) {

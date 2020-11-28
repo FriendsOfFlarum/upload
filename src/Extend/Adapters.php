@@ -7,7 +7,6 @@ use Flarum\Extension\Extension;
 use FoF\Upload\Events\Adapter\Collecting;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Collection;
 
 class Adapters implements ExtenderInterface
 {

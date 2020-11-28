@@ -2,6 +2,7 @@
 
 namespace FoF\Upload\Providers;
 
+use FoF\Upload\Adapters\Manager;
 use Illuminate\Support\ServiceProvider;
 
 class StorageServiceProvider extends ServiceProvider
@@ -13,6 +14,6 @@ class StorageServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Adapters\Manager::class);
+        $this->app->singleton(Manager::class);
     }
 }

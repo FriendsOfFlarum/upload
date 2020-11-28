@@ -2,6 +2,7 @@
 
 namespace FoF\Upload\Processors;
 
+use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
 use FoF\Upload\Contracts\Processable;
 use FoF\Upload\File;
@@ -79,7 +80,7 @@ class ImageProcessor implements Processable
     {
         if ($this->settings->get('watermark')) {
             $image->insert(
-                storage_path($this->settings->get('watermark')),
+                app(Paths::class)->storage.DIRECTORY_SEPARATOR.$this->settings->get('watermark'),
                 $this->settings->get('watermarkPosition', 'bottom-right')
             );
         }

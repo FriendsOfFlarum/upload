@@ -3,6 +3,7 @@
 namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
+use Flarum\Foundation\Paths;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
@@ -10,7 +11,6 @@ use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Validators\UploadValidator;
-use Flarum\Foundation\Application;
 use Flarum\User\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -43,9 +43,9 @@ class FileRepository
      */
     private $settings;
 
-    public function __construct(Application $app, UploadValidator $validator, MimeDetector $mimeDetector, Settings $settings)
+    public function __construct(Paths $paths, UploadValidator $validator, MimeDetector $mimeDetector, Settings $settings)
     {
-        $this->path = $app->storagePath();
+        $this->path = $paths->storage;
         $this->validator = $validator;
         $this->mimeDetector = $mimeDetector;
         $this->settings = $settings;
@@ -67,11 +67,11 @@ class FileRepository
     /**
      * @param Upload $file
      * @param User $actor
-     *
+     * @param string $mime
      * @return File
      * @throws \Exception
      */
-    public function createFileFromUpload(Upload $file, User $actor, String $mime)
+    public function createFileFromUpload(Upload $file, User $actor, string $mime)
     {
         // Generate a guaranteed unique Uuid.
         while ($uuid = Uuid::uuid4()->toString()) {

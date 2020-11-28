@@ -9,7 +9,6 @@ use FoF\Upload\Exceptions\InvalidDownloadException;
 use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Repositories\FileRepository;
 use Flarum\Discussion\DiscussionRepository;
-use Flarum\User\AssertPermissionTrait;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,8 +16,6 @@ use Illuminate\Support\Arr;
 
 class DownloadHandler
 {
-    use AssertPermissionTrait;
-
     protected static $downloader = [];
 
     /**
@@ -62,10 +59,7 @@ class DownloadHandler
      */
     public function handle(Download $command)
     {
-        $this->assertCan(
-            $command->actor,
-            'fof-upload.download'
-        );
+        $command->actor->assertCan('fof-upload.download');
 
         $file = $this->files->findByUuid($command->uuid);
 

@@ -11,7 +11,6 @@ use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Repositories\FileRepository;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
-use Flarum\User\AssertPermissionTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
@@ -20,8 +19,6 @@ use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class UploadHandler
 {
-    use AssertPermissionTrait;
-
     /**
      * @var Application
      */
@@ -68,10 +65,7 @@ class UploadHandler
      */
     public function handle(Upload $command)
     {
-        $this->assertCan(
-            $command->actor,
-            'fof-upload.upload'
-        );
+        $command->actor->assertCan('fof-upload.upload');
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
             try {
@@ -166,7 +160,7 @@ class UploadHandler
     protected function getAdapter($adapter)
     {
         if (!$adapter) {
-            return;
+            return null;
         }
 
         /** @var Manager $manager */
@@ -175,11 +169,6 @@ class UploadHandler
         return $manager->instantiate()->get($adapter);
     }
 
-    /**
-     * @param $template
-     *
-     * @return \Flagrow\Upload\Templates\AbstractTemplate|null
-     */
     protected function getTemplate($template)
     {
         return $this->settings->getTemplate($template);

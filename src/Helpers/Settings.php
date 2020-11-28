@@ -2,13 +2,11 @@
 
 namespace FoF\Upload\Helpers;
 
-use Aws\S3\S3Client;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Qiniu\Http\Client as QiniuClient;
 
 class Settings
 {
