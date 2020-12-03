@@ -2,11 +2,13 @@
 
 namespace FoF\Upload\Downloader;
 
+use Flarum\Foundation\Paths;
 use FoF\Upload\Commands\Download;
 use FoF\Upload\Contracts\Downloader;
 use FoF\Upload\Exceptions\InvalidDownloadException;
 use FoF\Upload\File;
 use GuzzleHttp\Client;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 
 class DefaultDownloader implements Downloader
@@ -42,6 +44,26 @@ class DefaultDownloader implements Downloader
      * @return ResponseInterface
      */
     public function download(File $file, Download $command)
+    {
+        if ($file->upload_method === 'local') {
+            return $this->retrieveFromLocal($file);
+        }
+        else {
+            return $this->retrieveFromExternal($file);
+        }
+    }
+
+    private function retrieveFromLocal(File $file): ResponseInterface
+    {
+        $paths = app(Paths::class);
+        $file_contents = file_get_contents($paths->public . '/assets/files/' . $file->path);
+
+        $response = $this->mutateHeaders(new HtmlResponse($file_contents), $file);
+
+        return $response;
+    }
+
+    private function retrieveFromExternal(File $file)
     {
         try {
             $response = $this->api->get($file->url);
