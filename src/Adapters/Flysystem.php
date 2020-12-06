@@ -26,6 +26,16 @@ abstract class Flysystem implements UploadAdapter
         $this->adapter = $adapter;
     }
 
+        /**
+     * Define adapter-specific configuration
+     *
+     * @return Config
+     */
+    protected function getConfig()
+    {
+        return new Config();
+    }
+
     /**
      * @param File $file
      * @param UploadedFile $upload
@@ -43,7 +53,7 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        $meta = $this->adapter->{$method}($file->path, $contents, new Config());
+        $meta = $this->adapter->{$method}($file->path, $contents, $this->getConfig());
 
         if (!$meta) {
             return false;
