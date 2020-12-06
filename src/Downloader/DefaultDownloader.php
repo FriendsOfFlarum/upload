@@ -7,6 +7,7 @@ use FoF\Upload\Contracts\Downloader;
 use FoF\Upload\Exceptions\InvalidDownloadException;
 use FoF\Upload\File;
 use GuzzleHttp\Client;
+use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
 
 class DefaultDownloader implements Downloader
@@ -41,7 +42,23 @@ class DefaultDownloader implements Downloader
      *
      * @return ResponseInterface
      */
-    public function download(File $file, Download $command)
+    public function download(File $file, Download $command): ResponseInterface
+    {
+        if ($file->upload_method === 'local') {
+            return $this->retrieveFromLocal($file);
+        }
+
+        return $this->retrieveFromExternal($file);
+    }
+
+    private function retrieveFromLocal(File $file): ResponseInterface
+    {
+        $file_contents = file_get_contents(public_path('/assets/files/' . $file->path));
+
+        return $this->mutateHeaders(new TextResponse($file_contents), $file);
+    }
+
+    private function retrieveFromExternal(File $file): ResponseInterface
     {
         try {
             $response = $this->api->get($file->url);
