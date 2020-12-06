@@ -48,9 +48,8 @@ class DefaultDownloader implements Downloader
         if ($file->upload_method === 'local') {
             return $this->retrieveFromLocal($file);
         }
-        else {
-            return $this->retrieveFromExternal($file);
-        }
+        
+        return $this->retrieveFromExternal($file);
     }
 
     private function retrieveFromLocal(File $file): ResponseInterface
