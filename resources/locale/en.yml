@@ -86,7 +86,7 @@ fof-upload:
       just-url_description: |
         Inserts just the URL. Rendering can be handled by other extensions with auto-link ability. No download functionality, no statistics are gathered and hotlink protection is ignored.
     upload_methods:
-      aws-s3: Amazon S3
+      aws-s3: S3/Compatible
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS
