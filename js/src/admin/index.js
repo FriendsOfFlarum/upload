@@ -8,21 +8,20 @@ app.initializers.add('fof-upload', app => {
     app.extensionData.for('fof-upload').registerPage(UploadPage);
 
     // add the permission option to the relative pane
-    extend(PermissionGrid.prototype, 'startItems', items => {
-        items.add('fof-upload', {
+    app.extensionData
+        .for('fof-upload')
+        .registerPermission({
             icon: 'far fa-file',
             label: app.translator.trans('fof-upload.admin.permissions.upload_label'),
             permission: 'fof-upload.upload',
-        });
-    });
+        }, 'start', 50);
 
-    // add the permission option to the relative pane
-    extend(PermissionGrid.prototype, 'viewItems', items => {
-        items.add('fof-download', {
+    app.extensionData
+        .for('fof-upload')
+        .registerPermission({
             icon: 'fas fa-download',
             label: app.translator.trans('fof-upload.admin.permissions.download_label'),
             permission: 'fof-upload.download',
             allowGuest: true,
-        });
-    });
+        }, 'view', 50);
 });
