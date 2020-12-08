@@ -1,5 +1,4 @@
 import app from 'flarum/app';
-import Component from 'flarum/Component';
 import Button from 'flarum/components/Button';
 import saveSettings from 'flarum/utils/saveSettings';
 import Alert from 'flarum/components/Alert';
@@ -8,10 +7,11 @@ import Switch from 'flarum/components/Switch';
 import UploadImageButton from 'flarum/components/UploadImageButton';
 import withAttr from 'flarum/utils/withAttr';
 import Stream from 'flarum/utils/Stream';
+import ExtensionPage from 'flarum/components/ExtensionPage';
 
 /* global m */
 
-export default class UploadPage extends Component {
+export default class UploadPage extends ExtensionPage {
 
     oninit(vnode) {
         super.oninit(vnode);
@@ -120,7 +120,7 @@ export default class UploadPage extends Component {
      *
      * @returns {*}
      */
-    view() {
+    content() {
         return [
             m('.UploadPage', [
                 m('.container', [

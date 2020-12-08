@@ -1,11 +1,11 @@
 import {extend} from 'flarum/extend';
 import app from 'flarum/app';
 import PermissionGrid from 'flarum/components/PermissionGrid';
-import addUploadPane from './addUploadPane';
+import UploadPage from "./components/UploadPage";
 
 app.initializers.add('fof-upload', app => {
     // add the admin pane
-    addUploadPane();
+    app.extensionData.for('fof-upload').registerPage(UploadPage);
 
     // add the permission option to the relative pane
     extend(PermissionGrid.prototype, 'startItems', items => {
