@@ -17,8 +17,16 @@
     ],
     "support": {
         "issues": "https://github.com/FriendsOfFlarum/upload/issues",
-        "source": "https://github.com/FriendsOfFlarum/upload"
+        "source": "https://github.com/FriendsOfFlarum/upload",
+        "forum": "https://discuss.flarum.org/d/4154"
     },
+    "homepage": "https://friendsofflarum.org",
+    "funding": [
+        {
+            "type": "website",
+            "url": "https://opencollective.com/fof/donate"
+        }
+    ],
     "require": {
         "flarum/core": ">=0.1.0-beta.15 <0.1.0-beta.17",
         "ramsey/uuid": "^3.5.2",
@@ -40,6 +48,7 @@
     "extra": {
         "flarum-extension": {
             "title": "FoF Upload",
+            "category": "feature",
             "icon": {
                 "image": "resources/logo.svg",
                 "backgroundColor": "#e74c3c",
