@@ -2,25 +2,15 @@
 
 namespace FoF\Upload\Extenders;
 
-use Flarum\Api\Event\Serializing;
 use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Extend\ExtenderInterface;
-use Flarum\Extension\Extension;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
 
-class AddForumAttributes implements ExtenderInterface
+class AddForumAttributes
 {
-    public function extend(Container $container, Extension $extension = null)
+    public function __invoke(ForumSerializer $serializer)
     {
-        $container->make(Dispatcher::class)->listen(Serializing::class, [$this, 'serializing']);
-    }
+        $attributes['fof-upload.canUpload'] = $serializer->getActor()->can('fof-upload.upload');
+        $attributes['fof-upload.canDownload'] = $serializer->getActor()->can('fof-upload.download');
 
-    public function serializing(Serializing $event)
-    {
-        if ($event->isSerializer(ForumSerializer::class)) {
-            $event->attributes['fof-upload.canUpload'] = $event->actor->can('fof-upload.upload');
-            $event->attributes['fof-upload.canDownload'] = $event->actor->can('fof-upload.download');
-        }
+        return $attributes;
     }
 }
