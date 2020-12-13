@@ -17,24 +17,32 @@ export default class UploadButton extends Component {
     }
 
     view() {
-        const buttonText = this.attrs.uploader.uploading ? app.translator.trans('fof-upload.forum.states.loading') : app.translator.trans('fof-upload.forum.buttons.attach');
+        const buttonText = this.attrs.uploader.uploading
+            ? app.translator.trans('fof-upload.forum.states.loading')
+            : app.translator.trans('fof-upload.forum.buttons.attach');
 
-        return m('.Button.hasIcon.fof-upload-button.Button--icon', {
-            className: this.attrs.uploader.uploading ? 'uploading' : '',
-        }, [
-            this.attrs.uploader.uploading ? LoadingIndicator.component({
-                size: 'tiny',
-                className: 'LoadingIndicator--inline Button-icon',
-            }) : icon('fas fa-file-upload', {className: 'Button-icon'}),
-            m('span.Button-label', buttonText),
-            m('form', [
-                m('input', {
-                    type: 'file',
-                    multiple: true,
-                    onchange: this.process.bind(this),
-                }),
-            ]),
-        ]);
+        return m(
+            '.Button.hasIcon.fof-upload-button.Button--icon',
+            {
+                className: this.attrs.uploader.uploading ? 'uploading' : '',
+            },
+            [
+                this.attrs.uploader.uploading
+                    ? LoadingIndicator.component({
+                          size: 'tiny',
+                          className: 'LoadingIndicator--inline Button-icon',
+                      })
+                    : icon('fas fa-file-upload', { className: 'Button-icon' }),
+                m('span.Button-label', buttonText),
+                m('form', [
+                    m('input', {
+                        type: 'file',
+                        multiple: true,
+                        onchange: this.process.bind(this),
+                    }),
+                ]),
+            ]
+        );
     }
 
     /**

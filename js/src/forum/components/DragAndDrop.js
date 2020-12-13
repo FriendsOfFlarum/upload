@@ -10,12 +10,12 @@ export default class DragAndDrop {
             return;
         }
 
-        this.composerElement.addEventListener('dragover', this.handlers.in = this.in.bind(this));
+        this.composerElement.addEventListener('dragover', (this.handlers.in = this.in.bind(this)));
 
-        this.composerElement.addEventListener('dragleave', this.handlers.out = this.out.bind(this));
+        this.composerElement.addEventListener('dragleave', (this.handlers.out = this.out.bind(this)));
         this.composerElement.addEventListener('dragend', this.handlers.out);
 
-        this.composerElement.addEventListener('drop', this.handlers.dropping = this.dropping.bind(this));
+        this.composerElement.addEventListener('drop', (this.handlers.dropping = this.dropping.bind(this)));
 
         this.isDropping = this.over = false;
     }
@@ -24,7 +24,7 @@ export default class DragAndDrop {
         // Based on https://css-tricks.com/drag-and-drop-file-uploading/
         const div = document.createElement('div');
 
-        return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+        return ('draggable' in div || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
     }
 
     unload() {
@@ -95,7 +95,7 @@ export default class DragAndDrop {
             this.upload(event.dataTransfer.files, () => {
                 this.composerElement.classList.remove('fof-upload-dropping');
                 this.isDropping = false;
-            })
+            });
         }
     }
 }

@@ -12,7 +12,6 @@ import ExtensionPage from 'flarum/components/ExtensionPage';
 /* global m */
 
 export default class UploadPage extends ExtensionPage {
-
     oninit(vnode) {
         super.oninit(vnode);
         // whether we are saving the settings or not right now
@@ -44,20 +43,10 @@ export default class UploadPage extends ExtensionPage {
         ];
 
         // the checkboxes we need to watch and to save.
-        this.checkboxes = [
-            'mustResize',
-            'addsWatermarks',
-
-            'disableHotlinkProtection',
-            'disableDownloadLogging',
-
-            'awsS3UsePathStyleEndpoint',
-        ];
+        this.checkboxes = ['mustResize', 'addsWatermarks', 'disableHotlinkProtection', 'disableDownloadLogging', 'awsS3UsePathStyleEndpoint'];
 
         // fields that are objects
-        this.objects = [
-            'mimeTypes',
-        ];
+        this.objects = ['mimeTypes'];
 
         // watermark positions
         this.watermarkPositions = {
@@ -65,11 +54,11 @@ export default class UploadPage extends ExtensionPage {
             'top-right': 'top-right',
             'bottom-left': 'bottom-left',
             'bottom-right': 'bottom-right',
-            'center': 'center',
-            'left': 'left',
-            'top': 'top',
-            'right': 'right',
-            'bottom': 'bottom',
+            center: 'center',
+            left: 'left',
+            top: 'top',
+            right: 'right',
+            bottom: 'bottom',
         };
 
         // get the saved settings from the database
@@ -86,27 +75,22 @@ export default class UploadPage extends ExtensionPage {
         // Contains current values.
         this.values = {};
         // bind the values of the fields and checkboxes to the getter/setter functions
-        this.fields.forEach(key =>
-            this.values[key] = Stream(settings[this.addPrefix(key)])
-        );
-        this.checkboxes.forEach(key =>
-            this.values[key] = Stream(settings[this.addPrefix(key)] === '1')
-        );
-        this.objects.forEach(key =>
-            this.values[key] = settings[this.addPrefix(key)]
-                ? Stream(JSON.parse(settings[this.addPrefix(key)]))
-                : Stream()
+        this.fields.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)])));
+        this.checkboxes.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)] === '1')));
+        this.objects.forEach(
+            (key) => (this.values[key] = settings[this.addPrefix(key)] ? Stream(JSON.parse(settings[this.addPrefix(key)])) : Stream())
         );
 
         // Set a sane default in case no mimeTypes have been configured yet.
         // Since 'local' (or others) can now be disabled, pick the last entry in the object for default
         this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1];
-        this.values.mimeTypes() || (this.values.mimeTypes = Stream({
-            '^image\\/.*': {
-                adapter: this.defaultAdap,
-                template: 'image-preview',
-            },
-        }));
+        this.values.mimeTypes() ||
+            (this.values.mimeTypes = Stream({
+                '^image\\/.*': {
+                    adapter: this.defaultAdap,
+                    template: 'image-preview',
+                },
+            }));
 
         this.newMimeType = {
             regex: Stream(''),
@@ -124,20 +108,23 @@ export default class UploadPage extends ExtensionPage {
         return [
             m('.UploadPage', [
                 m('.container', [
-                    m('form', {
-                        onsubmit: this.onsubmit.bind(this),
-                    }, [
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.preferences.title')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')),
-                            m('input.FormControl', {
-                                value: this.values.maxFileSize() || 2048,
-                                oninput: withAttr('value', this.values.maxFileSize),
-                            }),
-                            m('label', app.translator.trans('fof-upload.admin.labels.preferences.mime_types')),
-                            m('.MimeTypes--Container',
-                                Object.keys(this.values.mimeTypes())
-                                    .map(mime => {
+                    m(
+                        'form',
+                        {
+                            onsubmit: this.onsubmit.bind(this),
+                        },
+                        [
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.preferences.title')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')),
+                                m('input.FormControl', {
+                                    value: this.values.maxFileSize() || 2048,
+                                    oninput: withAttr('value', this.values.maxFileSize),
+                                }),
+                                m('label', app.translator.trans('fof-upload.admin.labels.preferences.mime_types')),
+                                m(
+                                    '.MimeTypes--Container',
+                                    Object.keys(this.values.mimeTypes()).map((mime) => {
                                         let config = this.values.mimeTypes()[mime];
                                         // Compatibility for older versions.
                                         if (typeof config !== 'object') {
@@ -162,183 +149,208 @@ export default class UploadPage extends ExtensionPage {
                                                 onchange: this.updateMimeTypeTemplate.bind(this, mime, config),
                                                 value: config.template || 'local',
                                             }),
-                                            Button.component({
-                                                type: 'button',
-                                                className: 'Button Button--warning',
-                                                onclick: this.deleteMimeType.bind(this, mime),
-                                            }, 'x'),
+                                            Button.component(
+                                                {
+                                                    type: 'button',
+                                                    className: 'Button Button--warning',
+                                                    onclick: this.deleteMimeType.bind(this, mime),
+                                                },
+                                                'x'
+                                            ),
                                         ]);
                                     }),
-                                m('br'),
-                                m('div', [
-                                    m('input.FormControl.MimeTypes.add-MimeType-key', {
-                                        value: this.newMimeType.regex(),
-                                        oninput: withAttr('value', this.newMimeType.regex),
-                                    }),
-                                    Select.component({
-                                        options: this.uploadMethodOptions,
-                                        className: 'add-MimeType-value',
-                                        oninput: withAttr('value', this.newMimeType.adapter),
-                                        value: this.newMimeType.adapter(),
-                                    }),
-                                    Select.component({
-                                        options: this.getTemplateOptionsForInput(),
-                                        className: 'add-MimeType-value',
-                                        oninput: withAttr('value', this.newMimeType.template),
-                                        value: this.newMimeType.template(),
-                                    }),
-                                    Button.component({
-                                        type: 'button',
-                                        className: 'Button Button--warning',
-                                        onclick: this.addMimeType.bind(this),
-                                    }, '+'),
-                                ]),
-                            ),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.mime_types')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.download_templates')),
-                            this.templateOptionsDescriptions(),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.resize.title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.resize')),
-                            Switch.component({
-                                state: this.values.mustResize() || false,
-                                onchange: this.values.mustResize,
-                            }, app.translator.trans('fof-upload.admin.labels.resize.toggle')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.resize.max_width')),
-                            m('input', {
-                                className: 'FormControl',
-                                value: this.values.resizeMaxWidth() || 100,
-                                oninput: withAttr('value', this.values.resizeMaxWidth),
-                                disabled: !this.values.mustResize(),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.client_extension.title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.client_extension')),
-                            m('input', {
-                                className: 'FormControl',
-                                value: this.values.whitelistedClientExtensions() || '',
-                                oninput: withAttr('value', this.values.whitelistedClientExtensions),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.watermark.title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.watermark')),
-                            Switch.component({
-                                state: this.values.addsWatermarks() || false,
-                                onchange: this.values.addsWatermarks,
-                            }, app.translator.trans('fof-upload.admin.labels.watermark.toggle')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.watermark.position')),
-                            m('div', [
-                                Select.component({
-                                    options: this.watermarkPositions,
-                                    onchange: this.values.watermarkPosition,
-                                    value: this.values.watermarkPosition() || 'bottom-right',
+                                    m('br'),
+                                    m('div', [
+                                        m('input.FormControl.MimeTypes.add-MimeType-key', {
+                                            value: this.newMimeType.regex(),
+                                            oninput: withAttr('value', this.newMimeType.regex),
+                                        }),
+                                        Select.component({
+                                            options: this.uploadMethodOptions,
+                                            className: 'add-MimeType-value',
+                                            oninput: withAttr('value', this.newMimeType.adapter),
+                                            value: this.newMimeType.adapter(),
+                                        }),
+                                        Select.component({
+                                            options: this.getTemplateOptionsForInput(),
+                                            className: 'add-MimeType-value',
+                                            oninput: withAttr('value', this.newMimeType.template),
+                                            value: this.newMimeType.template(),
+                                        }),
+                                        Button.component(
+                                            {
+                                                type: 'button',
+                                                className: 'Button Button--warning',
+                                                onclick: this.addMimeType.bind(this),
+                                            },
+                                            '+'
+                                        ),
+                                    ])
+                                ),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.mime_types')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.download_templates')),
+                                this.templateOptionsDescriptions(),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.resize.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.resize')),
+                                Switch.component(
+                                    {
+                                        state: this.values.mustResize() || false,
+                                        onchange: this.values.mustResize,
+                                    },
+                                    app.translator.trans('fof-upload.admin.labels.resize.toggle')
+                                ),
+                                m('label', app.translator.trans('fof-upload.admin.labels.resize.max_width')),
+                                m('input', {
+                                    className: 'FormControl',
+                                    value: this.values.resizeMaxWidth() || 100,
+                                    oninput: withAttr('value', this.values.resizeMaxWidth),
+                                    disabled: !this.values.mustResize(),
                                 }),
                             ]),
-                            m('label', {}, app.translator.trans('fof-upload.admin.labels.watermark.file')),
-                            UploadImageButton.component({
-                                name: 'fof/watermark',
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.disable-hotlink-protection')),
-                            Switch.component({
-                                state: this.values.disableHotlinkProtection() || false,
-                                onchange: this.values.disableHotlinkProtection,
-                            }, app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.toggle')),
-                            m('legend', app.translator.trans('fof-upload.admin.labels.disable-download-logging.title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.disable-download-logging')),
-                            Switch.component({
-                                state: this.values.disableDownloadLogging() || false,
-                                onchange: this.values.disableDownloadLogging,
-                            }, app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.local.title')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.local.cdn_url')),
-                            m('input.FormControl', {
-                                value: this.values.cdnUrl() || '',
-                                oninput: withAttr('value', this.values.cdnUrl),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.imgur.title')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.imgur.client_id')),
-                            m('input.FormControl', {
-                                value: this.values.imgurClientId() || '',
-                                oninput: withAttr('value', this.values.imgurClientId),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.qiniu.title')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.qiniu.key')),
-                            m('input.FormControl', {
-                                value: this.values.qiniuKey() || '',
-                                oninput: withAttr('value', this.values.qiniuKey),
-                            }),
-                            m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.secret')),
-                            m('input.FormControl', {
-                                value: this.values.qiniuSecret() || '',
-                                oninput: withAttr('value', this.values.qiniuSecret),
-                            }),
-                            m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.bucket')),
-                            m('input.FormControl', {
-                                value: this.values.qiniuBucket() || '',
-                                oninput: withAttr('value', this.values.qiniuBucket),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3Key() || '',
-                                oninput: withAttr('value', this.values.awsS3Key),
-                            }),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3Secret() || '',
-                                oninput: withAttr('value', this.values.awsS3Secret),
-                            }),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3Bucket() || '',
-                                oninput: withAttr('value', this.values.awsS3Bucket),
-                            }),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3Region() || '',
-                                oninput: withAttr('value', this.values.awsS3Region),
-                            }),
-                        ]),
-                        m('fieldset', [
-                            m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3Endpoint() || '',
-                                oninput: withAttr('value', this.values.awsS3Endpoint),
-                            }),
-                            Switch.component({
-                                state: this.values.awsS3UsePathStyleEndpoint() || false,
-                                onchange: this.values.awsS3UsePathStyleEndpoint,
-                            }, app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')),
-                            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
-                            m('input.FormControl', {
-                                value: this.values.awsS3ACL() || '',
-                                oninput: withAttr('value', this.values.awsS3ACL),
-                            }),
-                            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
-                        ]),
-                        Button.component({
-                            type: 'submit',
-                            className: 'Button Button--primary',
-                            loading: this.loading,
-                            disabled: !this.changed(),
-                        }, app.translator.trans('fof-upload.admin.buttons.save')),
-                    ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.client_extension.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.client_extension')),
+                                m('input', {
+                                    className: 'FormControl',
+                                    value: this.values.whitelistedClientExtensions() || '',
+                                    oninput: withAttr('value', this.values.whitelistedClientExtensions),
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.watermark.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.watermark')),
+                                Switch.component(
+                                    {
+                                        state: this.values.addsWatermarks() || false,
+                                        onchange: this.values.addsWatermarks,
+                                    },
+                                    app.translator.trans('fof-upload.admin.labels.watermark.toggle')
+                                ),
+                                m('label', app.translator.trans('fof-upload.admin.labels.watermark.position')),
+                                m('div', [
+                                    Select.component({
+                                        options: this.watermarkPositions,
+                                        onchange: this.values.watermarkPosition,
+                                        value: this.values.watermarkPosition() || 'bottom-right',
+                                    }),
+                                ]),
+                                m('label', {}, app.translator.trans('fof-upload.admin.labels.watermark.file')),
+                                UploadImageButton.component({
+                                    name: 'fof/watermark',
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.disable-hotlink-protection')),
+                                Switch.component(
+                                    {
+                                        state: this.values.disableHotlinkProtection() || false,
+                                        onchange: this.values.disableHotlinkProtection,
+                                    },
+                                    app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.toggle')
+                                ),
+                                m('legend', app.translator.trans('fof-upload.admin.labels.disable-download-logging.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.disable-download-logging')),
+                                Switch.component(
+                                    {
+                                        state: this.values.disableDownloadLogging() || false,
+                                        onchange: this.values.disableDownloadLogging,
+                                    },
+                                    app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')
+                                ),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.local.title')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.local.cdn_url')),
+                                m('input.FormControl', {
+                                    value: this.values.cdnUrl() || '',
+                                    oninput: withAttr('value', this.values.cdnUrl),
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.imgur.title')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.imgur.client_id')),
+                                m('input.FormControl', {
+                                    value: this.values.imgurClientId() || '',
+                                    oninput: withAttr('value', this.values.imgurClientId),
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.qiniu.title')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.qiniu.key')),
+                                m('input.FormControl', {
+                                    value: this.values.qiniuKey() || '',
+                                    oninput: withAttr('value', this.values.qiniuKey),
+                                }),
+                                m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.secret')),
+                                m('input.FormControl', {
+                                    value: this.values.qiniuSecret() || '',
+                                    oninput: withAttr('value', this.values.qiniuSecret),
+                                }),
+                                m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.bucket')),
+                                m('input.FormControl', {
+                                    value: this.values.qiniuBucket() || '',
+                                    oninput: withAttr('value', this.values.qiniuBucket),
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3Key() || '',
+                                    oninput: withAttr('value', this.values.awsS3Key),
+                                }),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3Secret() || '',
+                                    oninput: withAttr('value', this.values.awsS3Secret),
+                                }),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3Bucket() || '',
+                                    oninput: withAttr('value', this.values.awsS3Bucket),
+                                }),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3Region() || '',
+                                    oninput: withAttr('value', this.values.awsS3Region),
+                                }),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3Endpoint() || '',
+                                    oninput: withAttr('value', this.values.awsS3Endpoint),
+                                }),
+                                Switch.component(
+                                    {
+                                        state: this.values.awsS3UsePathStyleEndpoint() || false,
+                                        onchange: this.values.awsS3UsePathStyleEndpoint,
+                                    },
+                                    app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')
+                                ),
+                                m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
+                                m('input.FormControl', {
+                                    value: this.values.awsS3ACL() || '',
+                                    oninput: withAttr('value', this.values.awsS3ACL),
+                                }),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+                            ]),
+                            Button.component(
+                                {
+                                    type: 'submit',
+                                    className: 'Button Button--primary',
+                                    loading: this.loading,
+                                    disabled: !this.changed(),
+                                },
+                                app.translator.trans('fof-upload.admin.buttons.save')
+                            ),
+                        ]
+                    ),
                 ]),
             ]),
         ];
@@ -395,7 +407,7 @@ export default class UploadPage extends ExtensionPage {
     addMimeType() {
         this.values.mimeTypes()[this.newMimeType.regex()] = {
             adapter: this.newMimeType.adapter(),
-            template: this.newMimeType.template()
+            template: this.newMimeType.template(),
         };
 
         this.newMimeType.regex('');
@@ -410,15 +422,9 @@ export default class UploadPage extends ExtensionPage {
      * @returns boolean
      */
     changed() {
-        const fieldsCheck = this.fields.some(
-            key => this.values[key]() !== app.data.settings[this.addPrefix(key)]
-        );
-        const checkboxesCheck = this.checkboxes.some(
-            key => this.values[key]() !== (app.data.settings[this.addPrefix(key)] === '1')
-        );
-        const objectsCheck = this.objects.some(
-            key => JSON.stringify(this.values[key]()) !== (app.data.settings[this.addPrefix(key)])
-        );
+        const fieldsCheck = this.fields.some((key) => this.values[key]() !== app.data.settings[this.addPrefix(key)]);
+        const checkboxesCheck = this.checkboxes.some((key) => this.values[key]() !== (app.data.settings[this.addPrefix(key)] === '1'));
+        const objectsCheck = this.objects.some((key) => JSON.stringify(this.values[key]()) !== app.data.settings[this.addPrefix(key)]);
 
         return fieldsCheck || checkboxesCheck || objectsCheck;
     }
@@ -444,22 +450,17 @@ export default class UploadPage extends ExtensionPage {
         const settings = {};
 
         // gets all the values from the form
-        this.fields.forEach(key => settings[this.addPrefix(key)] = this.values[key]());
-        this.checkboxes.forEach(key => settings[this.addPrefix(key)] = this.values[key]());
-        this.objects.forEach(key => settings[this.addPrefix(key)] = JSON.stringify(this.values[key]()));
+        this.fields.forEach((key) => (settings[this.addPrefix(key)] = this.values[key]()));
+        this.checkboxes.forEach((key) => (settings[this.addPrefix(key)] = this.values[key]()));
+        this.objects.forEach((key) => (settings[this.addPrefix(key)] = JSON.stringify(this.values[key]())));
 
         // actually saves everything in the database
         saveSettings(settings)
             .then(() => {
                 // on success, show popup
-                this.successAlert = app.alerts.show(
-                    Alert,
-                    {type: 'success'},
-                    app.translator.trans('core.admin.basics.saved_message')
-                );
+                this.successAlert = app.alerts.show(Alert, { type: 'success' }, app.translator.trans('core.admin.basics.saved_message'));
             })
-            .catch(() => {
-            })
+            .catch(() => {})
             .then(() => {
                 // return to the initial state and redraw the page
                 this.loading = false;
