@@ -38,4 +38,7 @@ return [
         ->register(Providers\SettingsProvider::class)
         ->register(Providers\StorageServiceProvider::class)
         ->register(Providers\DownloadProvider::class),
+
+    (new Extend\View())
+        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
 ];

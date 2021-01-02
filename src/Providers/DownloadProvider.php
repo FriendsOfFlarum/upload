@@ -19,8 +19,6 @@ class DownloadProvider extends AbstractServiceProvider
             $this->app->make(DefaultDownloader::class)
         );
 
-        $this->loadViewsFrom(__DIR__ . '/../../resources/templates', 'fof-upload.templates');
-
         /** @var Settings $settings */
         $settings = $this->app->make(Settings::class);
 
