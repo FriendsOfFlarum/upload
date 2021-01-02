@@ -4,7 +4,6 @@ namespace FoF\Upload;
 
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Extend;
-use Flarum\Foundation\Application;
 use Flarum\Settings\Event\Deserializing;
 use FoF\Upload\Listeners\AddAvailableOptionsInAdmin;
 
@@ -29,16 +28,14 @@ return [
     new Extenders\ReplaceDeprecatedTemplates(),
     new Extenders\CreateStorageFolder('tmp'),
 
-    function (Application $app) {
-        $app->register(Providers\SettingsProvider::class);
-
-        $app->register(Providers\StorageServiceProvider::class);
-        $app->register(Providers\DownloadProvider::class);
-    },
-
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->mutate(Extenders\AddForumAttributes::class),
 
     (new Extend\Event())
         ->listen(Deserializing::class, AddAvailableOptionsInAdmin::class),
+
+    (new Extend\ServiceProvider())
+        ->register(Providers\SettingsProvider::class)
+        ->register(Providers\StorageServiceProvider::class)
+        ->register(Providers\DownloadProvider::class),
 ];
