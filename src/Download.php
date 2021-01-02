@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload;
 
 use Carbon\Carbon;
@@ -9,16 +19,16 @@ use Flarum\Post\Post;
 use Flarum\User\User;
 
 /**
- * @property int $id
- * @property int $file_id
- * @property File $file
- * @property int $actor_id
- * @property User $actor
- * @property int $discussion_id
+ * @property int        $id
+ * @property int        $file_id
+ * @property File       $file
+ * @property int        $actor_id
+ * @property User       $actor
+ * @property int        $discussion_id
  * @property Discussion $discussion
- * @property int $post_id
- * @property Post $post
- * @property Carbon $downloaded_at
+ * @property int        $post_id
+ * @property Post       $post
+ * @property Carbon     $downloaded_at
  */
 class Download extends AbstractModel
 {

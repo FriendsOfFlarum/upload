@@ -1,36 +1,46 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload;
 
 use Carbon\Carbon;
-use FoF\Upload\Contracts\Template;
-use FoF\Upload\Contracts\UploadAdapter;
 use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\User\User;
+use FoF\Upload\Contracts\Template;
+use FoF\Upload\Contracts\UploadAdapter;
 use Illuminate\Support\Str;
 
 /**
- * @property int $id
- * @property string $base_name
- * @property string $path
- * @property string $url
- * @property string $type
- * @property int $size
- * @property string $uuid
- * @property string $humanSize
- * @property string $upload_method
- * @property string $remote_id
- * @property string $tag
- * @property int $post_id
- * @property Post $post
- * @property int $discussion_id
- * @property Discussion $discussion
- * @property int $actor_id
- * @property User $actor
+ * @property int                                                 $id
+ * @property string                                              $base_name
+ * @property string                                              $path
+ * @property string                                              $url
+ * @property string                                              $type
+ * @property int                                                 $size
+ * @property string                                              $uuid
+ * @property string                                              $humanSize
+ * @property string                                              $upload_method
+ * @property string                                              $remote_id
+ * @property string                                              $tag
+ * @property int                                                 $post_id
+ * @property Post                                                $post
+ * @property int                                                 $discussion_id
+ * @property Discussion                                          $discussion
+ * @property int                                                 $actor_id
+ * @property User                                                $actor
  * @property \Illuminate\Database\Eloquent\Collection|Download[] $downloads
- * @property Carbon $created_at
+ * @property Carbon                                              $created_at
  */
 class File extends AbstractModel
 {

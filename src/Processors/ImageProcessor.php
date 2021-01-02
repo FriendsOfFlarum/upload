@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Processors;
 
 use Flarum\Foundation\Paths;
@@ -26,7 +36,7 @@ class ImageProcessor implements Processable
 
     /**
      * @param Settings $settings
-     * @param Paths $paths
+     * @param Paths    $paths
      */
     public function __construct(Settings $settings, Paths $paths)
     {
@@ -38,7 +48,7 @@ class ImageProcessor implements Processable
      * @param File         $file
      * @param UploadedFile $upload
      */
-    public function process(File $file, UploadedFile $upload, String $mimeType)
+    public function process(File $file, UploadedFile $upload, string $mimeType)
     {
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             try {

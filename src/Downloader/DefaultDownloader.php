@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Downloader;
 
 use Flarum\Foundation\Paths;
@@ -48,13 +58,13 @@ class DefaultDownloader implements Downloader
         if ($file->upload_method === 'local') {
             return $this->retrieveFromLocal($file);
         }
-        
+
         return $this->retrieveFromExternal($file);
     }
 
     private function retrieveFromLocal(File $file): ResponseInterface
     {
-        $file_contents = file_get_contents(app(Paths::class)->public . '/assets/files/' . $file->path);
+        $file_contents = file_get_contents(app(Paths::class)->public.'/assets/files/'.$file->path);
 
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
     }

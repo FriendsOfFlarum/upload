@@ -1,20 +1,30 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Adapters;
 
 use Aws\S3\S3Client;
-use FoF\Upload\Adapters;
-use League\Flysystem\Adapter as FlyAdapters;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use Overtrue\Flysystem\Qiniu\QiniuAdapter;
-use Qiniu\Http\Client as QiniuClient;
 use Flarum\Foundation\Paths;
+use FoF\Upload\Adapters;
 use FoF\Upload\Events\Adapter\Collecting;
 use FoF\Upload\Helpers\Settings;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use League\Flysystem\Adapter as FlyAdapters;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use Overtrue\Flysystem\Qiniu\QiniuAdapter;
+use Qiniu\Http\Client as QiniuClient;
 
 class Manager
 {
@@ -42,9 +52,9 @@ class Manager
     {
         $adapters = Collection::make([
             'aws-s3' => class_exists(S3Client::class),
-            'imgur' => true,
-            'qiniu' => class_exists(QiniuClient::class),
-            'local' => true
+            'imgur'  => true,
+            'qiniu'  => class_exists(QiniuClient::class),
+            'local'  => true,
         ]);
 
         $this->events->dispatch(new Collecting($adapters));
@@ -76,12 +86,12 @@ class Manager
             new AwsS3Adapter(
                 new S3Client([
                     'credentials' => [
-                        'key' => $settings->get('awsS3Key'),
+                        'key'    => $settings->get('awsS3Key'),
                         'secret' => $settings->get('awsS3Secret'),
                     ],
-                    'region' => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
-                    'version' => 'latest',
-                    'endpoint' => empty($settings->get('awsS3Endpoint')) ? null : $settings->get('awsS3Endpoint'),
+                    'region'                  => empty($settings->get('awsS3Region')) ? null : $settings->get('awsS3Region'),
+                    'version'                 => 'latest',
+                    'endpoint'                => empty($settings->get('awsS3Endpoint')) ? null : $settings->get('awsS3Endpoint'),
                     'use_path_style_endpoint' => empty($settings->get('awsS3UsePathStyleEndpoint')) ? null : (bool) $settings->get('awsS3UsePathStyleEndpoint'),
                 ]),
                 $settings->get('awsS3Bucket')
@@ -99,8 +109,8 @@ class Manager
         return new Adapters\Imgur(
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
-                'headers' => [
-                    'Authorization' => 'Client-ID ' . $settings->get('imgurClientId'),
+                'headers'  => [
+                    'Authorization' => 'Client-ID '.$settings->get('imgurClientId'),
                 ],
             ])
         );
@@ -114,12 +124,13 @@ class Manager
     protected function local(Settings $settings)
     {
         return new Adapters\Local(
-            new FlyAdapters\Local($this->paths->public . '/assets/files')
+            new FlyAdapters\Local($this->paths->public.'/assets/files')
         );
     }
 
     /**
-     * @param  Settings $settings
+     * @param Settings $settings
+     *
      * @return Adapters\Qiniu
      */
     protected function qiniu(Settings $settings)

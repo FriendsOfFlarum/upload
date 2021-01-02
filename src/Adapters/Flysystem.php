@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Adapters;
 
 use Carbon\Carbon;
@@ -26,8 +36,8 @@ abstract class Flysystem implements UploadAdapter
         $this->adapter = $adapter;
     }
 
-        /**
-     * Define adapter-specific configuration
+    /**
+     * Define adapter-specific configuration.
      *
      * @return Config
      */
@@ -37,9 +47,9 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
-     * @param string $contents
+     * @param string       $contents
      *
      * @return File
      */
@@ -74,7 +84,7 @@ abstract class Flysystem implements UploadAdapter
             '%s%s%s',
             $today->toDateString(),
             $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
-            $today->timestamp . '-' . $today->micro . '-' . $file->base_name
+            $today->timestamp.'-'.$today->micro.'-'.$file->base_name
         );
     }
 

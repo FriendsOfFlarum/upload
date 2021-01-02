@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Events\File;
 
-use FoF\Upload\File;
 use Flarum\User\User;
+use FoF\Upload\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Event
@@ -24,8 +34,7 @@ abstract class Event
     public $uploadedFile;
 
     /**
-     *
-     * @var String
+     * @var string
      */
     public $mime;
 
@@ -34,7 +43,7 @@ abstract class Event
      * @param File         $file
      * @param UploadedFile $uploadedFile
      */
-    public function __construct(User $actor, File $file, UploadedFile $uploadedFile, String $mime)
+    public function __construct(User $actor, File $file, UploadedFile $uploadedFile, string $mime)
     {
         $this->actor = $actor;
         $this->file = $file;

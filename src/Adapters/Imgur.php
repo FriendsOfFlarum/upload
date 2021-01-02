@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Adapters;
 
 use FoF\Upload\Contracts\UploadAdapter;
@@ -44,9 +54,9 @@ class Imgur implements UploadAdapter
     /**
      * Attempt to upload to the (remote) filesystem.
      *
-     * @param File $file
+     * @param File         $file
      * @param UploadedFile $upload
-     * @param string $contents
+     * @param string       $contents
      *
      * @return File|bool
      */
@@ -55,11 +65,11 @@ class Imgur implements UploadAdapter
         $response = $this->api->post('upload', [
             'multipart' => [
                 [
-                    'name' => 'type',
+                    'name'     => 'type',
                     'contents' => 'file',
                 ],
                 [
-                    'name' => 'image',
+                    'name'     => 'image',
                     'contents' => $contents,
                     'filename' => $file->base_name,
                 ],

@@ -1,16 +1,26 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Commands;
 
 use Exception;
+use Flarum\Foundation\Application;
+use Flarum\Foundation\ValidationException;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Repositories\FileRepository;
-use Flarum\Foundation\Application;
-use Flarum\Foundation\ValidationException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\UploadedFileInterface;
@@ -60,8 +70,9 @@ class UploadHandler
     /**
      * @param Upload $command
      *
-     * @return \Illuminate\Support\Collection
      * @throws \Flarum\User\Exception\PermissionDeniedException
+     *
+     * @return \Illuminate\Support\Collection
      */
     public function handle(Upload $command)
     {

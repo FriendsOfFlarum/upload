@@ -1,11 +1,21 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Extenders;
 
-use FoF\Upload\Contracts\TextFormatterTemplate;
-use FoF\Upload\Helpers\Settings;
 use Flarum\Extend\Formatter;
 use Flarum\Extension\Extension;
+use FoF\Upload\Contracts\TextFormatterTemplate;
+use FoF\Upload\Helpers\Settings;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use s9e\TextFormatter\Configurator;
@@ -27,8 +37,8 @@ class AddPostDownloadTags extends Formatter
     }
 
     /**
-     * @param Configurator $configurator
-     * @param string $name
+     * @param Configurator          $configurator
+     * @param string                $name
      * @param TextFormatterTemplate $template
      */
     protected function createTag(Configurator $configurator, string $name, TextFormatterTemplate $template)

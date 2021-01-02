@@ -1,10 +1,20 @@
 <?php
 
+/*
+ * This file is part of fof/follow-tags.
+ *
+ * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2016 - 2019 Flagrow
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Helpers;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
-use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -34,17 +44,17 @@ class Settings
 
     public function __get($name)
     {
-        return $this->settings->get($this->prefix . $name);
+        return $this->settings->get($this->prefix.$name);
     }
 
     public function __set($name, $value)
     {
-        $this->settings->set($this->prefix . $name, $value);
+        $this->settings->set($this->prefix.$name, $value);
     }
 
     public function __isset($name)
     {
-        return $this->settings->get($this->prefix . $name) !== null;
+        return $this->settings->get($this->prefix.$name) !== null;
     }
 
     /**
@@ -71,7 +81,7 @@ class Settings
                 return $available;
             })
             ->map(function ($available, $item) {
-                return app('translator')->trans('fof-upload.admin.upload_methods.' . $item);
+                return app('translator')->trans('fof-upload.admin.upload_methods.'.$item);
             });
     }
 
@@ -149,7 +159,7 @@ class Settings
          */
         foreach ($this->renderTemplates as $tag => $template) {
             $collect[$tag] = [
-                'name' => $template->name(),
+                'name'        => $template->name(),
                 'description' => $template->description(),
             ];
         }
