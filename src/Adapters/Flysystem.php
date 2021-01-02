@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of fof/follow-tags.
+ * This file is part of fof/upload.
  *
  * Copyright (c) 2020 FriendsOfFlarum.
  * Copyright (c) 2016 - 2019 Flagrow
