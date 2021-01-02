@@ -20,11 +20,18 @@ class ImageProcessor implements Processable
     protected $settings;
 
     /**
-     * @param Settings $settings
+     * @var Paths
      */
-    public function __construct(Settings $settings)
+    protected $paths;
+
+    /**
+     * @param Settings $settings
+     * @param Paths $paths
+     */
+    public function __construct(Settings $settings, Paths $paths)
     {
         $this->settings = $settings;
+        $this->paths = $paths;
     }
 
     /**
@@ -80,7 +87,7 @@ class ImageProcessor implements Processable
     {
         if ($this->settings->get('watermark')) {
             $image->insert(
-                app(Paths::class)->storage.DIRECTORY_SEPARATOR.$this->settings->get('watermark'),
+                $this->paths->storage.DIRECTORY_SEPARATOR.$this->settings->get('watermark'),
                 $this->settings->get('watermarkPosition', 'bottom-right')
             );
         }

@@ -5,7 +5,7 @@ namespace FoF\Upload;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Extend;
 use Flarum\Settings\Event\Deserializing;
-use FoF\Upload\Listeners\AddAvailableOptionsInAdmin;
+use FoF\Upload\Events\File\WillBeUploaded;
 
 return [
     (new Extend\Routes('api'))
@@ -23,16 +23,15 @@ return [
         ->js(__DIR__ . '/js/dist/forum.js'),
     new Extend\Locales(__DIR__ . '/resources/locale'),
 
-    new Extenders\AddImageProcessor(),
     new Extenders\AddPostDownloadTags(),
-    new Extenders\ReplaceDeprecatedTemplates(),
     new Extenders\CreateStorageFolder('tmp'),
 
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->mutate(Extenders\AddForumAttributes::class),
 
     (new Extend\Event())
-        ->listen(Deserializing::class, AddAvailableOptionsInAdmin::class),
+        ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
+        ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
     (new Extend\ServiceProvider())
         ->register(Providers\SettingsProvider::class)
@@ -41,4 +40,7 @@ return [
 
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
+
+    (new Extend\Formatter())
+        ->parse(Formatter\ReplaceDeprecatedTemplates::class),
 ];
