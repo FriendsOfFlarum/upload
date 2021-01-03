@@ -15,11 +15,12 @@ namespace FoF\Upload\Commands;
 use Exception;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
+use Flarum\Locale\Translator;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
-use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Util;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -35,9 +36,9 @@ class UploadHandler
     protected $app;
 
     /**
-     * @var Settings
+     * @var Util
      */
-    protected $settings;
+    protected $util;
 
     /**
      * @var Dispatcher
@@ -53,18 +54,25 @@ class UploadHandler
      */
     protected $mimeDetector;
 
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
     public function __construct(
         Application $app,
         Dispatcher $events,
-        Settings $settings,
+        Util $util,
         FileRepository $files,
-        MimeDetector $mimeDetector
+        MimeDetector $mimeDetector,
+        Translator $translator
     ) {
         $this->app = $app;
-        $this->settings = $settings;
+        $this->util = $util;
         $this->events = $events;
         $this->files = $files;
         $this->mimeDetector = $mimeDetector;
+        $this->translator = $translator;
     }
 
     /**
@@ -85,7 +93,7 @@ class UploadHandler
                 try {
                     $this->mimeDetector->setFile($upload->getPathname());
                 } catch (MimeDetectorException $e) {
-                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
+                    throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                 }
 
                 $uploadFileData = $this->mimeDetector->getFileType();
@@ -94,7 +102,7 @@ class UploadHandler
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
                     } catch (Exception $e) {
-                        throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
+                        throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                     }
                 }
 
@@ -107,7 +115,7 @@ class UploadHandler
                 );
 
                 if (!$adapter) {
-                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.forbidden_type')]);
+                    throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.forbidden_type')]);
                 }
 
                 if (!$adapter->forMime($uploadFileData['mime'])) {
@@ -182,7 +190,7 @@ class UploadHandler
 
     protected function getTemplate($template)
     {
-        return $this->settings->getTemplate($template);
+        return $this->util->getTemplate($template);
     }
 
     /**
@@ -192,7 +200,7 @@ class UploadHandler
      */
     protected function getMimeConfiguration($mime)
     {
-        return $this->settings->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
+        return $this->util->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
             return preg_match("/$regex/", $mime);
         });
     }

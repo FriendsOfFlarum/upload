@@ -13,18 +13,18 @@
 namespace FoF\Upload\Adapters;
 
 use Flarum\Foundation\ValidationException;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
-use FoF\Upload\Helpers\Settings;
 
 class Qiniu extends Flysystem implements UploadAdapter
 {
     protected function generateUrl(File $file)
     {
-        /** @var Settings $settings */
-        $settings = app()->make(Settings::class);
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = app(SettingsRepositoryInterface::class);
         $path = $file->getAttribute('path');
-        if ($cdnUrl = $settings->get('cdnUrl')) {
+        if ($cdnUrl = $settings->get('fof-upload.cdnUrl')) {
             $file->url = sprintf('%s/%s', $cdnUrl, $path);
         } else {
             throw new ValidationException(['upload' => 'QiNiu cloud CDN address is not configured.']);

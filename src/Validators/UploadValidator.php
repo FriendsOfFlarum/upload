@@ -13,19 +13,20 @@
 namespace FoF\Upload\Validators;
 
 use Flarum\Foundation\AbstractValidator;
-use FoF\Upload\Helpers\Settings;
+use Flarum\Settings\SettingsRepositoryInterface;
+use FoF\Upload\Helpers\Util;
 
 class UploadValidator extends AbstractValidator
 {
     protected function getRules()
     {
-        /** @var Settings $settings */
-        $settings = app(Settings::class);
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = app(SettingsRepositoryInterface::class);
 
         return [
             'file' => [
                 'required',
-                'max:'.$settings->get('maxFileSize', Settings::DEFAULT_MAX_FILE_SIZE),
+                'max:'.$settings->get('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE),
             ],
         ];
     }

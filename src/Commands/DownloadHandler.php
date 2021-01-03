@@ -13,11 +13,11 @@
 namespace FoF\Upload\Commands;
 
 use Flarum\Discussion\DiscussionRepository;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\Downloader;
 use FoF\Upload\Events\File\WasLoaded;
 use FoF\Upload\Events\File\WillBeDownloaded;
 use FoF\Upload\Exceptions\InvalidDownloadException;
-use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Repositories\FileRepository;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -45,11 +45,11 @@ class DownloadHandler
      */
     private $events;
     /**
-     * @var Settings
+     * @var SettingsRepositoryInterface
      */
     private $settings;
 
-    public function __construct(FileRepository $files, DiscussionRepository $discussions, Client $api, Dispatcher $events, Settings $settings)
+    public function __construct(FileRepository $files, DiscussionRepository $discussions, Client $api, Dispatcher $events, SettingsRepositoryInterface $settings)
     {
         $this->files = $files;
         $this->discussions = $discussions;
@@ -91,7 +91,7 @@ class DownloadHandler
 
                 $download = null;
 
-                if ($this->settings->get('disableDownloadLogging') != 1) {
+                if ($this->settings->get('fof-upload.disableDownloadLogging') != 1) {
                     $download = $this->files->downloadedEntry($file, $command);
                 }
 

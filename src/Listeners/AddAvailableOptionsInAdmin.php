@@ -13,23 +13,23 @@
 namespace FoF\Upload\Listeners;
 
 use Flarum\Settings\Event\Deserializing;
-use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Util;
 
 class AddAvailableOptionsInAdmin
 {
     /**
-     * @var Settings
+     * @var Util
      */
-    protected $settings;
+    protected $util;
 
-    public function __construct(Settings $settings)
+    public function __construct(Util $util)
     {
-        $this->settings = $settings;
+        $this->util = $util;
     }
 
     public function handle(Deserializing $event)
     {
-        $event->settings['fof-upload.availableUploadMethods'] = $this->settings->getAvailableUploadMethods()->toArray();
-        $event->settings['fof-upload.availableTemplates'] = $this->settings->getAvailableTemplates()->toArray();
+        $event->settings['fof-upload.availableUploadMethods'] = $this->util->getAvailableUploadMethods()->toArray();
+        $event->settings['fof-upload.availableTemplates'] = $this->util->getAvailableTemplates()->toArray();
     }
 }

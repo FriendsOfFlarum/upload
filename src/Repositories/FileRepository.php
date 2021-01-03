@@ -14,13 +14,13 @@ namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
 use Flarum\Foundation\Paths;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
-use FoF\Upload\Helpers\Settings;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -47,11 +47,11 @@ class FileRepository
      */
     private $mimeDetector;
     /**
-     * @var Settings
+     * @var SettingsRepositoryInterface
      */
     private $settings;
 
-    public function __construct(Paths $paths, UploadValidator $validator, MimeDetector $mimeDetector, Settings $settings)
+    public function __construct(Paths $paths, UploadValidator $validator, MimeDetector $mimeDetector, SettingsRepositoryInterface $settings)
     {
         $this->path = $paths->storage;
         $this->validator = $validator;
@@ -198,7 +198,7 @@ class FileRepository
      */
     protected function determineExtension(Upload $upload): string
     {
-        $whitelistedClientExtensions = explode(',', $this->settings->get('whitelistedClientExtensions', ''));
+        $whitelistedClientExtensions = explode(',', $this->settings->get('fof-upload.whitelistedClientExtensions', ''));
 
         $originalClientExtension = $upload->getClientOriginalExtension();
 

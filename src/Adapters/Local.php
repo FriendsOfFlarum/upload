@@ -14,9 +14,9 @@ namespace FoF\Upload\Adapters;
 
 use Flarum\Foundation\Paths;
 use Flarum\Http\UrlGenerator;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
-use FoF\Upload\Helpers\Settings;
 
 class Local extends Flysystem implements UploadAdapter
 {
@@ -46,13 +46,13 @@ class Local extends Flysystem implements UploadAdapter
             $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
-        /** @var Settings $settings */
-        $settings = app()->make(Settings::class);
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = app(SettingsRepositoryInterface::class);
         /** @var UrlGenerator $generator */
-        $generator = app()->make(UrlGenerator::class);
+        $generator = app(UrlGenerator::class);
 
-        if ($settings->get('cdnUrl')) {
-            $file->url = $settings->get('cdnUrl').$file->url;
+        if ($settings->get('fof-upload.cdnUrl')) {
+            $file->url = $settings->get('fof-upload.cdnUrl').$file->url;
         } else {
             $file->url = $generator->to('forum')->path(ltrim($file->url, '/'));
         }

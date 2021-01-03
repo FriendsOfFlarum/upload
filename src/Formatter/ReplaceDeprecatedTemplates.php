@@ -12,7 +12,7 @@
 
 namespace FoF\Upload\Formatter;
 
-use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Util;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Parser;
 
@@ -25,18 +25,18 @@ use s9e\TextFormatter\Parser;
 class ReplaceDeprecatedTemplates
 {
     /**
-     * @var Settings
+     * @var Util
      */
-    protected $settings;
+    protected $util;
 
     /**
      * @var FileRepository
      */
     protected $repository;
 
-    public function __construct(Settings $settings, FileRepository $repository)
+    public function __construct(Util $util, FileRepository $repository)
     {
-        $this->settings = $settings;
+        $this->Util = $util;
         $this->repository = $repository;
     }
 
@@ -51,9 +51,9 @@ class ReplaceDeprecatedTemplates
             }
 
             if ($matches[1] === 'file') {
-                $template = $this->settings->getTemplate('file');
+                $template = $this->util->getTemplate('file');
             } else {
-                $template = $this->settings->getTemplate('image');
+                $template = $this->util->getTemplate('image');
             }
 
             return $template->preview($file);

@@ -15,7 +15,7 @@ namespace FoF\Upload\Extenders;
 use Flarum\Extend\Formatter;
 use Flarum\Extension\Extension;
 use FoF\Upload\Contracts\TextFormatterTemplate;
-use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use s9e\TextFormatter\Configurator;
@@ -26,7 +26,7 @@ class AddPostDownloadTags extends Formatter
     public function extend(Container $container, Extension $extension = null)
     {
         $this->configure(function (Configurator $configurator) use ($container) {
-            foreach ($container->make(Settings::class)->getRenderTemplates() as $name => $template) {
+            foreach ($container->make(Util::class)->getRenderTemplates() as $name => $template) {
                 if ($template instanceof TextFormatterTemplate) {
                     $this->createTag($configurator, $name, $template);
                 }

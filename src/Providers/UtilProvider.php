@@ -13,12 +13,12 @@
 namespace FoF\Upload\Providers;
 
 use Flarum\Foundation\AbstractServiceProvider;
-use FoF\Upload\Helpers\Settings;
+use FoF\Upload\Helpers\Util;
 
-class SettingsProvider extends AbstractServiceProvider
+class UtilProvider extends AbstractServiceProvider
 {
     public function register()
     {
-        $this->app->singleton(Settings::class);
+        $this->app->singleton(Util::class);
     }
 }

@@ -44,7 +44,7 @@ return [
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
     (new Extend\ServiceProvider())
-        ->register(Providers\SettingsProvider::class)
+        ->register(Providers\UtilProvider::class)
         ->register(Providers\StorageServiceProvider::class)
         ->register(Providers\DownloadProvider::class),
 

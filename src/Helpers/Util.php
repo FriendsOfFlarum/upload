@@ -12,13 +12,12 @@
 
 namespace FoF\Upload\Helpers;
 
-use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-class Settings
+class Util
 {
     const DEFAULT_MAX_FILE_SIZE = 2048;
     const DEFAULT_MAX_IMAGE_WIDTH = 100;
@@ -29,44 +28,6 @@ class Settings
      * @var array
      */
     protected $renderTemplates = [];
-
-    protected $prefix = 'fof-upload.';
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    public function __construct(SettingsRepositoryInterface $settings)
-    {
-        $this->settings = $settings;
-    }
-
-    public function __get($name)
-    {
-        return $this->settings->get($this->prefix.$name);
-    }
-
-    public function __set($name, $value)
-    {
-        $this->settings->set($this->prefix.$name, $value);
-    }
-
-    public function __isset($name)
-    {
-        return $this->settings->get($this->prefix.$name) !== null;
-    }
-
-    /**
-     * @param $name
-     * @param null $default
-     *
-     * @return null
-     */
-    public function get($name, $default = null)
-    {
-        return $this->{$name} ?: $default;
-    }
 
     /**
      * @return Collection
@@ -154,7 +115,6 @@ class Settings
         $collect = [];
 
         /**
-         * @var string
          * @var Template $template
          */
         foreach ($this->renderTemplates as $tag => $template) {

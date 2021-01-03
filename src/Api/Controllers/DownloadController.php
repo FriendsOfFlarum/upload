@@ -13,9 +13,9 @@
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Post\PostRepository;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\Commands\Download;
-use FoF\Upload\Helpers\Settings;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -37,11 +37,11 @@ class DownloadController implements RequestHandlerInterface
      */
     private $posts;
     /**
-     * @var Settings
+     * @var SettingsRepositoryInterface
      */
     private $settings;
 
-    public function __construct(Dispatcher $bus, PostRepository $posts, Settings $settings)
+    public function __construct(Dispatcher $bus, PostRepository $posts, SettingsRepositoryInterface $settings)
     {
         $this->bus = $bus;
         $this->posts = $posts;
@@ -66,7 +66,7 @@ class DownloadController implements RequestHandlerInterface
         /** @var Session $session */
         $session = $request->getAttribute('session');
 
-        if ($this->settings->get('disableHotlinkProtection') != 1 && $csrf !== $session->token()) {
+        if ($this->settings->get('fof-upload.disableHotlinkProtection') != 1 && $csrf !== $session->token()) {
             throw new ModelNotFoundException();
         }
 
