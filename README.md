@@ -15,6 +15,35 @@ An extension that handles file uploads intelligently for your forum.
 - Drag and drop uploads.
 - Uploading multiple files at once (button and drag and drop both support this).
 - Easily extendable, the extension heavily relies on Events.
+- Extender interface to disable or force particular adaptors (see below)
+
+## Disable or Force a particular adaptor
+In some circumstances, you may wish to either disable an adaptor, or force the use of one. This is set in your root `extend.php` file.
+
+For example, you may disable `imgur`
+```
+(new FoF\Upload\Extend\Adapters())
+        ->disable('imgur'),
+```
+
+Chaining of multiple commands is also possible:
+```
+(new FoF\Upload\Extend\Adapters())
+        ->disable('imgur')
+        ->disable('aws-s3'),
+```
+
+You may also force an adaptor:
+```
+(new FoF\Upload\Extend\Adapters())
+        ->force('imgur'),
+```
+
+Adaptor names currently available:
+- `local`
+- `imgur`
+- `qiniu`
+- `aws-s3`
 
 ## Installation
 
