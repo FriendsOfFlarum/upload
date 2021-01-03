@@ -8,6 +8,7 @@ import UploadImageButton from 'flarum/components/UploadImageButton';
 import withAttr from 'flarum/utils/withAttr';
 import Stream from 'flarum/utils/Stream';
 import ExtensionPage from 'flarum/components/ExtensionPage';
+import ItemList from 'flarum/utils/ItemList';
 
 /* global m */
 
@@ -119,6 +120,8 @@ export default class UploadPage extends ExtensionPage {
                                 m('input.FormControl', {
                                     value: this.values.maxFileSize() || 2048,
                                     oninput: withAttr('value', this.values.maxFileSize),
+                                    type: 'number',
+                                    min: '0',
                                 }),
                                 m('label', app.translator.trans('fof-upload.admin.labels.preferences.mime_types')),
                                 m(
@@ -206,6 +209,8 @@ export default class UploadPage extends ExtensionPage {
                                     value: this.values.resizeMaxWidth() || 100,
                                     oninput: withAttr('value', this.values.resizeMaxWidth),
                                     disabled: !this.values.mustResize(),
+                                    type: 'number',
+                                    min: '0',
                                 }),
                             ]),
                             m('fieldset', [
@@ -268,89 +273,8 @@ export default class UploadPage extends ExtensionPage {
                                     oninput: withAttr('value', this.values.cdnUrl),
                                 }),
                             ]),
-                            this.uploadMethodOptions['imgur'] !== undefined
-                                ? m('.imgur', [
-                                      m('fieldset', [
-                                          m('legend', app.translator.trans('fof-upload.admin.labels.imgur.title')),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.imgur.client_id')),
-                                          m('input.FormControl', {
-                                              value: this.values.imgurClientId() || '',
-                                              oninput: withAttr('value', this.values.imgurClientId),
-                                          }),
-                                      ]),
-                                  ])
-                                : '',
-                            this.uploadMethodOptions['qiniu'] !== undefined
-                                ? m('.qiniu', [
-                                      m('fieldset', [
-                                          m('legend', app.translator.trans('fof-upload.admin.labels.qiniu.title')),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.qiniu.key')),
-                                          m('input.FormControl', {
-                                              value: this.values.qiniuKey() || '',
-                                              oninput: withAttr('value', this.values.qiniuKey),
-                                          }),
-                                          m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.secret')),
-                                          m('input.FormControl', {
-                                              value: this.values.qiniuSecret() || '',
-                                              oninput: withAttr('value', this.values.qiniuSecret),
-                                          }),
-                                          m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.bucket')),
-                                          m('input.FormControl', {
-                                              value: this.values.qiniuBucket() || '',
-                                              oninput: withAttr('value', this.values.qiniuBucket),
-                                          }),
-                                      ]),
-                                  ])
-                                : '',
-                            this.uploadMethodOptions['aws-s3'] !== undefined
-                                ? m('.aws', [
-                                      m('fieldset', [
-                                          m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3Key() || '',
-                                              oninput: withAttr('value', this.values.awsS3Key),
-                                          }),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3Secret() || '',
-                                              oninput: withAttr('value', this.values.awsS3Secret),
-                                          }),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3Bucket() || '',
-                                              oninput: withAttr('value', this.values.awsS3Bucket),
-                                          }),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3Region() || '',
-                                              oninput: withAttr('value', this.values.awsS3Region),
-                                          }),
-                                      ]),
-                                      m('fieldset', [
-                                          m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
-                                          m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3Endpoint() || '',
-                                              oninput: withAttr('value', this.values.awsS3Endpoint),
-                                          }),
-                                          Switch.component(
-                                              {
-                                                  state: this.values.awsS3UsePathStyleEndpoint() || false,
-                                                  onchange: this.values.awsS3UsePathStyleEndpoint,
-                                              },
-                                              app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')
-                                          ),
-                                          m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
-                                          m('input.FormControl', {
-                                              value: this.values.awsS3ACL() || '',
-                                              oninput: withAttr('value', this.values.awsS3ACL),
-                                          }),
-                                          m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
-                                      ]),
-                                  ])
-                                : '',
+
+                            this.adaptorItems().toArray(),
 
                             Button.component(
                                 {
@@ -366,6 +290,107 @@ export default class UploadPage extends ExtensionPage {
                 ]),
             ]),
         ];
+    }
+
+    adaptorItems() {
+        const items = new ItemList();
+
+        if (this.uploadMethodOptions['imgur'] !== undefined) {
+            items.add(
+                'imgur',
+                m('.imgur', [
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.imgur.title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imgur.client_id')),
+                        m('input.FormControl', {
+                            value: this.values.imgurClientId() || '',
+                            oninput: withAttr('value', this.values.imgurClientId),
+                        }),
+                    ]),
+                ])
+            );
+        }
+
+        if (this.uploadMethodOptions['qiniu'] !== undefined) {
+            items.add(
+                'qiniu',
+                m('.qiniu', [
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.qiniu.title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.qiniu.key')),
+                        m('input.FormControl', {
+                            value: this.values.qiniuKey() || '',
+                            oninput: withAttr('value', this.values.qiniuKey),
+                        }),
+                        m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.secret')),
+                        m('input.FormControl', {
+                            value: this.values.qiniuSecret() || '',
+                            oninput: withAttr('value', this.values.qiniuSecret),
+                        }),
+                        m('label', {}, app.translator.trans('fof-upload.admin.labels.qiniu.bucket')),
+                        m('input.FormControl', {
+                            value: this.values.qiniuBucket() || '',
+                            oninput: withAttr('value', this.values.qiniuBucket),
+                        }),
+                    ]),
+                ])
+            );
+        }
+
+        if (this.uploadMethodOptions['aws-s3'] !== undefined) {
+            items.add(
+                'aws-s3',
+                m('.aws', [
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3Key() || '',
+                            oninput: withAttr('value', this.values.awsS3Key),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3Secret() || '',
+                            oninput: withAttr('value', this.values.awsS3Secret),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3Bucket() || '',
+                            oninput: withAttr('value', this.values.awsS3Bucket),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3Region() || '',
+                            oninput: withAttr('value', this.values.awsS3Region),
+                        }),
+                    ]),
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
+                        m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3Endpoint() || '',
+                            oninput: withAttr('value', this.values.awsS3Endpoint),
+                        }),
+                        Switch.component(
+                            {
+                                state: this.values.awsS3UsePathStyleEndpoint() || false,
+                                onchange: this.values.awsS3UsePathStyleEndpoint,
+                            },
+                            app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')
+                        ),
+                        m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
+                        m('input.FormControl', {
+                            value: this.values.awsS3ACL() || '',
+                            oninput: withAttr('value', this.values.awsS3ACL),
+                        }),
+                        m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+                    ]),
+                ])
+            );
+        }
+
+        return items;
     }
 
     getTemplateOptionsForInput() {

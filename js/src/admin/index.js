@@ -1,6 +1,8 @@
 import app from 'flarum/app';
 import UploadPage from './components/UploadPage';
 
+export * from './components';
+
 app.initializers.add('fof-upload', (app) => {
     app.extensionData
         .for('fof-upload')
