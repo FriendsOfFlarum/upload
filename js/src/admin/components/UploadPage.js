@@ -71,7 +71,6 @@ export default class UploadPage extends ExtensionPage {
         this.uploadMethodOptions = settings[this.addPrefix('availableUploadMethods')] || {};
         // Options for the Template dropdown menu.
         this.templateOptions = settings[this.addPrefix('availableTemplates')] || {};
-        console.log(this.uploadMethodOptions);
         // Contains current values.
         this.values = {};
         // bind the values of the fields and checkboxes to the getter/setter functions
