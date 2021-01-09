@@ -25,7 +25,7 @@ export default class UploadButton extends Component {
             "button.Button.hasIcon.fof-upload-button.Button--icon",
             {
                 className: this.attrs.uploader.uploading ? "uploading" : "",
-                onclick: (e) => this.uploadButtonClicked(e, this),
+                onclick: this.uploadButtonClicked.bind(this),
             },
             [
                 this.attrs.uploader.uploading
@@ -62,11 +62,10 @@ export default class UploadButton extends Component {
      * Event handler for upload button being clicked
      *
      * @param {PointerEvent} e
-     * @param that Pass-through of `this` from component
      */
-    uploadButtonClicked(e, that) {
+    uploadButtonClicked(e) {
         // Trigger click on hidden input element
         // (Opens file dialog)
-        that.$("input").click();
+        this.$("input").click();
     }
 }
