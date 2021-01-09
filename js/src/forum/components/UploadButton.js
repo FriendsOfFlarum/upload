@@ -1,15 +1,15 @@
-import app from 'flarum/app';
-import Component from 'flarum/Component';
-import icon from 'flarum/helpers/icon';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import app from "flarum/app";
+import Component from "flarum/Component";
+import icon from "flarum/helpers/icon";
+import LoadingIndicator from "flarum/components/LoadingIndicator";
 
 export default class UploadButton extends Component {
     oninit(vnode) {
         super.oninit(vnode);
 
-        this.attrs.uploader.on('uploaded', () => {
+        this.attrs.uploader.on("uploaded", () => {
             // reset the button for a new upload
-            this.$('form')[0].reset();
+            this.$("form")[0].reset();
 
             // redraw to reflect uploader.loading in the DOM
             m.redraw();
@@ -18,25 +18,26 @@ export default class UploadButton extends Component {
 
     view() {
         const buttonText = this.attrs.uploader.uploading
-            ? app.translator.trans('fof-upload.forum.states.loading')
-            : app.translator.trans('fof-upload.forum.buttons.attach');
+            ? app.translator.trans("fof-upload.forum.states.loading")
+            : app.translator.trans("fof-upload.forum.buttons.attach");
 
         return m(
-            '.Button.hasIcon.fof-upload-button.Button--icon',
+            ".Button.hasIcon.fof-upload-button.Button--icon",
             {
-                className: this.attrs.uploader.uploading ? 'uploading' : '',
+                className: this.attrs.uploader.uploading ? "uploading" : "",
+                onclick: (e) => this.uploadButtonClicked(e, this),
             },
             [
                 this.attrs.uploader.uploading
                     ? LoadingIndicator.component({
-                          size: 'tiny',
-                          className: 'LoadingIndicator--inline Button-icon',
+                          size: "tiny",
+                          className: "LoadingIndicator--inline Button-icon",
                       })
-                    : icon('fas fa-file-upload', { className: 'Button-icon' }),
-                m('span.Button-label', buttonText),
-                m('form', [
-                    m('input', {
-                        type: 'file',
+                    : icon("fas fa-file-upload", { className: "Button-icon" }),
+                m("span.Button-label", buttonText),
+                m("form", [
+                    m("input", {
+                        type: "file",
                         multiple: true,
                         onchange: this.process.bind(this),
                     }),
@@ -52,8 +53,20 @@ export default class UploadButton extends Component {
      */
     process(e) {
         // get the file from the input field
-        const files = this.$('input').prop('files');
+        const files = this.$("input").prop("files");
 
         this.attrs.uploader.upload(files);
+    }
+
+    /**
+     * Event handler for upload button being clicked
+     *
+     * @param {PointerEvent} e
+     * @param that Pass-through of `this` from component
+     */
+    uploadButtonClicked(e, that) {
+        // Trigger click on hidden input element
+        // (Opens file dialog)
+        that.$("input").click();
     }
 }
