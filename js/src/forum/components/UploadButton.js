@@ -22,7 +22,7 @@ export default class UploadButton extends Component {
             : app.translator.trans("fof-upload.forum.buttons.attach");
 
         return m(
-            ".Button.hasIcon.fof-upload-button.Button--icon",
+            "button.Button.hasIcon.fof-upload-button.Button--icon",
             {
                 className: this.attrs.uploader.uploading ? "uploading" : "",
                 onclick: (e) => this.uploadButtonClicked(e, this),
