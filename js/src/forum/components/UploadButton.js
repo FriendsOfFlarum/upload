@@ -54,6 +54,13 @@ export default class UploadButton extends Component {
         // get the file from the input field
         const files = this.$('input').prop('files');
 
+        if (files.length === 0) {
+            // We've got no files to upload, so trying
+            // to begin an upload will show an error
+            // to the user.
+            return;
+        }
+
         this.attrs.uploader.upload(files);
     }
 }
