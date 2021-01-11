@@ -3,7 +3,7 @@
 /*
  * This file is part of fof/upload.
  *
- * Copyright (c) 2020 FriendsOfFlarum.
+ * Copyright (c) 2020 - 2021 FriendsOfFlarum.
  * Copyright (c) 2016 - 2019 Flagrow
  *
  * For the full copyright and license information, please view the LICENSE.md
@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Helpers;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
 use Illuminate\Support\Arr;
@@ -53,10 +54,8 @@ class Util
      *
      * @return Collection|mixed|null
      */
-    public function getJsonValue($field, $default = null, $attribute = null)
+    public function getJsonValue($json, $default = null, $attribute = null)
     {
-        $json = $this->{$field};
-
         if (empty($json)) {
             return $default;
         }
@@ -75,10 +74,13 @@ class Util
      */
     public function getMimeTypesConfiguration()
     {
+        $settings = app(SettingsRepositoryInterface::class);
+        $mimeTypes = $settings->get('fof-upload.mimeTypes');
+
         $adapters = $this->getAvailableUploadMethods();
 
         return $this->getJsonValue(
-            'mimeTypes',
+            $mimeTypes,
             collect(['^image\/.*' => ['adapter' => $adapters->flip()->last(), 'template' => 'image-preview']])
         )->filter();
     }
