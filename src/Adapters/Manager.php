@@ -17,6 +17,7 @@ use Flarum\Foundation\Paths;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters;
 use FoF\Upload\Events\Adapter\Collecting;
+use FoF\Upload\Events\Adapter\Instantiate;
 use FoF\Upload\Helpers\Util;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -78,7 +79,8 @@ class Manager
             ->map(function ($_, $adapter) {
                 $method = Str::camel($adapter);
 
-                return $this->{$method}($this->util);
+                return $this->events->until(new Instantiate($adapter, $this->util))
+                    ?? $this->{$method}($this->util);
             });
     }
 
