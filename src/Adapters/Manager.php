@@ -95,7 +95,9 @@ class Manager
      */
     protected function awsS3(Util $util)
     {
-       if (! $this->settings->get('fof-upload.awsS3Key')) return null;
+        if (!$this->settings->get('fof-upload.awsS3Key')) {
+            return null;
+        }
 
         return new Adapters\AwsS3(
             new AwsS3Adapter(
@@ -121,8 +123,10 @@ class Manager
      */
     protected function imgur(Util $util)
     {
-        if (! $this->settings->get('fof-upload.imgurClientId')) return null;
-        
+        if (!$this->settings->get('fof-upload.imgurClientId')) {
+            return null;
+        }
+
         return new Adapters\Imgur(
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
@@ -152,7 +156,9 @@ class Manager
      */
     protected function qiniu(Util $util)
     {
-        if (! $this->settings->get('fof-upload.qiniuKey')) return null;
+        if (!$this->settings->get('fof-upload.qiniuKey')) {
+            return null;
+        }
 
         $client = new QiniuAdapter(
             $this->settings->get('fof-upload.qiniuKey'),
