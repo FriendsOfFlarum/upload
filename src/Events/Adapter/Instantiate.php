@@ -16,8 +16,10 @@ use FoF\Upload\Helpers\Util;
 
 class Instantiate
 {
-    public string $adapter;
-    public Util $util;
+    /** @var string  */
+    public $adapter;
+    /** @var Util  */
+    public $util;
 
     public function __construct(string $adapter, Util $util)
     {
