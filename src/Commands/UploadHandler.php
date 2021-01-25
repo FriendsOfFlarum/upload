@@ -185,7 +185,7 @@ class UploadHandler
         /** @var Manager $manager */
         $manager = app(Manager::class);
 
-        return $manager->instantiate()->get($adapter);
+        return $manager->instantiate($adapter);
     }
 
     protected function getTemplate($template)

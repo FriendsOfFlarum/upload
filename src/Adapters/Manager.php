@@ -14,6 +14,7 @@ namespace FoF\Upload\Adapters;
 
 use Aws\S3\S3Client;
 use Flarum\Foundation\Paths;
+use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters;
 use FoF\Upload\Events\Adapter\Collecting;
@@ -70,22 +71,28 @@ class Manager
         return $adapters;
     }
 
-    public function instantiate()
+    public function instantiate(string $adapter)
     {
-        return $this->adapters()
+        $configured = $this->adapters()
             // Drops adapters that cannot be instantiated due to missing packages.
             ->filter(function ($available) {
                 return $available;
             })
-            // Attempt (or override) instantiation of adapters.
-            ->map(function ($_, $adapter) {
-                $method = Str::camel($adapter);
+            ->get($adapter);
 
-                return $this->events->until(new Instantiate($adapter, $this->util))
-                    ?? $this->{$method}($this->util);
-            })
-            // Drops adapters that returned null while instantiating.
-            ->filter();
+        if (! $configured) {
+            throw new ValidationException("No adapter configured for $adapter");
+        }
+
+        $method = Str::camel($adapter);
+
+        $driver = $this->events->until(new Instantiate($adapter, $this->util));
+
+        if (! $driver && ! method_exists([$this, $method])) {
+            throw new ValidationException("Cannot instantiate adapter $adapter");
+        }
+
+        return $driver ?? $this->{$method}($this->util);
     }
 
     /**
