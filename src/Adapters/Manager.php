@@ -88,7 +88,7 @@ class Manager
 
         $driver = $this->events->until(new Instantiate($adapter, $this->util));
 
-        if (!$driver && !method_exists([$this, $method])) {
+        if (!$driver && !method_exists($this, $method)) {
             throw new ValidationException(['upload' => "Cannot instantiate adapter $adapter"]);
         }
 
