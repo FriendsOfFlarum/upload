@@ -3,9 +3,9 @@ export default class FileListState {
         this.user = null;
 
         this.files = [];
-    
+
         this.moreResults = false;
-    
+
         this.loading = false;
     }
 
@@ -16,7 +16,7 @@ export default class FileListState {
      */
     setUser(user) {
         // Keep previous state
-        if(user === this.user) return;
+        if (user === this.user) return;
 
         // Set user
         this.user = user;
@@ -34,27 +34,29 @@ export default class FileListState {
      * @param offset The index to start the page at.
      */
     loadResults(offset = 0) {
-        if(!this.user) return;
+        if (!this.user) return;
 
         this.loading = true;
 
-        return app.store.find('fof/uploads', {
-            filter: {
-                user: this.user.id()
-            },
-            page: {
-                offset
-            }
-        }).then(this.parseResults.bind(this));
+        return app.store
+            .find('fof/uploads', {
+                filter: {
+                    user: this.user.id(),
+                },
+                page: {
+                    offset,
+                },
+            })
+            .then(this.parseResults.bind(this));
     }
 
     /**
      * Load the next page of discussion results.
      */
     loadMore() {
-      this.loading = true;
-  
-      this.loadResults(this.files.length).then(this.parseResults.bind(this));
+        this.loading = true;
+
+        this.loadResults(this.files.length).then(this.parseResults.bind(this));
     }
 
     /**
@@ -74,14 +76,14 @@ export default class FileListState {
     /**
      * Add files to the beginning of the list
      */
-     addToList(files) {
-        if(Array.isArray(files)) {
+    addToList(files) {
+        if (Array.isArray(files)) {
             this.files.unshift(...files);
-        }else{
+        } else {
             this.files.unshift(files);
         }
     }
-    
+
     /**
      * Are there any files in the list?
      */
@@ -109,4 +111,4 @@ export default class FileListState {
     empty() {
         return !this.hasFiles() && !this.isLoading();
     }
-}  
+}

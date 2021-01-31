@@ -59,7 +59,7 @@ export default class Uploader {
             // Dispatch
             this.dispatch('success', {
                 file: fileObj,
-                addBBcode
+                addBBcode,
             });
         });
 

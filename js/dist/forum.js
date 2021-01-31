@@ -134,15 +134,15 @@ __webpack_require__.r(__webpack_exports__);
 function fileToBBcode(file) {
   switch (file.tag()) {
     // File
-    case "file":
+    case 'file':
       return "[upl-file uuid=" + file.uuid() + " size=" + file.humanSize() + "]" + file.baseName() + "[/upl-file]";
     // Image template
 
-    case "image":
+    case 'image':
       return "[upl-image uuid=" + file.uuid() + " size=" + file.humanSize() + " url=" + file.url() + "]" + file.baseName() + "[/upl-image]";
     // Image preview
 
-    case "image-preview":
+    case 'image-preview':
       return "[upl-image-preview url=" + file.url() + "]";
     // 'just-url' or unknown
 
@@ -163,31 +163,31 @@ function fileToBBcode(file) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return mimeToIcon; });
-var image = ["image/png", "image/jpg", "image/jpeg", "image/svg+xml"];
-var archive = ["application/zip", "application/x-7z-compressed", "application/gzip", "application/vnd.rar", "application/x-rar-compressed"];
-var code = ["text/html", "text/css", "text/javascript", "application/json", "application/ld+json", "text/javascript", "application/x-httpd-php"];
-var word = ["application/x-abiword", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+var image = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml'];
+var archive = ['application/zip', 'application/x-7z-compressed', 'application/gzip', 'application/vnd.rar', 'application/x-rar-compressed'];
+var code = ['text/html', 'text/css', 'text/javascript', 'application/json', 'application/ld+json', 'text/javascript', 'application/x-httpd-php'];
+var word = ['application/x-abiword', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 function mimeToIcon(fileType) {
   // Display image (do not display for)
   if (image.indexOf(fileType) >= 0) {
     return 'image';
   } // Display image icon for other types
-  else if (fileType.includes("image/")) {
+  else if (fileType.includes('image/')) {
       return 'far fa-file-image';
     } // Video icon
-    else if (fileType.includes("video/")) {
+    else if (fileType.includes('video/')) {
         return 'far fa-file-video';
       } // Archive icon
       else if (archive.indexOf(fileType) >= 0) {
           return 'far fa-file-archive';
         } // PDF icon
-        else if (fileType === "application/pdf") {
+        else if (fileType === 'application/pdf') {
             return 'far fa-file-pdf';
           } // Word
           else if (word.indexOf(fileType) >= 0) {
               return 'far fa-file-word';
             } // Audio icon
-            else if (fileType.includes("audio/")) {
+            else if (fileType.includes('audio/')) {
                 return 'far fa-file-audio';
               } // Code files
               else if (code.indexOf(fileType) >= 0) {
@@ -246,15 +246,15 @@ var File = /*#__PURE__*/function (_mixin) {
 
   return File;
 }(flarum_utils_mixin__WEBPACK_IMPORTED_MODULE_2___default()(flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a, {
-  baseName: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("baseName"),
-  path: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("path"),
-  url: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("url"),
-  type: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("type"),
-  size: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("size"),
-  humanSize: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("humanSize"),
-  createdAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("createdAt"),
-  uuid: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("uuid"),
-  tag: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute("tag")
+  baseName: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('baseName'),
+  path: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('path'),
+  url: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('url'),
+  type: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('type'),
+  size: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('size'),
+  humanSize: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('humanSize'),
+  createdAt: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('createdAt'),
+  uuid: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('uuid'),
+  tag: flarum_Model__WEBPACK_IMPORTED_MODULE_1___default.a.attribute('tag')
 }));
 
 
@@ -489,7 +489,7 @@ var FileManagerButton = /*#__PURE__*/function (_Component) {
 
   _proto.view = function view() {
     return flarum_components_Button__WEBPACK_IMPORTED_MODULE_3___default.a.component({
-      className: "Button fof-upload-button Button--icon",
+      className: 'Button fof-upload-button Button--icon',
       onclick: this.fileManagerButtonClicked.bind(this),
       icon: 'fas fa-photo-video',
       title: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.forum.buttons.media')
@@ -497,8 +497,8 @@ var FileManagerButton = /*#__PURE__*/function (_Component) {
   }
   /**
    * Show tooltip on hover
-   * 
-   * @param {*} vnode 
+   *
+   * @param {*} vnode
    */
   ;
 
@@ -573,7 +573,7 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
 
     this.selectedFiles = []; // Allow multiselect
 
-    this.multiSelect = vnode.attrs.multiSelect || false; // Drag & drop
+    this.multiSelect = vnode.attrs.multiSelect || true; // Drag & drop
 
     this.dragDrop = null; // Initialize uploads
 
@@ -581,7 +581,7 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
   };
 
   _proto.className = function className() {
-    return "Modal--large fof-file-manager-modal";
+    return 'Modal--large fof-file-manager-modal';
   }
   /**
    * Initialize drag & drop
@@ -595,7 +595,7 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
 
     this.dragDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_5__["default"](function (files) {
       return _this.uploader.upload(files, false);
-    }, this.$().find(".Modal-content")[0]);
+    }, this.$().find('.Modal-content')[0]);
   }
   /**
    * Remove events from modal content
@@ -620,30 +620,30 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
       disabled: app.fileListState.isLoading(),
       isMediaUploadButton: true
     })), m("div", {
-      className: "fof-drag-and-drop"
+      className: 'fof-drag-and-drop'
     }, m("div", {
-      className: "fof-drag-and-drop-release"
+      className: 'fof-drag-and-drop-release'
     }, m("i", {
-      className: "fas fa-cloud-upload-alt"
-    }), app.translator.trans("fof-upload.forum.file_list.release_to_upload"))), m("div", {
+      className: 'fas fa-cloud-upload-alt'
+    }), app.translator.trans('fof-upload.forum.file_list.release_to_upload'))), m("div", {
       className: "Modal-header"
     }, m("h3", {
       className: "App-titleControl App-titleControl--text"
-    }, app.translator.trans("fof-upload.forum.media_manager"))), this.alertAttrs ? m("div", {
+    }, app.translator.trans('fof-upload.forum.media_manager'))), this.alertAttrs ? m("div", {
       className: "Modal-alert"
     }, Alert.component(this.alertAttrs)) : '', m("div", {
-      className: "Modal-body"
+      className: 'Modal-body'
     }, _UserFileList__WEBPACK_IMPORTED_MODULE_4__["default"].component({
       user: this.attrs.user,
       selectable: true,
       onFileSelect: this.onFileSelect.bind(this),
       selectedFiles: this.selectedFiles
     })), m("div", {
-      className: "Modal-footer"
+      className: 'Modal-footer'
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a.component({
       onclick: this.hide.bind(this),
       className: 'Button'
-    }, app.translator.trans("fof-upload.forum.buttons.cancel")), flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a.component({
+    }, app.translator.trans('fof-upload.forum.buttons.cancel')), flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a.component({
       onclick: this.onSelect.bind(this),
       disabled: this.selectedFiles.length === 0 || !this.multiSelect && this.selectedFiles.length > 1,
       className: 'Button Button--primary'
@@ -651,8 +651,8 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
   }
   /**
    * Add or remove file from selected files
-   * 
-   * @param {File} file 
+   *
+   * @param {File} file
    */
   ;
 
@@ -702,7 +702,7 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
 
 
     this.selectedFiles.map(function (fileId) {
-      var file = app.store.getById("files", fileId);
+      var file = app.store.getById('files', fileId);
       app.composer.editor.insertAtCursor(file.bbcode() + '\n');
     });
   };
@@ -823,7 +823,7 @@ var UploadButton = /*#__PURE__*/function (_Component) {
   _proto.view = function view() {
     var buttonText = this.attrs.uploader.uploading ? flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.forum.states.loading') : flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.forum.buttons.upload');
     return flarum_components_Button__WEBPACK_IMPORTED_MODULE_5___default.a.component({
-      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default()(["Button", "hasIcon", "fof-upload-button", !this.isMediaUploadButton && !this.attrs.uploader.uploading && "Button--icon", !this.isMediaUploadButton && !this.attrs.uploader.uploading && "Button--link", this.attrs.uploader.uploading && "uploading"]),
+      className: flarum_utils_classList__WEBPACK_IMPORTED_MODULE_3___default()(['Button', 'hasIcon', 'fof-upload-button', !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon', !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link', this.attrs.uploader.uploading && 'uploading']),
       icon: !this.attrs.uploader.uploading && 'fas fa-file-upload',
       onclick: this.uploadButtonClicked.bind(this),
       title: !this.isMediaUploadButton ? buttonText : null,
@@ -926,27 +926,27 @@ var UserFileList = /*#__PURE__*/function (_Component) {
 
     var state = app.fileListState;
     return m("div", {
-      className: "fof-upload-file-list"
+      className: 'fof-upload-file-list'
     }, state.isLoading() && state.files.length === 0 && m("div", {
-      className: "fof-upload-loading"
-    }, app.translator.trans("fof-upload.forum.file_list.loading"), m(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default.a, null)), this.inModal && state.empty() && m("p", {
-      className: "fof-upload-empty"
+      className: 'fof-upload-loading'
+    }, app.translator.trans('fof-upload.forum.file_list.loading'), m(flarum_components_LoadingIndicator__WEBPACK_IMPORTED_MODULE_3___default.a, null)), this.inModal && state.empty() && m("p", {
+      className: 'fof-upload-empty'
     }, m("i", {
-      className: "fas fa-cloud-upload-alt fof-upload-empty-icon"
-    }), app.translator.trans("fof-upload.forum.file_list.modal_empty_" + (app.screen() !== "phone" ? "desktop" : "phone"))), !this.inModal && state.empty()(m("p", {
-      className: "fof-upload-empty"
-    }, app.translator.trans("fof-upload.forum.file_list.empty"))), m("ul", null, state.files.map(function (file) {
-      var fileClassNames = "fof-file";
+      className: 'fas fa-cloud-upload-alt fof-upload-empty-icon'
+    }), app.translator.trans("fof-upload.forum.file_list.modal_empty_" + (app.screen() !== 'phone' ? 'desktop' : 'phone'))), !this.inModal && state.empty()(m("p", {
+      className: 'fof-upload-empty'
+    }, app.translator.trans('fof-upload.forum.file_list.empty'))), m("ul", null, state.files.map(function (file) {
+      var fileClassNames = 'fof-file';
       var fileIcon = Object(_common_mimeToIcon__WEBPACK_IMPORTED_MODULE_4__["default"])(file.type());
       var fileSelectable = _this.restrictFileType ? _this.isSelectable(file) : true; // File is image
 
-      if (fileIcon === "image") {
-        fileClassNames += " fof-file-type-image";
+      if (fileIcon === 'image') {
+        fileClassNames += ' fof-file-type-image';
       } // File is selected
 
 
       if (_this.attrs.selectedFiles && _this.attrs.selectedFiles.indexOf(file.id()) >= 0) {
-        fileClassNames += " fof-file-selected";
+        fileClassNames += ' fof-file-selected';
       }
 
       return m("li", null, m("button", {
@@ -957,30 +957,30 @@ var UserFileList = /*#__PURE__*/function (_Component) {
         title: file.baseName(),
         disabled: !fileSelectable
       }, m("span", {
-        className: "fof-file-icon"
+        className: 'fof-file-icon'
       }, m("i", {
         className: fileIcon !== 'image' ? fileIcon : 'far fa-file-image'
       })), fileIcon === 'image' && m("img", {
         src: file.url(),
-        className: "fof-file-image-preview"
+        className: 'fof-file-image-preview'
       }), m("span", {
-        className: "fof-file-name"
+        className: 'fof-file-name'
       }, file.baseName())));
     })), state.hasMoreResults() && m("div", {
-      className: "fof-load-more-files"
+      className: 'fof-load-more-files'
     }, m(flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a, {
-      className: "Button Button--primary",
+      className: 'Button Button--primary',
       disabled: state.isLoading(),
       loading: state.isLoading(),
       onclick: function onclick() {
         return state.loadMore();
       }
-    }, app.translator.trans("fof-upload.forum.buttons.load_more_files"))));
+    }, app.translator.trans('fof-upload.forum.buttons.load_more_files'))));
   }
   /**
-   * Check if a file is selectable 
-   * 
-   * @param {File} file 
+   * Check if a file is selectable
+   *
+   * @param {File} file
    */
   ;
 
@@ -991,13 +991,13 @@ var UserFileList = /*#__PURE__*/function (_Component) {
       return this.restrictFileType.indexOf(fileType) >= 0;
     } // Image
     else if (this.restrictFileType === 'image') {
-        return fileType.includes("image/");
+        return fileType.includes('image/');
       } // Audio
       else if (this.restrictFileType === 'audio') {
-          return fileType.includes("audio/");
+          return fileType.includes('audio/');
         } // Video
         else if (this.restrictFileType === 'video') {
-            return fileType.includes("video/");
+            return fileType.includes('video/');
           }
 
     return false;

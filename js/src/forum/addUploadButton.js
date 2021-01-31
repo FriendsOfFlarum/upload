@@ -35,7 +35,7 @@ export default function () {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
         this.uploader.on('success', ({ file, addBBcode }) => {
-            if(!addBBcode) return;
+            if (!addBBcode) return;
 
             this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n');
 

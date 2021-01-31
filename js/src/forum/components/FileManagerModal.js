@@ -1,8 +1,8 @@
-import Modal from "flarum/components/Modal";
-import Button from "flarum/components/Button";
-import UploadButton from "./UploadButton";
-import UserFileList from "./UserFileList";
-import DragAndDrop from "./DragAndDrop";
+import Modal from 'flarum/components/Modal';
+import Button from 'flarum/components/Button';
+import UploadButton from './UploadButton';
+import UserFileList from './UserFileList';
+import DragAndDrop from './DragAndDrop';
 
 export default class FileManagerModal extends Modal {
     oninit(vnode) {
@@ -15,7 +15,7 @@ export default class FileManagerModal extends Modal {
         this.selectedFiles = [];
 
         // Allow multiselect
-        this.multiSelect = vnode.attrs.multiSelect || false;
+        this.multiSelect = vnode.attrs.multiSelect || true;
 
         // Drag & drop
         this.dragDrop = null;
@@ -25,7 +25,7 @@ export default class FileManagerModal extends Modal {
     }
 
     className() {
-      return "Modal--large fof-file-manager-modal";
+        return 'Modal--large fof-file-manager-modal';
     }
 
     /**
@@ -34,14 +34,14 @@ export default class FileManagerModal extends Modal {
     oncreate(vnode) {
         super.oncreate(vnode);
 
-        this.dragDrop = new DragAndDrop((files) => this.uploader.upload(files, false), this.$().find(".Modal-content")[0]);
+        this.dragDrop = new DragAndDrop((files) => this.uploader.upload(files, false), this.$().find('.Modal-content')[0]);
     }
 
     /**
      * Remove events from modal content
      */
     onremove() {
-        if(this.dragDrop) {
+        if (this.dragDrop) {
             this.dragDrop.unload();
         }
     }
@@ -54,44 +54,50 @@ export default class FileManagerModal extends Modal {
                         {UploadButton.component({
                             uploader: this.uploader,
                             disabled: app.fileListState.isLoading(),
-                            isMediaUploadButton: true
+                            isMediaUploadButton: true,
                         })}
                     </div>
 
-                    <div className={"fof-drag-and-drop"}>
-                        <div className={"fof-drag-and-drop-release"}>
-                            <i className={"fas fa-cloud-upload-alt"}></i>
+                    <div className={'fof-drag-and-drop'}>
+                        <div className={'fof-drag-and-drop-release'}>
+                            <i className={'fas fa-cloud-upload-alt'}></i>
 
-                            {app.translator.trans("fof-upload.forum.file_list.release_to_upload")}
+                            {app.translator.trans('fof-upload.forum.file_list.release_to_upload')}
                         </div>
                     </div>
-        
+
                     <div className="Modal-header">
-                        <h3 className="App-titleControl App-titleControl--text">{app.translator.trans("fof-upload.forum.media_manager")}</h3>
+                        <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
                     </div>
 
                     {this.alertAttrs ? <div className="Modal-alert">{Alert.component(this.alertAttrs)}</div> : ''}
 
-                    <div className={"Modal-body"}>
+                    <div className={'Modal-body'}>
                         {UserFileList.component({
                             user: this.attrs.user,
                             selectable: true,
                             onFileSelect: this.onFileSelect.bind(this),
-                            selectedFiles: this.selectedFiles
+                            selectedFiles: this.selectedFiles,
                         })}
                     </div>
 
-                    <div className={"Modal-footer"}>
-                        {Button.component({
-                            onclick: this.hide.bind(this),
-                            className: 'Button',
-                        }, app.translator.trans("fof-upload.forum.buttons.cancel"))}
+                    <div className={'Modal-footer'}>
+                        {Button.component(
+                            {
+                                onclick: this.hide.bind(this),
+                                className: 'Button',
+                            },
+                            app.translator.trans('fof-upload.forum.buttons.cancel')
+                        )}
 
-                        {Button.component({
-                            onclick: this.onSelect.bind(this),
-                            disabled: this.selectedFiles.length === 0 || !this.multiSelect && this.selectedFiles.length > 1,
-                            className: 'Button Button--primary',
-                        }, app.translator.transChoice('fof-upload.forum.buttons.select_file', this.selectedFiles.length))}
+                        {Button.component(
+                            {
+                                onclick: this.onSelect.bind(this),
+                                disabled: this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1),
+                                className: 'Button Button--primary',
+                            },
+                            app.translator.transChoice('fof-upload.forum.buttons.select_file', this.selectedFiles.length)
+                        )}
                     </div>
                 </div>
             </div>
@@ -100,31 +106,31 @@ export default class FileManagerModal extends Modal {
 
     /**
      * Add or remove file from selected files
-     * 
-     * @param {File} file 
+     *
+     * @param {File} file
      */
     onFileSelect(file) {
         const itemPosition = this.selectedFiles.indexOf(file.id());
 
-        if(itemPosition >= 0) {
+        if (itemPosition >= 0) {
             this.selectedFiles.splice(itemPosition, 1);
-        }else{
-            if(this.multiSelect) {
+        } else {
+            if (this.multiSelect) {
                 this.selectedFiles.push(file.id());
-            }else{
+            } else {
                 this.selectedFiles = [file.id()];
             }
         }
     }
-    
+
     /**
      * Add files to file list after upload
      */
     onUpload() {
         this.uploader.on('success', ({ file }) => {
-            if(this.multiSelect) {
+            if (this.multiSelect) {
                 this.selectedFiles.push(file.id());
-            }else{
+            } else {
                 this.selectedFiles = [file.id()];
             }
         });
@@ -137,17 +143,17 @@ export default class FileManagerModal extends Modal {
         this.hide();
 
         // Custom callback
-        if(this.attrs.onSelect) {
+        if (this.attrs.onSelect) {
             this.attrs.onSelect(this.selectedFiles);
 
             return;
         }
-        
+
         // Add selected files to composer
         this.selectedFiles.map((fileId) => {
-            const file = app.store.getById("files", fileId);
+            const file = app.store.getById('files', fileId);
 
-            app.composer.editor.insertAtCursor(file.bbcode() + '\n')
+            app.composer.editor.insertAtCursor(file.bbcode() + '\n');
         });
     }
 }
