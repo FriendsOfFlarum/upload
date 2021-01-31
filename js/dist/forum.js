@@ -519,7 +519,6 @@ var FileManagerButton = /*#__PURE__*/function (_Component) {
     e.preventDefault(); // Open dialog
 
     flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.modal.show(_FileManagerModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
-      selectFile: true,
       uploader: this.attrs.uploader
     });
   };
@@ -573,7 +572,9 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
 
     this.selectedFiles = []; // Allow multiselect
 
-    this.multiSelect = vnode.attrs.multiSelect || true; // Drag & drop
+    this.multiSelect = vnode.attrs.multiSelect || true; // Restrict file selection to specific types
+
+    this.restrictFileType = vnode.attrs.restrictFileType || null; // Drag & drop
 
     this.dragDrop = null; // Initialize uploads
 
@@ -637,7 +638,8 @@ var FileManagerModal = /*#__PURE__*/function (_Modal) {
       user: this.attrs.user,
       selectable: true,
       onFileSelect: this.onFileSelect.bind(this),
-      selectedFiles: this.selectedFiles
+      selectedFiles: this.selectedFiles,
+      restrictFileType: this.restrictFileType
     })), m("div", {
       className: 'Modal-footer'
     }, flarum_components_Button__WEBPACK_IMPORTED_MODULE_2___default.a.component({

@@ -17,6 +17,9 @@ export default class FileManagerModal extends Modal {
         // Allow multiselect
         this.multiSelect = vnode.attrs.multiSelect || true;
 
+        // Restrict file selection to specific types
+        this.restrictFileType = vnode.attrs.restrictFileType || null;
+
         // Drag & drop
         this.dragDrop = null;
 
@@ -78,6 +81,7 @@ export default class FileManagerModal extends Modal {
                             selectable: true,
                             onFileSelect: this.onFileSelect.bind(this),
                             selectedFiles: this.selectedFiles,
+                            restrictFileType: this.restrictFileType
                         })}
                     </div>
 
