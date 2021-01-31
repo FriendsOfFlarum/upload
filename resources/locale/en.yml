@@ -92,8 +92,23 @@ fof-upload:
       ovh-svfs: OVH SVFS
       qiniu: QiNiu
   forum:
+    media_manager: Media manager
+
     buttons:
       attach: Attach
+      upload: Upload
+      cancel: Cancel
+      media: Media
+      load_more_files: Load more files
+      select_file: Select file|Select files
+
+    file_list:
+      loading: Loading files...
+      empty: There are no files to show.
+      release_to_upload: Release to upload
+      modal_empty_desktop: Your file list is empty, click or drag a file to upload.
+      modal_empty_phone: Your file list is empty, select a file to upload.
+
     states:
       error: Error
       loading: Uploading

@@ -14,16 +14,18 @@ namespace FoF\Upload\Api\Controllers;
 
 use FoF\Upload\Commands\Upload;
 use FoF\Upload\Exceptions\InvalidUploadException;
+use FoF\Upload\Api\Serializers\FileSerializer;
+use Flarum\Api\Controller\AbstractListController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Laminas\Diactoros\Response\JsonResponse;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Tobscure\JsonApi\Document;
 
-class UploadController implements RequestHandlerInterface
+class UploadController extends AbstractListController
 {
+    public $serializer = FileSerializer::class;
+
     /**
      * @var Dispatcher
      */
@@ -36,12 +38,11 @@ class UploadController implements RequestHandlerInterface
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Tobscure\JsonApi\Document $request
      *
      * @throws InvalidUploadException
-     *
-     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
@@ -55,6 +56,6 @@ class UploadController implements RequestHandlerInterface
             throw new InvalidUploadException('No files were uploaded');
         }
 
-        return new JsonResponse($collection->toArray(), 201);
+        return $collection;
     }
 }

@@ -5,6 +5,7 @@ import UploadButton from './components/UploadButton';
 import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
+import FileManagerButton from './components/FileManagerButton';
 
 export default function () {
     extend(TextEditor.prototype, 'oninit', function () {
@@ -13,6 +14,15 @@ export default function () {
     extend(TextEditor.prototype, 'controlItems', function (items) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
+        // Add media button
+        items.add(
+            'fof-upload-media',
+            FileManagerButton.component({
+                uploader: this.uploader,
+            })
+        );
+
+        // Add upload button
         items.add(
             'fof-upload',
             UploadButton.component({
@@ -24,8 +34,10 @@ export default function () {
     extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        this.uploader.on('success', (image) => {
-            this.attrs.composer.editor.insertAtCursor(image + '\n');
+        this.uploader.on('success', ({ file, addBBcode }) => {
+            if(!addBBcode) return;
+
+            this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n');
 
             // We wrap this in a typeof check to prevent it running when a user
             // is creating a new discussion. There's nothing to preview in a new
