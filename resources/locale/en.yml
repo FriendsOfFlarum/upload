@@ -107,7 +107,7 @@ fof-upload:
       empty: There are no files to show.
       release_to_upload: Release to upload
       modal_empty_desktop: Your file list is empty. Click or drag a file here to upload.
-      modal_empty_phone: Your file list is empty, select a file to upload.
+      modal_empty_phone: Your file list is empty. Select a file to upload.
 
     states:
       error: Error
