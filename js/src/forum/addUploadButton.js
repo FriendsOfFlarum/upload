@@ -14,21 +14,27 @@ export default function () {
     extend(TextEditor.prototype, 'controlItems', function (items) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
+        const composerButtonVisiblity = app.forum.attribute("fof-upload.composerButtonVisiblity");
+
         // Add media button
-        items.add(
-            'fof-upload-media',
-            FileManagerButton.component({
-                uploader: this.uploader,
-            })
-        );
+        if(composerButtonVisiblity === "both" || composerButtonVisiblity === "media-btn") {
+            items.add(
+                'fof-upload-media',
+                FileManagerButton.component({
+                    uploader: this.uploader,
+                })
+            );
+        }
 
         // Add upload button
-        items.add(
-            'fof-upload',
-            UploadButton.component({
-                uploader: this.uploader,
-            })
-        );
+        if(composerButtonVisiblity === "both" || composerButtonVisiblity === "upload-btn") {
+            items.add(
+                'fof-upload',
+                UploadButton.component({
+                    uploader: this.uploader,
+                })
+            );
+        }
     });
 
     extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {

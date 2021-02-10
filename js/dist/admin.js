@@ -186,7 +186,7 @@ var UploadPage = /*#__PURE__*/function (_ExtensionPage) {
     this.loading = false; // the fields we need to watch and to save
 
     this.fields = [// image
-    'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'whitelistedClientExtensions', // watermark
+    'resizeMaxWidth', 'cdnUrl', 'maxFileSize', 'whitelistedClientExtensions', 'composerButtonVisiblity', // watermark
     'watermark', 'watermarkPosition', // Imgur
     'imgurClientId', // AWS
     'awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Region', 'awsS3Endpoint', 'awsS3ACL', // QIniu
@@ -206,6 +206,12 @@ var UploadPage = /*#__PURE__*/function (_ExtensionPage) {
       top: 'top',
       right: 'right',
       bottom: 'bottom'
+    }; // Composer button options
+
+    this.composerButtonVisiblityOptions = {
+      'both': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.both'),
+      'upload-btn': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.upload-btn'),
+      'media-btn': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.media-btn')
     }; // get the saved settings from the database
 
     var settings = flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.data.settings; // our package prefix (to be added to every field and checkbox in the setting table)
@@ -303,7 +309,11 @@ var UploadPage = /*#__PURE__*/function (_ExtensionPage) {
       type: 'button',
       className: 'Button Button--warning',
       onclick: this.addMimeType.bind(this)
-    }, '+')])), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.mime_types')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.download_templates')), this.templateOptionsDescriptions()]), m('fieldset', [m('legend', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.resize.title')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.resize')), flarum_components_Switch__WEBPACK_IMPORTED_MODULE_6___default.a.component({
+    }, '+')])), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.mime_types')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.download_templates')), this.templateOptionsDescriptions()]), m('fieldset', [m('legend', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.title')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.composer_buttons')), m('div', [flarum_components_Select__WEBPACK_IMPORTED_MODULE_5___default.a.component({
+      options: this.composerButtonVisiblityOptions,
+      onchange: this.values.composerButtonVisiblity,
+      value: this.values.composerButtonVisiblity() || 'both'
+    })])]), m('fieldset', [m('legend', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.resize.title')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.resize')), flarum_components_Switch__WEBPACK_IMPORTED_MODULE_6___default.a.component({
       state: this.values.mustResize() || false,
       onchange: this.values.mustResize
     }, flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.resize.toggle')), m('label', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.resize.max_width')), m('input', {

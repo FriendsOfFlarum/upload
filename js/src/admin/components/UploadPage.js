@@ -25,6 +25,7 @@ export default class UploadPage extends ExtensionPage {
             'cdnUrl',
             'maxFileSize',
             'whitelistedClientExtensions',
+            'composerButtonVisiblity',
             // watermark
             'watermark',
             'watermarkPosition',
@@ -61,6 +62,13 @@ export default class UploadPage extends ExtensionPage {
             right: 'right',
             bottom: 'bottom',
         };
+
+        // Composer button options
+        this.composerButtonVisiblityOptions = {
+            'both' : app.translator.trans('fof-upload.admin.labels.composer_buttons.options.both'), 
+            'upload-btn' : app.translator.trans('fof-upload.admin.labels.composer_buttons.options.upload-btn'), 
+            'media-btn' : app.translator.trans('fof-upload.admin.labels.composer_buttons.options.media-btn')
+        }
 
         // get the saved settings from the database
         const settings = app.data.settings;
@@ -192,6 +200,17 @@ export default class UploadPage extends ExtensionPage {
                                 m('.helpText', app.translator.trans('fof-upload.admin.help_texts.mime_types')),
                                 m('.helpText', app.translator.trans('fof-upload.admin.help_texts.download_templates')),
                                 this.templateOptionsDescriptions(),
+                            ]),
+                            m('fieldset', [
+                                m('legend', app.translator.trans('fof-upload.admin.labels.composer_buttons.title')),
+                                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.composer_buttons')),
+                                m('div', [
+                                    Select.component({
+                                        options: this.composerButtonVisiblityOptions,
+                                        onchange: this.values.composerButtonVisiblity,
+                                        value: this.values.composerButtonVisiblity() || 'both',
+                                    }),
+                                ])
                             ]),
                             m('fieldset', [
                                 m('legend', app.translator.trans('fof-upload.admin.labels.resize.title')),

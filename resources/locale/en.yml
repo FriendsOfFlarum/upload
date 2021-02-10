@@ -26,6 +26,8 @@ fof-upload:
         The following settings are only required when using S3 compatible storage. If you use AWS, you can leave them blank.
       s3_acl: |
         The ACL that should be applied to the uploaded object (default: private). For possible values, see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+      composer_buttons: |
+        By default both the media manager button and upload button are visible. You can also choose to display only one button.
     labels:
       aws-s3:
         bucket: Bucket
@@ -69,6 +71,13 @@ fof-upload:
         position: Watermark position
         title: Watermark images
         toggle: Watermark images
+      composer_buttons:
+        title: Composer buttons
+        options:
+          both: Both
+          upload-btn: Upload button only
+          media-btn: Media manager button only
+
     permissions:
       download_label: Download files
       upload_label: Upload files
