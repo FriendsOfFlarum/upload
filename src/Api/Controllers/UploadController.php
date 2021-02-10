@@ -38,7 +38,7 @@ class UploadController extends AbstractListController
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Tobscure\JsonApi\Document $request
+     * @param \Tobscure\JsonApi\Document $document
      *
      * @throws InvalidUploadException
      */

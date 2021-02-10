@@ -70,7 +70,7 @@ export default class UserFileList extends Component {
                                         <i className={fileIcon !== 'image' ? fileIcon : 'far fa-file-image'} />
                                     </span>
 
-                                    {fileIcon === 'image' && <img src={file.url()} className={'fof-file-image-preview'} />}
+                                    {fileIcon === 'image' && <img src={file.url()} className={'fof-file-image-preview'} draggable={false} />}
 
                                     <span className={'fof-file-name'}>{file.baseName()}</span>
                                 </button>

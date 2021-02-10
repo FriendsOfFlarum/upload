@@ -964,7 +964,8 @@ var UserFileList = /*#__PURE__*/function (_Component) {
         className: fileIcon !== 'image' ? fileIcon : 'far fa-file-image'
       })), fileIcon === 'image' && m("img", {
         src: file.url(),
-        className: 'fof-file-image-preview'
+        className: 'fof-file-image-preview',
+        draggable: false
       }), m("span", {
         className: 'fof-file-name'
       }, file.baseName())));

@@ -40,7 +40,7 @@ class ListUploadsController extends AbstractListController
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Tobscure\JsonApi\Document $request
+     * @param \Tobscure\JsonApi\Document $document
      *
      */
     protected function data(ServerRequestInterface $request, Document $document)
