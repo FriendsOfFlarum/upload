@@ -61,9 +61,9 @@ export default class FileManagerModal extends Modal {
                         })}
                     </div>
 
-                    <div className={'fof-drag-and-drop'}>
-                        <div className={'fof-drag-and-drop-release'}>
-                            <i className={'fas fa-cloud-upload-alt'}></i>
+                    <div className="fof-drag-and-drop">
+                        <div className="fof-drag-and-drop-release">
+                            <i className="fas fa-cloud-upload-alt"></i>
 
                             {app.translator.trans('fof-upload.forum.file_list.release_to_upload')}
                         </div>
@@ -75,17 +75,17 @@ export default class FileManagerModal extends Modal {
 
                     {this.alertAttrs ? <div className="Modal-alert">{Alert.component(this.alertAttrs)}</div> : ''}
 
-                    <div className={'Modal-body'}>
+                    <div className="Modal-body">
                         {UserFileList.component({
                             user: this.attrs.user,
                             selectable: true,
                             onFileSelect: this.onFileSelect.bind(this),
                             selectedFiles: this.selectedFiles,
-                            restrictFileType: this.restrictFileType
+                            restrictFileType: this.restrictFileType,
                         })}
                     </div>
 
-                    <div className={'Modal-footer'}>
+                    <div className="Modal-footer">
                         {Button.component(
                             {
                                 onclick: this.hide.bind(this),

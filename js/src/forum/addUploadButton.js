@@ -14,10 +14,10 @@ export default function () {
     extend(TextEditor.prototype, 'controlItems', function (items) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        const composerButtonVisiblity = app.forum.attribute("fof-upload.composerButtonVisiblity");
+        const composerButtonVisiblity = app.forum.attribute('fof-upload.composerButtonVisiblity');
 
         // Add media button
-        if(composerButtonVisiblity === "both" || composerButtonVisiblity === "media-btn") {
+        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'media-btn') {
             items.add(
                 'fof-upload-media',
                 FileManagerButton.component({
@@ -27,7 +27,7 @@ export default function () {
         }
 
         // Add upload button
-        if(composerButtonVisiblity === "both" || composerButtonVisiblity === "upload-btn") {
+        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'upload-btn') {
             items.add(
                 'fof-upload',
                 UploadButton.component({

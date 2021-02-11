@@ -13,6 +13,8 @@ export default class UserFileList extends Component {
         this.inModal = vnode.attrs.selectable;
 
         this.restrictFileType = vnode.attrs.restrictFileType || null;
+
+        this.downloadOnClick = this.attrs.downloadOnClick || false;
     }
 
     view() {
@@ -39,7 +41,7 @@ export default class UserFileList extends Component {
                 )}
 
                 {/* Empty file list */}
-                {!this.inModal && state.empty()(<p className={'fof-upload-empty'}>{app.translator.trans('fof-upload.forum.file_list.empty')}</p>)}
+                {!this.inModal && state.empty() && <p className={'fof-upload-empty'}>{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
 
                 {/* File list */}
                 <ul>
@@ -62,7 +64,7 @@ export default class UserFileList extends Component {
                             <li>
                                 <button
                                     className={fileClassNames}
-                                    onclick={this.attrs.onFileSelect ? () => this.attrs.onFileSelect(file) : null}
+                                    onclick={() => this.onFileClick(file)}
                                     title={file.baseName()}
                                     disabled={!fileSelectable}
                                 >
@@ -94,6 +96,25 @@ export default class UserFileList extends Component {
                 )}
             </div>
         );
+    }
+
+    /**
+     * Execute function on file click
+     *
+     * @param {*} file
+     */
+    onFileClick(file) {
+        // Custom functionality
+        if (this.attrs.onFileSelect) {
+            this.attrs.onFileSelect(file);
+            return;
+        }
+
+        // Download on click
+        if (this.attrs.downloadOnClick) {
+            window.open(file.url());
+            return;
+        }
     }
 
     /**

@@ -34,6 +34,7 @@ class AddForumAttributes
     {
         $attributes['fof-upload.canUpload'] = $serializer->getActor()->can('fof-upload.upload');
         $attributes['fof-upload.canDownload'] = $serializer->getActor()->can('fof-upload.download');
+        $attributes['fof-upload.canViewUserUploads'] = $serializer->getActor()->can('fof-upload.viewUserUploads');
         $attributes['fof-upload.composerButtonVisiblity'] = $this->settings->get('fof-upload.composerButtonVisiblity', 'both');
 
         return $attributes;

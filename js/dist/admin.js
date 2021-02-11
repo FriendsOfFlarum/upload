@@ -209,7 +209,7 @@ var UploadPage = /*#__PURE__*/function (_ExtensionPage) {
     }; // Composer button options
 
     this.composerButtonVisiblityOptions = {
-      'both': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.both'),
+      both: flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.both'),
       'upload-btn': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.upload-btn'),
       'media-btn': flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.options.media-btn')
     }; // get the saved settings from the database
@@ -309,7 +309,7 @@ var UploadPage = /*#__PURE__*/function (_ExtensionPage) {
       type: 'button',
       className: 'Button Button--warning',
       onclick: this.addMimeType.bind(this)
-    }, '+')])), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.mime_types')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.download_templates')), this.templateOptionsDescriptions()]), m('fieldset', [m('legend', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.title')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.composer_buttons')), m('div', [flarum_components_Select__WEBPACK_IMPORTED_MODULE_5___default.a.component({
+    }, '+')])), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.mime_types')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.download_templates')), this.templateOptionsDescriptions()]), m('fieldset.composerButtons', [m('legend', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.labels.composer_buttons.title')), m('.helpText', flarum_app__WEBPACK_IMPORTED_MODULE_1___default.a.translator.trans('fof-upload.admin.help_texts.composer_buttons')), m('div', [flarum_components_Select__WEBPACK_IMPORTED_MODULE_5___default.a.component({
       options: this.composerButtonVisiblityOptions,
       onchange: this.values.composerButtonVisiblity,
       value: this.values.composerButtonVisiblity() || 'both'
@@ -587,7 +587,11 @@ flarum_app__WEBPACK_IMPORTED_MODULE_0___default.a.initializers.add('fof-upload',
     label: app.translator.trans('fof-upload.admin.permissions.download_label'),
     permission: 'fof-upload.download',
     allowGuest: true
-  }, 'view', 50);
+  }, 'view', 50).registerPermission({
+    icon: 'fas fa-eye',
+    label: app.translator.trans('fof-upload.admin.permissions.view_user_uploads_label'),
+    permission: 'fof-upload.viewUserUploads'
+  }, 'moderate', 50);
 });
 
 /***/ }),

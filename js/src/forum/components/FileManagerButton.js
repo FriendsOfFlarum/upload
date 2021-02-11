@@ -35,7 +35,7 @@ export default class FileManagerButton extends Component {
 
         // Open dialog
         app.modal.show(FileManagerModal, {
-            uploader: this.attrs.uploader
+            uploader: this.attrs.uploader,
         });
     }
 }

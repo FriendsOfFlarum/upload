@@ -54,8 +54,8 @@ class ListUploadsController extends AbstractListController
         $filterUploads = Arr::get($params, "filter.user", $actor->id);
 
         // Can this user load other their files?
-        if($filterUploads !== $actor->id) {
-            $actor->assertCan("fof-upload.view-files");
+        if(intval($filterUploads) !== $actor->id) {
+            $actor->assertCan("fof-upload.viewUserUploads");
         }
         
         // Params

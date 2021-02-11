@@ -25,5 +25,14 @@ app.initializers.add('fof-upload', (app) => {
             },
             'view',
             50
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-eye',
+                label: app.translator.trans('fof-upload.admin.permissions.view_user_uploads_label'),
+                permission: 'fof-upload.viewUserUploads',
+            },
+            'moderate',
+            50
         );
 });

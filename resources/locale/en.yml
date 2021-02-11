@@ -81,6 +81,8 @@ fof-upload:
     permissions:
       download_label: Download files
       upload_label: Upload files
+      view_user_uploads_label: View user uploads
+      delete_user_uploads_label: Delete user uploads
     templates:
       file: Default file download template
       file_description: |
@@ -106,8 +108,9 @@ fof-upload:
     buttons:
       attach: Attach
       upload: Upload
+      user_uploads: User uploads
       cancel: Cancel
-      media: Media
+      media: My media
       load_more_files: Load more files
       select_file: Select file|Select files
 
