@@ -1,10 +1,9 @@
 export default class PasteClipboard {
-    constructor(upload, textAreaElement) {
+    constructor(upload, element) {
         this.upload = upload;
 
-        // We don't need to remove the events listeners, because they are bound to the textarea when it's created,
-        // and need to stay as long as the textarea exists in the DOM
-        textAreaElement.addEventListener('paste', this.paste.bind(this));
+        // We don't need to remove the events listeners, because they'll get removed when the DOM does.
+        element.addEventListener('paste', this.paste.bind(this));
     }
 
     paste(e) {
