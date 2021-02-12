@@ -62,14 +62,12 @@ export default function () {
             }
         });
 
-        const dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), this.$().parents('.Composer')[0]);
+        this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), this.$().parents('.Composer')[0]);
 
-        const unloadHandler = () => {
-            dragAndDrop.unload();
-        };
+        new PasteClipboard((files) => this.uploader.upload(files), this.$('.TextEditor-editor')[0]);
+    });
 
-        this.$('textarea').bind('onunload', unloadHandler);
-
-        new PasteClipboard((files) => this.uploader.upload(files), this.$('textarea')[0]);
+    extend(TextEditor.prototype, 'onremove', function (f_, vnode) {
+        this.dragAndDrop.unload();
     });
 }
