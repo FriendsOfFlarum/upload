@@ -68,6 +68,8 @@ export default function () {
     });
 
     extend(TextEditor.prototype, 'onremove', function (f_, vnode) {
+        if (!app.forum.attribute('fof-upload.canUpload')) return;
+
         this.dragAndDrop.unload();
     });
 }
