@@ -15,35 +15,7 @@ An extension that handles file uploads intelligently for your forum.
 - Drag and drop uploads.
 - Uploading multiple files at once (button and drag and drop both support this).
 - Easily extendable, the extension heavily relies on Events.
-- Extender interface to disable or force particular adaptors (see below)
-
-## Disable or Force a particular adaptor
-In some circumstances, you may wish to either disable an adaptor, or force the use of one. This is set in your root `extend.php` file.
-
-For example, you may disable `imgur`
-```
-(new FoF\Upload\Extend\Adapters())
-        ->disable('imgur'),
-```
-
-Chaining of multiple commands is also possible:
-```
-(new FoF\Upload\Extend\Adapters())
-        ->disable('imgur')
-        ->disable('aws-s3'),
-```
-
-You may also force an adaptor:
-```
-(new FoF\Upload\Extend\Adapters())
-        ->force('imgur'),
-```
-
-Adaptor names currently available:
-- `local`
-- `imgur`
-- `qiniu`
-- `aws-s3`
+- Extender interface to disable or force particular adapters (see below)
 
 ## Installation
 
@@ -112,6 +84,36 @@ In case you want to allow all regular file types including video, music, compres
 
 A mimetype consists of a primary and secondary type. The primary type can be `image`, `video` and `application` for instance.
 The secondary is like a more detailed specification, eg `png`, `pdf` etc. These two are divided by a `/`, in regex you have to escape this character by using: `\/`.
+
+
+### Disable or Force a particular adapter
+
+In some circumstances, you may wish to either disable an adapter, or force the use of one. This is set in your root `extend.php` file.
+
+For example, you may disable `imgur`
+```
+(new FoF\Upload\Extend\Adapters())
+        ->disable('imgur'),
+```
+
+Chaining of multiple commands is also possible:
+```
+(new FoF\Upload\Extend\Adapters())
+        ->disable('imgur')
+        ->disable('aws-s3'),
+```
+
+You may also force an adapter:
+```
+(new FoF\Upload\Extend\Adapters())
+        ->force('imgur'),
+```
+
+Adapter names currently available:
+- `local`
+- `imgur`
+- `qiniu`
+- `aws-s3`
 
 ## FAQ
 
