@@ -12,10 +12,10 @@
 
 namespace FoF\Upload\Api\Controllers;
 
+use Flarum\Api\Controller\AbstractListController;
+use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\Commands\Upload;
 use FoF\Upload\Exceptions\InvalidUploadException;
-use FoF\Upload\Api\Serializers\FileSerializer;
-use Flarum\Api\Controller\AbstractListController;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -38,7 +38,7 @@ class UploadController extends AbstractListController
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Tobscure\JsonApi\Document $document
+     * @param \Tobscure\JsonApi\Document               $document
      *
      * @throws InvalidUploadException
      */

@@ -14,6 +14,6 @@ use Flarum\Database\Migration;
 use Flarum\Group\Group;
 
 return Migration::addPermissions([
-    'fof-upload.viewUserUploads' => Group::MODERATOR_ID,
-    'fof-upload.deleteUserUploads' => Group::MODERATOR_ID
+    'fof-upload.viewUserUploads'   => Group::MODERATOR_ID,
+    'fof-upload.deleteUserUploads' => Group::MODERATOR_ID,
 ]);

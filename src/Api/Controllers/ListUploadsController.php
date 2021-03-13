@@ -12,13 +12,11 @@
 
 namespace FoF\Upload\Api\Controllers;
 
-use FoF\Upload\File;
-use FoF\Upload\Api\Serializers\FileSerializer;
-use Flarum\Http\UrlGenerator;
 use Flarum\Api\Controller\AbstractListController;
-use Illuminate\Contracts\Bus\Dispatcher;
+use Flarum\Http\UrlGenerator;
+use FoF\Upload\Api\Serializers\FileSerializer;
+use FoF\Upload\File;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
@@ -26,7 +24,7 @@ class ListUploadsController extends AbstractListController
 {
     public $serializer = FileSerializer::class;
 
-    public $sortFields = ["id"];
+    public $sortFields = ['id'];
 
     /**
      * @var UrlGenerator
@@ -40,8 +38,7 @@ class ListUploadsController extends AbstractListController
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Tobscure\JsonApi\Document $document
-     *
+     * @param \Tobscure\JsonApi\Document               $document
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
@@ -51,20 +48,20 @@ class ListUploadsController extends AbstractListController
         // User is signed in
         $actor->assertRegistered();
 
-        $filterUploads = Arr::get($params, "filter.user", $actor->id);
+        $filterUploads = Arr::get($params, 'filter.user', $actor->id);
 
         // Can this user load other their files?
-        if(intval($filterUploads) !== $actor->id) {
-            $actor->assertCan("fof-upload.viewUserUploads");
+        if (intval($filterUploads) !== $actor->id) {
+            $actor->assertCan('fof-upload.viewUserUploads');
         }
-        
+
         // Params
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
 
         // Build query
         $query = File::where([
-            'actor_id' => $filterUploads
+            'actor_id' => $filterUploads,
         ]);
 
         $results = $query
@@ -77,7 +74,7 @@ class ListUploadsController extends AbstractListController
         $hasMoreResults = $limit > 0 && $results->count() > $limit;
 
         // Pop
-        if($hasMoreResults) {
+        if ($hasMoreResults) {
             $results->pop();
         }
 

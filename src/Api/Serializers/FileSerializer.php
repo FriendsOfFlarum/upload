@@ -29,15 +29,15 @@ class FileSerializer extends AbstractSerializer
     protected function getDefaultAttributes($model)
     {
         return [
-            'baseName' => $model->base_name,
-            'path' => $model->path,
-            'url' => $model->url,
-            'type' => $model->type,
-            'size' => $model->size,
+            'baseName'  => $model->base_name,
+            'path'      => $model->path,
+            'url'       => $model->url,
+            'type'      => $model->type,
+            'size'      => $model->size,
             'humanSize' => $model->humanSize,
             'createdAt' => $model->created_at,
-            'uuid' => $model->uuid,
-            'tag' => $model->tag
+            'uuid'      => $model->uuid,
+            'tag'       => $model->tag,
         ];
     }
 }
