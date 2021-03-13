@@ -1,5 +1,5 @@
-import Modal from 'flarum/components/Modal';
-import Button from 'flarum/components/Button';
+import Modal from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
 import UploadButton from './UploadButton';
 import UserFileList from './UserFileList';
 import DragAndDrop from './DragAndDrop';
@@ -51,7 +51,7 @@ export default class FileManagerModal extends Modal {
 
     view() {
         return (
-            <div className={'Modal modal-dialog ' + this.className()}>
+            <div className={`Modal modal-dialog ${this.className()}`}>
                 <div className="Modal-content">
                     <div className="fof-modal-buttons App-backControl">
                         <UploadButton uploader={this.uploader} disabled={app.fileListState.isLoading()} isMediaUploadButton />
@@ -59,7 +59,7 @@ export default class FileManagerModal extends Modal {
 
                     <div className="fof-drag-and-drop">
                         <div className="fof-drag-and-drop-release">
-                            <i className="fas fa-cloud-upload-alt"></i>
+                            <i className="fas fa-cloud-upload-alt" />
 
                             {app.translator.trans('fof-upload.forum.file_list.release_to_upload')}
                         </div>
@@ -95,7 +95,7 @@ export default class FileManagerModal extends Modal {
                             disabled={this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1)}
                             className="Button Button--primary"
                         >
-                            {app.translator.transChoice('fof-upload.forum.buttons.select_file', this.selectedFiles.length)}
+                            {app.translator.transChoice('fof-upload.forum.file_list.confirm_selection_btn', this.selectedFiles.length)}
                         </Button>
                     </div>
                 </div>

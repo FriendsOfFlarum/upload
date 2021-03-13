@@ -1,7 +1,8 @@
-import Component from 'flarum/Component';
-import Button from 'flarum/components/Button';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import Component from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import mimeToIcon from '../../common/mimeToIcon';
+import classList from 'flarum/common/utils/classList';
 
 export default class UserFileList extends Component {
     oninit(vnode) {
@@ -11,9 +12,7 @@ export default class UserFileList extends Component {
         app.fileListState.setUser(vnode.attrs.user || app.session.user);
 
         this.inModal = vnode.attrs.selectable;
-
         this.restrictFileType = vnode.attrs.restrictFileType || null;
-
         this.downloadOnClick = this.attrs.downloadOnClick || false;
     }
 
@@ -33,48 +32,77 @@ export default class UserFileList extends Component {
 
                 {/* Empty personal file list */}
                 {this.inModal && state.empty() && (
-                    <p className={'fof-upload-empty'}>
-                        <i className={'fas fa-cloud-upload-alt fof-upload-empty-icon'}></i>
+                    <p className="fof-upload-empty">
+                        <i className="fas fa-cloud-upload-alt fof-upload-empty-icon" />
 
                         {app.translator.trans(`fof-upload.forum.file_list.modal_empty_${app.screen() !== 'phone' ? 'desktop' : 'phone'}`)}
                     </p>
                 )}
 
                 {/* Empty file list */}
-                {!this.inModal && state.empty() && <p className={'fof-upload-empty'}>{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
+                {!this.inModal && state.empty() && <p className="fof-upload-empty">{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
 
                 {/* File list */}
                 <ul>
                     {state.files.map((file) => {
-                        let fileClassNames = 'fof-file';
+                        const fileClassNames = classList({
+                            'fof-file': true,
+                            // File is image
+                            'fof-file-type-image': fileIcon === 'image',
+                            // File is selected
+                            'fof-file-selected': this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0,
+                        });
+
                         const fileIcon = mimeToIcon(file.type());
                         const fileSelectable = this.restrictFileType ? this.isSelectable(file) : true;
 
-                        // File is image
-                        if (fileIcon === 'image') {
-                            fileClassNames += ' fof-file-type-image';
-                        }
-
-                        // File is selected
-                        if (this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0) {
-                            fileClassNames += ' fof-file-selected';
-                        }
+                        /**
+                         * File's baseName (file name + extension)
+                         * @type {string}
+                         */
+                        const fileName = file.baseName();
 
                         return (
                             <li>
                                 <button
                                     className={fileClassNames}
                                     onclick={() => this.onFileClick(file)}
-                                    title={file.baseName()}
                                     disabled={!fileSelectable}
+                                    aria-label={app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', {
+                                        fileName,
+                                    })}
                                 >
-                                    <span className={'fof-file-icon'}>
-                                        <i className={fileIcon !== 'image' ? fileIcon : 'far fa-file-image'} />
-                                    </span>
+                                    <figure>
+                                        {fileIcon === 'image' ? (
+                                            <img
+                                                src={file.url()}
+                                                className="fof-file-image-preview"
+                                                draggable={false}
+                                                // Images should always have an `alt`, even if empty!
+                                                //
+                                                // As we already state the file name as part of the
+                                                // button alt label, there's no point in restating it.
+                                                //
+                                                // See: https://www.w3.org/WAI/tutorials/images/decorative#decorative-image-as-part-of-a-text-link
+                                                alt=""
+                                            />
+                                        ) : (
+                                            <span
+                                                className="fof-file-icon"
+                                                // Prevents a screen-reader from traversing this node.
+                                                //
+                                                // This is a placeholder for when no preview is available,
+                                                // and a preview won't benefit a user using a screen
+                                                // reader anyway, so there is no benefit to making them
+                                                // aware of a lack of a preview.
+                                                role="presentation"
+                                            >
+                                                <i className={`fa-fw ${fileIcon}`} />
+                                            </span>
+                                        )}
 
-                                    {fileIcon === 'image' && <img src={file.url()} className={'fof-file-image-preview'} draggable={false} />}
-
-                                    <span className={'fof-file-name'}>{file.baseName()}</span>
+                                        <figcaption className="fof-file-name">{fileName}</figcaption>
+                                    </figure>
                                 </button>
                             </li>
                         );
@@ -90,7 +118,7 @@ export default class UserFileList extends Component {
                             loading={state.isLoading()}
                             onclick={() => state.loadMore()}
                         >
-                            {app.translator.trans('fof-upload.forum.buttons.load_more_files')}
+                            {app.translator.trans('fof-upload.forum.file_list.load_more_files_btn')}
                         </Button>
                     </div>
                 )}

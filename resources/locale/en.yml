@@ -111,8 +111,6 @@ fof-upload:
       user_uploads: User uploads
       cancel: Cancel
       media: My media
-      load_more_files: Load more files
-      select_file: Select file|Select files
 
     file_list:
       loading: Loading files...
@@ -120,6 +118,9 @@ fof-upload:
       release_to_upload: Release to upload
       modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
       modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
+      select_file_a11y_label: Select file "{fileName}"
+      confirm_selection_btn: Select file|Select files
+      load_more_files_btn: Load more files
 
     states:
       error: Error
