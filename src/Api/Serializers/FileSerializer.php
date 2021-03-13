@@ -38,6 +38,7 @@ class FileSerializer extends AbstractSerializer
             'createdAt' => $model->created_at,
             'uuid'      => $model->uuid,
             'tag'       => $model->tag,
+            'hidden'    => $model->hidden_from_media_manager,
         ];
     }
 }

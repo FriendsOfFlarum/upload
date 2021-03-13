@@ -12,6 +12,7 @@ export default class File extends mixin(Model, {
     createdAt: Model.attribute('createdAt'),
     uuid: Model.attribute('uuid'),
     tag: Model.attribute('tag'),
+    hidden: Model.attribute('hidden'),
 }) {
     /**
      * Use FoF Uploads endpoint
