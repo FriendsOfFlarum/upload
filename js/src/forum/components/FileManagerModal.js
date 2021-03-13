@@ -54,11 +54,7 @@ export default class FileManagerModal extends Modal {
             <div className={'Modal modal-dialog ' + this.className()}>
                 <div className="Modal-content">
                     <div className="fof-modal-buttons App-backControl">
-                        {UploadButton.component({
-                            uploader: this.uploader,
-                            disabled: app.fileListState.isLoading(),
-                            isMediaUploadButton: true,
-                        })}
+                        <UploadButton uploader={this.uploader} disabled={app.fileListState.isLoading()} isMediaUploadButton />
                     </div>
 
                     <div className="fof-drag-and-drop">
@@ -73,35 +69,34 @@ export default class FileManagerModal extends Modal {
                         <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
                     </div>
 
-                    {this.alertAttrs ? <div className="Modal-alert">{Alert.component(this.alertAttrs)}</div> : ''}
+                    {this.alertAttrs && (
+                        <div className="Modal-alert">
+                            <Alert {...this.alertAttrs} />
+                        </div>
+                    )}
 
                     <div className="Modal-body">
-                        {UserFileList.component({
-                            user: this.attrs.user,
-                            selectable: true,
-                            onFileSelect: this.onFileSelect.bind(this),
-                            selectedFiles: this.selectedFiles,
-                            restrictFileType: this.restrictFileType,
-                        })}
+                        <UserFileList
+                            user={this.attrs.user}
+                            selectable
+                            onFileSelect={this.onFileSelect.bind(this)}
+                            selectedFiles={this.selectedFiles}
+                            restrictFileType={this.restrictFileType}
+                        />
                     </div>
 
                     <div className="Modal-footer">
-                        {Button.component(
-                            {
-                                onclick: this.hide.bind(this),
-                                className: 'Button',
-                            },
-                            app.translator.trans('fof-upload.forum.buttons.cancel')
-                        )}
+                        <Button onclick={this.hide.bind(this)} className="Button">
+                            {app.translator.trans('fof-upload.forum.buttons.cancel')}
+                        </Button>
 
-                        {Button.component(
-                            {
-                                onclick: this.onSelect.bind(this),
-                                disabled: this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1),
-                                className: 'Button Button--primary',
-                            },
-                            app.translator.transChoice('fof-upload.forum.buttons.select_file', this.selectedFiles.length)
-                        )}
+                        <Button
+                            onclick={this.onSelect.bind(this)}
+                            disabled={this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1)}
+                            className="Button Button--primary"
+                        >
+                            {app.translator.transChoice('fof-upload.forum.buttons.select_file', this.selectedFiles.length)}
+                        </Button>
                     </div>
                 </div>
             </div>
