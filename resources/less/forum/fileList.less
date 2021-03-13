@@ -2,6 +2,10 @@
     .fof-upload-loading {
         font-size: 20px;
         text-align: center;
+
+        .LoadingIndicator {
+            margin-top: 8px;
+        }
     }
 
     .fof-upload-empty {
@@ -22,34 +26,33 @@
     ul {
         padding: 0px;
         margin: 0 -7px;
-        
+
         display: flex;
         flex-flow: row wrap;
         position: relative;
 
         li {
             margin: 7px;
-            flex: ~"0 1 calc(20% - 14px)"; 
+            flex: ~"0 1 calc(20% - 14px)";
             list-style-type: none;
 
             @media screen and (min-width: 710px) and (max-width: 769px) {
-                flex: ~"0 1 calc(25% - 14px)"; 
+                flex: ~"0 1 calc(25% - 14px)";
             }
 
             @media screen and (min-width: 500px) and (max-width: 710px) {
-                flex: ~"0 1 calc(33% - 14px)"; 
+                flex: ~"0 1 calc(33% - 14px)";
             }
 
             @media screen and (min-width: 360px) and (max-width: 500px) {
-                flex: ~"0 1 calc(50% - 14px)"; 
+                flex: ~"0 1 calc(50% - 14px)";
             }
 
             @media screen and (max-width: 360px) {
-                flex: ~"0 1 calc(100% - 14px)"; 
+                flex: ~"0 1 calc(100% - 14px)";
             }
         }
     }
-
 
     .fof-file {
         position: relative;
