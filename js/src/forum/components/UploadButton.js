@@ -53,7 +53,7 @@ export default class UploadButton extends Component {
                         size: 'tiny',
                         className: 'LoadingIndicator--inline Button-icon',
                     })}
-                {!this.isMediaUploadButton && this.attrs.uploader.uploading && <span className="Button-label">{buttonText}</span>}
+                {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
                 <form>
                     <input type="file" multiple={true} onchange={this.process.bind(this)} />
                 </form>
