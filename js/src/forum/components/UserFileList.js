@@ -45,16 +45,16 @@ export default class UserFileList extends Component {
                 {/* File list */}
                 <ul>
                     {state.files.map((file) => {
-                        const fileClassNames = classList({
-                            'fof-file': true,
-                            // File is image
-                            'fof-file-type-image': fileIcon === 'image',
-                            // File is selected
-                            'fof-file-selected': this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0,
-                        });
-
                         const fileIcon = mimeToIcon(file.type());
                         const fileSelectable = this.restrictFileType ? this.isSelectable(file) : true;
+
+                        const fileClassNames = classList([
+                            'fof-file',
+                            // File is image
+                            fileIcon === 'image' && 'fof-file-type-image',
+                            // File is selected
+                            this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0 && 'fof-file-selected',
+                        ]);
 
                         /**
                          * File's baseName (file name + extension)
