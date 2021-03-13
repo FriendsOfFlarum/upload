@@ -17,7 +17,7 @@ return [
     'up' => function (Builder $schema) {
         if (!$schema->hasColumn('fof_upload_files', 'hide_from_media_manager')) {
             $schema->table('fof_upload_files', function (Blueprint $table) {
-                $table->boolean('hide_from_media_manager')->nullable();
+                $table->boolean('hide_from_media_manager')->default(false);
             });
         }
     },

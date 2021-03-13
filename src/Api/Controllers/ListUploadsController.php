@@ -60,9 +60,7 @@ class ListUploadsController extends AbstractListController
         $offset = $this->extractOffset($request);
 
         // Build query
-        $query = File::where([
-            'actor_id' => $filterUploads,
-        ]);
+        $query = File::where('actor_id', $filterUploads)->where('hide_from_media_manager', false);
 
         $results = $query
             ->skip($offset)
