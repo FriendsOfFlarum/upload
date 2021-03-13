@@ -3,6 +3,7 @@ import Button from 'flarum/common/components/Button';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import mimeToIcon from '../../common/mimeToIcon';
 import classList from 'flarum/common/utils/classList';
+import extractText from 'flarum/common/utils/extractText';
 
 export default class UserFileList extends Component {
     oninit(vnode) {
@@ -68,9 +69,11 @@ export default class UserFileList extends Component {
                                     className={fileClassNames}
                                     onclick={() => this.onFileClick(file)}
                                     disabled={!fileSelectable}
-                                    aria-label={app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', {
-                                        fileName,
-                                    })}
+                                    aria-label={extractText(
+                                        app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', {
+                                            fileName,
+                                        })
+                                    )}
                                 >
                                     <figure>
                                         {fileIcon === 'image' ? (
