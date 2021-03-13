@@ -1,7 +1,8 @@
 import app from 'flarum/app';
 import Component from 'flarum/Component';
-import icon from 'flarum/helpers/icon';
+import classList from 'flarum/utils/classList';
 import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import Button from 'flarum/components/Button';
 
 export default class UploadButton extends Component {
     oninit(vnode) {
@@ -14,34 +15,49 @@ export default class UploadButton extends Component {
             // redraw to reflect uploader.loading in the DOM
             m.redraw();
         });
+
+        this.isMediaUploadButton = vnode.attrs.isMediaUploadButton || false;
+    }
+
+    oncreate(vnode) {
+        super.oncreate(vnode);
+
+        // Add tooltip
+        if (!this.isMediaUploadButton) {
+            this.$().tooltip();
+        }
     }
 
     view() {
         const buttonText = this.attrs.uploader.uploading
             ? app.translator.trans('fof-upload.forum.states.loading')
-            : app.translator.trans('fof-upload.forum.buttons.attach');
+            : app.translator.trans('fof-upload.forum.buttons.upload');
 
-        return m(
-            'button.Button.hasIcon.fof-upload-button.Button--icon',
+        return Button.component(
             {
-                className: this.attrs.uploader.uploading ? 'uploading' : '',
+                className: classList([
+                    'Button',
+                    'hasIcon',
+                    'fof-upload-button',
+                    !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
+                    !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
+                    this.attrs.uploader.uploading && 'uploading',
+                ]),
+                icon: !this.attrs.uploader.uploading && 'fas fa-file-upload',
                 onclick: this.uploadButtonClicked.bind(this),
+                title: !this.isMediaUploadButton ? buttonText : null,
+                disabled: this.attrs.disabled,
             },
             [
-                this.attrs.uploader.uploading
-                    ? LoadingIndicator.component({
-                          size: 'tiny',
-                          className: 'LoadingIndicator--inline Button-icon',
-                      })
-                    : icon('fas fa-file-upload', { className: 'Button-icon' }),
-                m('span.Button-label', buttonText),
-                m('form', [
-                    m('input', {
-                        type: 'file',
-                        multiple: true,
-                        onchange: this.process.bind(this),
+                this.attrs.uploader.uploading &&
+                    LoadingIndicator.component({
+                        size: 'tiny',
+                        className: 'LoadingIndicator--inline Button-icon',
                     }),
-                ]),
+                this.isMediaUploadButton || this.attrs.uploader.uploading ? <span className="Button-label">{buttonText}</span> : null,
+                <form>
+                    <input type="file" multiple={true} onchange={this.process.bind(this)} />
+                </form>,
             ]
         );
     }
@@ -62,7 +78,7 @@ export default class UploadButton extends Component {
             return;
         }
 
-        this.attrs.uploader.upload(files);
+        this.attrs.uploader.upload(files, !this.isMediaUploadButton);
     }
 
     /**

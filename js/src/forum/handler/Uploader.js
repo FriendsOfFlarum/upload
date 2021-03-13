@@ -17,7 +17,7 @@ export default class Uploader {
         this.callbacks[type].forEach((callback) => callback(response));
     }
 
-    upload(files) {
+    upload(files, addBBcode = true) {
         this.uploading = true;
         this.dispatch('uploading', files);
 
@@ -38,7 +38,7 @@ export default class Uploader {
                 serialize: (raw) => raw,
                 body,
             })
-            .then(this.uploaded.bind(this))
+            .then((result) => this.uploaded(result, addBBcode))
             .catch((error) => {
                 this.uploading = false;
                 m.redraw();
@@ -47,10 +47,21 @@ export default class Uploader {
             });
     }
 
-    uploaded(files) {
+    uploaded(result, addBBcode = false) {
         this.uploading = false;
 
-        files.forEach((file) => this.dispatch('success', file));
+        result.data.forEach((file) => {
+            const fileObj = app.store.pushObject(file);
+
+            // Add file to media manager
+            app.fileListState.addToList(fileObj);
+
+            // Dispatch
+            this.dispatch('success', {
+                file: fileObj,
+                addBBcode,
+            });
+        });
 
         this.dispatch('uploaded');
     }

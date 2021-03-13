@@ -98,7 +98,7 @@ class UploadHandler
 
                 $uploadFileData = $this->mimeDetector->getFileType();
 
-                if ($uploadFileData['mime'] === null) {
+                if (!isset($uploadFileData['mime']) || $uploadFileData['mime'] === null) {
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
                     } catch (Exception $e) {
@@ -165,7 +165,7 @@ class UploadHandler
                 throw $e;
             }
 
-            return $template->preview($file);
+            return $file;
         });
 
         return $savedFiles->filter();

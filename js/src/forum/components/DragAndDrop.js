@@ -16,8 +16,6 @@ export default class DragAndDrop {
         this.composerElement.addEventListener('dragend', this.handlers.out);
 
         this.composerElement.addEventListener('drop', (this.handlers.dropping = this.dropping.bind(this)));
-
-        this.isDropping = this.over = false;
     }
 
     supportsFileDragging() {
@@ -88,14 +86,8 @@ export default class DragAndDrop {
 
         event.preventDefault();
 
-        if (!this.isDropping) {
-            this.isDropping = true;
-            this.composerElement.classList.add('fof-upload-dropping');
+        this.upload(event.dataTransfer.files);
 
-            this.upload(event.dataTransfer.files, () => {
-                this.composerElement.classList.remove('fof-upload-dropping');
-                this.isDropping = false;
-            });
-        }
+        this.composerElement.classList.remove('fof-upload-dragging');
     }
 }

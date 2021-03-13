@@ -1,0 +1,103 @@
+.fof-file-manager-modal {
+    .fof-modal-buttons {
+        @media screen and (min-width: 768px) {
+            position: absolute;
+            right: 10px;
+            top: 22px;
+            z-index: 1;
+        }
+
+        @media screen and (max-width: 768px) {
+            left: unset;
+            right: 0;
+        }
+
+        // Show full content on desktop
+        @media screen and (min-width: 767px) {
+            .Button.fof-upload-button {
+                width: auto;
+                padding: 8px 13px;
+
+                @media screen and (min-width: 767px) {
+                    margin-right: 10px;
+                }
+
+                .Button-icon {
+                    margin-right: 7px;
+                }
+
+                .Button-label {
+                    display: inline-block;
+                }
+            }
+        }
+
+        // Hide attach button label
+        @media screen and (max-width: 767px) {
+            .fof-upload-button:not(.uploading) {
+                .Button-icon {
+                    margin: 0;
+                }
+                
+                .Button-label {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .fof-drag-and-drop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: fade(@control-bg, 90%);
+        z-index: 5;
+        transition: opacity 150ms ease-in-out;
+        pointer-events: none;
+        opacity: 0;
+
+        .fof-drag-and-drop-release {
+            position: absolute;
+            top: 50%;
+            text-align: center;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            font-size: 30px;
+
+            > i {
+                display: block;
+                margin-bottom: 20px;
+                font-size: 75px;
+            }
+        }
+    }
+
+    .Modal-content.fof-upload-dragging,
+    .Modal-content.fof-upload-dropping {
+        .fof-drag-and-drop {
+            opacity: 1;
+        }
+    }
+
+    .Modal-body {
+        max-height: 500px;
+        overflow: auto;
+
+        // Full height on mobile devices
+        @media screen and (max-width: 767px) {
+            height: ~"calc(100vh - 122px)";
+            max-height: unset;
+        }
+    }
+
+    .Modal-footer {
+        text-align: right;
+
+        .Button {
+            margin-left: 10px;
+        }
+    }
+}

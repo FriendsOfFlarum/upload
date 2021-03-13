@@ -14,7 +14,6 @@ namespace FoF\Upload\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
 use FoF\Upload\File;
-use Illuminate\Support\Arr;
 
 class FileSerializer extends AbstractSerializer
 {
@@ -29,11 +28,16 @@ class FileSerializer extends AbstractSerializer
      */
     protected function getDefaultAttributes($model)
     {
-        $attributes = Arr::only(
-            $model->attributesToArray(),
-            ['uuid', 'base_name', 'tag']
-        );
-
-        return $attributes;
+        return [
+            'baseName' => $model->base_name,
+            'path' => $model->path,
+            'url' => $model->url,
+            'type' => $model->type,
+            'size' => $model->size,
+            'humanSize' => $model->humanSize,
+            'createdAt' => $model->created_at,
+            'uuid' => $model->uuid,
+            'tag' => $model->tag
+        ];
     }
 }

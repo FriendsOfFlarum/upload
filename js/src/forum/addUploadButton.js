@@ -5,6 +5,7 @@ import UploadButton from './components/UploadButton';
 import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
+import FileManagerButton from './components/FileManagerButton';
 
 export default function () {
     extend(TextEditor.prototype, 'oninit', function () {
@@ -13,19 +14,36 @@ export default function () {
     extend(TextEditor.prototype, 'controlItems', function (items) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        items.add(
-            'fof-upload',
-            UploadButton.component({
-                uploader: this.uploader,
-            })
-        );
+        const composerButtonVisiblity = app.forum.attribute('fof-upload.composerButtonVisiblity');
+
+        // Add media button
+        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'media-btn') {
+            items.add(
+                'fof-upload-media',
+                FileManagerButton.component({
+                    uploader: this.uploader,
+                })
+            );
+        }
+
+        // Add upload button
+        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'upload-btn') {
+            items.add(
+                'fof-upload',
+                UploadButton.component({
+                    uploader: this.uploader,
+                })
+            );
+        }
     });
 
     extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {
         if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        this.uploader.on('success', (image) => {
-            this.attrs.composer.editor.insertAtCursor(image + '\n');
+        this.uploader.on('success', ({ file, addBBcode }) => {
+            if (!addBBcode) return;
+
+            this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n');
 
             // We wrap this in a typeof check to prevent it running when a user
             // is creating a new discussion. There's nothing to preview in a new

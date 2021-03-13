@@ -1,0 +1,130 @@
+.fof-upload-file-list {
+    .fof-upload-loading {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .fof-upload-empty {
+        font-size: 20px;
+        text-align: center;
+
+        @media screen and (min-width: 769px) {
+            padding: 40px 0;
+        }
+
+        .fof-upload-empty-icon {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 35px;
+        }
+    }
+
+    ul {
+        padding: 0px;
+        margin: 0 -7px;
+        
+        display: flex;
+        flex-flow: row wrap;
+        position: relative;
+
+        li {
+            margin: 7px;
+            flex: ~"0 1 calc(20% - 14px)"; 
+            list-style-type: none;
+
+            @media screen and (min-width: 710px) and (max-width: 769px) {
+                flex: ~"0 1 calc(25% - 14px)"; 
+            }
+
+            @media screen and (min-width: 500px) and (max-width: 710px) {
+                flex: ~"0 1 calc(33% - 14px)"; 
+            }
+
+            @media screen and (min-width: 360px) and (max-width: 500px) {
+                flex: ~"0 1 calc(50% - 14px)"; 
+            }
+
+            @media screen and (max-width: 360px) {
+                flex: ~"0 1 calc(100% - 14px)"; 
+            }
+        }
+    }
+
+
+    .fof-file {
+        position: relative;
+        display: block;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        background: @body-bg;
+        background-position: center center;
+        background-size: cover;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid @control-bg;
+        outline: none;
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        transition: box-shadow 150ms ease-in-out, border-color 150ms ease-in-out;
+
+        &:before {
+            content: "";
+            display: block;
+            padding-top: 100%;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+        }
+
+        &:hover:not(:disabled):not(.fof-file-selected) {
+            border-color: darken(@body-bg, 20%);
+        }
+
+        .fof-file-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -68%);
+            font-size: 45px;
+        }
+
+        .fof-file-image-preview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            max-height: 100%;
+            transform: translate(-50%, -50%);
+            opacity: if(@config-dark-mode, 0.6, 1);
+        }
+
+        .fof-file-name {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            padding: 10px;
+            font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+        }
+
+        &.fof-file-type-image {
+            .fof-file-name {
+                background: fade(@body-bg, 80%);
+                color: @text-color;
+            }
+        }
+
+        &.fof-file-selected {
+            box-shadow: 0 0 0 3px fade(@primary-color, 60%);
+        }
+    }
+
+    .fof-load-more-files {
+        text-align: center;
+        padding: 40px 20px 20px;
+    }
+}

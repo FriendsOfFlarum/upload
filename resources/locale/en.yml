@@ -26,6 +26,8 @@ fof-upload:
         The following settings are only required when using S3 compatible storage. If you use AWS, you can leave them blank.
       s3_acl: |
         The ACL that should be applied to the uploaded object (default: private). For possible values, see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+      composer_buttons: |
+        By default both the media manager button and upload button are visible. You can also choose to display only one button.
     labels:
       aws-s3:
         bucket: Bucket
@@ -69,9 +71,18 @@ fof-upload:
         position: Watermark position
         title: Watermark images
         toggle: Watermark images
+      composer_buttons:
+        title: Composer buttons
+        options:
+          both: Both
+          upload-btn: Upload button only
+          media-btn: Media manager button only
+
     permissions:
       download_label: Download files
       upload_label: Upload files
+      view_user_uploads_label: View user uploads
+      delete_user_uploads_label: Delete user uploads
     templates:
       file: Default file download template
       file_description: |
@@ -92,8 +103,24 @@ fof-upload:
       ovh-svfs: OVH SVFS
       qiniu: QiNiu
   forum:
+    media_manager: Media manager
+
     buttons:
       attach: Attach
+      upload: Upload
+      user_uploads: User uploads
+      cancel: Cancel
+      media: My media
+      load_more_files: Load more files
+      select_file: Select file|Select files
+
+    file_list:
+      loading: Loading files...
+      empty: There are no files to show.
+      release_to_upload: Release to upload
+      modal_empty_desktop: Your file list is empty. Click or drag a file here to upload.
+      modal_empty_phone: Your file list is empty. Select a file to upload.
+
     states:
       error: Error
       loading: Uploading
