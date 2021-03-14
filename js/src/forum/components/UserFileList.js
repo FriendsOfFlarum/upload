@@ -23,6 +23,11 @@ export default class UserFileList extends Component {
          * @type {string[]} List of file UUIDs currently being hidden.
          */
         this.filesBeingHidden = [];
+
+        /**
+         * The user who's media we are dealing with
+         */
+        this.user = vnode.attrs.user;
     }
 
     view() {
@@ -78,13 +83,16 @@ export default class UserFileList extends Component {
 
                         return (
                             <li aria-busy={isFileHiding}>
-                                <Button
+                                {app.session.user && (this.user === app.session.user || app.session.user.deleteOthersMediaLibrary()) && (
+                                    <Button
                                     className="Button Button--icon fof-file-delete"
                                     icon="far fa-trash-alt"
                                     aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName })}
                                     disabled={isFileHiding}
                                     onclick={this.hideFile.bind(this, file)}
                                 />
+                                )}
+                                
                                 <button
                                     className={fileClassNames}
                                     onclick={() => this.onFileClick(file)}
