@@ -1,8 +1,9 @@
 import app from 'flarum/app';
-import Component from 'flarum/Component';
-import classList from 'flarum/utils/classList';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
-import Button from 'flarum/components/Button';
+import Component from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import classList from 'flarum/common/utils/classList';
+import extractText from 'flarum/common/utils/extractText';
 
 export default class UploadButton extends Component {
     oninit(vnode) {
@@ -45,7 +46,7 @@ export default class UploadButton extends Component {
                 ])}
                 icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
                 onclick={this.uploadButtonClicked.bind(this)}
-                title={this.isMediaUploadButton ? buttonText : null}
+                title={!this.isMediaUploadButton && buttonText}
                 disabled={this.attrs.disabled}
             >
                 {this.attrs.uploader.uploading && <LoadingIndicator size="tiny" className="LoadingIndicator--inline Button-icon" />}
