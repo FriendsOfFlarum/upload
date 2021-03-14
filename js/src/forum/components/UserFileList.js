@@ -76,8 +76,6 @@ export default class UserFileList extends Component {
 
                         const isFileHiding = this.filesBeingHidden.includes(file.uuid());
 
-                        console.info(fileName, file);
-
                         return (
                             <li aria-busy={isFileHiding}>
                                 <Button
@@ -254,9 +252,6 @@ export default class UserFileList extends Component {
                     // Remove file from hiding list
                     const i = this.filesBeingHidden.indexOf(uuid);
                     this.filesBeingHidden.splice(i, 1);
-
-                    // Force redraw
-                    // m.redraw();
                 });
         } else {
             // Remove file from hiding list
