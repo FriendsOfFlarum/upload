@@ -27,7 +27,7 @@ export default class UserFileList extends Component {
         /**
          * The user who's media we are dealing with
          */
-        this.user = vnode.attrs.user;
+        this.user = app.fileListState.user;
     }
 
     view() {
