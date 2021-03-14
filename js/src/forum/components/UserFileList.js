@@ -15,9 +15,16 @@ export default class UserFileList extends Component {
         this.inModal = vnode.attrs.selectable;
         this.restrictFileType = vnode.attrs.restrictFileType || null;
         this.downloadOnClick = this.attrs.downloadOnClick || false;
+        /**
+         * @type {string[]} List of file UUIDs currently being hidden.
+         */
+        this.filesBeingHidden = [];
     }
 
     view() {
+        /**
+         * @type {{empty(): boolean, files: import('../../common/models/File').default[]}}
+         */
         const state = app.fileListState;
 
         return (
@@ -63,17 +70,24 @@ export default class UserFileList extends Component {
                          */
                         const fileName = file.baseName();
 
+                        const isFileHiding = this.filesBeingHidden.includes(file.uuid());
+
+                        console.info(fileName, file);
+
                         return (
-                            <li>
+                            <li aria-busy={isFileHiding}>
+                                <Button
+                                    className="Button Button--icon fof-file-delete"
+                                    icon="far fa-trash-alt"
+                                    aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName })}
+                                    disabled={isFileHiding}
+                                    onclick={this.hideFile.bind(this, file)}
+                                />
                                 <button
                                     className={fileClassNames}
                                     onclick={() => this.onFileClick(file)}
-                                    disabled={!fileSelectable}
-                                    aria-label={extractText(
-                                        app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', {
-                                            fileName,
-                                        })
-                                    )}
+                                    disabled={!fileSelectable || isFileHiding}
+                                    aria-label={extractText(app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', { fileName }))}
                                 >
                                     <figure>
                                         {fileIcon === 'image' ? (
@@ -105,6 +119,12 @@ export default class UserFileList extends Component {
                                         )}
 
                                         <figcaption className="fof-file-name">{fileName}</figcaption>
+
+                                        {isFileHiding && (
+                                            <span class="fof-file-loading" role="status" aria-label={app.translator.trans('')}>
+                                                <LoadingIndicator />
+                                            </span>
+                                        )}
                                     </figure>
                                 </button>
                             </li>
@@ -177,5 +197,67 @@ export default class UserFileList extends Component {
         }
 
         return false;
+    }
+
+    /**
+     * Begins the hiding process for a file.
+     *
+     * - Shows a native confirmation dialog
+     * - If confirmed, sends AJAX request to the hide file API
+     *
+     * @param {import('../../common/models/File').default} file File to hide
+     */
+    hideFile(file) {
+        /**
+         * @type {string} File UUID
+         */
+        const uuid = file.uuid();
+
+        if (this.filesBeingHidden.includes(uuid)) return;
+
+        this.filesBeingHidden.push(uuid);
+
+        const confirmHide = confirm(
+            extractText(app.translator.trans('fof-upload.forum.file_list.hide_file.hide_confirmation', { fileName: file.baseName() }))
+        );
+
+        if (confirmHide) {
+            app.request({
+                method: 'PATCH',
+                url: `${app.forum.attribute('apiUrl')}/fof/upload/hide`,
+                body: { uuid },
+            })
+                .then(() => {
+                    app.alerts.show(Alert, { type: 'success' }, app.translator.trans('fof-upload.forum.file_list.hide_file.hide_success'));
+                })
+                .catch(() => {
+                    app.alerts.show(
+                        Alert,
+                        { type: 'error' },
+                        app.translator.trans('fof-upload.forum.file_list.hide_file.hide_fail', { fileName: file.fileName() })
+                    );
+                })
+                .then(() => {
+                    // Remove hidden file from state
+                    /**
+                     * @type {{ files: import('../../common/models/File').default[] }}
+                     */
+                    const state = app.fileListState;
+
+                    const index = state.files.findIndex((file) => uuid === file.uuid());
+                    state.files.splice(index, 1);
+
+                    // Remove file from hiding list
+                    const i = this.filesBeingHidden.indexOf(uuid);
+                    this.filesBeingHidden.splice(i, 1);
+
+                    // Force redraw
+                    // m.redraw();
+                });
+        } else {
+            // Remove file from hiding list
+            const i = this.filesBeingHidden.indexOf(uuid);
+            this.filesBeingHidden.splice(i, 1);
+        }
     }
 }

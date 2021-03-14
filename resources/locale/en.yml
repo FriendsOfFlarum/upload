@@ -121,6 +121,11 @@ fof-upload:
       select_file_a11y_label: Select file "{fileName}"
       confirm_selection_btn: Select file|Select files
       load_more_files_btn: Load more files
+      hide_file:
+        btn_a11y_label: Hide "{fileName}" from media manager
+        hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
+        hide_success: File hidden
+        hide_fail: Couldn't hide file "{fileName}"
 
     states:
       error: Error
