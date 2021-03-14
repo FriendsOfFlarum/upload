@@ -23,8 +23,6 @@ export default class UploadsUserPage extends UserPage {
         } else {
             return null;
         }
-
-        
     }
 
     show(user) {
