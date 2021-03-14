@@ -32,7 +32,7 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
         $uuid = Arr::get($request->getParsedBody(), 'uuid');
 
         if (empty($uuid)) {
-            throw new ValidationException(['uuid cannot be empty']);
+            throw new ValidationException(['UUID cannot be empty']);
         }
 
         $fileUpload = File::where('uuid', $uuid)->firstOrFail();

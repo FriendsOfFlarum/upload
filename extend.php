@@ -23,7 +23,7 @@ return [
         ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
         ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
         ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
-        ->post('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
+        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
 
     (new Extend\Frontend('admin'))
         ->css(__DIR__.'/resources/less/admin.less')
