@@ -32,7 +32,7 @@ export default class UserFileList extends Component {
         const state = app.fileListState;
 
         return (
-            <div className={'fof-upload-file-list'}>
+            <div className="fof-upload-file-list" aria-live="polite">
                 {/* Loading */}
                 {state.isLoading() && state.files.length === 0 && (
                     <div className={'fof-upload-loading'}>
