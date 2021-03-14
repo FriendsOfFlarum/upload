@@ -156,7 +156,7 @@ export default class UserFileList extends Component {
     /**
      * Execute function on file click
      *
-     * @param {*} file
+     * @param {import('../../common/models/File').default} file
      */
     onFileClick(file) {
         // Custom functionality
@@ -175,7 +175,7 @@ export default class UserFileList extends Component {
     /**
      * Check if a file is selectable
      *
-     * @param {File} file
+     * @param {import('../../common/models/File').default} file
      */
     isSelectable(file) {
         const fileType = file.type();
