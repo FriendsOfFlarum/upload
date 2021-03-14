@@ -1,7 +1,12 @@
 const image = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml', 'image/gif'];
 const archive = ['application/zip', 'application/x-7z-compressed', 'application/gzip', 'application/vnd.rar', 'application/x-rar-compressed'];
 const code = ['text/html', 'text/css', 'text/javascript', 'application/json', 'application/ld+json', 'text/javascript', 'application/x-httpd-php'];
-const word = ['application/x-abiword', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+const word = [
+    'application/x-abiword',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/pdf',
+];
 
 /**
  *
