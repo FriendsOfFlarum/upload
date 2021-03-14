@@ -14,6 +14,7 @@ namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Foundation\ValidationException;
 use Flarum\User\Exception\PermissionDeniedException;
+use Flarum\User\User;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\EmptyResponse;
@@ -37,8 +38,10 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
 
         $fileUpload = File::where('uuid', $uuid)->firstOrFail();
 
+        $fileUser = User::find($fileUpload->actor_id);
+
         // If the actor does not own the file and the actor does not have edit uploads of others permission..
-        if ($actor->id !== $fileUpload->actor_id && !$actor->hasPermission('fof-upload.viewUserUploads')) {
+        if ($actor->id !== $fileUpload->actor_id && !$actor->hasPermission('fof-upload.deleteUserUploads')) {
             throw new PermissionDeniedException();
         }
 
