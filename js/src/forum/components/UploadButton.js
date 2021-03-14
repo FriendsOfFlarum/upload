@@ -3,7 +3,6 @@ import Component from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
-import extractText from 'flarum/common/utils/extractText';
 
 export default class UploadButton extends Component {
     oninit(vnode) {
@@ -34,6 +33,25 @@ export default class UploadButton extends Component {
             ? app.translator.trans('fof-upload.forum.states.loading')
             : app.translator.trans('fof-upload.forum.buttons.upload');
 
+        /**
+         * Flarum core has decided that all buttons should have tooltips, but
+         * it uses `extractText` to get a title attr when none is provided.
+         *
+         * That returns `false` when no text is available, like the icon in a
+         * button.
+         *
+         * This means that it starts creating weird tooltips, such as `falsefalse`
+         * and `falseUpload`.
+         *
+         * To override this behaviour, we pass `" "` when no tooltip is desired.
+         * Using `""` won't work as JS interprets this as a falsey value which will
+         * trigger the core logic.
+         *
+         * Thankfully, browsers ignore title attributes made of only whitespace,
+         * preventing a ghost-like tooltip.
+         */
+        const tooltip = (!this.isMediaUploadButton && buttonText) || ' ';
+
         return (
             <Button
                 className={classList([
@@ -46,7 +64,7 @@ export default class UploadButton extends Component {
                 ])}
                 icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
                 onclick={this.uploadButtonClicked.bind(this)}
-                title={!this.isMediaUploadButton && buttonText}
+                title={tooltip}
                 disabled={this.attrs.disabled}
             >
                 {this.attrs.uploader.uploading && <LoadingIndicator size="tiny" className="LoadingIndicator--inline Button-icon" />}
