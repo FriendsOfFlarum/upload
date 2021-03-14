@@ -1,9 +1,13 @@
 import Component from 'flarum/common/Component';
+
 import Button from 'flarum/common/components/Button';
+import Alert from 'flarum/common/components/Alert';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
-import mimeToIcon from '../../common/mimeToIcon';
+
 import classList from 'flarum/common/utils/classList';
 import extractText from 'flarum/common/utils/extractText';
+
+import mimeToIcon from '../../common/mimeToIcon';
 
 export default class UserFileList extends Component {
     oninit(vnode) {
