@@ -38,8 +38,6 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
 
         $fileUpload = File::where('uuid', $uuid)->firstOrFail();
 
-        $fileUser = User::find($fileUpload->actor_id);
-
         // If the actor does not own the file and the actor does not have edit uploads of others permission..
         if ($actor->id !== $fileUpload->actor_id && !$actor->hasPermission('fof-upload.deleteUserUploads')) {
             throw new PermissionDeniedException();
