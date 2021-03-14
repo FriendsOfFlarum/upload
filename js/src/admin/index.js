@@ -34,5 +34,12 @@ app.initializers.add('fof-upload', (app) => {
             },
             'moderate',
             50
+        )
+        .registerPermission(
+            {
+                icon: 'fas fa-eye',
+                label: app.translator.trans('fof-upload.admin.permissions.delete_uploads_of_others_label'),
+                permission: 'fof-upload.deleteUserUploads',
+            }
         );
 });
