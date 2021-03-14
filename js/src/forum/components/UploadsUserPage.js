@@ -11,16 +11,18 @@ export default class UploadsUserPage extends UserPage {
     }
 
     content() {
-        if (this.user !== app.session.user && !app.forum.attribute('fof-upload.canViewUserUploads')) return null;
-
-        return (
-            this.user &&
-            UserFileList.component({
-                user: this.user,
-                selectable: false,
-                downloadOnClick: true,
-            })
-        );
+        if (app.session.user && (app.session.user.viewOthersMediaLibrary() || this.user === app.session.user)) {
+            return (
+                this.user &&
+                UserFileList.component({
+                    user: this.user,
+                    selectable: false,
+                    downloadOnClick: true,
+                })
+            );
+        } else {
+            return null;
+        }
     }
 
     show(user) {

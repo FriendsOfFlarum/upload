@@ -1,6 +1,12 @@
-import Component from 'flarum/Component';
-import Button from 'flarum/components/Button';
-import LoadingIndicator from 'flarum/components/LoadingIndicator';
+import Component from 'flarum/common/Component';
+
+import Button from 'flarum/common/components/Button';
+import Alert from 'flarum/common/components/Alert';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+
+import classList from 'flarum/common/utils/classList';
+import extractText from 'flarum/common/utils/extractText';
+
 import mimeToIcon from '../../common/mimeToIcon';
 
 export default class UserFileList extends Component {
@@ -11,17 +17,27 @@ export default class UserFileList extends Component {
         app.fileListState.setUser(vnode.attrs.user || app.session.user);
 
         this.inModal = vnode.attrs.selectable;
-
         this.restrictFileType = vnode.attrs.restrictFileType || null;
-
         this.downloadOnClick = this.attrs.downloadOnClick || false;
+        /**
+         * @type {string[]} List of file UUIDs currently being hidden.
+         */
+        this.filesBeingHidden = [];
+
+        /**
+         * The user who's media we are dealing with
+         */
+        this.user = app.fileListState.user;
     }
 
     view() {
+        /**
+         * @type {{empty(): boolean, files: import('../../common/models/File').default[]}}
+         */
         const state = app.fileListState;
 
         return (
-            <div className={'fof-upload-file-list'}>
+            <div className="fof-upload-file-list" aria-live="polite">
                 {/* Loading */}
                 {state.isLoading() && state.files.length === 0 && (
                     <div className={'fof-upload-loading'}>
@@ -33,48 +49,97 @@ export default class UserFileList extends Component {
 
                 {/* Empty personal file list */}
                 {this.inModal && state.empty() && (
-                    <p className={'fof-upload-empty'}>
-                        <i className={'fas fa-cloud-upload-alt fof-upload-empty-icon'}></i>
+                    <p className="fof-upload-empty">
+                        <i className="fas fa-cloud-upload-alt fof-upload-empty-icon" />
 
                         {app.translator.trans(`fof-upload.forum.file_list.modal_empty_${app.screen() !== 'phone' ? 'desktop' : 'phone'}`)}
                     </p>
                 )}
 
                 {/* Empty file list */}
-                {!this.inModal && state.empty() && <p className={'fof-upload-empty'}>{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
+                {!this.inModal && state.empty() && <p className="fof-upload-empty">{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
 
                 {/* File list */}
                 <ul>
                     {state.files.map((file) => {
-                        let fileClassNames = 'fof-file';
                         const fileIcon = mimeToIcon(file.type());
                         const fileSelectable = this.restrictFileType ? this.isSelectable(file) : true;
 
-                        // File is image
-                        if (fileIcon === 'image') {
-                            fileClassNames += ' fof-file-type-image';
-                        }
+                        const fileClassNames = classList([
+                            'fof-file',
+                            // File is image
+                            fileIcon === 'image' && 'fof-file-type-image',
+                            // File is selected
+                            this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0 && 'fof-file-selected',
+                        ]);
 
-                        // File is selected
-                        if (this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0) {
-                            fileClassNames += ' fof-file-selected';
-                        }
+                        /**
+                         * File's baseName (file name + extension)
+                         * @type {string}
+                         */
+                        const fileName = file.baseName();
+
+                        const isFileHiding = this.filesBeingHidden.includes(file.uuid());
 
                         return (
-                            <li>
+                            <li aria-busy={isFileHiding}>
+                                {app.session.user && (this.user === app.session.user || app.session.user.deleteOthersMediaLibrary()) && (
+                                    <Button
+                                        className="Button Button--icon fof-file-delete"
+                                        icon="far fa-trash-alt"
+                                        aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName })}
+                                        disabled={isFileHiding}
+                                        onclick={this.hideFile.bind(this, file)}
+                                    />
+                                )}
+
                                 <button
                                     className={fileClassNames}
                                     onclick={() => this.onFileClick(file)}
-                                    title={file.baseName()}
-                                    disabled={!fileSelectable}
+                                    disabled={!fileSelectable || isFileHiding}
+                                    aria-label={extractText(app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', { fileName }))}
                                 >
-                                    <span className={'fof-file-icon'}>
-                                        <i className={fileIcon !== 'image' ? fileIcon : 'far fa-file-image'} />
-                                    </span>
+                                    <figure>
+                                        {fileIcon === 'image' ? (
+                                            <img
+                                                src={file.url()}
+                                                className="fof-file-image-preview"
+                                                draggable={false}
+                                                // Images should always have an `alt`, even if empty!
+                                                //
+                                                // As we already state the file name as part of the
+                                                // button alt label, there's no point in restating it.
+                                                //
+                                                // See: https://www.w3.org/WAI/tutorials/images/decorative#decorative-image-as-part-of-a-text-link
+                                                alt=""
+                                            />
+                                        ) : (
+                                            <span
+                                                className="fof-file-icon"
+                                                // Prevents a screen-reader from traversing this node.
+                                                //
+                                                // This is a placeholder for when no preview is available,
+                                                // and a preview won't benefit a user using a screen
+                                                // reader anyway, so there is no benefit to making them
+                                                // aware of a lack of a preview.
+                                                role="presentation"
+                                            >
+                                                <i className={`fa-fw ${fileIcon}`} />
+                                            </span>
+                                        )}
 
-                                    {fileIcon === 'image' && <img src={file.url()} className={'fof-file-image-preview'} draggable={false} />}
+                                        <figcaption className="fof-file-name">{fileName}</figcaption>
 
-                                    <span className={'fof-file-name'}>{file.baseName()}</span>
+                                        {isFileHiding && (
+                                            <span
+                                                class="fof-file-loading"
+                                                role="status"
+                                                aria-label={app.translator.trans('fof-upload.forum.file_list.hide_file.loading')}
+                                            >
+                                                <LoadingIndicator />
+                                            </span>
+                                        )}
+                                    </figure>
                                 </button>
                             </li>
                         );
@@ -90,7 +155,7 @@ export default class UserFileList extends Component {
                             loading={state.isLoading()}
                             onclick={() => state.loadMore()}
                         >
-                            {app.translator.trans('fof-upload.forum.buttons.load_more_files')}
+                            {app.translator.trans('fof-upload.forum.file_list.load_more_files_btn')}
                         </Button>
                     </div>
                 )}
@@ -101,7 +166,7 @@ export default class UserFileList extends Component {
     /**
      * Execute function on file click
      *
-     * @param {*} file
+     * @param {import('../../common/models/File').default} file
      */
     onFileClick(file) {
         // Custom functionality
@@ -120,7 +185,7 @@ export default class UserFileList extends Component {
     /**
      * Check if a file is selectable
      *
-     * @param {File} file
+     * @param {import('../../common/models/File').default} file
      */
     isSelectable(file) {
         const fileType = file.type();
@@ -146,5 +211,64 @@ export default class UserFileList extends Component {
         }
 
         return false;
+    }
+
+    /**
+     * Begins the hiding process for a file.
+     *
+     * - Shows a native confirmation dialog
+     * - If confirmed, sends AJAX request to the hide file API
+     *
+     * @param {import('../../common/models/File').default} file File to hide
+     */
+    hideFile(file) {
+        /**
+         * @type {string} File UUID
+         */
+        const uuid = file.uuid();
+
+        if (this.filesBeingHidden.includes(uuid)) return;
+
+        this.filesBeingHidden.push(uuid);
+
+        const confirmHide = confirm(
+            extractText(app.translator.trans('fof-upload.forum.file_list.hide_file.hide_confirmation', { fileName: file.baseName() }))
+        );
+
+        if (confirmHide) {
+            app.request({
+                method: 'PATCH',
+                url: `${app.forum.attribute('apiUrl')}/fof/upload/hide`,
+                body: { uuid },
+            })
+                .then(() => {
+                    app.alerts.show(Alert, { type: 'success' }, app.translator.trans('fof-upload.forum.file_list.hide_file.hide_success'));
+                })
+                .catch(() => {
+                    app.alerts.show(
+                        Alert,
+                        { type: 'error' },
+                        app.translator.trans('fof-upload.forum.file_list.hide_file.hide_fail', { fileName: file.fileName() })
+                    );
+                })
+                .then(() => {
+                    // Remove hidden file from state
+                    /**
+                     * @type {{ files: import('../../common/models/File').default[] }}
+                     */
+                    const state = app.fileListState;
+
+                    const index = state.files.findIndex((file) => uuid === file.uuid());
+                    state.files.splice(index, 1);
+
+                    // Remove file from hiding list
+                    const i = this.filesBeingHidden.indexOf(uuid);
+                    this.filesBeingHidden.splice(i, 1);
+                });
+        } else {
+            // Remove file from hiding list
+            const i = this.filesBeingHidden.indexOf(uuid);
+            this.filesBeingHidden.splice(i, 1);
+        }
     }
 }

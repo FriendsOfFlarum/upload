@@ -41,6 +41,7 @@ use Illuminate\Support\Str;
  * @property User                                                $actor
  * @property \Illuminate\Database\Eloquent\Collection|Download[] $downloads
  * @property Carbon                                              $created_at
+ * @property bool                                                $hide_from_media_manager
  */
 class File extends AbstractModel
 {

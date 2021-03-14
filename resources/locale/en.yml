@@ -82,7 +82,7 @@ fof-upload:
       download_label: Download files
       upload_label: Upload files
       view_user_uploads_label: View user uploads
-      delete_user_uploads_label: Delete user uploads
+      delete_uploads_of_others_label: Delete user uploads
     templates:
       file: Default file download template
       file_description: |
@@ -111,15 +111,22 @@ fof-upload:
       user_uploads: User uploads
       cancel: Cancel
       media: My media
-      load_more_files: Load more files
-      select_file: Select file|Select files
 
     file_list:
       loading: Loading files...
       empty: There are no files to show.
       release_to_upload: Release to upload
-      modal_empty_desktop: Your file list is empty. Click or drag a file here to upload.
-      modal_empty_phone: Your file list is empty. Select a file to upload.
+      modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
+      modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
+      select_file_a11y_label: Select file "{fileName}"
+      confirm_selection_btn: Select file|Select files
+      load_more_files_btn: Load more files
+      hide_file:
+        btn_a11y_label: Hide "{fileName}" from media manager
+        hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
+        hide_success: File hidden
+        hide_fail: Couldn't hide file "{fileName}"
+        loading: Hiding file...
 
     states:
       error: Error

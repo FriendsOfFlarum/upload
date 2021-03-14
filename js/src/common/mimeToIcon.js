@@ -1,11 +1,24 @@
-const image = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml'];
+const image = ['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml', 'image/gif'];
 const archive = ['application/zip', 'application/x-7z-compressed', 'application/gzip', 'application/vnd.rar', 'application/x-rar-compressed'];
 const code = ['text/html', 'text/css', 'text/javascript', 'application/json', 'application/ld+json', 'text/javascript', 'application/x-httpd-php'];
-const word = ['application/x-abiword', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+const word = [
+    'application/x-abiword',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/pdf',
+];
 
+/**
+ * Returns a FontAwesome icon class for a specified MIME type.
+ *
+ * If it's a known image type, it returns `image` instead.
+ *
+ * @param {string} fileType MIME type
+ * @returns {string} Icon for MIME type
+ */
 export default function mimeToIcon(fileType) {
     // Display image (do not display for)
-    if (image.indexOf(fileType) >= 0) {
+    if (image.includes(fileType)) {
         return 'image';
     }
     // Display image icon for other types
