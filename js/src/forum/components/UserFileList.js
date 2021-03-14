@@ -123,7 +123,11 @@ export default class UserFileList extends Component {
                                         <figcaption className="fof-file-name">{fileName}</figcaption>
 
                                         {isFileHiding && (
-                                            <span class="fof-file-loading" role="status" aria-label={app.translator.trans('')}>
+                                            <span
+                                                class="fof-file-loading"
+                                                role="status"
+                                                aria-label={app.translator.trans('fof-upload.forum.file_list.hide_file.loading')}
+                                            >
                                                 <LoadingIndicator />
                                             </span>
                                         )}

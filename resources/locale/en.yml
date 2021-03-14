@@ -126,6 +126,7 @@ fof-upload:
         hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
         hide_success: File hidden
         hide_fail: Couldn't hide file "{fileName}"
+        loading: Hiding file...
 
     states:
       error: Error
