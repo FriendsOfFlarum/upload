@@ -1,3 +1,5 @@
+import app from 'flarum/common/app';
+
 export default class FileListState {
     constructor() {
         this.user = null;

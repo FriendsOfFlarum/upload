@@ -1,6 +1,6 @@
-import app from 'flarum/app';
-import { extend } from 'flarum/extend';
-import Post from 'flarum/components/Post';
+import app from 'flarum/common/app';
+import { extend } from 'flarum/common/extend';
+import Post from 'flarum/forum/components/Post';
 
 /* global $ */
 

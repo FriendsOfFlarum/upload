@@ -119,7 +119,7 @@ class UploadHandler
                 }
 
                 if (!$adapter->forMime($uploadFileData['mime'])) {
-                    throw new ValidationException(['upload' => app('translator')->trans('fof-upload.api.upload_errors.unsupported_type', ['mime' => $uploadFileData['mime']])]);
+                    throw new ValidationException(['upload' => resolve('translator')->trans('fof-upload.api.upload_errors.unsupported_type', ['mime' => $uploadFileData['mime']])]);
                 }
 
                 $file = $this->files->createFileFromUpload($upload, $command->actor, $uploadFileData['mime']);
@@ -183,7 +183,7 @@ class UploadHandler
         }
 
         /** @var Manager $manager */
-        $manager = app(Manager::class);
+        $manager = resolve(Manager::class);
 
         return $manager->instantiate($adapter);
     }

@@ -36,14 +36,14 @@ class Util
     public function getAvailableUploadMethods()
     {
         /** @var Manager $manager */
-        $manager = app(Manager::class);
+        $manager = resolve(Manager::class);
 
         return $manager->adapters()
             ->filter(function ($available) {
                 return $available;
             })
             ->map(function ($available, $item) {
-                return app('translator')->trans('fof-upload.admin.upload_methods.'.$item);
+                return resolve('translator')->trans('fof-upload.admin.upload_methods.'.$item);
             });
     }
 
@@ -74,7 +74,7 @@ class Util
      */
     public function getMimeTypesConfiguration()
     {
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
         $mimeTypes = $settings->get('fof-upload.mimeTypes');
 
         $adapters = $this->getAvailableUploadMethods();

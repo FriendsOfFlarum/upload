@@ -26,15 +26,15 @@ class DownloadProvider extends AbstractServiceProvider
     public function register()
     {
         DownloadHandler::addDownloader(
-            $this->app->make(DefaultDownloader::class)
+            $this->container->make(DefaultDownloader::class)
         );
 
         /** @var Util $util */
-        $util = $this->app->make(Util::class);
+        $util = $this->container->make(Util::class);
 
-        $util->addRenderTemplate($this->app->make(FileTemplate::class));
-        $util->addRenderTemplate($this->app->make(ImageTemplate::class));
-        $util->addRenderTemplate($this->app->make(ImagePreviewTemplate::class));
-        $util->addRenderTemplate($this->app->make(JustUrlTemplate::class));
+        $util->addRenderTemplate($this->container->make(FileTemplate::class));
+        $util->addRenderTemplate($this->container->make(ImageTemplate::class));
+        $util->addRenderTemplate($this->container->make(ImagePreviewTemplate::class));
+        $util->addRenderTemplate($this->container->make(JustUrlTemplate::class));
     }
 }

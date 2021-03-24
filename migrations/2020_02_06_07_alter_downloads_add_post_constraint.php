@@ -16,7 +16,7 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         // Set post_id null if the post does not exist.
-        // Will prevent issues when applying foriegn key constraint.
+        // Will prevent issues when applying foreign key constraint.
         $connection = $schema->getConnection();
         $connection->table('fof_upload_downloads')
             ->whereNotExists(function ($query) {

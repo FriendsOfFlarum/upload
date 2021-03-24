@@ -19,7 +19,7 @@ An extension that handles file uploads intelligently for your forum.
 
 ## Installation
 
-Use [Bazaar](https://discuss.flarum.org/d/5151) or install manually:
+Install manually with composer:
 
 ```sh
 composer require fof/upload

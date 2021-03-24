@@ -3,8 +3,8 @@
     "name": "@fof/upload",
     "dependencies": {
         "flarum-webpack-config": "0.1.0-beta.10",
-        "webpack": "^4.0.0",
-        "webpack-cli": "^3.0.7"
+        "webpack": "^4.46.0",
+        "webpack-cli": "^4.5.0"
     },
     "scripts": {
         "dev": "webpack --mode development --watch",
@@ -12,6 +12,7 @@
         "lint": "prettier --single-quote --trailing-comma es5 --print-width 150 --tab-width 4 --write src"
     },
     "devDependencies": {
-        "prettier": "^2.1.2"
+        "flarum": "0.1.0-beta.16",
+        "prettier": "^2.2.1"
     }
 }

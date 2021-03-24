@@ -119,7 +119,6 @@ class FileRepository
             $tempFile,
             $upload->getClientFilename(),
             $upload->getClientMediaType(),
-            $upload->getSize(),
             $upload->getError(),
             true
         );
