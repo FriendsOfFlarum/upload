@@ -77,6 +77,20 @@ fof-upload:
           both: Both
           upload-btn: Upload button only
           media-btn: Media manager button only
+      gcs:
+        project_id: Project ID
+        bucket: Bucket
+        private_key_id: Private key ID
+        private_key: Private Key
+        client_email: Client Email
+        client_id: Client ID
+        auth_uri: Auth URI
+        token_uri: Token URI
+        auth_provider_x509_cert_url: x509 cert URL
+        client_x509_cert_url: Client cert URL
+        title: Google Cloud storage settings
+        advanced_title: Advanced Google Cloud storage settings
+        prefix: Upload prefix
 
     permissions:
       download_label: Download files
@@ -102,6 +116,7 @@ fof-upload:
       local: Local
       ovh-svfs: OVH SVFS
       qiniu: QiNiu
+      gcs: Google Cloud Storage
   forum:
     media_manager: Media manager
 

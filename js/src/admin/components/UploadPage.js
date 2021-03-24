@@ -38,6 +38,18 @@ export default class UploadPage extends ExtensionPage {
             'awsS3Region',
             'awsS3Endpoint',
             'awsS3ACL',
+            // GCS
+            'gcsProjectId',
+            'gcsBucketName',
+            'gcsPrivateKeyId',
+            'gcsPrivateKey',
+            'gcsClientEmail',
+            'gcsClientId',
+            'gcsAuthUri',
+            'gcsTokenUri',
+            'gcsAuthProviderX509CertUrl',
+            'gcsClientX509CertUrl',
+            'gcsUploadPrefix',
             // QIniu
             'qiniuKey',
             'qiniuSecret',
@@ -404,6 +416,75 @@ export default class UploadPage extends ExtensionPage {
                             oninput: withAttr('value', this.values.awsS3ACL),
                         }),
                         m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+                    ]),
+                ])
+            );
+        }
+
+        if (this.uploadMethodOptions['gcs'] !== undefined) {
+            items.add(
+                'gcs',
+                m('.gcs', [
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.gcs.title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.project_id')),
+                        m('input.FormControl', {
+                            value: this.values.gcsProjectId() || '',
+                            oninput: withAttr('value', this.values.gcsProjectId),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.bucket')),
+                        m('input.FormControl', {
+                            value: this.values.gcsBucketName() || '',
+                            oninput: withAttr('value', this.values.gcsBucketName),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.private_key_id')),
+                        m('input.FormControl', {
+                            value: this.values.gcsPrivateKeyId() || '',
+                            oninput: withAttr('value', this.values.gcsPrivateKeyId),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.private_key')),
+                        m('input.FormControl', {
+                            value: this.values.gcsPrivateKey() || '',
+                            oninput: withAttr('value', this.values.gcsPrivateKey),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.client_email')),
+                        m('input.FormControl', {
+                            value: this.values.gcsClientEmail() || '',
+                            oninput: withAttr('value', this.values.gcsClientEmail),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.client_id')),
+                        m('input.FormControl', {
+                            value: this.values.gcsClientId() || '',
+                            oninput: withAttr('value', this.values.gcsClientId),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.auth_uri')),
+                        m('input.FormControl', {
+                            value: this.values.gcsAuthUri() || '',
+                            oninput: withAttr('value', this.values.gcsAuthUri),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.token_uri')),
+                        m('input.FormControl', {
+                            value: this.values.gcsTokenUri() || '',
+                            oninput: withAttr('value', this.values.gcsTokenUri),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.auth_provider_x509_cert_url')),
+                        m('input.FormControl', {
+                            value: this.values.gcsAuthProviderX509CertUrl() || '',
+                            oninput: withAttr('value', this.values.gcsAuthProviderX509CertUrl),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.client_x509_cert_url')),
+                        m('input.FormControl', {
+                            value: this.values.gcsClientX509CertUrl() || '',
+                            oninput: withAttr('value', this.values.gcsClientX509CertUrl),
+                        }),
+                    ]),
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.gcs.advanced_title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.gcs.prefix')),
+                        m('input.FormControl', {
+                            value: this.values.gcsUploadPrefix() || '',
+                            oninput: withAttr('value', this.values.gcsUploadPrefix),
+                        }),
                     ]),
                 ])
             );
