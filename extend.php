@@ -42,7 +42,7 @@ return [
     new Extenders\CreateStorageFolder('tmp'),
 
     (new Extend\ApiSerializer(ForumSerializer::class))
-        ->mutate(Extenders\AddForumAttributes::class),
+        ->attributes(Extenders\AddForumAttributes::class),
 
     (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
@@ -60,5 +60,5 @@ return [
         ->parse(Formatter\ReplaceDeprecatedTemplates::class),
 
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
-        ->mutate(Extenders\AddCurrentUserAttributes::class),
+        ->attributes(Extenders\AddCurrentUserAttributes::class),
 ];

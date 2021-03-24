@@ -1,15 +1,15 @@
-import { extend } from 'flarum/extend';
-import app from 'flarum/app';
-import UserPage from 'flarum/components/UserPage';
-import LinkButton from 'flarum/components/LinkButton';
+import { extend } from 'flarum/common/extend';
+import app from 'flarum/common/app';
+import UserPage from 'flarum/forum/components/UserPage';
+import LinkButton from 'flarum/common/components/LinkButton';
 
 import File from '../common/models/File';
 import FileListState from './states/FileListState';
 import downloadButtonInteraction from './downloadButtonInteraction';
 import addUploadButton from './addUploadButton';
 import UploadsUserPage from './components/UploadsUserPage';
-import User from 'flarum/models/User';
-import Model from 'flarum/Model';
+import User from 'flarum/common/models/User';
+import Model from 'flarum/common/Model';
 
 export * from './components';
 

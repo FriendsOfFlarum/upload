@@ -35,7 +35,7 @@ abstract class AbstractTemplate implements Template
      */
     protected function getView($view, $arguments = [])
     {
-        return app(Factory::class)->make($view, $arguments);
+        return resolve(Factory::class)->make($view, $arguments);
     }
 
     /**
@@ -46,6 +46,6 @@ abstract class AbstractTemplate implements Template
      */
     protected function trans($key, array $params = [])
     {
-        return app('translator')->trans($key, $params);
+        return resolve('translator')->trans($key, $params);
     }
 }

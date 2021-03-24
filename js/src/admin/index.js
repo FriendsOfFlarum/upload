@@ -1,4 +1,4 @@
-import app from 'flarum/app';
+import app from 'flarum/common/app';
 import UploadPage from './components/UploadPage';
 
 export * from './components';

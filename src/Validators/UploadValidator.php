@@ -18,10 +18,10 @@ use FoF\Upload\Helpers\Util;
 
 class UploadValidator extends AbstractValidator
 {
-    protected function getRules()
+    protected function getRules(): array
     {
         /** @var SettingsRepositoryInterface $settings */
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
 
         return [
             'file' => [

@@ -1,6 +1,6 @@
-import app from 'flarum/app';
-import Component from 'flarum/Component';
-import Button from 'flarum/components/Button';
+import app from 'flarum/common/app';
+import Component from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
 import FileManagerModal from './FileManagerModal';
 
 export default class FileManagerButton extends Component {

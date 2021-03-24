@@ -64,7 +64,7 @@ class DefaultDownloader implements Downloader
 
     private function retrieveFromLocal(File $file): ResponseInterface
     {
-        $file_contents = file_get_contents(app(Paths::class)->public.'/assets/files/'.$file->path);
+        $file_contents = file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$file->path);
 
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
     }

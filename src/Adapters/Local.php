@@ -22,7 +22,7 @@ class Local extends Flysystem implements UploadAdapter
 {
     protected function generateUrl(File $file)
     {
-        $publicPath = app(Paths::class)->public;
+        $publicPath = resolve(Paths::class)->public;
 
         $searches = [];
         $replaces = [];
@@ -47,9 +47,9 @@ class Local extends Flysystem implements UploadAdapter
         );
 
         /** @var SettingsRepositoryInterface $settings */
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
         /** @var UrlGenerator $generator */
-        $generator = app(UrlGenerator::class);
+        $generator = resolve(UrlGenerator::class);
 
         if ($settings->get('fof-upload.cdnUrl')) {
             $file->url = $settings->get('fof-upload.cdnUrl').$file->url;

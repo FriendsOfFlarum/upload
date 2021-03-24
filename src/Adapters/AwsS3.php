@@ -23,7 +23,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
     protected function getConfig()
     {
         /** @var SettingsRepositoryInterface $settings */
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
 
         $config = new Config();
         if ($acl = $settings->get('fof-upload.awsS3ACL')) {
@@ -36,7 +36,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
     protected function generateUrl(File $file)
     {
         /** @var SettingsRepositoryInterface $settings */
-        $settings = app(SettingsRepositoryInterface::class);
+        $settings = resolve(SettingsRepositoryInterface::class);
 
         $cdnUrl = $settings->get('fof-upload.cdnUrl');
 

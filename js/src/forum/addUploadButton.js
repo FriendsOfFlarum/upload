@@ -1,6 +1,6 @@
-import app from 'flarum/app';
-import { extend } from 'flarum/extend';
-import TextEditor from 'flarum/components/TextEditor';
+import app from 'flarum/common/app';
+import { extend } from 'flarum/common/extend';
+import TextEditor from 'flarum/common/components/TextEditor';
 import UploadButton from './components/UploadButton';
 import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';

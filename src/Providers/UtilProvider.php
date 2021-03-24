@@ -19,6 +19,6 @@ class UtilProvider extends AbstractServiceProvider
 {
     public function register()
     {
-        $this->app->singleton(Util::class);
+        $this->container->singleton(Util::class);
     }
 }
