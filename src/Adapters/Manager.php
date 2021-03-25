@@ -20,6 +20,7 @@ use FoF\Upload\Adapters;
 use FoF\Upload\Events\Adapter\Collecting;
 use FoF\Upload\Events\Adapter\Instantiate;
 use FoF\Upload\Helpers\Util;
+use Google\Cloud\Storage\StorageClient;
 use GuzzleHttp\Client as Guzzle;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
@@ -28,7 +29,6 @@ use League\Flysystem\Adapter as FlyAdapters;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use Overtrue\Flysystem\Qiniu\QiniuAdapter;
 use Qiniu\Http\Client as QiniuClient;
-use Google\Cloud\Storage\StorageClient;
 use Superbalist\Flysystem\GoogleStorage\GoogleStorageAdapter;
 
 class Manager
@@ -66,7 +66,7 @@ class Manager
             'imgur'  => true,
             'qiniu'  => class_exists(QiniuClient::class),
             'local'  => true,
-            'gcs'  => class_exists(StorageClient::class),
+            'gcs'    => class_exists(StorageClient::class),
         ]);
 
         $this->events->dispatch(new Collecting($adapters));
@@ -141,7 +141,7 @@ class Manager
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers'  => [
-                    'Authorization' => 'Client-ID ' . $this->settings->get('fof-upload.imgurClientId'),
+                    'Authorization' => 'Client-ID '.$this->settings->get('fof-upload.imgurClientId'),
                 ],
             ])
         );
@@ -155,7 +155,7 @@ class Manager
     protected function local(Util $util)
     {
         return new Adapters\Local(
-            new FlyAdapters\Local($this->paths->public . '/assets/files')
+            new FlyAdapters\Local($this->paths->public.'/assets/files')
         );
     }
 
@@ -194,18 +194,19 @@ class Manager
         $storageClient = new StorageClient(
             [
                 'keyFile' => [
-                    'type' => 'service_account',
-                    'project_id' => $this->settings->get('fof-upload.gcsProjectId'),
-                    'private_key_id' => $this->settings->get('fof-upload.gcsPrivateKeyId'),
-                    'private_key' => str_replace('\n', "\n", $this->settings->get('fof-upload.gcsPrivateKey')),
-                    'client_email' => $this->settings->get('fof-upload.gcsClientEmail'),
-                    'client_id' => $this->settings->get('fof-upload.gcsClientId'),
-                    'auth_uri' => $this->settings->get('fof-upload.gcsAuthUri'),
-                    'token_uri' => $this->settings->get('fof-upload.gcsTokenUri'),
+                    'type'                        => 'service_account',
+                    'project_id'                  => $this->settings->get('fof-upload.gcsProjectId'),
+                    'private_key_id'              => $this->settings->get('fof-upload.gcsPrivateKeyId'),
+                    'private_key'                 => str_replace('\n', "\n", $this->settings->get('fof-upload.gcsPrivateKey')),
+                    'client_email'                => $this->settings->get('fof-upload.gcsClientEmail'),
+                    'client_id'                   => $this->settings->get('fof-upload.gcsClientId'),
+                    'auth_uri'                    => $this->settings->get('fof-upload.gcsAuthUri'),
+                    'token_uri'                   => $this->settings->get('fof-upload.gcsTokenUri'),
                     'auth_provider_x509_cert_url' => $this->settings->get('fof-upload.gcsAuthProviderX509CertUrl'),
-                    'client_x509_cert_url' => $this->settings->get('fof-upload.gcsClientX509CertUrl'),
+                    'client_x509_cert_url'        => $this->settings->get('fof-upload.gcsClientX509CertUrl'),
                 ],
-            ]);
+            ]
+        );
 
         return new Adapters\GoogleCS(
             new GoogleStorageAdapter(

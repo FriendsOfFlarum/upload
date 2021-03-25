@@ -16,7 +16,6 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
-use League\Flysystem\Config;
 
 class GoogleCS extends Flysystem implements UploadAdapter
 {
