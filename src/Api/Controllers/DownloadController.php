@@ -48,11 +48,6 @@ class DownloadController implements RequestHandlerInterface
         $this->settings = $settings;
     }
 
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $actor = $request->getAttribute('actor');
