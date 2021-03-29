@@ -50,11 +50,9 @@
             "title": "FoF Upload",
             "category": "feature",
             "icon": {
-                "image": "resources/logo.svg",
+                "name": "fas fa-file-upload",
                 "backgroundColor": "#e74c3c",
-                "backgroundSize": "90%",
-                "backgroundRepeat": "no-repeat",
-                "backgroundPosition": "center"
+                "color": "#fff"
             }
         },
         "flagrow": {
