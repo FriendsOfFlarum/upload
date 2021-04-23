@@ -42,6 +42,12 @@ export default class UploadPage extends ExtensionPage {
             'qiniuKey',
             'qiniuSecret',
             'qiniuBucket',
+            // ImageX
+            'imagexRegion',
+            'imagexAccessKey',
+            'imagexSecretKey',
+            'imagexServiceId',
+            'imagexDomain',
         ];
 
         // the checkboxes we need to watch and to save.
@@ -404,6 +410,44 @@ export default class UploadPage extends ExtensionPage {
                             oninput: withAttr('value', this.values.awsS3ACL),
                         }),
                         m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+                    ]),
+                ])
+            );
+        }
+
+        console.log(this.uploadMethodOptions);
+
+        if (this.uploadMethodOptions['imagex'] !== undefined) {
+            items.add(
+                'imagex',
+                m('.imagex', [
+                    m('fieldset', [
+                        m('legend', app.translator.trans('fof-upload.admin.labels.imagex.title')),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imagex.region')),
+                        m('input.FormControl', {
+                            value: this.values.imagexRegion() || '',
+                            oninput: withAttr('value', this.values.imagexRegion),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imagex.accessKey')),
+                        m('input.FormControl', {
+                            value: this.values.imagexAccessKey() || '',
+                            oninput: withAttr('value', this.values.imagexAccessKey),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imagex.secretKey')),
+                        m('input.FormControl', {
+                            value: this.values.imagexSecretKey() || '',
+                            oninput: withAttr('value', this.values.imagexSecretKey),
+                        }),
+                        m('label', {}, app.translator.trans('fof-upload.admin.labels.imagex.serviceId')),
+                        m('input.FormControl', {
+                            value: this.values.imagexServiceId() || '',
+                            oninput: withAttr('value', this.values.imagexServiceId),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imagex.domain')),
+                        m('input.FormControl', {
+                            value: this.values.imagexDomain() || '',
+                            oninput: withAttr('value', this.values.imagexDomain),
+                        }),
                     ]),
                 ])
             );

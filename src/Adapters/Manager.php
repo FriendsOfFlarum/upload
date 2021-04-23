@@ -13,6 +13,7 @@
 namespace FoF\Upload\Adapters;
 
 use Aws\S3\S3Client;
+use ExerciseBook\Flysystem\ImageX\ImageXAdapter as ImageXClient;
 use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -64,6 +65,8 @@ class Manager
             'imgur'  => true,
             'qiniu'  => class_exists(QiniuClient::class),
             'local'  => true,
+
+            'imagex'  => class_exists(ImageXClient::class),
         ]);
 
         $this->events->dispatch(new Collecting($adapters));
@@ -175,5 +178,33 @@ class Manager
         );
 
         return new Adapters\Qiniu($client);
+    }
+
+    /**
+     * @param Util $util
+     *
+     * @return Adapters\Local
+     */
+    protected function imagex(Util $util)
+    {
+        if (
+            !$this->settings->get('fof-upload.imagexRegion') ||
+            !$this->settings->get('fof-upload.imagexAccessKey') ||
+            !$this->settings->get('fof-upload.imagexSecretKey') ||
+            !$this->settings->get('fof-upload.imagexServiceId') ||
+            !$this->settings->get('fof-upload.imagexDomain')
+        ) {
+            return null;
+        }
+
+        $config = [
+                "region" => $this->settings->get('fof-upload.imagexRegion'),
+                "access_key" => $this->settings->get('fof-upload.imagexAccessKey'),
+                "secret_key" => $this->settings->get('fof-upload.imagexSecretKey'),
+                "service_id" => $this->settings->get('fof-upload.imagexServiceId'),
+                "domain" => $this->settings->get('fof-upload.imagexDomain'),
+            ];
+
+        return new Adapters\ImageX($config);
     }
 }

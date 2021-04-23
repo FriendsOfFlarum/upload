@@ -57,6 +57,14 @@ fof-upload:
         secret: Secret
         bucket: Bucket
       preferences:
+      imagex:
+        title: ImageX storage settings
+        region: Region
+        accessKey: Access key
+        secretKey: Secret key
+        serviceId: Service id
+        domain: Binded domain
+      preferences:
         max_file_size: Maximum file size (in kilobytes)
         mime_types: 'Configure your mime type, upload adapter mapping'
         title: General preferences
@@ -102,6 +110,7 @@ fof-upload:
       local: Local
       ovh-svfs: OVH SVFS
       qiniu: QiNiu
+      imagex: ImageX
   forum:
     media_manager: Media manager
 
