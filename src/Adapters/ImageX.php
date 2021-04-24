@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace FoF\Upload\Adapters;
-
 
 use ExerciseBook\Flysystem\ImageX\ImageXAdapter;
 use ExerciseBook\Flysystem\ImageX\ImageXConfig;
@@ -35,11 +43,11 @@ class ImageX extends Flysystem implements UploadAdapter
         // Save config
         $this->config = new ImageXConfig();
 
-        $this->config->region = $config["region"];
-        $this->config->accessKey = $config["access_key"];
-        $this->config->secretKey = $config["secret_key"];
-        $this->config->serviceId = $config["service_id"];
-        $this->config->domain = $config["domain"];
+        $this->config->region = $config['region'];
+        $this->config->accessKey = $config['access_key'];
+        $this->config->secretKey = $config['secret_key'];
+        $this->config->serviceId = $config['service_id'];
+        $this->config->domain = $config['domain'];
 
         $this->arrConfig = $config;
         $this->uriPrefix = $this->adapter->imageXBuildUriPrefix();
@@ -54,12 +62,12 @@ class ImageX extends Flysystem implements UploadAdapter
     {
         $type = mb_strtolower($file->type);
         $path = $file->getAttribute('path');
-        $template = $this->arrConfig["template"];
+        $template = $this->arrConfig['template'];
 
-        if (Str::startsWith($type, "image/") && $template) {
-            $url = '//' . $this->config->domain . '/' . $this->uriPrefix . '/' . $path . '~' . $template . '.image';
+        if (Str::startsWith($type, 'image/') && $template) {
+            $url = '//'.$this->config->domain.'/'.$this->uriPrefix.'/'.$path.'~'.$template.'.image';
         } else {
-            $url = '//' . $this->config->domain . '/' . $this->uriPrefix . '/' . $path;
+            $url = '//'.$this->config->domain.'/'.$this->uriPrefix.'/'.$path;
         }
         $file->url = $url;
     }

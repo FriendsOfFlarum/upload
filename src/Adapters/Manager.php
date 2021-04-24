@@ -3,10 +3,10 @@
 /*
  * This file is part of fof/upload.
  *
- * Copyright (c) 2020 - 2021 FriendsOfFlarum.
- * Copyright (c) 2016 - 2019 Flagrow
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
  *
- * For the full copyright and license information, please view the LICENSE.md
+ * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
@@ -198,13 +198,13 @@ class Manager
         }
 
         $config = [
-                "region" => $this->settings->get('fof-upload.imagexRegion'),
-                "access_key" => $this->settings->get('fof-upload.imagexAccessKey'),
-                "secret_key" => $this->settings->get('fof-upload.imagexSecretKey'),
-                "service_id" => $this->settings->get('fof-upload.imagexServiceId'),
-                "domain" => $this->settings->get('fof-upload.imagexDomain'),
-                "template" => $this->settings->get('fof-upload.imagexTemplate'),
-            ];
+            'region'     => $this->settings->get('fof-upload.imagexRegion'),
+            'access_key' => $this->settings->get('fof-upload.imagexAccessKey'),
+            'secret_key' => $this->settings->get('fof-upload.imagexSecretKey'),
+            'service_id' => $this->settings->get('fof-upload.imagexServiceId'),
+            'domain'     => $this->settings->get('fof-upload.imagexDomain'),
+            'template'   => $this->settings->get('fof-upload.imagexTemplate'),
+        ];
 
         return new Adapters\ImageX($config);
     }
