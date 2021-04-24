@@ -39,11 +39,13 @@
     },
     "suggest": {
         "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
-        "overtrue/flysystem-qiniu": "Uploads to QiNiu using API."
+        "overtrue/flysystem-qiniu": "Uploads to QiNiu using API.",
+        "exercisebook/flysystem-imagex": "Uploads to ImageX using API."
     },
     "require-dev": {
         "league/flysystem-aws-s3-v3": "^1.0",
-        "overtrue/flysystem-qiniu": "1.0.4"
+        "overtrue/flysystem-qiniu": "1.0.4",
+        "exercisebook/flysystem-imagex": "<1.0"
     },
     "extra": {
         "flarum-extension": {
