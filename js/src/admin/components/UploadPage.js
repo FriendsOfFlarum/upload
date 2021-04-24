@@ -48,6 +48,7 @@ export default class UploadPage extends ExtensionPage {
             'imagexSecretKey',
             'imagexServiceId',
             'imagexDomain',
+            'imagexTemplate',
         ];
 
         // the checkboxes we need to watch and to save.
@@ -447,6 +448,11 @@ export default class UploadPage extends ExtensionPage {
                         m('input.FormControl', {
                             value: this.values.imagexDomain() || '',
                             oninput: withAttr('value', this.values.imagexDomain),
+                        }),
+                        m('label', app.translator.trans('fof-upload.admin.labels.imagex.template')),
+                        m('input.FormControl', {
+                            value: this.values.imagexTemplate() || '',
+                            oninput: withAttr('value', this.values.imagexTemplate),
                         }),
                     ]),
                 ])

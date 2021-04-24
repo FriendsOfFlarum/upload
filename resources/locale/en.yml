@@ -64,6 +64,7 @@ fof-upload:
         secretKey: Secret key
         serviceId: Service id
         domain: Binded domain
+        template: Template
       preferences:
         max_file_size: Maximum file size (in kilobytes)
         mime_types: 'Configure your mime type, upload adapter mapping'

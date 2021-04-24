@@ -183,7 +183,7 @@ class Manager
     /**
      * @param Util $util
      *
-     * @return Adapters\Local
+     * @return ImageX
      */
     protected function imagex(Util $util)
     {
@@ -203,6 +203,7 @@ class Manager
                 "secret_key" => $this->settings->get('fof-upload.imagexSecretKey'),
                 "service_id" => $this->settings->get('fof-upload.imagexServiceId'),
                 "domain" => $this->settings->get('fof-upload.imagexDomain'),
+                "template" => $this->settings->get('fof-upload.imagexTemplate'),
             ];
 
         return new Adapters\ImageX($config);

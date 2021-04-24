@@ -6,11 +6,9 @@ namespace FoF\Upload\Adapters;
 
 use ExerciseBook\Flysystem\ImageX\ImageXAdapter;
 use ExerciseBook\Flysystem\ImageX\ImageXConfig;
-use Flarum\Foundation\ValidationException;
-use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
-use League\Flysystem\AdapterInterface;
+use Illuminate\Support\Str;
 use League\Flysystem\Config;
 
 class ImageX extends Flysystem implements UploadAdapter
@@ -54,8 +52,15 @@ class ImageX extends Flysystem implements UploadAdapter
 
     protected function generateUrl(File $file)
     {
+        $type = mb_strtolower($file->type);
         $path = $file->getAttribute('path');
-        $url = '//' . $this->config->domain . '/' . $this->uriPrefix . '/' . $path;
+        $template = $this->arrConfig["template"];
+
+        if (Str::startsWith($type, "image/") && $template) {
+            $url = '//' . $this->config->domain . '/' . $this->uriPrefix . '/' . $path . '~' . $template . '.image';
+        } else {
+            $url = '//' . $this->config->domain . '/' . $this->uriPrefix . '/' . $path;
+        }
         $file->url = $url;
     }
 }
