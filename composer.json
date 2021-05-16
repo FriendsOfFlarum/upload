@@ -46,6 +46,9 @@
         "overtrue/flysystem-qiniu": "1.0.4"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        },
         "flarum-extension": {
             "title": "FoF Upload",
             "category": "feature",
