@@ -51,7 +51,7 @@ export default class FileManagerModal extends Modal {
 
     view() {
         const fileCount = this.selectedFiles.length;
-        
+
         return (
             <div className={`Modal modal-dialog ${this.className()}`}>
                 <div className="Modal-content">
@@ -97,7 +97,7 @@ export default class FileManagerModal extends Modal {
                             disabled={this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1)}
                             className="Button Button--primary"
                         >
-                            {app.translator.trans('fof-upload.forum.file_list.confirm_selection_btn', {fileCount})}
+                            {app.translator.trans('fof-upload.forum.file_list.confirm_selection_btn', { fileCount })}
                         </Button>
                     </div>
                 </div>
