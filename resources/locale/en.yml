@@ -119,7 +119,7 @@ fof-upload:
       modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
       modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
       select_file_a11y_label: Select file "{fileName}"
-      confirm_selection_btn: Select file|Select files
+      confirm_selection_btn: "{fileCount, plural, =0 {None selected} one {Select file} other {Select files}}"
       load_more_files_btn: Load more files
       hide_file:
         btn_a11y_label: Hide "{fileName}" from media manager
