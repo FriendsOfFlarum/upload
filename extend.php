@@ -58,9 +58,6 @@ return [
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
 
-    (new Extend\Formatter())
-        ->parse(Formatter\ReplaceDeprecatedTemplates::class),
-
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
 ];
