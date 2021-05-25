@@ -31,7 +31,7 @@ class FileSerializer extends AbstractSerializer
     {
         /** @var Util */
         $util = resolve(Util::class);
-        
+
         return [
             'baseName'  => $model->base_name,
             'path'      => $model->path,
