@@ -1,6 +1,5 @@
 import Model from 'flarum/common/Model';
 import mixin from 'flarum/common/utils/mixin';
-import fileToBBcode from '../fileToBBcode';
 
 export default class File extends mixin(Model, {
     baseName: Model.attribute('baseName'),
@@ -13,18 +12,12 @@ export default class File extends mixin(Model, {
     uuid: Model.attribute('uuid'),
     tag: Model.attribute('tag'),
     hidden: Model.attribute('hidden'),
+    bbcode: Model.attribute('bbcode'),
 }) {
     /**
      * Use FoF Uploads endpoint
      */
     apiEndpoint() {
         return '/fof/uploads' + (this.exists ? '/' + this.data.id : '');
-    }
-
-    /**
-     * Generate bbcode for this file
-     */
-    bbcode() {
-        return fileToBBcode(this);
     }
 }
