@@ -114,7 +114,7 @@ class FileRepository
         // Move the file to a temporary location first.
         /**
          * sometimes function tempnam() maybe show notice
-         * https://www.php.net/manual/zh/function.tempnam.php
+         * https://www.php.net/manual/zh/function.tempnam.php.
          *
          * Please note that this function might throw a notice in PHP 7.1.0 and above.
          * This was a bugfix: https://bugs.php.net/bug.php?id=69489
