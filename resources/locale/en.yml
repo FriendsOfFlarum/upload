@@ -3,8 +3,6 @@ fof-upload:
     pane:
       title: Upload
       description: Set up uploading services and preferences.
-    buttons:
-      save: Save settings
     help_texts:
       disable-download-logging: |
         Disable logging every download made by users of your forum. Keeping it enabled allows you to view the number of downloads and other metrics in the nearby future.

@@ -302,7 +302,7 @@ export default class UploadPage extends ExtensionPage {
                                     loading: this.loading,
                                     disabled: !this.changed(),
                                 },
-                                app.translator.trans('fof-upload.admin.buttons.save')
+                                app.translator.trans('core.admin.settings.submit_button')
                             ),
                         ]
                     ),
@@ -514,7 +514,7 @@ export default class UploadPage extends ExtensionPage {
         saveSettings(settings)
             .then(() => {
                 // on success, show popup
-                this.successAlert = app.alerts.show(Alert, { type: 'success' }, app.translator.trans('core.admin.basics.saved_message'));
+                this.successAlert = app.alerts.show(Alert, { type: 'success' }, app.translator.trans('core.admin.settings.saved_message'));
             })
             .catch(() => {})
             .then(() => {
