@@ -13,13 +13,16 @@
 namespace FoF\Upload\Providers;
 
 use Flarum\Foundation\AbstractServiceProvider;
+
 use FoF\Upload\Commands\DownloadHandler;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Helpers\Util;
+use FoF\Upload\Templates\BbcodeImageTemplate;
 use FoF\Upload\Templates\FileTemplate;
 use FoF\Upload\Templates\ImagePreviewTemplate;
 use FoF\Upload\Templates\ImageTemplate;
 use FoF\Upload\Templates\JustUrlTemplate;
+use FoF\Upload\Templates\MarkdownImageTemplate;
 
 class DownloadProvider extends AbstractServiceProvider
 {
@@ -36,5 +39,7 @@ class DownloadProvider extends AbstractServiceProvider
         $util->addRenderTemplate($this->container->make(ImageTemplate::class));
         $util->addRenderTemplate($this->container->make(ImagePreviewTemplate::class));
         $util->addRenderTemplate($this->container->make(JustUrlTemplate::class));
+        $util->addRenderTemplate($this->container->make(MarkdownImageTemplate::class));
+        $util->addRenderTemplate($this->container->make(BbcodeImageTemplate::class));
     }
 }

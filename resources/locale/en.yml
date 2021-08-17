@@ -86,11 +86,17 @@ fof-upload:
       file_description: |
         Shows the file name and some general information. Proxies downloads through php, allowing for statistics gathering and hotlink protection.
       image: Default image download template
+      image_description: |
+        Shows a thumbnail of the image and proxies download through php. Allowing statistics to be gathered and hotlink protection.
       image-preview: Complete image preview template
       image-preview_description: |
         Shows the complete image in-line. No download functionality, no statistics are gathered and hotlink protection is ignored.
-      image_description: |
-        Shows a thumbnail of the image and proxies download through php. Allowing statistics to be gathered and hotlink protection.
+      markdown-image: Markdown image template
+      markdown-image_description: |
+        Shows the complete image in-line using Markdown. <strong>You must have flarum/markdown installed and enabled for this to work.</strong> No download functionality, no statistics are gathered and hotlink protection is ignored.
+      bbcode-image: BBCode image template
+      bbcode-image_description: |
+        Shows the complete image in-line using BBCode. <strong>You must have flarum/bbcode installed and enabled for this to work.</strong> No download functionality, no statistics are gathered and hotlink protection is ignored.
       just-url: Just URL
       just-url_description: |
         Inserts just the URL. Rendering can be handled by other extensions with auto-link ability. No download functionality, no statistics are gathered and hotlink protection is ignored.
