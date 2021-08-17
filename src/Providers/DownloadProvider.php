@@ -13,7 +13,6 @@
 namespace FoF\Upload\Providers;
 
 use Flarum\Foundation\AbstractServiceProvider;
-
 use FoF\Upload\Commands\DownloadHandler;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Helpers\Util;
