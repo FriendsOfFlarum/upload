@@ -43,7 +43,7 @@ export default function () {
         this.uploader.on('success', ({ file, addBBcode }) => {
             if (!addBBcode) return;
 
-            this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n');
+            this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
 
             // We wrap this in a typeof check to prevent it running when a user
             // is creating a new discussion. There's nothing to preview in a new

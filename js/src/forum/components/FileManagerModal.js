@@ -154,7 +154,7 @@ export default class FileManagerModal extends Modal {
         this.selectedFiles.map((fileId) => {
             const file = app.store.getById('files', fileId);
 
-            app.composer.editor.insertAtCursor(file.bbcode() + '\n');
+            app.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
         });
     }
 }
