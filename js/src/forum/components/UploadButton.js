@@ -1,4 +1,4 @@
-import app from 'flarum/common/app';
+import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
@@ -40,7 +40,7 @@ export default class UploadButton extends Component {
                     onclick={this.uploadButtonClicked.bind(this)}
                     disabled={this.attrs.disabled}
                 >
-                    {this.attrs.uploader.uploading && <LoadingIndicator size="small" className="LoadingIndicator--inline Button-icon" />}
+                    {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
                     {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
                     <form>
                         <input type="file" multiple={true} onchange={this.process.bind(this)} />
