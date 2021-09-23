@@ -13,7 +13,8 @@
         "lint": "prettier --single-quote --trailing-comma es5 --print-width 150 --tab-width 4 --write src"
     },
     "devDependencies": {
-        "prettier": "^2.3.2",
-        "@flarum/prettier-config": "^1.0.0"
+        "@flarum/prettier-config": "^1.0.0",
+        "flarum-tsconfig": "^1.0.2",
+        "prettier": "^2.3.2"
     }
 }
