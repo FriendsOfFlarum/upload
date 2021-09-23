@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "flarum-tsconfig": "^1.0.2"
+  }
+}
