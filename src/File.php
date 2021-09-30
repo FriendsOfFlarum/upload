@@ -49,6 +49,10 @@ class File extends AbstractModel
 
     protected $appends = ['humanSize'];
 
+    protected $casts = [
+        'hide_from_media_manager' => 'boolean'
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

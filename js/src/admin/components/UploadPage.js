@@ -454,7 +454,11 @@ export default class UploadPage extends ExtensionPage {
                 continue;
             }
 
-            children.push(<li>{this.templateOptions[template].name}: {m.trust(this.templateOptions[template].description)}</li>);
+            children.push(
+                <li>
+                    {this.templateOptions[template].name}: {m.trust(this.templateOptions[template].description)}
+                </li>
+            );
         }
 
         return m('ul', children);

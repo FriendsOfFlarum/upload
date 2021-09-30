@@ -16,6 +16,8 @@ export * from './components';
 app.initializers.add('fof-upload', () => {
     User.prototype.viewOthersMediaLibrary = Model.attribute('fof-upload-viewOthersMediaLibrary');
     User.prototype.deleteOthersMediaLibrary = Model.attribute('fof-upload-deleteOthersMediaLibrary');
+    User.prototype.uploadCountCurrent = Model.attribute('fof-upload-uploadCountCurrent');
+    User.prototype.uploadCountAll = Model.attribute('fof-upload-uploadCountAll');
 
     addUploadButton();
     downloadButtonInteraction();
@@ -34,7 +36,12 @@ app.initializers.add('fof-upload', () => {
 
     // Add uploads to user page menu items
     extend(UserPage.prototype, 'navItems', function (items) {
-        if (app.session.user && (app.session.user.viewOthersMediaLibrary() || this.user === app.session.user)) {
+        const canUpload = !!app.forum.attribute('fof-upload.canUpload');
+        const hasUploads = !!this.user.uploadCountCurrent();
+
+        if (app.session.user && (app.session.user.viewOthersMediaLibrary() || (this.user === app.session.user && (canUpload || hasUploads)))) {
+            const uploadCount = this.user.uploadCountCurrent();
+
             items.add(
                 'uploads',
                 LinkButton.component(
@@ -45,9 +52,13 @@ app.initializers.add('fof-upload', () => {
                         name: 'uploads',
                         icon: 'fas fa-file-upload',
                     },
-                    this.user === app.session.user
-                        ? app.translator.trans('fof-upload.forum.buttons.media')
-                        : app.translator.trans('fof-upload.forum.buttons.user_uploads')
+                    [
+                        this.user === app.session.user
+                            ? app.translator.trans('fof-upload.forum.buttons.media')
+                            : app.translator.trans('fof-upload.forum.buttons.user_uploads'),
+                        ' ',
+                        uploadCount > 0 ? <span className="Button-badge">{uploadCount}</span> : '',
+                    ]
                 ),
                 80
             );

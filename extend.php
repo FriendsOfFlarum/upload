@@ -14,6 +14,7 @@ namespace FoF\Upload;
 
 use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Api\Serializer\UserSerializer;
 use Flarum\Extend;
 use Flarum\Settings\Event\Deserializing;
 use FoF\Upload\Events\File\WillBeUploaded;
@@ -60,4 +61,7 @@ return [
 
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
+
+    (new Extend\ApiSerializer(UserSerializer::class))
+        ->attributes(Extenders\AddUserAttributes::class),
 ];
