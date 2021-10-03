@@ -6,7 +6,7 @@ import Group from 'flarum/common/models/Group';
 import Modal from 'flarum/common/components/Modal';
 import Stream from 'flarum/common/utils/Stream';
 
-export default class MimeTypeModal extends Modal
+export default class MimetypeModal extends Modal
 {
     oninit(vnode) {
         super.oninit(vnode);
