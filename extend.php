@@ -21,10 +21,10 @@ use FoF\Upload\Events\File\WillBeUploaded;
 
 return [
     (new Extend\Routes('api'))
-        ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
-        ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
-        ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
-        ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
+        ->get('/fof/upload/files', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
+        ->post('/fof/upload/files', 'fof-upload.upload', Api\Controllers\UploadController::class)
+        ->post('/fof/upload/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
+        ->get('/fof/upload/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
 
     (new Extend\Csrf())->exemptRoute('fof-upload.download'),

@@ -35,7 +35,7 @@ export default class Uploader {
         return app
             .request({
                 method: 'POST',
-                url: app.forum.attribute('apiUrl') + '/fof/upload',
+                url: app.forum.attribute('apiUrl') + '/fof/upload/files',
                 // prevent JSON.stringify'ing the form data in the XHR call
                 serialize: (raw) => raw,
                 body,

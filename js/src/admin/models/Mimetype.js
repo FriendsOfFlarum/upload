@@ -8,6 +8,6 @@ export default class Webhook extends mixin(Model, {
     template: Model.attribute('template'),
 }) {
     apiEndpoint() {
-        return `/fof/upload${this.exists ? `/${this.data.id}` : ''}`;
+        return `/fof/upload/mimes${this.exists ? `/${this.data.id}` : ''}`;
     }
 }

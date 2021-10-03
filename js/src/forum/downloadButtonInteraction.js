@@ -17,7 +17,7 @@ export default function () {
                     return;
                 }
 
-                let url = app.forum.attribute('apiUrl') + '/fof/download';
+                let url = app.forum.attribute('apiUrl') + '/fof/upload/download';
 
                 url += '/' + e.currentTarget.dataset.fofUploadDownloadUuid;
                 url += '/' + this.attrs.post.id();

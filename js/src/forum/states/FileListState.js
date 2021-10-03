@@ -41,7 +41,7 @@ export default class FileListState {
         this.loading = true;
 
         return app.store
-            .find('fof/uploads', {
+            .find('fof/upload/files', {
                 filter: {
                     user: this.user.id(),
                 },

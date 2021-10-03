@@ -18,6 +18,6 @@ export default class File extends mixin(Model, {
      * Use FoF Uploads endpoint
      */
     apiEndpoint() {
-        return '/fof/uploads' + (this.exists ? '/' + this.data.id : '');
+        return '/fof/upload/files' + (this.exists ? '/' + this.data.id : '');
     }
 }

@@ -261,7 +261,7 @@ export default class UploadPage extends ExtensionPage {
                                 ]),
                                 m('label', {}, app.translator.trans('fof-upload.admin.labels.watermark.file')),
                                 UploadImageButton.component({
-                                    name: 'fof/watermark',
+                                    name: 'fof/upload/watermark',
                                 }),
                             ]),
                             m('fieldset', [
