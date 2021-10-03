@@ -1,5 +1,6 @@
 import app from 'flarum/common/app';
 import UploadPage from './components/UploadPage';
+import Mimetype from './models/Mimetype';
 
 export * from './components';
 
@@ -44,4 +45,6 @@ app.initializers.add('fof-upload', (app) => {
             'moderate',
             50
         );
+
+    app.store.models.mimetypes = Mimetype;
 });
