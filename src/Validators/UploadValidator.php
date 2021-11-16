@@ -24,7 +24,7 @@ class UploadValidator extends AbstractValidator
         return [
             'file' => [
                 'required',
-                'max:' . $this->maxFilesize(),
+                'max:'.$this->maxFilesize(),
             ],
         ];
     }
@@ -36,8 +36,8 @@ class UploadValidator extends AbstractValidator
 
         return [
             'max' => $translator->trans('fof-upload.forum.validation.max_size', [
-                'max' => $this->maxFilesize()
-            ])
+                'max' => $this->maxFilesize(),
+            ]),
         ];
     }
 
