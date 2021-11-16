@@ -136,6 +136,9 @@ fof-upload:
       error: Error
       loading: Uploading
       unauthorized: You are not allowed to download files
+
+    validation:
+      max_size: "Uploads over {max} kb are not accepted."
   api:
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.
