@@ -133,7 +133,7 @@ export default class UploadPage extends ExtensionPage {
                                     type: 'number',
                                     min: '0',
                                 }),
-                                m('p', app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
+                                m('.helpText', app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
                                     post: max_post,
                                     upload: max_upload
                                 })),
