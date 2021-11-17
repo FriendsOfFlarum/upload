@@ -113,6 +113,8 @@ export default class UploadPage extends ExtensionPage {
      * @returns {*}
      */
     content() {
+        const max_post = app.data.settings[this.addPrefix('php_ini.post_max_size')];
+        const max_upload = app.data.settings[this.addPrefix('php_ini.upload_max_filesize')]
         return [
             m('.UploadPage', [
                 m('.container', [
@@ -131,6 +133,10 @@ export default class UploadPage extends ExtensionPage {
                                     type: 'number',
                                     min: '0',
                                 }),
+                                m('p', app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
+                                    post: max_post,
+                                    upload: max_upload
+                                })),
                                 m('label', app.translator.trans('fof-upload.admin.labels.preferences.mime_types')),
                                 m(
                                     '.MimeTypes--Container',

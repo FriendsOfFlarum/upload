@@ -31,5 +31,7 @@ class AddAvailableOptionsInAdmin
     {
         $event->settings['fof-upload.availableUploadMethods'] = $this->util->getAvailableUploadMethods()->toArray();
         $event->settings['fof-upload.availableTemplates'] = $this->util->getAvailableTemplates()->toArray();
+        $event->settings['fof-upload.php_ini.post_max_size'] = ini_get('post_max_size');
+        $event->settings['fof-upload.php_ini.upload_max_filesize'] = ini_get('upload_max_filesize');
     }
 }
