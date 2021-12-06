@@ -1,4 +1,4 @@
-import app from 'flarum/common/app';
+import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import TextEditor from 'flarum/common/components/TextEditor';
 import UploadButton from './components/UploadButton';

@@ -1,4 +1,4 @@
-import app from 'flarum/common/app';
+import app from 'flarum/admin/app';
 import Button from 'flarum/common/components/Button';
 import saveSettings from 'flarum/admin/utils/saveSettings';
 import Alert from 'flarum/common/components/Alert';

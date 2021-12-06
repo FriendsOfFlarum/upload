@@ -1,5 +1,5 @@
 import { extend } from 'flarum/common/extend';
-import app from 'flarum/common/app';
+import app from 'flarum/forum/app';
 import UserPage from 'flarum/forum/components/UserPage';
 import LinkButton from 'flarum/common/components/LinkButton';
 
