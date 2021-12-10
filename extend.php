@@ -30,17 +30,17 @@ return [
     (new Extend\Csrf())->exemptRoute('fof-upload.download'),
 
     (new Extend\Frontend('admin'))
-        ->css(__DIR__ . '/resources/less/admin.less')
-        ->js(__DIR__ . '/js/dist/admin.js'),
+        ->css(__DIR__.'/resources/less/admin.less')
+        ->js(__DIR__.'/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__ . '/resources/less/forum/download.less')
-        ->css(__DIR__ . '/resources/less/forum/upload.less')
-        ->css(__DIR__ . '/resources/less/forum/fileManagerModal.less')
-        ->css(__DIR__ . '/resources/less/forum/fileList.less')
-        ->css(__DIR__ . '/resources/less/forum/textPreview.less')
-        ->js(__DIR__ . '/js/dist/forum.js'),
-    new Extend\Locales(__DIR__ . '/resources/locale'),
+        ->css(__DIR__.'/resources/less/forum/download.less')
+        ->css(__DIR__.'/resources/less/forum/upload.less')
+        ->css(__DIR__.'/resources/less/forum/fileManagerModal.less')
+        ->css(__DIR__.'/resources/less/forum/fileList.less')
+        ->css(__DIR__.'/resources/less/forum/textPreview.less')
+        ->js(__DIR__.'/js/dist/forum.js'),
+    new Extend\Locales(__DIR__.'/resources/locale'),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
@@ -58,7 +58,7 @@ return [
         ->register(Providers\DownloadProvider::class),
 
     (new Extend\View())
-        ->namespace('fof-upload.templates', __DIR__ . '/resources/templates'),
+        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
 
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
@@ -67,5 +67,5 @@ return [
         ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
-        ->render(Formatter\TextPreview\FormatTextPreview::class)
+        ->render(Formatter\TextPreview\FormatTextPreview::class),
 ];
