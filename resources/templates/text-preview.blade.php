@@ -15,12 +15,12 @@ $translator = resolve('translator');
     <button type="button" class="Button hasIcon FofUpload-TextPreviewToggle">
         <i aria-hidden="true" class="icon fas fa-chevron-down Button-icon FofUpload-TextPreviewExpandIcon"></i>
         <span class="Button-label FofUpload-TextPreviewExpand">
-            @php echo($translator->trans('fof-upload.ref.text_preview.expand')); @endphp
+            @php echo($translator->trans('fof-upload.forum.text_preview.expand')); @endphp
         </span>
 
         <i aria-hidden="true" class="icon fas fa-chevron-up Button-icon FofUpload-TextPreviewCollapseIcon"></i>
         <span class="Button-label FofUpload-TextPreviewCollapse">
-            @php echo($translator->trans('fof-upload.ref.text_preview.collapse')); @endphp
+            @php echo($translator->trans('fof-upload.forum.text_preview.collapse')); @endphp
         </span>
 
         <div data-size="small" class="FofUpload-TextPreviewToggleLoading LoadingIndicator-container LoadingIndicator-container--inline LoadingIndicator-container--small">
@@ -31,7 +31,7 @@ $translator = resolve('translator');
     <div class="FofUpload-TextPreviewError">
         <p>
             <i aria-hidden="true" class="icon fas fa-exclamation-circle"></i>
-            @php echo($translator->trans('fof-upload.ref.text_preview.error')) @endphp
+            @php echo($translator->trans('fof-upload.forum.text_preview.error')) @endphp
         </p>
     </div>
 
