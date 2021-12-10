@@ -15,14 +15,14 @@
         background: @body-bg;
     }
 
-    &Full,
-    &Snippet,
-    &Toggle,
-    &Error {
-        [data-loading="true"] & {
-            display: none;
-        }
-    }
+    // &Full,
+    // &Snippet,
+    // &Toggle,
+    // &Error {
+    //     [data-loading="true"] & {
+    //         display: none;
+    //     }
+    // }
 
     &Full {
         max-height: 90vh;
@@ -54,14 +54,6 @@
         }
     }
 
-    &Loading {
-        padding: 16px 0;
-
-        [data-loading="false"] & {
-            display: none;
-        }
-    }
-
     &Toggle {
         width: 100%;
         border-top-left-radius: 0;
@@ -70,6 +62,12 @@
 
         [data-hassnippet="true"] & {
             display: block;
+        }
+
+        &Loading {
+            [data-loading="false"] & {
+                display: none;
+            }
         }
     }
 

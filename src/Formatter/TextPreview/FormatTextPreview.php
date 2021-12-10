@@ -1,0 +1,75 @@
+<?php
+
+namespace FoF\Upload\Formatter\TextPreview;
+
+use Flarum\Foundation\Paths;
+use Flarum\Http\SlugManager;
+use Flarum\Post\Post;
+use Flarum\User\User;
+use FoF\Upload\Downloader\DefaultDownloader;
+use FoF\Upload\Repositories\FileRepository;
+use s9e\TextFormatter\Renderer;
+use s9e\TextFormatter\Utils;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+class FormatTextPreview
+{
+    /**
+     * @var FileRepository
+     */
+    private $files;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Paths
+     */
+    private $paths;
+
+    public function __construct(FileRepository $files, TranslatorInterface $translator, Paths $paths)
+    {
+        $this->files = $files;
+        $this->translator = $translator;
+        $this->paths = $paths;
+    }
+
+    /**
+     * Configure rendering for user mentions.
+     *
+     * @param s9e\TextFormatter\Renderer $renderer
+     * @param mixed $context
+     * @param string|null $xml
+     * @return string $xml to be rendered
+     */
+    public function __invoke(Renderer $renderer, $context, string $xml)
+    {
+        return Utils::replaceAttributes($xml, 'UPL-TEXT-PREVIEW', function ($attributes) {
+            $file = $this->files->findByUuid($attributes['uuid']);
+
+            $attributes['snippet_is_full_file'] = 'false';
+            $snippet = "";
+
+            if ($file) {
+                $file_contents = file_get_contents($this->paths->public . '/assets/files/' . $file->path);
+
+                $file_contents_normalised = str_replace(["\r\n", "\r", "\n"], "\n", $file_contents);
+
+                // automatically normalises line endings
+                $lines = explode("\n", $file_contents_normalised);
+                $first_five_lines = array_slice($lines, 0, 5);
+                $snippet = implode("\n", $first_five_lines);
+
+                if ($snippet !== $file_contents_normalised) {
+                    $attributes['snippet_is_full_file'] = 'true';
+                }
+            }
+
+            $attributes['snippet'] = $snippet;
+
+            return $attributes;
+        });
+    }
+}
