@@ -1,12 +1,19 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Formatter\TextPreview;
 
 use Flarum\Foundation\Paths;
-use Flarum\Http\SlugManager;
-use Flarum\Post\Post;
 use Flarum\User\User;
-use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
@@ -40,8 +47,9 @@ class FormatTextPreview
      * Configure rendering for user mentions.
      *
      * @param s9e\TextFormatter\Renderer $renderer
-     * @param mixed $context
-     * @param string|null $xml
+     * @param mixed                      $context
+     * @param string|null                $xml
+     *
      * @return string $xml to be rendered
      */
     public function __invoke(Renderer $renderer, $context, string $xml)
@@ -50,10 +58,10 @@ class FormatTextPreview
             $file = $this->files->findByUuid($attributes['uuid']);
 
             $attributes['snippet_is_full_file'] = 'false';
-            $snippet = "";
+            $snippet = '';
 
             if ($file) {
-                $file_contents = file_get_contents($this->paths->public . '/assets/files/' . $file->path);
+                $file_contents = file_get_contents($this->paths->public.'/assets/files/'.$file->path);
 
                 $file_contents_normalised = str_replace(["\r\n", "\r", "\n"], "\n", $file_contents);
 
