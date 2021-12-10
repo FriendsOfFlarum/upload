@@ -48,6 +48,6 @@ class TextPreviewTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[upl-text-preview uuid={IDENTIFIER} url={URL}]{SIMPLETEXT1}[/upl-text-preview]';
+        return '[upl-text-preview uuid={IDENTIFIER}]{SIMPLETEXT1}[/upl-text-preview]';
     }
 }

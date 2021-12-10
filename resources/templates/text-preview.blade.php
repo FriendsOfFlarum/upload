@@ -39,6 +39,13 @@ $translator = resolve('translator');
         {
             const figure = document.currentScript.parentElement;
 
+            const uuid = '{@uuid}';
+
+            let url = app.forum.attribute('apiUrl') + '/fof/download';
+            url += '/' + encodeURIComponent(uuid);
+            url += '/' + encodeURIComponent($(figure).parents('.PostStream-item').data('id'));
+            url += '/' + encodeURIComponent(app.session.csrfToken);
+
             function createCodeHtml(text) {
                 const codeEl = document.createElement('code');
                 codeEl.innerText = text;
@@ -50,12 +57,12 @@ $translator = resolve('translator');
                 figure.setAttribute('data-error', 'true');
 
                 console.group('[FoF Upload] Failed to preview text file.');
-                console.error('Failed to load text file: {@url}');
+                console.error('Failed to load text file: ' + url);
                 console.log(e);
                 console.groupEnd();
             }
 
-            fetch('{@url}')
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         figure.setAttribute('data-loading', 'false');
