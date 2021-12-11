@@ -44,7 +44,7 @@ class FormatTextPreview
     }
 
     /**
-     * Configure rendering for user mentions.
+     * Configure rendering for text preview uploads.
      *
      * @param s9e\TextFormatter\Renderer $renderer
      * @param mixed                      $context
