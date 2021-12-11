@@ -13,7 +13,6 @@
 namespace FoF\Upload\Formatter\TextPreview;
 
 use Flarum\Foundation\Paths;
-use Flarum\User\User;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
