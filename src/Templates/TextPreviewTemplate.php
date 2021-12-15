@@ -55,6 +55,6 @@ class TextPreviewTemplate extends AbstractTextFormatterTemplate
 
     public function preview(File $file): string
     {
-        return "[upl-text-preview uuid={$file->uuid} url={$file->url}]{$file->base_name}[/upl-text-preview]";
+        return "[upl-text-preview uuid={$file->uuid} url={$file->url} has_snippet=false]{$file->base_name}[/upl-text-preview]";
     }
 }
