@@ -56,7 +56,7 @@ class FormatTextPreview
         return Utils::replaceAttributes($xml, 'UPL-TEXT-PREVIEW', function ($attributes) {
             $file = $this->files->findByUuid($attributes['uuid']);
 
-            $attributes['snippet_is_full_file'] = 'false';
+            $attributes['has_snippet'] = 'true';
             $snippet = '';
 
             if ($file) {
@@ -70,7 +70,7 @@ class FormatTextPreview
                 $snippet = implode("\n", $first_five_lines);
 
                 if ($snippet !== $file_contents_normalised) {
-                    $attributes['snippet_is_full_file'] = 'true';
+                    $attributes['has_snippet'] = 'false';
                 }
             }
 

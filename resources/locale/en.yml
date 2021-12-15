@@ -149,6 +149,8 @@ fof-upload:
       collapse: Collapse preview
       error: |
         Error previewing file. It may have been deleted, or the provided file ID is invalid.
+      no_snippet_preview: "<preview will appear here after posting>"
+      no_snippet: "<no preview snippet available>"
   api:
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.

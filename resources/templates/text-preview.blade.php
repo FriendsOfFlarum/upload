@@ -2,13 +2,13 @@
 $translator = resolve('translator');
 @endphp
 
-<figure class="FofUpload-TextPreview" data-loading="false" data-expanded="false" data-hassnippet="{@snippet_is_full_file}">
+<figure class="FofUpload-TextPreview" data-loading="false" data-expanded="false" data-hassnippet="{@has_snippet}">
     <figcaption class="FofUpload-TextPreviewTitle">
         <i aria-hidden="true" class="icon far fa-file"></i> {SIMPLETEXT1}
     </figcaption>
 
     <div class="FofUpload-TextPreviewSnippet">
-      <pre><code>{@snippet}</code></pre>
+      <pre><code data-preview-text="@php echo($translator->trans('fof-upload.forum.text_preview.no_snippet_preview')) @endphp" data-nosnippet-text="@php echo($translator->trans('fof-upload.forum.text_preview.no_snippet')) @endphp">{@snippet}</code></pre>
     </div>
     <div class="FofUpload-TextPreviewFull"></div>
 
@@ -44,13 +44,15 @@ $translator = resolve('translator');
             const loadingEl = figure.querySelector('.FofUpload-TextPreviewLoading');
             const toggleBtn = figure.querySelector('.FofUpload-TextPreviewToggle');
 
-            const uuid = '{@uuid}';
             const snippetText = '';
 
-            let url = app.forum.attribute('apiUrl') + '/fof/download';
-            url += '/' + encodeURIComponent(uuid);
-            url += '/' + encodeURIComponent($(figure).parents('.PostStream-item').data('id'));
-            url += '/' + encodeURIComponent(app.session.csrfToken);
+            const testUrl = new URL(location.origin);
+            const url = new URL('{@url}');
+
+            if (testUrl.origin !== url.origin) {
+              // Prevent cross-origin requests
+              handleError(new Error('Attempted to fetch a cross-origin file in text preview.'));
+            }
 
             function createCodeHtml(text) {
                 const codeEl = document.createElement('code');
@@ -71,7 +73,7 @@ $translator = resolve('translator');
             let fileContent = null;
 
             // Only allow toggling preview if showing a snippet
-            if ({@snippet_is_full_file}) {
+            if ({@has_snippet} && testUrl.origin === url.origin) {
                 toggleBtn.addEventListener('click', () => {
                     if (fileContent !== null) {
                         const expanded = figure.getAttribute('data-expanded') === 'true';

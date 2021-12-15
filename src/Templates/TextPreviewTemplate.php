@@ -12,6 +12,8 @@
 
 namespace FoF\Upload\Templates;
 
+use FoF\Upload\File;
+
 class TextPreviewTemplate extends AbstractTextFormatterTemplate
 {
     /**
@@ -48,6 +50,11 @@ class TextPreviewTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[upl-text-preview uuid={IDENTIFIER} snippet_is_full_file={SIMPLETEXT} snippet={SIMPLETEXT}]{SIMPLETEXT1}[/upl-text-preview]';
+        return '[upl-text-preview uuid={IDENTIFIER} url={URL} has_snippet={SIMPLETEXT?} snippet={SIMPLETEXT?}]{SIMPLETEXT1}[/upl-text-preview]';
+    }
+
+    public function preview(File $file): string
+    {
+        return "[upl-text-preview uuid={$file->uuid} url={$file->url}]{$file->base_name}[/upl-text-preview]";
     }
 }

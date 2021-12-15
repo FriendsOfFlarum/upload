@@ -31,6 +31,9 @@ abstract class AbstractTextFormatterTemplate extends AbstractTemplate implements
             '/uuid=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->uuid, $m[0]);
             },
+            '/path=(?<find>{.*?})/' => function ($m) use ($file) {
+                return str_replace($m['find'], $file->path, $m[0]);
+            },
             '/url=(?<find>{.*?})/' => function ($m) use ($file) {
                 return str_replace($m['find'], $file->url, $m[0]);
             },
