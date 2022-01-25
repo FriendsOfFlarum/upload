@@ -56,7 +56,7 @@ fof-upload:
         bucket: Bucket
       preferences:
         max_file_size: Maximum file size (in kilobytes)
-        mime_types: 'Configure your mime type, upload adapter mapping'
+        mime_types: "Configure your mime type, upload adapter mapping"
         title: General preferences
         php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
@@ -101,6 +101,9 @@ fof-upload:
       just-url: Just URL
       just-url_description: |
         Inserts just the URL. Rendering can be handled by other extensions with auto-link ability. No download functionality, no statistics are gathered and hotlink protection is ignored.
+      text-preview: Text preview
+      text-preview_description: |
+        Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
     upload_methods:
       aws-s3: S3/Compatible
       imgur: Imgur
@@ -140,8 +143,16 @@ fof-upload:
 
     validation:
       max_size: "Uploads over {max} kb are not accepted."
+
+    text_preview:
+      expand: Expand preview
+      collapse: Collapse preview
+      error: |
+        Error previewing file. It may have been deleted, or the provided file ID is invalid.
+      no_snippet_preview: "<preview will appear here after posting>"
+      no_snippet: "<no preview snippet available>"
   api:
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.
-      unsupported_type: 'Upload adapter does not support the provided mime type: {mime}.'
+      unsupported_type: "Upload adapter does not support the provided mime type: {mime}."
       could_not_detect_mime: Could not detect the MIME type of this file, please try again.

@@ -19,9 +19,9 @@ export default function () {
 
                 let url = app.forum.attribute('apiUrl') + '/fof/download';
 
-                url += '/' + e.currentTarget.dataset.fofUploadDownloadUuid;
-                url += '/' + this.attrs.post.id();
-                url += '/' + app.session.csrfToken;
+                url += '/' + encodeURIComponent(e.currentTarget.dataset.fofUploadDownloadUuid);
+                url += '/' + encodeURIComponent(this.attrs.post.id());
+                url += '/' + encodeURIComponent(app.session.csrfToken);
 
                 window.open(url);
             });
