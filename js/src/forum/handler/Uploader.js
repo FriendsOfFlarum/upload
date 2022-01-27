@@ -1,70 +1,70 @@
 import app from 'flarum/forum/app';
 
 export default class Uploader {
-    constructor() {
-        this.callbacks = {
-            success: [],
-            failure: [],
-            uploading: [],
-            uploaded: [],
-        };
+  constructor() {
+    this.callbacks = {
+      success: [],
+      failure: [],
+      uploading: [],
+      uploaded: [],
+    };
+    this.uploading = false;
+  }
+
+  on(type, callback) {
+    this.callbacks[type].push(callback);
+  }
+
+  dispatch(type, response) {
+    this.callbacks[type].forEach((callback) => callback(response));
+  }
+
+  upload(files, addBBcode = true) {
+    this.uploading = true;
+    this.dispatch('uploading', files);
+
+    m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
+
+    const body = new FormData();
+
+    for (let i = 0; i < files.length; i++) {
+      body.append('files[]', files[i]);
+    }
+
+    // send a POST request to the api
+    return app
+      .request({
+        method: 'POST',
+        url: app.forum.attribute('apiUrl') + '/fof/upload',
+        // prevent JSON.stringify'ing the form data in the XHR call
+        serialize: (raw) => raw,
+        body,
+      })
+      .then((result) => this.uploaded(result, addBBcode))
+      .catch((error) => {
         this.uploading = false;
-    }
+        m.redraw();
 
-    on(type, callback) {
-        this.callbacks[type].push(callback);
-    }
+        throw error;
+      });
+  }
 
-    dispatch(type, response) {
-        this.callbacks[type].forEach((callback) => callback(response));
-    }
+  uploaded(result, addBBcode = false) {
+    this.uploading = false;
 
-    upload(files, addBBcode = true) {
-        this.uploading = true;
-        this.dispatch('uploading', files);
+    result.data.forEach((file) => {
+      const fileObj = app.store.pushObject(file);
 
-        m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
+      // Add file to media manager
+      app.fileListState.addToList(fileObj);
 
-        const body = new FormData();
+      // Dispatch
+      this.dispatch('success', {
+        file: fileObj,
+        addBBcode,
+      });
+    });
 
-        for (let i = 0; i < files.length; i++) {
-            body.append('files[]', files[i]);
-        }
-
-        // send a POST request to the api
-        return app
-            .request({
-                method: 'POST',
-                url: app.forum.attribute('apiUrl') + '/fof/upload',
-                // prevent JSON.stringify'ing the form data in the XHR call
-                serialize: (raw) => raw,
-                body,
-            })
-            .then((result) => this.uploaded(result, addBBcode))
-            .catch((error) => {
-                this.uploading = false;
-                m.redraw();
-
-                throw error;
-            });
-    }
-
-    uploaded(result, addBBcode = false) {
-        this.uploading = false;
-
-        result.data.forEach((file) => {
-            const fileObj = app.store.pushObject(file);
-
-            // Add file to media manager
-            app.fileListState.addToList(fileObj);
-
-            // Dispatch
-            this.dispatch('success', {
-                file: fileObj,
-                addBBcode,
-            });
-        });
-
-        this.dispatch('uploaded');
-    }
+    this.dispatch('uploaded');
+  }
 }

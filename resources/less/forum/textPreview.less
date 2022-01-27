@@ -1,0 +1,112 @@
+.FofUpload-TextPreview {
+    background: @control-bg;
+    color: @control-color;
+
+    border: 2px solid @control-bg;
+    border-radius: @border-radius;
+
+    width: 100%;
+    margin: 8px 0;
+
+    pre, code {
+      border-radius: 0;
+    }
+
+    &Full,
+    &Snippet,
+    &Loading,
+    &Error {
+        background: @body-bg;
+    }
+
+
+    &Full {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    &Snippet code {
+      &:empty::before {
+        content: attr(data-nosnippet-text);
+
+        .editing & {
+          content: attr(data-preview-text);
+        }
+      }
+    }
+
+    &Full,
+    &Snippet {
+        overflow-x: auto;
+
+        pre {
+            margin: 0;
+        }
+
+        code {
+            padding: 12px;
+        }
+
+        [data-error="true"] & {
+            display: none;
+        }
+    }
+
+    &Title {
+        padding: 8px 16px;
+
+        .icon {
+            margin-right: 4px;
+        }
+    }
+
+    &Toggle {
+        width: 100%;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        display: none;
+
+        [data-hassnippet="true"] & {
+            display: block;
+        }
+
+        &Loading {
+            [data-loading="false"] & {
+                display: none;
+            }
+        }
+    }
+
+    &Expand,
+    &ExpandIcon,
+    &Snippet {
+        [data-expanded="true"] & {
+            display: none;
+        }
+    }
+
+    &Collapse,
+    &CollapseIcon,
+    &Full {
+        [data-expanded="false"] & {
+            display: none;
+        }
+    }
+
+    &Error {
+        display: none;
+        padding: 8px 16px;
+
+        [data-error="true"] & {
+            display: block;
+        }
+
+        .icon {
+            margin-right: 4px;
+        }
+
+        p {
+            margin: 0;
+        }
+    }
+}

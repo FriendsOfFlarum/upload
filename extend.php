@@ -38,6 +38,7 @@ return [
         ->css(__DIR__.'/resources/less/forum/upload.less')
         ->css(__DIR__.'/resources/less/forum/fileManagerModal.less')
         ->css(__DIR__.'/resources/less/forum/fileList.less')
+        ->css(__DIR__.'/resources/less/forum/textPreview.less')
         ->js(__DIR__.'/js/dist/forum.js'),
     new Extend\Locales(__DIR__.'/resources/locale'),
 
@@ -64,4 +65,7 @@ return [
 
     (new Extend\ApiSerializer(UserSerializer::class))
         ->attributes(Extenders\AddUserAttributes::class),
+
+    (new Extend\Formatter())
+        ->render(Formatter\TextPreview\FormatTextPreview::class),
 ];

@@ -6,10 +6,10 @@ import UserFileList from './UserFileList';
 import UploadButton from './UploadButton';
 
 export const components = {
-    DragAndDrop,
-    FileManagerButton,
-    FileManagerModal,
-    UserFileList,
-    Uploader,
-    UploadButton,
+  DragAndDrop,
+  FileManagerButton,
+  FileManagerModal,
+  UserFileList,
+  Uploader,
+  UploadButton,
 };
