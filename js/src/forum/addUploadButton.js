@@ -8,68 +8,68 @@ import Uploader from './handler/Uploader';
 import FileManagerButton from './components/FileManagerButton';
 
 export default function () {
-    extend(TextEditor.prototype, 'oninit', function () {
-        this.uploader = new Uploader();
-    });
-    extend(TextEditor.prototype, 'controlItems', function (items) {
-        if (!app.forum.attribute('fof-upload.canUpload')) return;
+  extend(TextEditor.prototype, 'oninit', function () {
+    this.uploader = new Uploader();
+  });
+  extend(TextEditor.prototype, 'controlItems', function (items) {
+    if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        const composerButtonVisiblity = app.forum.attribute('fof-upload.composerButtonVisiblity');
+    const composerButtonVisiblity = app.forum.attribute('fof-upload.composerButtonVisiblity');
 
-        // Add media button
-        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'media-btn') {
-            items.add(
-                'fof-upload-media',
-                FileManagerButton.component({
-                    uploader: this.uploader,
-                })
-            );
-        }
+    // Add media button
+    if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'media-btn') {
+      items.add(
+        'fof-upload-media',
+        FileManagerButton.component({
+          uploader: this.uploader,
+        })
+      );
+    }
 
-        // Add upload button
-        if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'upload-btn') {
-            items.add(
-                'fof-upload',
-                UploadButton.component({
-                    uploader: this.uploader,
-                })
-            );
-        }
-    });
+    // Add upload button
+    if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'upload-btn') {
+      items.add(
+        'fof-upload',
+        UploadButton.component({
+          uploader: this.uploader,
+        })
+      );
+    }
+  });
 
-    extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {
-        if (!app.forum.attribute('fof-upload.canUpload')) return;
+  extend(TextEditor.prototype, 'oncreate', function (f_, vnode) {
+    if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-        this.uploader.on('success', ({ file, addBBcode }) => {
-            if (!addBBcode) return;
+    this.uploader.on('success', ({ file, addBBcode }) => {
+      if (!addBBcode) return;
 
-            this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
+      this.attrs.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
 
-            // We wrap this in a typeof check to prevent it running when a user
-            // is creating a new discussion. There's nothing to preview in a new
-            // discussion, so the `preview` function isn't defined.
-            if (typeof this.attrs.preview === 'function') {
-                // Scroll the preview into view
-                // preview() causes the composer to close on mobile, but we don't want that. We want only the scroll
-                // We work around that by temporarily patching the isFullScreen method
-                const originalIsFullScreen = app.composer.isFullScreen;
+      // We wrap this in a typeof check to prevent it running when a user
+      // is creating a new discussion. There's nothing to preview in a new
+      // discussion, so the `preview` function isn't defined.
+      if (typeof this.attrs.preview === 'function') {
+        // Scroll the preview into view
+        // preview() causes the composer to close on mobile, but we don't want that. We want only the scroll
+        // We work around that by temporarily patching the isFullScreen method
+        const originalIsFullScreen = app.composer.isFullScreen;
 
-                app.composer.isFullScreen = () => false;
+        app.composer.isFullScreen = () => false;
 
-                this.attrs.preview();
+        this.attrs.preview();
 
-                app.composer.isFullScreen = originalIsFullScreen;
-            }
-        });
-
-        this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), this.$().parents('.Composer')[0]);
-
-        new PasteClipboard((files) => this.uploader.upload(files), this.$('.TextEditor-editor')[0]);
+        app.composer.isFullScreen = originalIsFullScreen;
+      }
     });
 
-    extend(TextEditor.prototype, 'onremove', function (f_, vnode) {
-        if (!app.forum.attribute('fof-upload.canUpload')) return;
+    this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), this.$().parents('.Composer')[0]);
 
-        this.dragAndDrop.unload();
-    });
+    new PasteClipboard((files) => this.uploader.upload(files), this.$('.TextEditor-editor')[0]);
+  });
+
+  extend(TextEditor.prototype, 'onremove', function (f_, vnode) {
+    if (!app.forum.attribute('fof-upload.canUpload')) return;
+
+    this.dragAndDrop.unload();
+  });
 }
