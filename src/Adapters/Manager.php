@@ -106,18 +106,25 @@ class Manager
             return null;
         }
 
+        $s3Config = [
+            'region'                  => empty($this->settings->get('fof-upload.awsS3Region')) ? null : $this->settings->get('fof-upload.awsS3Region'),
+            'version'                 => 'latest',
+            'endpoint'                => empty($this->settings->get('fof-upload.awsS3Endpoint')) ? null : $this->settings->get('fof-upload.awsS3Endpoint'),
+            'use_path_style_endpoint' => empty($this->settings->get('fof-upload.awsS3UsePathStyleEndpoint')) ? null : (bool) $this->settings->get('fof-upload.awsS3UsePathStyleEndpoint'),
+        ];
+
+        // Only explicitly provide credentials if available.
+        // Otherwise S3Client will attempt to use instance profile.
+        if ($this->settings->get('fof-upload.awsS3Key') && $this->settings->get('fof-upload.awsS3Secret')) {
+            $s3Config['credentials'] = [
+                'key'    => $this->settings->get('fof-upload.awsS3Key'),
+                'secret' => $this->settings->get('fof-upload.awsS3Secret'),
+            ];
+        }
+
         return new Adapters\AwsS3(
             new AwsS3Adapter(
-                new S3Client([
-                    'credentials' => [
-                        'key'    => $this->settings->get('fof-upload.awsS3Key'),
-                        'secret' => $this->settings->get('fof-upload.awsS3Secret'),
-                    ],
-                    'region'                  => empty($this->settings->get('fof-upload.awsS3Region')) ? null : $this->settings->get('fof-upload.awsS3Region'),
-                    'version'                 => 'latest',
-                    'endpoint'                => empty($this->settings->get('fof-upload.awsS3Endpoint')) ? null : $this->settings->get('fof-upload.awsS3Endpoint'),
-                    'use_path_style_endpoint' => empty($this->settings->get('fof-upload.awsS3UsePathStyleEndpoint')) ? null : (bool) $this->settings->get('fof-upload.awsS3UsePathStyleEndpoint'),
-                ]),
+                new S3Client($s3Config),
                 $this->settings->get('fof-upload.awsS3Bucket')
             )
         );
