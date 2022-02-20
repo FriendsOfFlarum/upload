@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Api\Controllers;
 
 use Exception;
@@ -50,7 +60,7 @@ class InspectMimeController implements RequestHandlerInterface
             $upload = $this->files->moveUploadedFileToTemp(Arr::first($files));
         } catch (ValidationException $exception) {
             return new JsonResponse([
-                'laravel_validation' => false,
+                'laravel_validation'       => false,
                 'laravel_validation_error' => $exception->getMessage(),
             ]);
         }
