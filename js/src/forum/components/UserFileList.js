@@ -52,13 +52,16 @@ export default class UserFileList extends Component {
         {this.inModal && state.empty() && (
           <p className="fof-upload-empty">
             <i className="fas fa-cloud-upload-alt fof-upload-empty-icon" />
-
             {app.translator.trans(`fof-upload.forum.file_list.modal_empty_${app.screen() !== 'phone' ? 'desktop' : 'phone'}`)}
           </p>
         )}
 
         {/* Empty file list */}
-        {!this.inModal && state.empty() && <p className="fof-upload-empty">{app.translator.trans('fof-upload.forum.file_list.empty')}</p>}
+        {!this.inModal && state.empty() && (
+          <div className="Placeholder">
+            <p className="fof-upload-empty">{app.translator.trans('fof-upload.forum.file_list.empty')}</p>
+          </div>
+        )}
 
         {/* File list */}
         <ul>
