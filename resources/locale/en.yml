@@ -78,6 +78,7 @@ fof-upload:
           both: Both
           upload-btn: Upload button only
           media-btn: Media manager button only
+      inspect-mime: Test file MIME type
 
     permissions:
       download_label: Download files
@@ -112,6 +113,20 @@ fof-upload:
       local: Local
       ovh-svfs: OVH SVFS
       qiniu: QiNiu
+    inspect-mime:
+      title: Inspect MIME
+      description: |
+        FoF Upload uses the <a>PHP Mime Detector</a> library for common MIME types and PHP Fileinfo as a fallback.
+        The MIME value returned by Fileinfo can be different from server to server!
+      select: Select a file below to inspect the values that will be used. The file will not be saved.
+      laravel-validation: Laravel File Validation
+      no-file-selected: No file
+      validation-passed: Passed
+      validation-failed: "Failed: {error}"
+      mime-detector: Mime Detector (primary)
+      mime-fileinfo: PHP Fileinfo (fallback)
+      guessed-extension: Default file extension (if original is not whitelisted)
+      not-available: No result
   forum:
     media_manager: Media manager
 

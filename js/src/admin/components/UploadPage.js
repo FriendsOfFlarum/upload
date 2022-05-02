@@ -9,6 +9,7 @@ import withAttr from 'flarum/common/utils/withAttr';
 import Stream from 'flarum/common/utils/Stream';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import ItemList from 'flarum/common/utils/ItemList';
+import InspectMimeModal from './InspectMimeModal';
 
 /* global m */
 
@@ -205,6 +206,15 @@ export default class UploadPage extends ExtensionPage {
                   ])
                 ),
                 m('.helpText', app.translator.trans('fof-upload.admin.help_texts.mime_types')),
+                Button.component(
+                  {
+                    className: 'Button',
+                    onclick() {
+                      app.modal.show(InspectMimeModal);
+                    },
+                  },
+                  app.translator.trans('fof-upload.admin.labels.inspect-mime')
+                ),
                 m('.helpText', app.translator.trans('fof-upload.admin.help_texts.download_templates')),
                 this.templateOptionsDescriptions(),
               ]),
