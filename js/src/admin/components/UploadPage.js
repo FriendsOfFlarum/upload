@@ -369,6 +369,7 @@ export default class UploadPage extends ExtensionPage {
         m('.aws', [
           m('fieldset', [
             m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
+            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_instance_profile')),
             m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
             m('input.FormControl', {
               value: this.values.awsS3Key() || '',
