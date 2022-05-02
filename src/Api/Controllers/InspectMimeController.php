@@ -61,7 +61,7 @@ class InspectMimeController implements RequestHandlerInterface
         } catch (ValidationException $exception) {
             return new JsonResponse([
                 'laravel_validation'       => false,
-                'laravel_validation_error' => $exception->getMessage(),
+                'laravel_validation_error' => implode("\n", Arr::flatten($exception->errors())),
             ]);
         }
 
