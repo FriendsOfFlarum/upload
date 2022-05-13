@@ -82,7 +82,7 @@ class Imgur implements UploadAdapter
 
             $link = Arr::get($meta, 'link');
 
-            $file->url = preg_replace('/^https?:/', null, $link);
+            $file->url = $link;
             $file->remote_id = Arr::get($meta, 'id');
         }
 
