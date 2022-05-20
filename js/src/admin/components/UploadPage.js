@@ -339,11 +339,14 @@ export default class UploadPage extends ExtensionPage {
         <div className="imgur">
           <fieldset>
             <legend>{app.translator.trans('fof-upload.admin.labels.imgur.title')}</legend>
-            <p>{icon('fas fa-exclamation-circle')} {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
-              a: <Link href="https://imgur.com/tos" external={true} target="_blank" />
-            })}</p>
+            <p>
+              {icon('fas fa-exclamation-circle')}{' '}
+              {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
+                a: <Link href="https://imgur.com/tos" external={true} target="_blank" />,
+              })}
+            </p>
             <label>{app.translator.trans('fof-upload.admin.labels.imgur.client_id')}</label>
-            <input className="FormControl" value={this.values.imgurClientId() || ''} oninput={withAttr('value', this.values.imgurClientId)}/>
+            <input className="FormControl" value={this.values.imgurClientId() || ''} oninput={withAttr('value', this.values.imgurClientId)} />
           </fieldset>
         </div>,
         100
