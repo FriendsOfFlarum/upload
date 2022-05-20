@@ -10,6 +10,8 @@ import Stream from 'flarum/common/utils/Stream';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import ItemList from 'flarum/common/utils/ItemList';
 import InspectMimeModal from './InspectMimeModal';
+import icon from 'flarum/common/helpers/icon';
+import Link from 'flarum/common/components/Link';
 
 /* global m */
 
@@ -334,16 +336,17 @@ export default class UploadPage extends ExtensionPage {
     if (this.uploadMethodOptions['imgur'] !== undefined) {
       items.add(
         'imgur',
-        m('.imgur', [
-          m('fieldset', [
-            m('legend', app.translator.trans('fof-upload.admin.labels.imgur.title')),
-            m('label', app.translator.trans('fof-upload.admin.labels.imgur.client_id')),
-            m('input.FormControl', {
-              value: this.values.imgurClientId() || '',
-              oninput: withAttr('value', this.values.imgurClientId),
-            }),
-          ]),
-        ])
+        <div className="imgur">
+          <fieldset>
+            <legend>{app.translator.trans('fof-upload.admin.labels.imgur.title')}</legend>
+            <p>{icon('fas fa-exclamation-circle')} {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
+              a: <Link href="https://imgur.com/tos" external={true} target="_blank" />
+            })}</p>
+            <label>{app.translator.trans('fof-upload.admin.labels.imgur.client_id')}</label>
+            <input className="FormControl" value={this.values.imgurClientId() || ''} oninput={withAttr('value', this.values.imgurClientId)}/>
+          </fieldset>
+        </div>,
+        100
       );
     }
 
@@ -369,7 +372,8 @@ export default class UploadPage extends ExtensionPage {
               oninput: withAttr('value', this.values.qiniuBucket),
             }),
           ]),
-        ])
+        ]),
+        80
       );
     }
 
@@ -423,7 +427,8 @@ export default class UploadPage extends ExtensionPage {
             }),
             m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
           ]),
-        ])
+        ]),
+        60
       );
     }
 
