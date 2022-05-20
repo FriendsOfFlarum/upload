@@ -48,6 +48,7 @@ fof-upload:
       imgur:
         client_id: Imgur client ID
         title: Imgur image storage settings
+        tos: It is your responsibility to ensure your forum users adhere to Imgur's <a>Terms of service</a>
       local:
         cdn_url: Content Delivery URL (prefixes files)
         title: Local storage settings
