@@ -1,0 +1,65 @@
+<?php
+
+namespace FoF\Upload\Extend;
+
+use Flarum\Extend\ExtenderInterface;
+use Flarum\Extension\Extension;
+use Illuminate\Contracts\Container\Container;
+
+class SvgSanitizer implements ExtenderInterface
+{
+    protected $allowedAttrs = [];
+
+    protected $allowedTags = [];
+
+    protected $removeAttrs = [];
+
+    protected $removeTags = [];
+
+    public function allowAttr(string $attr): self
+    {
+        $this->allowedAttrs[] = $attr;
+
+        return $this;
+    }
+
+    public function allowTag(string $tag): self
+    {
+        $this->allowedTags[] = $tag;
+
+        return $this;
+    }
+
+    public function removeAttr($attr): self
+    {
+        $this->removeAttrs[] = $attr;
+
+        return $this;
+    }
+
+    public function removeTag($tag): self
+    {
+        $this->removeTags[] = $tag;
+
+        return $this;
+    }
+    
+    public function extend(Container $container, Extension $extension = null)
+    {
+        $container->singleton('fof.upload.sanitizer.svg_allowed_attrs', function (): array {
+            return $this->allowedAttrs;
+        });
+
+        $container->singleton('fof.upload.sanitizer.svg_disallowed_attrs', function (): array {
+            return $this->removeAttrs;
+        });
+
+        $container->singleton('fof.upload.sanitizer.svg_allowed_tags', function (): array {
+            return $this->allowedTags;
+        });
+
+        $container->singleton('fof.upload.sanitizer.svg_disallowed_tags', function (): array {
+            return $this->removeTags;
+        });
+    }
+}

@@ -32,7 +32,8 @@
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^3.0",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "enshrined/svg-sanitize": "^0.15.4"
     },
     "replace": {
         "flagrow/upload": "*"
