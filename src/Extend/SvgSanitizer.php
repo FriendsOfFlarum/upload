@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Extend;
 
 use Flarum\Extend\ExtenderInterface;
@@ -43,7 +53,7 @@ class SvgSanitizer implements ExtenderInterface
 
         return $this;
     }
-    
+
     public function extend(Container $container, Extension $extension = null)
     {
         $container->singleton('fof.upload.sanitizer.svg_allowed_attrs', function (): array {
