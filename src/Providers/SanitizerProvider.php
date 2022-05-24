@@ -29,5 +29,21 @@ class SanitizerProvider extends AbstractServiceProvider
 
             return $sanitizer;
         });
+
+        $this->container->singleton('fof.upload.sanitizer.svg_allowed_attrs', function (): array {
+            return [];
+        });
+
+        $this->container->singleton('fof.upload.sanitizer.svg_disallowed_attrs', function (): array {
+            return [];
+        });
+
+        $this->container->singleton('fof.upload.sanitizer.svg_allowed_tags', function (): array {
+            return [];
+        });
+
+        $this->container->singleton('fof.upload.sanitizer.svg_disallowed_tags', function (): array {
+            return [];
+        });
     }
 }

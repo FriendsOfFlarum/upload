@@ -56,20 +56,20 @@ class SvgSanitizer implements ExtenderInterface
 
     public function extend(Container $container, Extension $extension = null)
     {
-        $container->singleton('fof.upload.sanitizer.svg_allowed_attrs', function (): array {
-            return $this->allowedAttrs;
+        $container->extend('fof.upload.sanitizer.svg_allowed_attrs', function ($items): array {
+            return array_merge($items, $this->allowedAttrs);
         });
 
-        $container->singleton('fof.upload.sanitizer.svg_disallowed_attrs', function (): array {
-            return $this->removeAttrs;
+        $container->extend('fof.upload.sanitizer.svg_disallowed_attrs', function ($items): array {
+            return array_merge($items, $this->removeAttrs);
         });
 
-        $container->singleton('fof.upload.sanitizer.svg_allowed_tags', function (): array {
-            return $this->allowedTags;
+        $container->extend('fof.upload.sanitizer.svg_allowed_tags', function ($items): array {
+            return array_merge($items, $this->allowedTags);
         });
 
-        $container->singleton('fof.upload.sanitizer.svg_disallowed_tags', function (): array {
-            return $this->removeTags;
+        $container->extend('fof.upload.sanitizer.svg_disallowed_tags', function ($items): array {
+            return array_merge($items, $this->removeTags);
         });
     }
 }
