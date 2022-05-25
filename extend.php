@@ -18,6 +18,7 @@ use Flarum\Api\Serializer\UserSerializer;
 use Flarum\Extend;
 use Flarum\Settings\Event\Deserializing;
 use FoF\Upload\Events\File\WillBeUploaded;
+use FoF\Upload\Extend\SvgSanitizer;
 
 return [
     (new Extend\Routes('api'))
@@ -56,7 +57,8 @@ return [
     (new Extend\ServiceProvider())
         ->register(Providers\UtilProvider::class)
         ->register(Providers\StorageServiceProvider::class)
-        ->register(Providers\DownloadProvider::class),
+        ->register(Providers\DownloadProvider::class)
+        ->register(Providers\SanitizerProvider::class),
 
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
@@ -69,4 +71,7 @@ return [
 
     (new Extend\Formatter())
         ->render(Formatter\TextPreview\FormatTextPreview::class),
+
+    (new SvgSanitizer())
+        ->allowTag('animate'),
 ];

@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Commands;
 
+use enshrined\svgSanitize\Sanitizer;
 use Exception;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
@@ -24,6 +25,7 @@ use FoF\Upload\Helpers\Util;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Psr\Http\Message\UploadedFileInterface;
 use SoftCreatR\MimeDetector\MimeDetector;
 use SoftCreatR\MimeDetector\MimeDetectorException;
@@ -59,13 +61,19 @@ class UploadHandler
      */
     protected $translator;
 
+    /**
+     * @var Sanitizer
+     */
+    protected $sanitizer;
+
     public function __construct(
         Application $app,
         Dispatcher $events,
         Util $util,
         FileRepository $files,
         MimeDetector $mimeDetector,
-        Translator $translator
+        Translator $translator,
+        Sanitizer $sanitizer
     ) {
         $this->app = $app;
         $this->util = $util;
@@ -73,6 +81,7 @@ class UploadHandler
         $this->files = $files;
         $this->mimeDetector = $mimeDetector;
         $this->translator = $translator;
+        $this->sanitizer = $sanitizer;
     }
 
     /**
@@ -104,6 +113,20 @@ class UploadHandler
                     } catch (Exception $e) {
                         throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                     }
+                }
+
+                // If an SVG has been uploaded, remove any unwanted tags & attrs, if possible, else throw a validation error
+                if (Str::startsWith($uploadFileData['mime'], 'image/svg')) {
+                    // Will return false if sanitization fails, else will return the clean SVG contents.
+                    $cleanSvg = $this->sanitizer->sanitize(file_get_contents($upload->getPathname()));
+
+                    if (!$cleanSvg) {
+                        //TODO maybe expose the error list via ValidationException?
+                        //$issues = $this->sanitizer->getXmlIssues();
+                        throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.svg_failure')]);
+                    }
+
+                    file_put_contents($upload->getPathname(), $cleanSvg, LOCK_EX);
                 }
 
                 $mimeConfiguration = $this->getMimeConfiguration($uploadFileData['mime']);
