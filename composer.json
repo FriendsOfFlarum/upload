@@ -28,6 +28,7 @@
         }
     ],
     "require": {
+        "php": ">=8.0",
         "flarum/core": "^1.2.0",
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^3.0",
