@@ -16,6 +16,8 @@ use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Serializer\UserSerializer;
 use Flarum\Extend;
+use Flarum\Post\Event\Posted;
+use Flarum\Post\Event\Revised;
 use Flarum\Settings\Event\Deserializing;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Extend\SvgSanitizer;
@@ -50,8 +52,10 @@ return [
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(Extenders\AddForumAttributes::class),
 
-    (new Extend\Event())
+    (new Extend\Event)
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
+        ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
+        ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
     (new Extend\ServiceProvider())
