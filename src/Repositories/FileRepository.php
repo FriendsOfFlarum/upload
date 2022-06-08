@@ -296,26 +296,37 @@ class FileRepository
         $table = (new File())->getTable();
         $db = (new File())->getConnection();
 
-        return File::query()
-            ->join('posts', function (JoinClause $join) use ($table, $db) {
+        $changes = 0;
+
+        // Finds files and the posts they have been published in.
+        File::query()
+            // Sorting is required when using each, for bulk querying.
+            ->orderBy("$table.id")
+            // Load everything for files, and any matched post ids concatenated.
+            ->select("$table.*", $db->raw("group_concat(distinct posts.id) as matched_post_ids"))
+            // Join on the posts table so that we can find posts that contain the file url.
+            ->leftJoin('posts', function (JoinClause $join) use ($table, $db) {
                 $join
-                    ->on("$table.actor_id", '=', 'posts.user_id')
-                    ->where('content', 'like', $db->raw("CONCAT('%', $table.url, '%')"))
-                    ->limit(1);
+                    ->on("$table.actor_id", "=", "posts.user_id")
+                    ->where('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')"));
             })
-            ->whereNull('post_id')
-            ->whereNotNull('posts.id')
+            // In case the outside calling code needs to mutate the query more, append that here
+            // for instance used to call logic for just one post.
             ->when($mutate, $mutate)
-            ->whereDoesntHave('downloads')
-            ->whereBetween("$table.created_at", [
-                $db->raw('date_sub(posts.created_at, interval 1 hour)'),
-                $db->raw('date_add(posts.created_at, interval 1 hour)'),
-            ])
+            // Group the results by file id, this works together with the group_concat in the select.
             ->groupBy("$table.id")
-            ->update([
-                "$table.post_id"       => $db->raw('posts.id'),
-                "$table.discussion_id" => $db->raw('posts.discussion_id'),
-            ]);
+            // Now loop over all discovered files.
+            ->each(function (File $file) use (&$changes) {
+                // Sync attaches and detaches in one swoop. This updates the intermediate table.
+                // $file->matched_post_ids contains all posts by author that contain the file url.
+                $attached = $file->posts()->sync(
+                    array_filter(explode(',', $file->matched_post_ids ?? ''))
+                );
+
+                $changes += count($attached);
+            });
+
+        return $changes;
     }
 
     public function cleanUp(Carbon $before = null): int
@@ -326,8 +337,7 @@ class FileRepository
         $count = 0;
 
         File::query()
-            ->whereNull('post_id')
-            ->whereNull('discussion_id')
+            ->whereDoesntHave('posts')
             ->where('created_at', '<', $before ?? Carbon::now()->subDay())
             ->each(function (File $file) use ($manager, &$count) {
                 $adapter = $manager->instantiate($file->upload_method);
