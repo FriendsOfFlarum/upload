@@ -293,13 +293,13 @@ class FileRepository
 
     public function matchPosts(callable $mutate = null): int
     {
-        $table = (new File)->getTable();
-        $db = (new File)->getConnection();
+        $table = (new File())->getTable();
+        $db = (new File())->getConnection();
 
         return File::query()
             ->join('posts', function (JoinClause $join) use ($table, $db) {
                 $join
-                    ->on("$table.actor_id", "=", "posts.user_id")
+                    ->on("$table.actor_id", '=', 'posts.user_id')
                     ->where('content', 'like', $db->raw("CONCAT('%', $table.url, '%')"))
                     ->limit(1);
             })
@@ -308,12 +308,12 @@ class FileRepository
             ->when($mutate, $mutate)
             ->whereDoesntHave('downloads')
             ->whereBetween("$table.created_at", [
-                $db->raw("date_sub(posts.created_at, interval 1 hour)"),
-                $db->raw("date_add(posts.created_at, interval 1 hour)")
+                $db->raw('date_sub(posts.created_at, interval 1 hour)'),
+                $db->raw('date_add(posts.created_at, interval 1 hour)'),
             ])
             ->groupBy("$table.id")
             ->update([
-                "$table.post_id" => $db->raw('posts.id'),
+                "$table.post_id"       => $db->raw('posts.id'),
                 "$table.discussion_id" => $db->raw('posts.discussion_id'),
             ]);
     }
@@ -332,7 +332,9 @@ class FileRepository
             ->each(function (File $file) use ($manager, &$count) {
                 $adapter = $manager->instantiate($file->upload_method);
 
-                if ($adapter->delete($file)) $file->delete() && $count++;
+                if ($adapter->delete($file)) {
+                    $file->delete() && $count++;
+                }
             });
 
         return $count;
