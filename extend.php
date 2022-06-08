@@ -31,7 +31,7 @@ return [
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
 
-    (new Extend\Console)->command(Console\MapFilesCommand::class),
+    (new Extend\Console())->command(Console\MapFilesCommand::class),
 
     (new Extend\Csrf())->exemptRoute('fof-upload.download'),
 
@@ -54,7 +54,7 @@ return [
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(Extenders\AddForumAttributes::class),
 
-    (new Extend\Event)
+    (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
         ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
