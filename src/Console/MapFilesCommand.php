@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Console;
 
+use Carbon\Carbon;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Console\Command;
 
@@ -19,7 +20,8 @@ class MapFilesCommand extends Command
 {
     protected $signature = 'fof:upload
         {--map : Tries to map uploaded files to posts}
-        {--cleanup : Cleans unused uploaded files from storage}';
+        {--cleanup : Cleans unused uploaded files from storage}
+        {--cleanup-before= : Orphaned files before this date are removed (default 1 day ago, format "yyyy-mm-dd" or "now", "today" etc)}';
     protected $description = 'Helps restore mapping of uploaded files to their relative posts';
 
     public function handle(FileRepository $files)
@@ -27,13 +29,17 @@ class MapFilesCommand extends Command
         if ($this->option('map')) {
             $mapped = $files->matchPosts();
 
-            $this->info("$mapped files have been matched against posts.");
+            $this->info("$mapped matches have been modified between files and posts.");
         }
 
         if ($this->option('cleanup')) {
-            $deleted = $files->cleanUp();
+            $before = $this->option('cleanup-before')
+                ? Carbon::parse($this->option('cleanup-before'))
+                : Carbon::now()->subDay();
 
-            $this->info("$deleted unused uploaded files cleaned up.");
+            $deleted = $files->cleanUp($before);
+
+            $this->info("$deleted unused uploaded files cleaned up from before $before.");
         }
     }
 }
