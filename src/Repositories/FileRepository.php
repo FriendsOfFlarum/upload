@@ -303,11 +303,11 @@ class FileRepository
             // Sorting is required when using each, for bulk querying.
             ->orderBy("$table.id")
             // Load everything for files, and any matched post ids concatenated.
-            ->select("$table.*", $db->raw("group_concat(distinct posts.id) as matched_post_ids"))
+            ->select("$table.*", $db->raw('group_concat(distinct posts.id) as matched_post_ids'))
             // Join on the posts table so that we can find posts that contain the file url.
             ->leftJoin('posts', function (JoinClause $join) use ($table, $db) {
                 $join
-                    ->on("$table.actor_id", "=", "posts.user_id")
+                    ->on("$table.actor_id", '=', 'posts.user_id')
                     ->where('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')"));
             })
             // In case the outside calling code needs to mutate the query more, append that here
