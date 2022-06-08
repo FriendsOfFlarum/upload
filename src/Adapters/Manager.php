@@ -17,6 +17,7 @@ use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters;
+use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events\Adapter\Collecting;
 use FoF\Upload\Events\Adapter\Instantiate;
 use FoF\Upload\Helpers\Util;
@@ -71,7 +72,7 @@ class Manager
         return $adapters;
     }
 
-    public function instantiate(string $adapter)
+    public function instantiate(string $adapter): UploadAdapter
     {
         $configured = $this->adapters()
             // Drops adapters that cannot be instantiated due to missing packages.
