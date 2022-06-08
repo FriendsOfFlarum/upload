@@ -14,6 +14,7 @@ namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
 use Flarum\Foundation\Paths;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use FoF\Upload\Adapters\Manager;
@@ -291,7 +292,27 @@ class FileRepository
         return $download;
     }
 
-    public function matchPosts(callable $mutate = null): int
+    public function matchFilesForPost(Post $post): void
+    {
+        $table = (new File())->getTable();
+        $db = (new File())->getConnection();
+
+        File::query()
+            // Files already mapped to the post.
+            ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
+            // Files found in (new) content.
+            ->orWhereExists(fn ($query) => $query->select($db->raw(1))->from('posts')->where('posts.id', $post->id)->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')")))
+            // Loop over every found item to de- or attach.
+            ->each(function (File $file) use ($post) {
+                if (Str::contains($post->content, $file->url)) {
+                    $file->posts()->attach($post);
+                } else {
+                    $file->posts()->detach($post);
+                }
+            });
+    }
+
+    public function matchPosts(): int
     {
         $table = (new File())->getTable();
         $db = (new File())->getConnection();
@@ -310,9 +331,6 @@ class FileRepository
                     ->on("$table.actor_id", '=', 'posts.user_id')
                     ->where('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')"));
             })
-            // In case the outside calling code needs to mutate the query more, append that here
-            // for instance used to call logic for just one post.
-            ->when($mutate, $mutate)
             // Group the results by file id, this works together with the group_concat in the select.
             ->groupBy("$table.id")
             // Now loop over all discovered files.
@@ -329,7 +347,7 @@ class FileRepository
         return $changes;
     }
 
-    public function cleanUp(Carbon $before = null): int
+    public function cleanUp(Carbon $before): int
     {
         /** @var Manager $manager */
         $manager = resolve(Manager::class);
@@ -338,7 +356,7 @@ class FileRepository
 
         File::query()
             ->whereDoesntHave('posts')
-            ->where('created_at', '<', $before ?? Carbon::now()->subDay())
+            ->where('created_at', '<', $before)
             ->each(function (File $file) use ($manager, &$count) {
                 $adapter = $manager->instantiate($file->upload_method);
 
