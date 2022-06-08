@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Flarum\Foundation\Paths;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
@@ -23,6 +24,7 @@ use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -287,5 +289,52 @@ class FileRepository
         $download->save();
 
         return $download;
+    }
+
+    public function matchPosts(callable $mutate = null): int
+    {
+        $table = (new File)->getTable();
+        $db = (new File)->getConnection();
+
+        return File::query()
+            ->join('posts', function (JoinClause $join) use ($table, $db) {
+                $join
+                    ->on("$table.actor_id", "=", "posts.user_id")
+                    ->where('content', 'like', $db->raw("CONCAT('%', $table.url, '%')"))
+                    ->limit(1);
+            })
+            ->whereNull('post_id')
+            ->whereNotNull('posts.id')
+            ->when($mutate, $mutate)
+            ->whereDoesntHave('downloads')
+            ->whereBetween("$table.created_at", [
+                $db->raw("date_sub(posts.created_at, interval 1 hour)"),
+                $db->raw("date_add(posts.created_at, interval 1 hour)")
+            ])
+            ->groupBy("$table.id")
+            ->update([
+                "$table.post_id" => $db->raw('posts.id'),
+                "$table.discussion_id" => $db->raw('posts.discussion_id'),
+            ]);
+    }
+
+    public function cleanUp(Carbon $before = null): int
+    {
+        /** @var Manager $manager */
+        $manager = resolve(Manager::class);
+
+        $count = 0;
+
+        File::query()
+            ->whereNull('post_id')
+            ->whereNull('discussion_id')
+            ->where('created_at', '<', $before ?? Carbon::now()->subDay())
+            ->each(function (File $file) use ($manager, &$count) {
+                $adapter = $manager->instantiate($file->upload_method);
+
+                if ($adapter->delete($file)) $file->delete() && $count++;
+            });
+
+        return $count;
     }
 }

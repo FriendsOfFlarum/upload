@@ -4,14 +4,19 @@ namespace FoF\Upload\Listeners;
 
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
-use FoF\Upload\Concerns\MatchingPosts;
+use FoF\Upload\Repositories\FileRepository;
 
 class LinkImageToPostOnSave
 {
-    use MatchingPosts;
+    private FileRepository $files;
+
+    public function __construct(FileRepository $files)
+    {
+        $this->files = $files;
+    }
 
     public function handle(Posted|Revised $event)
     {
-        $this->matchPosts(fn ($query) => $query->where('posts.id', $event->post->id));
+        $this->files->matchPosts(fn ($query) => $query->where('posts.id', $event->post->id));
     }
 }
