@@ -347,7 +347,7 @@ class FileRepository
         return $changes;
     }
 
-    public function cleanUp(Carbon $before): int
+    public function cleanUp(Carbon $before, callable $confirm = null): int
     {
         /** @var Manager $manager */
         $manager = resolve(Manager::class);
@@ -357,8 +357,10 @@ class FileRepository
         File::query()
             ->whereDoesntHave('posts')
             ->where('created_at', '<', $before)
-            ->each(function (File $file) use ($manager, &$count) {
+            ->each(function (File $file) use ($manager, &$count, $confirm) {
                 $adapter = $manager->instantiate($file->upload_method);
+
+                if ($confirm !== null && $confirm($file, $adapter) !== true) return;
 
                 if ($adapter->delete($file)) {
                     $file->delete() && $count++;
