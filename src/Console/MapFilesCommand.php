@@ -13,7 +13,6 @@
 namespace FoF\Upload\Console;
 
 use Carbon\Carbon;
-use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Console\Command;
