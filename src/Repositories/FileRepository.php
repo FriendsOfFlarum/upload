@@ -360,7 +360,9 @@ class FileRepository
             ->each(function (File $file) use ($manager, &$count, $confirm) {
                 $adapter = $manager->instantiate($file->upload_method);
 
-                if ($confirm !== null && $confirm($file, $adapter) !== true) return;
+                if ($confirm !== null && $confirm($file, $adapter) !== true) {
+                    return;
+                }
 
                 if ($adapter->delete($file)) {
                     $file->delete() && $count++;
