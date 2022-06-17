@@ -15,55 +15,25 @@ An extension that handles file uploads intelligently for your forum.
 - Drag and drop uploads.
 - Uploading multiple files at once (button and drag and drop both support this).
 - Easily extendable, the extension heavily relies on Events.
-- Extender interface to disable or force particular adapters (see below)
+- Extender interface to disable or force particular adapters (see below).
+- Connect uploaded files to the posts they're used in and the author that uploaded them.
+- Deletion of unused uploads.
 
 ## Installation
 
 Install manually with composer:
 
 ```sh
-composer require fof/upload
+composer require fof/upload:"*"
 ```
 
 ## Updating
 
 ```sh
-composer require fof/upload
+composer require fof/upload:"*"
 php flarum migrate
 php flarum cache:clear
 ```
-
-### Updating from Flagrow
-
-This extension replaces [Flagrow Upload](https://packagist.org/packages/flagrow/upload).
-
-To upgrade from the old extension to the new one:
-
-- **Backup your data!** You should backup the database and the uploaded files.
-
-- Make sure the latest version of Flagrow upload is installed and migrations have run:
-
-```sh
-composer require flagrow/upload
-composer show flagrow/upload # You should see "versions: * 0.7.1" on the 4th line of output
-php flarum migrate
-```
-
-- Disable the Upload extension in the admin panel.
-
-- Run:
-
-```sh
-composer require fof/upload
-```
-
-Composer should let you know that `flagrow/upload` has been automatically removed.
-
-- Enable the new extension in the admin panel.
-
-- Your existing configuration and uploads meta will be migrated to FoF Upload automatically.
-
-- The same file locations on the disk are used by FoF Upload, it means the files don't need to be moved.
 
 ## Configuration
 
