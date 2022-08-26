@@ -67,13 +67,13 @@ class ListUploadsController extends AbstractListController
             // themselves and users with elevated permissions
             ->when(
                 $filterUploads != $actor->id && $actor->cannot('fof-upload.deleteUserUploads'),
-                fn($query) => $query->where('hide_from_media_manager', false)
+                fn ($query) => $query->where('hide_from_media_manager', false)
             )
             // Filter images contained in private discussions or posts, except for users
             // themselves or users with elevated permissions.
             ->when(
                 $filterUploads != $actor->id && $actor->cannot('fof-upload.deleteUserUploads'),
-                fn($query) => $query
+                fn ($query) => $query
                     ->whereHas('posts', fn ($query) => $query->where('posts.is_private', 0))
                     ->whereHas('posts.discussion', fn ($query) => $query->where('discussions.is_private', 0))
             )
