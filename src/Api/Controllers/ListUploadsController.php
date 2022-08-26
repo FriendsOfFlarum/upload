@@ -14,6 +14,7 @@ namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\UrlGenerator;
+use Flarum\User\User;
 use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
@@ -42,6 +43,7 @@ class ListUploadsController extends AbstractListController
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
+        /** @var User $actor */
         $actor = $request->getAttribute('actor');
         $params = $request->getQueryParams();
 
@@ -59,10 +61,22 @@ class ListUploadsController extends AbstractListController
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
 
-        // Build query
-        $query = File::where('actor_id', $filterUploads)->where('hide_from_media_manager', false);
-
-        $results = $query
+        $results = File::query()
+            ->where('actor_id', $filterUploads)
+            // Filter images hidden from the media manager for all users except for users
+            // themselves and users with elevated permissions
+            ->when(
+                $filterUploads != $actor->id && $actor->cannot('fof-upload.deleteUserUploads'),
+                fn($query) => $query->where('hide_from_media_manager', false)
+            )
+            // Filter images contained in private discussions or posts, except for users
+            // themselves or users with elevated permissions.
+            ->when(
+                $filterUploads != $actor->id && $actor->cannot('fof-upload.deleteUserUploads'),
+                fn($query) => $query
+                    ->whereHas('posts', fn ($query) => $query->where('posts.is_private', 0))
+                    ->whereHas('posts.discussion', fn ($query) => $query->where('discussions.is_private', 0))
+            )
             ->skip($offset)
             ->take($limit + 1)
             ->orderBy('id', 'desc')
