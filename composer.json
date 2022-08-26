@@ -2,9 +2,9 @@
     "name": "fof/upload",
     "description": "The file upload extension for the Flarum forum with insane intelligence.",
     "keywords": [
-        "upload",
+        "upload", "uploader",
         "flarum",
-        "file"
+        "file", "image", "video", "document"
     ],
     "type": "flarum-extension",
     "license": "MIT",
@@ -29,12 +29,12 @@
     ],
     "require": {
         "php": ">=8.0",
-        "flarum/core": "^1.2.0",
-        "ramsey/uuid": "^3.5.2 || ^4",
-        "softcreatr/php-mime-detector": "^3.0",
-        "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ext-json": "*",
-        "enshrined/svg-sanitize": "^0.15.4"
+        "enshrined/svg-sanitize": "^0.15.4",
+        "flarum/core": "^1.2.0",
+        "guzzlehttp/guzzle": "^6.0 || ^7.0",
+        "ramsey/uuid": "^3.5.2 || ^4",
+        "softcreatr/php-mime-detector": "^3.0"
     },
     "replace": {
         "flagrow/upload": "*"
