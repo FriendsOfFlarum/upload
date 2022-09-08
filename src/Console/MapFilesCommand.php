@@ -39,8 +39,8 @@ class MapFilesCommand extends Command
             $this->info("$mapped matches have been modified between files and posts.");
         }
 
-        if (! $map && $cleanup && ! $force && ! $this->confirm('Are you sure you want to clean up without mapping first?')) {
-            $this->info("Run mapping first then.");
+        if (!$map && $cleanup && !$force && !$this->confirm('Are you sure you want to clean up without mapping first?')) {
+            $this->info('Run mapping first then.');
         }
 
         if ($cleanup) {
