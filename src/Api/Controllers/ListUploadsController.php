@@ -36,10 +36,6 @@ class ListUploadsController extends AbstractListController
         $this->url = $url;
     }
 
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Tobscure\JsonApi\Document               $document
-     */
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = $request->getAttribute('actor');
@@ -48,10 +44,10 @@ class ListUploadsController extends AbstractListController
         // User is signed in
         $actor->assertRegistered();
 
-        $filterUploads = Arr::get($params, 'filter.user', $actor->id);
+        $filterByUserId = Arr::get($params, 'filter.user', $actor->id);
 
         // Can this user load other their files?
-        if (intval($filterUploads) !== $actor->id) {
+        if (intval($filterByUserId) !== $actor->id) {
             $actor->assertCan('fof-upload.viewUserUploads');
         }
 
@@ -60,7 +56,9 @@ class ListUploadsController extends AbstractListController
         $offset = $this->extractOffset($request);
 
         // Build query
-        $query = File::where('actor_id', $filterUploads)->where('hide_from_media_manager', false);
+        $query = File::query()
+            ->where('actor_id', $filterByUserId)
+            ->where('hide_from_media_manager', false);
 
         $results = $query
             ->skip($offset)

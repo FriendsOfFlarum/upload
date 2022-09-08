@@ -29,20 +29,28 @@ class MapFilesCommand extends Command
 
     public function handle(FileRepository $files)
     {
-        if ($this->option('map')) {
+        $map = $this->option('map');
+        $cleanup = $this->option('cleanup');
+        $force = $this->option('force');
+
+        if ($map) {
             $mapped = $files->matchPosts();
 
             $this->info("$mapped matches have been modified between files and posts.");
         }
 
-        if ($this->option('cleanup')) {
+        if (! $map && $cleanup && ! $force && ! $this->confirm('Are you sure you want to clean up without mapping first?')) {
+            $this->info("Run mapping first then.");
+        }
+
+        if ($cleanup) {
             $before = $this->option('cleanup-before')
                 ? Carbon::parse($this->option('cleanup-before'))
                 : Carbon::now()->subDay();
 
             $deleted = $files->cleanUp(
                 $before,
-                $this->option('force')
+                $force
                     ? null
                     : fn (File $file) => $this->confirm("Delete $file->url (stored on '$file->upload_method' at path '$file->path')?")
             );
