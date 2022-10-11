@@ -10,7 +10,6 @@
  * file that was distributed with this source code.
  */
 
-use Flarum\Group\Permission;
 use Illuminate\Database\Schema\Builder;
 
 return [

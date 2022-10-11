@@ -10,7 +10,6 @@
  * file that was distributed with this source code.
  */
 
-use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Database\Schema\Builder;
 
 return [
@@ -18,27 +17,27 @@ return [
         $db = $schema->getConnection();
 
         foreach ([
-                     'maxFileSize',
-                     'mimeTypes',
-                     'templates',
-                     'mustResize',
-                     'resizeMaxWidth',
-                     'cdnUrl',
-                     'addsWatermarks',
-                     'watermarkPosition',
-                     'watermark',
-                     'overrideAvatarUpload',
-                     'imgurClientId',
-                     'awsS3Key',
-                     'awsS3Secret',
-                     'awsS3Bucket',
-                     'awsS3Region',
-                     'disableHotlinkProtection',
-                     'disableDownloadLogging',
-                     'qiniuKey',
-                     'qiniuSecret',
-                     'qiniuBucket',
-                 ] as $key) {
+            'maxFileSize',
+            'mimeTypes',
+            'templates',
+            'mustResize',
+            'resizeMaxWidth',
+            'cdnUrl',
+            'addsWatermarks',
+            'watermarkPosition',
+            'watermark',
+            'overrideAvatarUpload',
+            'imgurClientId',
+            'awsS3Key',
+            'awsS3Secret',
+            'awsS3Bucket',
+            'awsS3Region',
+            'disableHotlinkProtection',
+            'disableDownloadLogging',
+            'qiniuKey',
+            'qiniuSecret',
+            'qiniuBucket',
+        ] as $key) {
             $db->table('settings')
                 ->where('key', 'flagrow.upload.'.$key)
                 ->update(['key' => 'fof-upload.'.$key]);
