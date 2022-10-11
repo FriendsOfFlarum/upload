@@ -15,10 +15,13 @@ use Illuminate\Database\Schema\Builder;
 
 return [
     'up' => function (Builder $schema) {
-        Permission::query()
+        $db = $schema->getConnection();
+
+        $db->table('group_permission')
             ->where('permission', 'flagrow.upload')
             ->update(['permission' => 'fof-upload.upload']);
-        Permission::query()
+
+        $db->table('group_permission')
             ->where('permission', 'flagrow.upload.download')
             ->update(['permission' => 'fof-upload.download']);
     },
