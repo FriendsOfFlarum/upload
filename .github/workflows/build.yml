@@ -1,32 +1,18 @@
-name: JavaScript
+name: Javascript
 
-on:
-  push:
-    branches:
-      - master
+on: [workflow_dispatch, push, pull_request]
 
 jobs:
-  build:
-    name: JS / Build
-    runs-on: ubuntu-latest
+  run:
+    uses: flarum/framework/.github/workflows/REUSABLE_frontend.yml@main
+    with:
+      enable_bundlewatch: false
+      enable_prettier: true
+      enable_typescript: false
 
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Restore npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('js/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      # Our action will install npm, cd into `./js`, run `npm run build` and
-      # `npm run build-typings`, then commit and upload any changes
-      - name: Build production JS
-        uses: flarum/action-build@2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: build
-          package_manager: npm
- 
+      frontend_directory: ./js
+      backend_directory: .
+      js_package_manager: npm
+      main_git_branch: master
+    secrets:
+      bundlewatch_github_token: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
