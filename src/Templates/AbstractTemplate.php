@@ -39,7 +39,7 @@ abstract class AbstractTemplate implements Template
     }
 
     /**
-     * @param $key
+     * @param       $key
      * @param array $params
      *
      * @return mixed
