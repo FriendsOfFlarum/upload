@@ -20,6 +20,8 @@ use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
 use Flarum\Settings\Event\Deserializing;
 use FoF\Upload\Events\File\WillBeUploaded;
+use FoF\Upload\Exceptions\ExceptionHandler;
+use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 
 return [
@@ -80,4 +82,7 @@ return [
 
     (new SvgSanitizer())
         ->allowTag('animate'),
+
+    (new Extend\ErrorHandling())
+        ->handler(InvalidUploadException::class, ExceptionHandler::class),
 ];

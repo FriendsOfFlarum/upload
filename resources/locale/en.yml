@@ -174,3 +174,11 @@ fof-upload:
       forbidden_type: Uploading files of this type is not allowed.
       unsupported_type: "Upload adapter does not support the provided mime type: {mime}."
       could_not_detect_mime: Could not detect the MIME type of this file, please try again.
+      max_upload_file_size_ini: Upload max filesize limit reached from php.ini.
+      max_upload_file_size_form: Upload max filesize limit reached from form.
+      partial_upload: Partial upload.
+      no_file_uploaded: No file uploaded.
+      no_upload_tmp_folder: No tmp folder for uploading files.
+      cannot_write_to_disk: Cannot write to disk.
+      upload_blocked_by_php_extension: A php extension blocked the upload.
+      no_files_made_it_to_upload: Please upload files no larger than {max} kb.

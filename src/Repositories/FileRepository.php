@@ -148,30 +148,23 @@ class FileRepository
      *
      * @throws InvalidUploadException
      */
-    protected function handleUploadError($code)
+    protected function handleUploadError($code): void
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
-                throw new InvalidUploadException('Upload max filesize limit reached from php.ini.');
-                break;
+                throw new InvalidUploadException('max_upload_file_size_ini', 413);
             case UPLOAD_ERR_FORM_SIZE:
-                throw new InvalidUploadException('Upload max filesize limit reached from form.');
-                break;
+                throw new InvalidUploadException('max_upload_file_size_form', 413);
             case UPLOAD_ERR_PARTIAL:
-                throw new InvalidUploadException('Partial upload.');
-                break;
+                throw new InvalidUploadException('partial_upload', 206);
             case UPLOAD_ERR_NO_FILE:
-                throw new InvalidUploadException('No file uploaded.');
-                break;
+                throw new InvalidUploadException('no_file_uploaded', 400);
             case UPLOAD_ERR_NO_TMP_DIR:
-                throw new InvalidUploadException('No tmp folder for uploading files.');
-                break;
+                throw new InvalidUploadException('no_upload_tmp_folder', 500);
             case UPLOAD_ERR_CANT_WRITE:
-                throw new InvalidUploadException('Cannot write to disk');
-                break;
+                throw new InvalidUploadException('cannot_write_to_disk', 500);
             case UPLOAD_ERR_EXTENSION:
-                throw new InvalidUploadException('A php extension blocked the upload.');
-                break;
+                throw new InvalidUploadException('upload_blocked_by_php_extension', 500);
             case UPLOAD_ERR_OK:
                 break;
         }
