@@ -47,14 +47,17 @@ export default class Uploader {
 
         const e = error.response.errors[0];
 
-        if (! e.code.includes('fof-upload')) {
-            throw error;
+        if (!e.code.includes('fof-upload')) {
+          throw error;
         }
 
         app.alerts.clear();
-        app.alerts.show({
+        app.alerts.show(
+          {
             type: 'error',
-        }, e.detail);
+          },
+          e.detail
+        );
       });
   }
 
