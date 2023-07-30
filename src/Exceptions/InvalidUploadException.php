@@ -34,7 +34,7 @@ class InvalidUploadException extends \Exception
     public function errors(): array
     {
         return [
-            'upload' => [$this->getMessage()]
+            'upload' => [$this->getMessage()],
         ];
     }
 

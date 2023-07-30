@@ -62,7 +62,7 @@ class UploadController extends AbstractListController
 
         if ($collection->isEmpty()) {
             throw new InvalidUploadException('no_files_made_it_to_upload', 400, [
-                'max' => $this->settings->get('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
+                'max' => $this->settings->get('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE),
             ]);
         }
 
