@@ -103,10 +103,6 @@ class Manager
      */
     protected function awsS3(Util $util)
     {
-        if (!$this->settings->get('fof-upload.awsS3Key')) {
-            return null;
-        }
-
         $s3Config = [
             'region'                  => empty($this->settings->get('fof-upload.awsS3Region')) ? null : $this->settings->get('fof-upload.awsS3Region'),
             'version'                 => 'latest',
