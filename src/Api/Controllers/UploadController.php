@@ -13,9 +13,11 @@
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\Commands\Upload;
 use FoF\Upload\Exceptions\InvalidUploadException;
+use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -31,9 +33,15 @@ class UploadController extends AbstractListController
      */
     protected $bus;
 
-    public function __construct(Dispatcher $bus)
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    public function __construct(Dispatcher $bus, SettingsRepositoryInterface $settings)
     {
         $this->bus = $bus;
+        $this->settings = $settings;
     }
 
     /**
@@ -53,7 +61,9 @@ class UploadController extends AbstractListController
         );
 
         if ($collection->isEmpty()) {
-            throw new InvalidUploadException('No files were uploaded');
+            throw new InvalidUploadException('no_files_made_it_to_upload', 400, [
+                'max' => $this->settings->get('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE),
+            ]);
         }
 
         return $collection;
