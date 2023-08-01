@@ -32,7 +32,7 @@ class ExceptionHandler
         return array_map(function (string $field, array $messages): array {
             return [
                 'detail' => implode("\n", $messages),
-                'source' => ['pointer' => "/data/attributes/$field"]
+                'source' => ['pointer' => "/data/attributes/$field"],
             ];
         }, array_keys($errors), $errors);
     }
