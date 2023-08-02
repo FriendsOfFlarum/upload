@@ -287,7 +287,12 @@ class FileRepository
 
     public function matchFilesForPost(Post $post): void
     {
+        $prfx = (new File())->getConnection()->getTablePrefix();
         $table = (new File())->getTable();
+
+        // join the prefix to the table name (if it exists)
+        $table = $prfx.$table;
+
         $db = (new File())->getConnection();
 
         File::query()
