@@ -369,7 +369,7 @@ class FileRepository
     protected function getTable(): string
     {
         $file = new File();
-        
+
         $prfx = $file->getConnection()->getTablePrefix();
         $table = $file->getTable();
 
