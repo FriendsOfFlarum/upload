@@ -287,11 +287,7 @@ class FileRepository
 
     public function matchFilesForPost(Post $post): void
     {
-        $prfx = (new File())->getConnection()->getTablePrefix();
-        $table = (new File())->getTable();
-
-        // join the prefix to the table name (if it exists)
-        $table = $prfx.$table;
+        $table = $this->getTable();
 
         $db = (new File())->getConnection();
 
@@ -312,7 +308,7 @@ class FileRepository
 
     public function matchPosts(): int
     {
-        $table = (new File())->getTable();
+        $table = $this->getTable();
         $db = (new File())->getConnection();
 
         $changes = 0;
@@ -368,5 +364,18 @@ class FileRepository
             });
 
         return $count;
+    }
+
+    protected function getTable(): string
+    {
+        $file = new File();
+        
+        $prfx = $file->getConnection()->getTablePrefix();
+        $table = $file->getTable();
+
+        // join the prefix to the table name (if it exists)
+        $table = $prfx.$table;
+
+        return $table;
     }
 }
