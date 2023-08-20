@@ -15,22 +15,20 @@ An extension that handles file uploads intelligently for your forum.
 - Drag and drop uploads.
 - Uploading multiple files at once (button and drag and drop both support this).
 - Easily extendable, the extension heavily relies on Events.
-- Extender interface to disable or force particular adapters (see below).
-- Connect uploaded files to the posts they're used in and the author that uploaded them.
-- Deletion of unused uploads.
+- Extender interface to disable or force particular adapters (see below)
 
 ## Installation
 
-Install manually with composer:
+Install manually:
 
 ```sh
-composer require fof/upload:"*"
+composer require fof/upload "*"
 ```
 
 ## Updating
 
 ```sh
-composer require fof/upload:"*"
+composer require fof/upload "*"
 php flarum migrate
 php flarum cache:clear
 ```
@@ -85,10 +83,43 @@ Adapter names currently available:
 - `qiniu`
 - `aws-s3`
 
+## Commands
+
+### MapFilesCommand
+
+Using `php flarum fof:upload` you have a powerful tool in your hands to map uploads to posts and
+clean up unused files. To do so there are two steps to take into consideration:
+
+- Mapping (`--map`) allows you to look through posts to identify whether which uploaded files have been used inside any posts, and store this information
+- Clean up (`--cleanup`, `--cleanup-before=yyyy-mm-dd`) grants you to ability to remove files that have been uploaded before the given time and haven't been mapped to any (existing) posts.
+
+The intent of this command stems from the original concept of understand what uploads are used where and to allow removal
+of unused, stale files. You can run this command manually or as a cronjob.
+
+Example 1; only mapping files:
+
+```bash
+php flarum fof:upload --map
+```
+
+Example 2; map and clean up
+
+```bash
+php flarum fof:upload --map --cleanup --cleanup-before="a month ago"
+```
+
+Once you're happy with how the command operates, you can append the flag `--force`, which removes the need to confirm
+the action:
+
+```bash
+php flarum fof:upload --map --cleanup --cleanup-before="last year" --force
+```
+
 ## FAQ
 
 -  __AWS S3__: read the [AWS S3 configuration page](https://github.com/FriendsOfFlarum/upload/wiki/aws-s3).
 -  __Adding Templates__: read the [Custom Templates wiki page](https://github.com/FriendsOfFlarum/upload/wiki/Custom-Templates).
+- __Upgrading from flagrow/upload__: read the [wiki article](https://github.com/FriendsOfFlarum/upload/wiki/Upgrade-from-Flagrow-Upload).
 
 ## Links
 
