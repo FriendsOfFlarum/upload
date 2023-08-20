@@ -17,5 +17,6 @@ use FoF\Upload\File;
 class WasLoaded
 {
     public function __construct(public File $file)
-    {}
+    {
+    }
 }

@@ -20,6 +20,8 @@ class WillBeDownloaded
     public function __construct(
         public File $file,
         public &$response,
-        public ?Download $download = null)
-    {}
+        public ?Download $download = null
+    )
+    {
+    }
 }
