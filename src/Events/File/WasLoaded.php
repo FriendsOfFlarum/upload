@@ -16,13 +16,6 @@ use FoF\Upload\File;
 
 class WasLoaded
 {
-    /**
-     * @var File
-     */
-    public $file;
-
-    public function __construct(File $file)
-    {
-        $this->file = $file;
-    }
+    public function __construct(public File $file)
+    {}
 }

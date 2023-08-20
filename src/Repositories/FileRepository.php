@@ -21,17 +21,18 @@ use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
+use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
-use SoftCreatR\MimeDetector\MimeDetector;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 
 class FileRepository
@@ -40,26 +41,14 @@ class FileRepository
      * @var string
      */
     protected $path;
-    /**
-     * @var UploadValidator
-     */
-    private $validator;
 
-    /**
-     * @var MimeDetector
-     */
-    private $mimeDetector;
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    private $settings;
-
-    public function __construct(Paths $paths, UploadValidator $validator, MimeDetector $mimeDetector, SettingsRepositoryInterface $settings)
-    {
+    public function __construct(
+        Paths $paths,
+        private UploadValidator $validator,
+        private SettingsRepositoryInterface $settings,
+        private Dispatcher $events
+    ) {
         $this->path = $paths->storage;
-        $this->validator = $validator;
-        $this->mimeDetector = $mimeDetector;
-        $this->settings = $settings;
     }
 
     /**
@@ -75,16 +64,7 @@ class FileRepository
             ->first();
     }
 
-    /**
-     * @param Upload $file
-     * @param User   $actor
-     * @param string $mime
-     *
-     * @throws \Exception
-     *
-     * @return File
-     */
-    public function createFileFromUpload(Upload $file, User $actor, string $mime)
+    public function createFileFromUpload(Upload $file, User $actor, string $mime): File
     {
         // Generate a guaranteed unique Uuid.
         while ($uuid = Uuid::uuid4()->toString()) {
@@ -93,24 +73,20 @@ class FileRepository
             }
         }
 
+        $this->events->dispatch(
+            $event = new IsSlugged($file, $actor, $mime, $this->getBasename($file, $uuid))
+        );
+
         return (new File())->forceFill([
             'uuid'      => $uuid,
-            'base_name' => $this->getBasename($file, $uuid),
+            'base_name' => $event->slug,
             'size'      => $file->getSize(),
             'type'      => $mime,
             'actor_id'  => $actor->id,
         ]);
     }
 
-    /**
-     * @param UploadedFileInterface $upload
-     *
-     * @throws InvalidUploadException
-     * @throws \Illuminate\Validation\ValidationException
-     *
-     * @return Upload
-     */
-    public function moveUploadedFileToTemp(UploadedFileInterface $upload)
+    public function moveUploadedFileToTemp(UploadedFileInterface $upload): Upload
     {
         $this->handleUploadError($upload->getError());
 
@@ -143,11 +119,6 @@ class FileRepository
         return $file;
     }
 
-    /**
-     * @param $code
-     *
-     * @throws InvalidUploadException
-     */
     protected function handleUploadError($code): void
     {
         switch ($code) {
@@ -170,39 +141,16 @@ class FileRepository
         }
     }
 
-    /**
-     * Deletes a file from the temporary file location.
-     *
-     * @param Upload $file
-     *
-     * @throws \League\Flysystem\FileNotFoundException
-     *
-     * @return bool
-     */
-    public function removeFromTemp(Upload $file)
+    public function removeFromTemp(Upload $file): bool
     {
         return $this->getTempFilesystem($file->getPath())->delete($file->getBasename());
     }
 
-    /**
-     * Retrieves a filesystem manager for the temporary file location.
-     *
-     * @param string $path
-     *
-     * @return Filesystem
-     */
-    protected function getTempFilesystem($path)
+    protected function getTempFilesystem(string $path): Filesystem
     {
         return new Filesystem(new Local($path));
     }
 
-    /**
-     * Chooses a file extension for the upload.
-     *
-     * @param Upload $upload
-     *
-     * @return string
-     */
     protected function determineExtension(Upload $upload): string
     {
         $whitelistedClientExtensions = explode(',', $this->settings->get('fof-upload.whitelistedClientExtensions', ''));
@@ -223,13 +171,7 @@ class FileRepository
         return 'bin';
     }
 
-    /**
-     * @param Upload $upload
-     * @param string $uuid
-     *
-     * @return string
-     */
-    protected function getBasename(Upload $upload, $uuid)
+    protected function getBasename(Upload $upload, string $uuid): string
     {
         $name = pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME);
 
@@ -242,14 +184,6 @@ class FileRepository
         );
     }
 
-    /**
-     * @param Upload        $upload
-     * @param UploadAdapter $adapter
-     *
-     * @throws \League\Flysystem\FileNotFoundException
-     *
-     * @return bool|false|resource|string
-     */
     public function readUpload(Upload $upload, UploadAdapter $adapter)
     {
         $filesystem = $this->getTempFilesystem($upload->getPath());
@@ -259,13 +193,7 @@ class FileRepository
             : $filesystem->read($upload->getBasename());
     }
 
-    /**
-     * @param File            $file
-     * @param DownloadCommand $command
-     *
-     * @return Download
-     */
-    public function downloadedEntry(File $file, DownloadCommand $command)
+    public function downloadedEntry(File $file, DownloadCommand $command): Download
     {
         $download = new Download();
 

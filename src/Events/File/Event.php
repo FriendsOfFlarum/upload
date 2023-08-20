@@ -18,36 +18,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Event
 {
-    /**
-     * @var User
-     */
-    public $actor;
-
-    /**
-     * @var File
-     */
-    public $file;
-
-    /**
-     * @var UploadedFile
-     */
-    public $uploadedFile;
-
-    /**
-     * @var string
-     */
-    public $mime;
-
-    /**
-     * @param User         $actor
-     * @param File         $file
-     * @param UploadedFile $uploadedFile
-     */
-    public function __construct(User $actor, File $file, UploadedFile $uploadedFile, string $mime)
-    {
-        $this->actor = $actor;
-        $this->file = $file;
-        $this->uploadedFile = $uploadedFile;
-        $this->mime = $mime;
-    }
+    public function __construct(
+        public User $actor,
+        public File $file,
+        public UploadedFile $uploadedFile,
+        public string $mime
+    ) {}
 }
