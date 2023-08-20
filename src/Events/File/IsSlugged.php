@@ -18,9 +18,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class IsSlugged
 {
     public function __construct(
-        public readonly UploadedFile $file,
-        public readonly User $user,
-        public readonly string $mime,
+        public UploadedFile $file,
+        public User $user,
+        public string $mime,
         public string $slug
     ) {
     }
