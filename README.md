@@ -115,6 +115,12 @@ the action:
 php flarum fof:upload --map --cleanup --cleanup-before="last year" --force
 ```
 
+The following (to resume) will happen when this command is put into a recurring cronjob:
+
+- based on the interval of the cronjob (daily, weekly or however)
+- the command will go over all uploads to discover in which posts they have been used
+- delete those files that have been uploaded "last year" that have not been found in posts
+
 ## FAQ
 
 -  __AWS S3__: read the [AWS S3 configuration page](https://github.com/FriendsOfFlarum/upload/wiki/aws-s3).
