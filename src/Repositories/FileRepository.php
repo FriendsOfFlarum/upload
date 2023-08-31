@@ -215,7 +215,7 @@ class FileRepository
 
     public function matchFilesForPost(Post $post): void
     {
-        $table = (new File)->getTable();
+        $table = (new File())->getTable();
 
         $db = (new File())->getConnection();
         $prefix = $db->getTablePrefix();
@@ -224,7 +224,8 @@ class FileRepository
             // Files already mapped to the post.
             ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
-            ->orWhereExists(fn ($query) => $query
+            ->orWhereExists(
+                fn ($query) => $query
                 ->select($db->raw(1))
                 ->from('posts')
                 ->where('posts.id', $post->id)
@@ -242,7 +243,7 @@ class FileRepository
 
     public function matchPosts(): int
     {
-        $table = (new File)->getTable();
+        $table = (new File())->getTable();
         $db = (new File())->getConnection();
         $prefix = $db->getTablePrefix();
 
