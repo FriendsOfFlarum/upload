@@ -20,7 +20,7 @@ function setAwsMimeTypeAdapterDelimiter(Builder $schema, string $old = '_', stri
         ->where('key', 'fof-upload.mimeTypes')
         ->value('value');
 
-    $mimeConfiguration = json_decode($mimeConfiguration, true);
+    $mimeConfiguration = json_decode($mimeConfiguration ?? '[]', true);
 
     foreach ($mimeConfiguration as $mime => &$config) {
         if ($config['adapter'] === "aws{$old}s3") {
