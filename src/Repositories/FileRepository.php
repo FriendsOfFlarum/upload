@@ -215,15 +215,21 @@ class FileRepository
 
     public function matchFilesForPost(Post $post): void
     {
-        $table = $this->getTable();
+        $table = (new File)->getTable();
 
         $db = (new File())->getConnection();
+        $prefix = $db->getTablePrefix();
 
         File::query()
             // Files already mapped to the post.
             ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
-            ->orWhereExists(fn ($query) => $query->select($db->raw(1))->from('posts')->where('posts.id', $post->id)->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')")))
+            ->orWhereExists(fn ($query) => $query
+                ->select($db->raw(1))
+                ->from('posts')
+                ->where('posts.id', $post->id)
+                ->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
+            )
             // Loop over every found item to de- or attach.
             ->each(function (File $file) use ($post) {
                 if (Str::contains($post->content, $file->url)) {
@@ -236,8 +242,9 @@ class FileRepository
 
     public function matchPosts(): int
     {
-        $table = $this->getTable();
+        $table = (new File)->getTable();
         $db = (new File())->getConnection();
+        $prefix = $db->getTablePrefix();
 
         $changes = 0;
 
@@ -246,12 +253,12 @@ class FileRepository
             // Sorting is required when using each, for bulk querying.
             ->orderBy("$table.id")
             // Load everything for files, and any matched post ids concatenated.
-            ->select("$table.*", $db->raw('group_concat(distinct posts.id) as matched_post_ids'))
+            ->select("$table.*", $db->raw("group_concat(distinct {$prefix}posts.id) as matched_post_ids"))
             // Join on the posts table so that we can find posts that contain the file url.
-            ->leftJoin('posts', function (JoinClause $join) use ($table, $db) {
+            ->leftJoin('posts', function (JoinClause $join) use ($table, $db, $prefix) {
                 $join
                     ->on("$table.actor_id", '=', 'posts.user_id')
-                    ->where('posts.content', 'like', $db->raw("CONCAT('%', $table.url, '%')"));
+                    ->where('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"));
             })
             // Group the results by file id, this works together with the group_concat in the select.
             ->groupBy("$table.id")
@@ -292,18 +299,5 @@ class FileRepository
             });
 
         return $count;
-    }
-
-    protected function getTable(): string
-    {
-        $file = new File();
-
-        $prfx = $file->getConnection()->getTablePrefix();
-        $table = $file->getTable();
-
-        // join the prefix to the table name (if it exists)
-        $table = $prfx.$table;
-
-        return $table;
     }
 }
