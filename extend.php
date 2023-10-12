@@ -89,6 +89,6 @@ return [
 
     (new Extend\Conditional())
         ->whenExtensionEnabled('blomstra-gdpr', [
-            class_exists(UserData::class) ? (new UserData())->addType(Data\Uploads::class) : null
+            class_exists(UserData::class) ? (new UserData())->addType(Data\Uploads::class) : null,
         ]),
 ];

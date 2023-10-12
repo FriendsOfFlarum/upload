@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Data;
 
 use Blomstra\Gdpr\Data\Type;
@@ -13,7 +23,7 @@ class Uploads extends Type
     {
         /** @var DefaultDownloader $downloader */
         $downloader = resolve(DefaultDownloader::class);
-        
+
         File::query()
             ->where('actor_id', $this->user->id)
             ->orderBy('id', 'asc')
