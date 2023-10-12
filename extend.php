@@ -12,6 +12,7 @@
 
 namespace FoF\Upload;
 
+use Blomstra\Gdpr\Extend\UserData;
 use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Serializer\UserSerializer;
@@ -85,4 +86,9 @@ return [
 
     (new Extend\ErrorHandling())
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
+
+    (new Extend\Conditional())
+        ->whenExtensionEnabled('blomstra-gdpr', [
+            class_exists(UserData::class) ? (new UserData())->addType(Data\Uploads::class) : null
+        ]),
 ];
