@@ -53,7 +53,7 @@ class DefaultDownloader implements Downloader
      *
      * @return ResponseInterface
      */
-    public function download(File $file, Download $command): ResponseInterface
+    public function download(File $file, ?Download $command = null): ResponseInterface
     {
         if ($file->upload_method === 'local') {
             return $this->retrieveFromLocal($file);
