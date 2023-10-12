@@ -2,9 +2,13 @@
     "name": "fof/upload",
     "description": "The file upload extension for the Flarum forum with insane intelligence.",
     "keywords": [
-        "upload", "uploader",
+        "upload",
+        "uploader",
         "flarum",
-        "file", "image", "video", "document"
+        "file",
+        "image",
+        "video",
+        "document"
     ],
     "type": "flarum-extension",
     "license": "MIT",
@@ -31,7 +35,7 @@
         "php": ">=8.0",
         "ext-json": "*",
         "enshrined/svg-sanitize": "^0.15.4",
-        "flarum/core": "^1.2.0",
+        "flarum/core": "^1.8.0",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^3.0"
@@ -45,7 +49,8 @@
     },
     "require-dev": {
         "league/flysystem-aws-s3-v3": "^1.0",
-        "overtrue/flysystem-qiniu": "1.0.4"
+        "overtrue/flysystem-qiniu": "1.0.4",
+        "blomstra/gdpr": "@beta"
     },
     "extra": {
         "flarum-extension": {
@@ -59,6 +64,12 @@
         },
         "flagrow": {
             "discuss": "https://discuss.flarum.org/d/4154"
+        },
+        "flarum-cli": {
+            "modules": {
+                "githubActions": true,
+                "typescript": true
+            }
         }
     },
     "autoload": {

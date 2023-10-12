@@ -3,7 +3,7 @@ import UploadPage from './components/UploadPage';
 
 export * from './components';
 
-app.initializers.add('fof-upload', (app) => {
+app.initializers.add('fof-upload', () => {
   app.extensionData
     .for('fof-upload')
     .registerPage(UploadPage)

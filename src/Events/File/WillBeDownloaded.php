@@ -21,7 +21,6 @@ class WillBeDownloaded
         public File $file,
         public &$response,
         public ?Download $download = null
-    )
-    {
+    ) {
     }
 }
