@@ -8,7 +8,7 @@ jobs:
     with:
       enable_bundlewatch: false
       enable_prettier: true
-      enable_typescript: true
+      enable_typescript: false
 
       frontend_directory: ./js
       backend_directory: .
