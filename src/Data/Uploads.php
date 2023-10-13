@@ -47,6 +47,8 @@ class Uploads extends Type
 
     public function delete(): void
     {
+        // TODO: this currently only removes the entry from the DB, we also need to remove the files from storage.
+        
         File::query()
             ->where('user_id', $this->user->id)
             ->delete();
