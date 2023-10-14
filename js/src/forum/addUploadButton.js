@@ -62,7 +62,13 @@ export default function () {
       }
     });
 
-    this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), this.$().parents('.Composer')[0]);
+    // Gracefully fail if the TextEditor was used in a non-Composer context
+    // Using a custom method to retrieve the target allows other extensions to still use this feature by returning an alternate container
+    const dragAndDropTarget = this.fofUploadDragAndDropTarget();
+
+    if (dragAndDropTarget) {
+      this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), dragAndDropTarget);
+    }
 
     new PasteClipboard((files) => this.uploader.upload(files), this.$('.TextEditor-editor')[0]);
   });
@@ -70,6 +76,12 @@ export default function () {
   extend(TextEditor.prototype, 'onremove', function (f_, vnode) {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-    this.dragAndDrop.unload();
+    if (this.dragAndDrop) {
+      this.dragAndDrop.unload();
+    }
   });
+
+  TextEditor.prototype.fofUploadDragAndDropTarget = function () {
+    return this.$().parents('.Composer')[0];
+  };
 }
