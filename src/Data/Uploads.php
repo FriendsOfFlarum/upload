@@ -39,7 +39,7 @@ class Uploads extends Type
     public function anonymize(): void
     {
         File::query()
-            ->where('user_id', $this->user->id)
+            ->where('actor_id', $this->user->id)
             ->update([
                 'actor_id' => null,
             ]);
@@ -50,7 +50,7 @@ class Uploads extends Type
         // TODO: this currently only removes the entry from the DB, we also need to remove the files from storage.
 
         File::query()
-            ->where('user_id', $this->user->id)
+            ->where('actor_id', $this->user->id)
             ->delete();
     }
 }
