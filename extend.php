@@ -88,7 +88,8 @@ return [
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
 
     (new Extend\Conditional())
-        ->whenExtensionEnabled('blomstra-gdpr', [
-            class_exists(UserData::class) ? (new UserData())->addType(Data\Uploads::class) : null,
+        ->whenExtensionEnabled('blomstra-gdpr', fn () => [
+            (new UserData())
+                ->addType(Data\Uploads::class),
         ]),
 ];

@@ -19,6 +19,11 @@ use PhpZip\ZipFile;
 
 class Uploads extends Type
 {
+    public static function exportDescription(): string
+    {
+        return 'All files uploaded by the user.';
+    }
+
     public function export(ZipFile $zip): void
     {
         /** @var DefaultDownloader $downloader */
@@ -36,6 +41,11 @@ class Uploads extends Type
             });
     }
 
+    public static function anonymizeDescription(): string
+    {
+        return 'Removes the user reference from the uploaded files. The files themselves remain accessible to users that could view them pre-anonymization.';
+    }
+
     public function anonymize(): void
     {
         File::query()
@@ -43,6 +53,11 @@ class Uploads extends Type
             ->update([
                 'actor_id' => null,
             ]);
+    }
+
+    public static function deleteDescription(): string
+    {
+        return 'Currently, the file entry is removed from the database, but the file itself is not deleted. This will change to include removing the file from the disk before the stable release of GDPR.';
     }
 
     public function delete(): void
