@@ -23,7 +23,7 @@ class Uploads extends Type
     {
         return 'All files uploaded by the user.';
     }
-    
+
     public function export(ZipFile $zip): void
     {
         /** @var DefaultDownloader $downloader */
