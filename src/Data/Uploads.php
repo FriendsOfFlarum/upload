@@ -15,7 +15,6 @@ namespace FoF\Upload\Data;
 use Blomstra\Gdpr\Data\Type;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\File;
-use PhpZip\ZipFile;
 
 class Uploads extends Type
 {
@@ -24,21 +23,22 @@ class Uploads extends Type
         return 'All files uploaded by the user.';
     }
 
-    public function export(ZipFile $zip): void
+    public function export(): ?array
     {
         /** @var DefaultDownloader $downloader */
         $downloader = resolve(DefaultDownloader::class);
 
+        $dataExport = [];
+
         File::query()
             ->where('actor_id', $this->user->id)
             ->orderBy('id', 'asc')
-            ->each(function (File $file) use ($zip, $downloader) {
+            ->each(function (File $file) use ($downloader, &$dataExport) {
                 $fileContent = $downloader->download($file)->getBody()->getContents();
-                $zip->addFromString(
-                    "uploads/{$file->path}",
-                    $fileContent
-                );
+                $dataExport[] = ["uploads/{$file->path}" => $fileContent];
             });
+
+        return $dataExport;
     }
 
     public static function anonymizeDescription(): string
