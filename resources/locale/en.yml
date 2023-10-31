@@ -1,3 +1,11 @@
+blomstra-gdpr:
+  lib:
+    data:
+      uploads:
+        export_description: All files uploaded by the user.
+        anonymize_description: Removes the user reference from the uploaded files. The files themselves remain accessible to users that could view them pre-anonymization.
+        delete_description: Deletes all files uploaded by the user.
+
 fof-upload:
   admin:
     pane:
