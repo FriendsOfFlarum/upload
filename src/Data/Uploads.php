@@ -13,16 +13,13 @@
 namespace FoF\Upload\Data;
 
 use Blomstra\Gdpr\Data\Type;
+use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\File;
+use Psr\Log\LoggerInterface;
 
 class Uploads extends Type
 {
-    public static function exportDescription(): string
-    {
-        return 'All files uploaded by the user.';
-    }
-
     public function export(): ?array
     {
         /** @var DefaultDownloader $downloader */
@@ -41,11 +38,6 @@ class Uploads extends Type
         return $dataExport;
     }
 
-    public static function anonymizeDescription(): string
-    {
-        return 'Removes the user reference from the uploaded files. The files themselves remain accessible to users that could view them pre-anonymization.';
-    }
-
     public function anonymize(): void
     {
         File::query()
@@ -55,17 +47,24 @@ class Uploads extends Type
             ]);
     }
 
-    public static function deleteDescription(): string
-    {
-        return 'Currently, the file entry is removed from the database, but the file itself is not deleted. This will change to include removing the file from the disk before the stable release of GDPR.';
-    }
-
     public function delete(): void
     {
-        // TODO: this currently only removes the entry from the DB, we also need to remove the files from storage.
+        /** @var Manager $manager */
+        $manager = resolve(Manager::class);
+
+        /** @var LoggerInterface $logger */
+        $logger = resolve(LoggerInterface::class);
 
         File::query()
             ->where('actor_id', $this->user->id)
-            ->delete();
+            ->each(function (File $file) use ($manager, $logger) {
+                $adaptor = $manager->instantiate($file->upload_method);
+
+                if ($adaptor->delete($file)) {
+                    $file->delete();
+                } else {
+                    $logger->error("[GDPR][FoF Upload] Could not delete file {$file->id} from disk.");
+                }
+            });
     }
 }
