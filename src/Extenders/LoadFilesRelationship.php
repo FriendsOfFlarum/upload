@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Extenders;
 
 use Flarum\Api\Controller\ListDiscussionsController;
@@ -17,7 +27,7 @@ class LoadFilesRelationship
         } elseif (is_array($data) && isset($data['actor'])) {
             $loadable = $data['actor'];
         } elseif ($controller instanceof ListPostsController || $controller instanceof ListDiscussionsController) {
-            $loadable = (new User)->newCollection($data->pluck('user'));
+            $loadable = (new User())->newCollection($data->pluck('user'));
         }
 
         if ($loadable) {

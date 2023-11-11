@@ -14,7 +14,6 @@ namespace FoF\Upload\Extenders;
 
 use Flarum\Api\Serializer\UserSerializer;
 use Flarum\User\User;
-use FoF\Upload\File;
 
 class AddUserAttributes
 {
