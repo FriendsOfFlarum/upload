@@ -20,8 +20,8 @@ class AddUserAttributes
 {
     public function __invoke(UserSerializer $serializer, User $user, array $attributes): array
     {
-        $attributes['fof-upload-uploadCountCurrent'] = File::where('actor_id', $user->id)->where('hide_from_media_manager', false)->count();
-        $attributes['fof-upload-uploadCountAll'] = File::where('actor_id', $user->id)->count();
+        $attributes['fof-upload-uploadCountCurrent'] = $user->foffiles_current_count;
+        $attributes['fof-upload-uploadCountAll'] = $user->foffiles_count;
 
         return $attributes;
     }

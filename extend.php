@@ -13,6 +13,10 @@
 namespace FoF\Upload;
 
 use Blomstra\Gdpr\Extend\UserData;
+use Flarum\Api\Controller\ListDiscussionsController;
+use Flarum\Api\Controller\ListPostsController;
+use Flarum\Api\Controller\ShowForumController;
+use Flarum\Api\Controller\ShowUserController;
 use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Serializer\UserSerializer;
@@ -20,10 +24,12 @@ use Flarum\Extend;
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
 use Flarum\Settings\Event\Deserializing;
+use Flarum\User\User;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Exceptions\ExceptionHandler;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
+use FoF\Upload\Extenders\LoadFilesRelationship;
 
 return [
     (new Extend\Routes('api'))
@@ -53,6 +59,21 @@ return [
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
+
+    (new Extend\Model(User::class))
+        ->hasMany('foffiles', File::class, 'actor_id')
+        ->relationship('foffilesCurrent', function (User $model) {
+            return $model->foffiles()->where('hide_from_media_manager', false);
+        }),
+
+    (new Extend\ApiController(ShowUserController::class))
+        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    (new Extend\ApiController(ShowForumController::class))
+        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    (new Extend\ApiController(ListDiscussionsController::class))
+        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    (new Extend\ApiController(ListPostsController::class))
+        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
 
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(Extenders\AddForumAttributes::class),
