@@ -36,6 +36,9 @@ class AddForumAttributes
         $attributes['fof-upload.canDownload'] = $serializer->getActor()->can('fof-upload.download');
         $attributes['fof-upload.composerButtonVisiblity'] = $this->settings->get('fof-upload.composerButtonVisiblity', 'both');
 
+        $serializer->getActor()->load('foffiles');
+        $serializer->getActor()->load('foffilesCurrent');
+
         return $attributes;
     }
 }
