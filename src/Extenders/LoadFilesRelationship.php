@@ -27,7 +27,7 @@ class LoadFilesRelationship
         } elseif (is_array($data) && isset($data['actor'])) {
             $loadable = $data['actor'];
         } elseif ($controller instanceof ListPostsController || $controller instanceof ListDiscussionsController) {
-            $loadable = (new User())->newCollection($data->pluck('user'));
+            $loadable = (new User())->newCollection($data->pluck('user'))->filter();
         }
 
         if ($loadable) {
