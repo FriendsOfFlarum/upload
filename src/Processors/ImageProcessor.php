@@ -35,20 +35,12 @@ class ImageProcessor implements Processable
      */
     protected $paths;
 
-    /**
-     * @param Settings $settings
-     * @param Paths    $paths
-     */
     public function __construct(SettingsRepositoryInterface $settings, Paths $paths)
     {
         $this->settings = $settings;
         $this->paths = $paths;
     }
 
-    /**
-     * @param File         $file
-     * @param UploadedFile $upload
-     */
     public function process(File $file, UploadedFile $upload, string $mimeType)
     {
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {

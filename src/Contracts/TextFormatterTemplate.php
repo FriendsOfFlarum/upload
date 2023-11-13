@@ -12,6 +12,8 @@
 
 namespace FoF\Upload\Contracts;
 
+use Illuminate\Contracts\View\View;
+
 /**
  * An additional interface for templates that need to be registered in TextFormatter as a bbcode.
  */
@@ -26,8 +28,6 @@ interface TextFormatterTemplate
 
     /**
      * The xsl template to use with this tag.
-     *
-     * @return string
      */
-    public function template(): string;
+    public function template(): View;
 }

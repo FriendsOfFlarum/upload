@@ -77,11 +77,11 @@ class DefaultDownloader implements Downloader
             throw new InvalidDownloadException($e->getMessage());
         }
 
-        if ($response->getStatusCode() == 200) {
+        if ($response->getStatusCode() === 200) {
             $response = $this->mutateHeaders($response, $file);
-
-            return $response;
         }
+
+        return $response;
     }
 
     /**

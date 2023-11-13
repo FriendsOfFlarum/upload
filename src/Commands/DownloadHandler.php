@@ -12,14 +12,12 @@
 
 namespace FoF\Upload\Commands;
 
-use Flarum\Discussion\DiscussionRepository;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\Downloader;
 use FoF\Upload\Events\File\WasLoaded;
 use FoF\Upload\Events\File\WillBeDownloaded;
 use FoF\Upload\Exceptions\InvalidDownloadException;
 use FoF\Upload\Repositories\FileRepository;
-use GuzzleHttp\Client;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -32,28 +30,20 @@ class DownloadHandler
      * @var FileRepository
      */
     private $files;
-    /**
-     * @var DiscussionRepository
-     */
-    private $discussions;
-    /**
-     * @var Client
-     */
-    private $api;
+
     /**
      * @var Dispatcher
      */
     private $events;
+
     /**
      * @var SettingsRepositoryInterface
      */
     private $settings;
 
-    public function __construct(FileRepository $files, DiscussionRepository $discussions, Client $api, Dispatcher $events, SettingsRepositoryInterface $settings)
+    public function __construct(FileRepository $files, Dispatcher $events, SettingsRepositoryInterface $settings)
     {
         $this->files = $files;
-        $this->discussions = $discussions;
-        $this->api = $api;
         $this->events = $events;
         $this->settings = $settings;
     }

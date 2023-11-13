@@ -25,7 +25,6 @@ use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
@@ -54,7 +53,7 @@ class FileRepository
     /**
      * @param $uuid
      *
-     * @return File|Model
+     * @return File|null
      */
     public function findByUuid($uuid)
     {
@@ -204,7 +203,7 @@ class FileRepository
             'downloaded_at' => new Carbon(),
         ]);
 
-        if ($command->actor && !$command->actor->isGuest()) {
+        if (!$command->actor->isGuest()) {
             $download->actor_id = $command->actor->id;
         }
 

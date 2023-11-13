@@ -7,5 +7,7 @@ jobs:
     uses: flarum/framework/.github/workflows/REUSABLE_backend.yml@main
     with:
       enable_backend_testing: false
+      enable_phpstan: true
+      php_versions: '["8.0", "8.1", "8.2"]'
 
       backend_directory: .

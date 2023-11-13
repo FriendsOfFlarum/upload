@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
  * @property Collection|Download[] $downloads
  * @property Carbon                $created_at
  * @property bool                  $hide_from_media_manager
+ * @property array                 $matched_post_ids
  */
 class File extends AbstractModel
 {
@@ -79,7 +80,7 @@ class File extends AbstractModel
 
     public function getHumanSizeAttribute(): string
     {
-        return $this->human_filesize($this->size);
+        return $this->human_filesize((string) $this->size);
     }
 
     public function human_filesize(string $bytes, int $decimals = 0): string
@@ -87,6 +88,6 @@ class File extends AbstractModel
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
 
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$size[$factor];
+        return sprintf("%.{$decimals}f", (int) $bytes / pow(1024, $factor)).@$size[$factor];
     }
 }

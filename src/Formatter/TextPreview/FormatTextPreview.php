@@ -16,7 +16,6 @@ use Flarum\Foundation\Paths;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatTextPreview
 {
@@ -26,28 +25,22 @@ class FormatTextPreview
     private $files;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var Paths
      */
     private $paths;
 
-    public function __construct(FileRepository $files, TranslatorInterface $translator, Paths $paths)
+    public function __construct(FileRepository $files, Paths $paths)
     {
         $this->files = $files;
-        $this->translator = $translator;
         $this->paths = $paths;
     }
 
     /**
      * Configure rendering for text preview uploads.
      *
-     * @param s9e\TextFormatter\Renderer $renderer
-     * @param mixed                      $context
-     * @param string|null                $xml
+     * @param Renderer $renderer
+     * @param mixed    $context
+     * @param string   $xml
      *
      * @return string $xml to be rendered
      */

@@ -20,6 +20,10 @@ class FileSerializer extends AbstractSerializer
 {
     protected $type = 'files';
 
+    public function __construct(protected Util $util)
+    {
+    }
+
     /**
      * Get the default set of serialized attributes for a model.
      *
@@ -29,9 +33,6 @@ class FileSerializer extends AbstractSerializer
      */
     protected function getDefaultAttributes($model)
     {
-        /** @var Util */
-        $util = resolve(Util::class);
-
         return [
             'baseName'  => $model->base_name,
             'path'      => $model->path,
@@ -42,8 +43,8 @@ class FileSerializer extends AbstractSerializer
             'createdAt' => $model->created_at,
             'uuid'      => $model->uuid,
             'tag'       => $model->tag,
-            'hidden'    => $model->hidden_from_media_manager,
-            'bbcode'    => $util->getBbcodeForFile($model),
+            'hidden'    => $model->hide_from_media_manager,
+            'bbcode'    => $this->util->getBbcodeForFile($model),
         ];
     }
 }

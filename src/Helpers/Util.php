@@ -48,13 +48,6 @@ class Util
             });
     }
 
-    /**
-     * @param      $field
-     * @param null $default
-     * @param null $attribute
-     *
-     * @return Collection|mixed|null
-     */
     public function getJsonValue($json, $default = null, $attribute = null)
     {
         if (empty($json)) {
@@ -111,7 +104,7 @@ class Util
     }
 
     /**
-     * @return Collection|Template[]
+     * @return Collection
      */
     public function getAvailableTemplates()
     {
@@ -147,7 +140,6 @@ class Util
      */
     public function getBbcodeForFile(File $file): ?string
     {
-        /** @var Template */
         $template = $this->getTemplate($file->tag);
 
         return $template ? $template->preview($file) : null;

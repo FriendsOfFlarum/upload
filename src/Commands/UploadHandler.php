@@ -107,7 +107,7 @@ class UploadHandler
 
                 $uploadFileData = $this->mimeDetector->getFileType();
 
-                if (!isset($uploadFileData['mime']) || $uploadFileData['mime'] === null) {
+                if (Arr::get($uploadFileData, 'mime')) {
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
                     } catch (Exception $e) {
@@ -165,7 +165,7 @@ class UploadHandler
 
                 $file = $response;
 
-                $file->upload_method = $adapter;
+                $file->upload_method = Str::lower(Str::afterLast($adapter::class, '\\'));
                 $file->tag = $template;
                 $file->actor_id = $command->actor->id;
 
@@ -181,9 +181,7 @@ class UploadHandler
                     new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
             } catch (Exception $e) {
-                if (isset($upload)) {
-                    $this->files->removeFromTemp($upload);
-                }
+                $this->files->removeFromTemp($upload);
 
                 throw $e;
             }

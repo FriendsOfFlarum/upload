@@ -16,10 +16,16 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 
 class AwsS3 extends Flysystem implements UploadAdapter
 {
+    /**
+     * @var AwsS3Adapter
+     */
+    protected $adapter;
+
     protected function getConfig()
     {
         /** @var SettingsRepositoryInterface $settings */
