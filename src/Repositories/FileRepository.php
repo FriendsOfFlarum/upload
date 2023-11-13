@@ -25,7 +25,6 @@ use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;

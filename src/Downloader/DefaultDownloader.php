@@ -80,7 +80,7 @@ class DefaultDownloader implements Downloader
         if ($response->getStatusCode() === 200) {
             $response = $this->mutateHeaders($response, $file);
         }
-        
+
         return $response;
     }
 

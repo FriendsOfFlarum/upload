@@ -25,7 +25,7 @@ class Local extends Flysystem implements UploadAdapter
      * @var AdapterLocal
      */
     protected $adapter;
-    
+
     protected function generateUrl(File $file)
     {
         $publicPath = resolve(Paths::class)->public;

@@ -25,7 +25,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
      * @var AwsS3Adapter
      */
     protected $adapter;
-    
+
     protected function getConfig()
     {
         /** @var SettingsRepositoryInterface $settings */
