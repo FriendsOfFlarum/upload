@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
  * @property Collection|Download[] $downloads
  * @property Carbon                $created_at
  * @property bool                  $hide_from_media_manager
+ * @property array                 $matched_post_ids
  */
 class File extends AbstractModel
 {
