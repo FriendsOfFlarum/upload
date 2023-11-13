@@ -46,7 +46,7 @@ class AddPostDownloadTags extends Formatter
         try {
             $configurator->BBCodes->addCustom(
                 $template->bbcode(),
-                $template->template()
+                $template->template()->render()
             );
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException("Failed importing $name due to {$e->getMessage()}");

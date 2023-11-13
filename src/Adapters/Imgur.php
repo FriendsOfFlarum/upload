@@ -103,5 +103,7 @@ class Imgur implements UploadAdapter
     public function delete(File $file)
     {
         // TODO: Implement delete() method.
+        
+        return false;
     }
 }

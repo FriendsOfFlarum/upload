@@ -54,7 +54,7 @@ class FileRepository
     /**
      * @param $uuid
      *
-     * @return File|Model
+     * @return File|null
      */
     public function findByUuid($uuid)
     {
@@ -204,7 +204,7 @@ class FileRepository
             'downloaded_at' => new Carbon(),
         ]);
 
-        if ($command->actor && !$command->actor->isGuest()) {
+        if (!$command->actor->isGuest()) {
             $download->actor_id = $command->actor->id;
         }
 

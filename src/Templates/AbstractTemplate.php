@@ -14,6 +14,7 @@ namespace FoF\Upload\Templates;
 
 use FoF\Upload\Contracts\Template;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 
 abstract class AbstractTemplate implements Template
 {
@@ -27,13 +28,7 @@ abstract class AbstractTemplate implements Template
         return $this->tag;
     }
 
-    /**
-     * @param string $view
-     * @param array  $arguments
-     *
-     * @return string
-     */
-    protected function getView($view, $arguments = [])
+    protected function getView(string $view, array $arguments = []): View
     {
         return resolve(Factory::class)->make($view, $arguments);
     }

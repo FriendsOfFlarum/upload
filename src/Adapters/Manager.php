@@ -130,7 +130,7 @@ class Manager
     /**
      * @param Util $util
      *
-     * @return Adapters\Imgur
+     * @return Adapters\Imgur|null
      */
     protected function imgur(Util $util)
     {
@@ -163,7 +163,7 @@ class Manager
     /**
      * @param Util $util
      *
-     * @return Adapters\Qiniu
+     * @return Adapters\Qiniu|null
      */
     protected function qiniu(Util $util)
     {

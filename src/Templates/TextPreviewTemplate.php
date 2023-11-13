@@ -13,6 +13,7 @@
 namespace FoF\Upload\Templates;
 
 use FoF\Upload\File;
+use Illuminate\Contracts\View\View;
 
 class TextPreviewTemplate extends AbstractTextFormatterTemplate
 {
@@ -37,10 +38,7 @@ class TextPreviewTemplate extends AbstractTextFormatterTemplate
         return $this->trans('fof-upload.admin.templates.text-preview_description');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function template(): string
+    public function template(): View
     {
         return $this->getView('fof-upload.templates::text-preview');
     }

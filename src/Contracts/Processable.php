@@ -17,12 +17,5 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 interface Processable
 {
-    /**
-     * @param File         $file
-     * @param UploadedFile $upload
-     * @param string       $mime
-     *
-     * @return File
-     */
     public function process(File $file, UploadedFile $upload, string $mime);
 }

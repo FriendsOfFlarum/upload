@@ -49,9 +49,9 @@ abstract class Flysystem implements UploadAdapter
     /**
      * @param File         $file
      * @param UploadedFile $upload
-     * @param string       $contents
+     * @param mixed        $contents
      *
-     * @return File
+     * @return File|bool
      */
     public function upload(File $file, UploadedFile $upload, $contents)
     {

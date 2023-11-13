@@ -17,9 +17,15 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
+use League\Flysystem\Adapter\Local as AdapterLocal;
 
 class Local extends Flysystem implements UploadAdapter
 {
+    /**
+     * @var AdapterLocal
+     */
+    protected $adapter;
+    
     protected function generateUrl(File $file)
     {
         $publicPath = resolve(Paths::class)->public;

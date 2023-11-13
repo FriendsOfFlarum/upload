@@ -12,6 +12,8 @@
 
 namespace FoF\Upload\Templates;
 
+use Illuminate\Contracts\View\View;
+
 class ImageTemplate extends AbstractTextFormatterTemplate
 {
     /**
@@ -35,10 +37,7 @@ class ImageTemplate extends AbstractTextFormatterTemplate
         return $this->trans('fof-upload.admin.templates.image_description');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function template(): string
+    public function template(): View
     {
         return $this->getView('fof-upload.templates::image');
     }

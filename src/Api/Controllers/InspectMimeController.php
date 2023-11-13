@@ -48,7 +48,7 @@ class InspectMimeController implements RequestHandlerInterface
         RequestUtil::getActor($request)->assertAdmin();
 
         /**
-         * @var $files UploadedFileInterface[]
+         * @var UploadedFileInterface[] $files
          */
         $files = Arr::get($request->getUploadedFiles(), 'files', []);
 
