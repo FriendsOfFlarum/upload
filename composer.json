@@ -51,7 +51,8 @@
         "league/flysystem-aws-s3-v3": "^1.0",
         "overtrue/flysystem-qiniu": "1.0.4",
         "blomstra/gdpr": "@beta",
-        "flarum/phpstan": "*"
+        "flarum/phpstan": "*",
+        "flarum/testing": "^1.0.0"
     },
     "extra": {
         "flarum-extension": {
@@ -69,7 +70,8 @@
         "flarum-cli": {
             "modules": {
                 "githubActions": true,
-                "typescript": true
+                "typescript": true,
+                "backendTesting": true
             }
         }
     },
@@ -80,9 +82,25 @@
     },
     "scripts": {
         "analyse:phpstan": "phpstan analyse",
-        "clear-cache:phpstan": "phpstan clear-result-cache"
+        "clear-cache:phpstan": "phpstan clear-result-cache",
+        "test": [
+            "@test:unit",
+            "@test:integration"
+        ],
+        "test:unit": "phpunit -c tests/phpunit.unit.xml",
+        "test:integration": "phpunit -c tests/phpunit.integration.xml",
+        "test:setup": "@php tests/integration/setup.php"
     },
     "scripts-descriptions": {
-        "analyse:phpstan": "Run static analysis"
+        "analyse:phpstan": "Run static analysis",
+        "test": "Runs all tests.",
+        "test:unit": "Runs all unit tests.",
+        "test:integration": "Runs all integration tests.",
+        "test:setup": "Sets up a database for use with integration tests. Execute this only once."
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FoF\\Upload\\Tests\\": "tests/"
+        }
     }
 }
