@@ -107,7 +107,7 @@ class UploadHandler
 
                 $uploadFileData = $this->mimeDetector->getFileType();
 
-                if (Arr::get($uploadFileData, 'mime')) {
+                if (!Arr::has($uploadFileData, 'mime')) {
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
                     } catch (Exception $e) {
