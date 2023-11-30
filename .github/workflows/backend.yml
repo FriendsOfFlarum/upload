@@ -4,10 +4,10 @@ on: [workflow_dispatch, push, pull_request]
 
 jobs:
   run:
-    uses: flarum/framework/.github/workflows/REUSABLE_backend.yml@main
+    uses: flarum/framework/.github/workflows/REUSABLE_backend.yml@1.x
     with:
       enable_backend_testing: false
       enable_phpstan: true
-      php_versions: '["8.0", "8.1", "8.2"]'
+      php_versions: '["8.0", "8.1", "8.2", "8.3"]'
 
       backend_directory: .
