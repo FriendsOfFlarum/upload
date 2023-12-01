@@ -132,7 +132,6 @@ class FileRepository
 
     protected function handleUploadError($code): void
     {
-        print_r($code);
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
                 throw new InvalidUploadException('max_upload_file_size_ini', 413);
