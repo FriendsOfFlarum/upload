@@ -55,7 +55,7 @@ class ForumAttributesTest extends TestCase
                 '/'
             )
         );
-        
+
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertStringContainsString('<h1>All Discussions</h1>', $response->getBody()->getContents());
