@@ -22,7 +22,8 @@ class FileSerializer extends AbstractSerializer
 
     public function __construct(
         protected Util $util
-    ) { }
+    ) {
+    }
 
     /**
      * Get the default set of serialized attributes for a model.

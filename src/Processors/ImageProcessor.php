@@ -28,7 +28,8 @@ class ImageProcessor implements Processable
     public function __construct(
         protected SettingsRepositoryInterface $settings,
         protected Paths $paths
-    ) {}
+    ) {
+    }
 
     public function process(File $file, UploadedFile $upload, string $mimeType)
     {

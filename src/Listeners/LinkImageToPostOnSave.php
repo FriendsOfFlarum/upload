@@ -20,7 +20,8 @@ class LinkImageToPostOnSave
 {
     public function __construct(
         private FileRepository $files
-    ) {}
+    ) {
+    }
 
     public function handle(Posted|Revised $event)
     {

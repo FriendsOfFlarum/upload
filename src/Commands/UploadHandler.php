@@ -40,7 +40,8 @@ class UploadHandler
         protected MimeDetector $mimeDetector,
         protected Translator $translator,
         protected Sanitizer $sanitizer
-    ) {}
+    ) {
+    }
 
     /**
      * @param Upload $command

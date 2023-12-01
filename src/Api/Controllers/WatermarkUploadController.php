@@ -29,7 +29,8 @@ class WatermarkUploadController extends ShowForumController
     public function __construct(
         protected SettingsRepositoryInterface $settings,
         protected Paths $paths
-    ) { }
+    ) {
+    }
 
     public function data(ServerRequestInterface $request, Document $document)
     {

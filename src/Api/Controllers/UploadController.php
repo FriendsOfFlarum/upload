@@ -32,7 +32,8 @@ class UploadController extends AbstractListController
     public function __construct(
         protected Dispatcher $bus,
         protected SettingsRepositoryInterface $settings
-    ) { }
+    ) {
+    }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request

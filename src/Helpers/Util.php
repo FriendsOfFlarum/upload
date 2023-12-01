@@ -36,7 +36,8 @@ class Util
         protected Manager $manager,
         protected SettingsRepositoryInterface $settings,
         protected TranslatorInterface $translator
-    ) {}
+    ) {
+    }
 
     /**
      * @return Collection

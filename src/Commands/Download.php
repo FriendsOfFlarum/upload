@@ -21,5 +21,6 @@ class Download
         public User $actor,
         public ?int $discussionId = null,
         public ?int $postId = null
-    ) {}
+    ) {
+    }
 }

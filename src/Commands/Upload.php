@@ -20,5 +20,6 @@ class Upload
     public function __construct(
         public Collection $files,
         public User $actor
-    ) {}
+    ) {
+    }
 }

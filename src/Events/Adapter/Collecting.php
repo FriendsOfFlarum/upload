@@ -18,5 +18,6 @@ class Collecting
 {
     public function __construct(
         public Collection &$adapters
-    ) {}
+    ) {
+    }
 }

@@ -27,7 +27,8 @@ abstract class AbstractTemplate implements Template
     public function __construct(
         protected Factory $viewFactory,
         protected TranslatorInterface $translator
-    ) {}
+    ) {
+    }
 
     public function tag(): string
     {

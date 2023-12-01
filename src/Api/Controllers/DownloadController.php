@@ -33,7 +33,8 @@ class DownloadController implements RequestHandlerInterface
         protected Dispatcher $bus,
         protected PostRepository $posts,
         protected SettingsRepositoryInterface $settings
-    ) { }
+    ) {
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

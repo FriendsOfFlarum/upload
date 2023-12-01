@@ -22,5 +22,6 @@ class Identified
         public User $actor,
         public UploadedFile $upload,
         public ?UploadAdapter $adapter = null
-    ) {}
+    ) {
+    }
 }

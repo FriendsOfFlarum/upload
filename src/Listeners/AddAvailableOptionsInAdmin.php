@@ -19,7 +19,8 @@ class AddAvailableOptionsInAdmin
 {
     public function __construct(
         protected Util $util
-    ) {}
+    ) {
+    }
 
     public function handle(Deserializing $event)
     {

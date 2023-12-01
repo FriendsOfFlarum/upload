@@ -30,7 +30,8 @@ class InspectMimeController implements RequestHandlerInterface
     public function __construct(
         protected FileRepository $files,
         protected MimeDetector $mimeDetector
-    ) { }
+    ) {
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

@@ -22,7 +22,8 @@ class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
 {
     public function __construct(
         private string $path
-    ) {}
+    ) {
+    }
 
     public function onEnable(Container $container, Extension $extension)
     {

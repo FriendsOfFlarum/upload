@@ -29,7 +29,8 @@ class ListUploadsController extends AbstractListController
 
     public function __construct(
         protected UrlGenerator $url
-    ) { }
+    ) {
+    }
 
     protected function data(ServerRequestInterface $request, Document $document)
     {

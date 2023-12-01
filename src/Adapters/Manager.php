@@ -37,7 +37,8 @@ class Manager
         protected Paths $paths,
         protected Util $util,
         protected SettingsRepositoryInterface $settings
-    ) {}
+    ) {
+    }
 
     public function adapters(): Collection
     {

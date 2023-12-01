@@ -25,7 +25,8 @@ class DefaultDownloader implements Downloader
 {
     public function __construct(
         private Client $api
-    ) {}
+    ) {
+    }
 
     public function forFile(File $file): bool
     {

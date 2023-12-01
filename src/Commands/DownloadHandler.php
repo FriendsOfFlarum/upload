@@ -30,7 +30,8 @@ class DownloadHandler
         protected FileRepository $files,
         protected Dispatcher $events,
         protected SettingsRepositoryInterface $settings
-    ) { }
+    ) {
+    }
 
     /**
      * @param Download $command

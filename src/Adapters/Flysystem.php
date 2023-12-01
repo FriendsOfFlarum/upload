@@ -30,7 +30,8 @@ abstract class Flysystem implements UploadAdapter
     public function __construct(
         protected AdapterInterface $adapter,
         protected SettingsRepositoryInterface $settings
-    ) {}
+    ) {
+    }
 
     /**
      * Define adapter-specific configuration.

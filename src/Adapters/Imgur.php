@@ -23,7 +23,8 @@ class Imgur implements UploadAdapter
 {
     public function __construct(
         protected Guzzle $api
-    ) {}
+    ) {
+    }
 
     public function forMime($mime): bool
     {

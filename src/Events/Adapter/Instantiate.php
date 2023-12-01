@@ -19,5 +19,6 @@ class Instantiate
     public function __construct(
         public string $adapter,
         public Util $util
-    ) { }
+    ) {
+    }
 }

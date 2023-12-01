@@ -19,7 +19,8 @@ class AddImageProcessor
 {
     public function __construct(
         public ImageProcessor $processor
-    ) {}
+    ) {
+    }
 
     public function handle(WillBeUploaded $event)
     {

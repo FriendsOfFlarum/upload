@@ -22,7 +22,8 @@ class FormatTextPreview
     public function __construct(
         private FileRepository $files,
         private Paths $paths
-    ) {}
+    ) {
+    }
 
     /**
      * Configure rendering for text preview uploads.
