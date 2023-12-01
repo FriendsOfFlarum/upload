@@ -58,7 +58,6 @@ class UploadHandler
             $upload = $this->files->moveUploadedFileToTemp($file);
 
             try {
-
                 try {
                     $this->mimeDetector->setFile($upload->getPathname());
                 } catch (MimeDetectorException $e) {

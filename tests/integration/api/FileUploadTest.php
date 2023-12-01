@@ -48,7 +48,7 @@ class FileUploadTest extends EnhancedTestCase
     {
         $this->setting('fof-upload.mimeTypes', json_encode([
             $mime => [
-                'adapter' => $adapter,
+                'adapter'   => $adapter,
                 'template'  => $template,
             ],
         ]));

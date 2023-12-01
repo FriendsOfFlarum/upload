@@ -116,6 +116,7 @@ class FileRepository
 
         if ($file->getSize() && $this->bytesToKiloBytes($file->getSize()) > $this->settings->get('fof-upload.maxFileSize')) {
             $this->removeFromTemp($file);
+
             throw new ValidationException($this->validator->getMessages());
         }
 
