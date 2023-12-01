@@ -29,7 +29,6 @@ abstract class Flysystem implements UploadAdapter
 
     public function __construct(
         protected AdapterInterface $adapter,
-        protected SettingsRepositoryInterface $settings
     ) {
     }
 
@@ -73,7 +72,7 @@ abstract class Flysystem implements UploadAdapter
         return $file;
     }
 
-    protected function generateFilename(File $file)
+    protected function generateFilename(File $file): void
     {
         $today = (new Carbon());
 
@@ -85,7 +84,7 @@ abstract class Flysystem implements UploadAdapter
         );
     }
 
-    abstract protected function generateUrl(File $file);
+    abstract protected function generateUrl(File $file): void;
 
     /**
      * In case deletion is not possible, return false.

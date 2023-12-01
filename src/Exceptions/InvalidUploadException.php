@@ -30,7 +30,7 @@ class InvalidUploadException extends \Exception
         ];
     }
 
-    protected function constructMessage()
+    protected function constructMessage(): string
     {
         return resolve(TranslatorInterface::class)->trans('fof-upload.api.upload_errors.'.$this->type, $this->params);
     }

@@ -31,7 +31,7 @@ class ImageProcessor implements Processable
     ) {
     }
 
-    public function process(File $file, UploadedFile $upload, string $mimeType)
+    public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             try {

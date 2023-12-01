@@ -24,7 +24,7 @@ use Illuminate\Support\Arr;
 
 class DownloadHandler
 {
-    protected static $downloader = [];
+    protected static array $downloader = [];
 
     public function __construct(
         protected FileRepository $files,
@@ -81,17 +81,17 @@ class DownloadHandler
         throw new InvalidDownloadException();
     }
 
-    public static function prependDownloader(Downloader $downloader)
+    public static function prependDownloader(Downloader $downloader): void
     {
         static::$downloader = Arr::prepend(static::$downloader, $downloader);
     }
 
-    public static function addDownloader(Downloader $downloader)
+    public static function addDownloader(Downloader $downloader): void
     {
         static::$downloader[] = $downloader;
     }
 
-    public static function downloader()
+    public static function downloader(): array
     {
         return static::$downloader;
     }

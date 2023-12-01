@@ -27,7 +27,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DownloadController implements RequestHandlerInterface
 {
-    public $serializer = FileSerializer::class;
+    public string $serializer = FileSerializer::class;
 
     public function __construct(
         protected Dispatcher $bus,

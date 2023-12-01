@@ -19,7 +19,7 @@ class WillBeDownloaded
 {
     public function __construct(
         public File $file,
-        public &$response,
+        public mixed &$response,
         public ?Download $download = null
     ) {
     }

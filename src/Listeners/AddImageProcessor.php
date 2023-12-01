@@ -22,7 +22,7 @@ class AddImageProcessor
     ) {
     }
 
-    public function handle(WillBeUploaded $event)
+    public function handle(WillBeUploaded $event): void
     {
         if ($this->validateMime($event->mime)) {
             $this->processor->process($event->file, $event->uploadedFile, $event->mime);

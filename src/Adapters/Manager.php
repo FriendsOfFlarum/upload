@@ -106,7 +106,6 @@ class Manager
                 new S3Client($s3Config),
                 $this->settings->get('fof-upload.awsS3Bucket')
             ),
-            $this->settings
         );
     }
 
@@ -140,7 +139,6 @@ class Manager
     {
         return new Adapters\Local(
             new FlyAdapters\Local($this->paths->public.'/assets/files'),
-            $this->settings
         );
     }
 
@@ -162,6 +160,6 @@ class Manager
             $this->settings->get('fof-upload.cdnUrl')
         );
 
-        return new Adapters\Qiniu($client, $this->settings);
+        return new Adapters\Qiniu($client);
     }
 }

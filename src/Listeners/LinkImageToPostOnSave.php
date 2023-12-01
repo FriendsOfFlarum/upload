@@ -23,7 +23,7 @@ class LinkImageToPostOnSave
     ) {
     }
 
-    public function handle(Posted|Revised $event)
+    public function handle(Posted|Revised $event): void
     {
         $this->files->matchFilesForPost($event->post);
     }

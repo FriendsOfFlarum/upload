@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Adapters;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
@@ -23,19 +24,25 @@ class AwsS3 extends Flysystem implements UploadAdapter
 {
     protected AdapterInterface $adapter;
 
-    protected function getConfig()
+    protected function getConfig(): Config
     {
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = resolve(SettingsRepositoryInterface::class);
+
         $config = new Config();
-        if ($acl = $this->settings->get('fof-upload.awsS3ACL')) {
+        if ($acl = $settings->get('fof-upload.awsS3ACL')) {
             $config->set('ACL', $acl);
         }
 
         return $config;
     }
 
-    protected function generateUrl(File $file)
+    protected function generateUrl(File $file): void
     {
-        $cdnUrl = (string) $this->settings->get('fof-upload.cdnUrl');
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = resolve(SettingsRepositoryInterface::class);
+        
+        $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
 
         if (!$cdnUrl) {
             // Ensure that $this->adapter is an instance of AwsS3Adapter

@@ -18,6 +18,7 @@ use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
 use Flarum\Locale\Translator;
 use FoF\Upload\Adapters\Manager;
+use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
@@ -152,11 +153,11 @@ class UploadHandler
     }
 
     /**
-     * @param $adapter
+     * @param ?string $adapter
      *
      * @return UploadAdapter|null
      */
-    protected function getAdapter($adapter)
+    protected function getAdapter(?string $adapter)
     {
         if (!$adapter) {
             return null;
@@ -168,7 +169,7 @@ class UploadHandler
         return $manager->instantiate($adapter);
     }
 
-    protected function getTemplate($template)
+    protected function getTemplate($template): ?Template
     {
         return $this->util->getTemplate($template);
     }
@@ -178,7 +179,7 @@ class UploadHandler
      *
      * @return mixed
      */
-    protected function getMimeConfiguration($mime)
+    protected function getMimeConfiguration(?string $mime)
     {
         return $this->util->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
             return preg_match("/$regex/", $mime);

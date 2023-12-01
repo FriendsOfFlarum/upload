@@ -22,7 +22,7 @@ class AddAvailableOptionsInAdmin
     ) {
     }
 
-    public function handle(Deserializing $event)
+    public function handle(Deserializing $event): void
     {
         $event->settings['fof-upload.availableUploadMethods'] = $this->util->getAvailableUploadMethods()->toArray();
         $event->settings['fof-upload.availableTemplates'] = $this->util->getAvailableTemplates()->toArray();

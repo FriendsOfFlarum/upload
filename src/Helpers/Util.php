@@ -32,24 +32,17 @@ class Util
      */
     protected $renderTemplates = [];
 
-    public function __construct(
-        protected Manager $manager,
-        protected SettingsRepositoryInterface $settings,
-        protected TranslatorInterface $translator
-    ) {
-    }
-
     /**
      * @return Collection
      */
     public function getAvailableUploadMethods()
     {
-        return $this->manager->adapters()
+        return resolve(Manager::class)->adapters()
             ->filter(function ($available) {
                 return $available;
             })
             ->map(function ($available, $item) {
-                return $this->translator->trans('fof-upload.admin.upload_methods.'.$item);
+                return resolve(TranslatorInterface::class)->trans('fof-upload.admin.upload_methods.'.$item);
             });
     }
 
@@ -73,7 +66,7 @@ class Util
      */
     public function getMimeTypesConfiguration()
     {
-        $mimeTypes = $this->settings->get('fof-upload.mimeTypes');
+        $mimeTypes = resolve(SettingsRepositoryInterface::class)->get('fof-upload.mimeTypes');
 
         $adapters = $this->getAvailableUploadMethods();
 
@@ -128,7 +121,7 @@ class Util
     }
 
     /**
-     * @param string $template
+     * @param string|Template|null $template
      *
      * @return Template|null
      */
