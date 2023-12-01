@@ -14,7 +14,6 @@ namespace FoF\Upload\Validators;
 
 use Flarum\Foundation\AbstractValidator;
 use Flarum\Settings\SettingsRepositoryInterface;
-use FoF\Upload\Helpers\Util;
 
 class UploadValidator extends AbstractValidator
 {
@@ -28,7 +27,7 @@ class UploadValidator extends AbstractValidator
         ];
     }
 
-    protected function getMessages()
+    public function getMessages()
     {
         return [
             'max' => $this->translator->trans('fof-upload.forum.validation.max_size', [
@@ -42,6 +41,6 @@ class UploadValidator extends AbstractValidator
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
 
-        return $settings->get('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE);
+        return $settings->get('fof-upload.maxFileSize');
     }
 }

@@ -30,6 +30,7 @@ use FoF\Upload\Exceptions\ExceptionHandler;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 use FoF\Upload\Extenders\LoadFilesRelationship;
+use FoF\Upload\Helpers\Util;
 
 return [
     (new Extend\Routes('api'))
@@ -55,6 +56,7 @@ return [
         ->css(__DIR__.'/resources/less/forum/fileList.less')
         ->css(__DIR__.'/resources/less/forum/textPreview.less')
         ->js(__DIR__.'/js/dist/forum.js'),
+
     new Extend\Locales(__DIR__.'/resources/locale'),
 
     new Extenders\AddPostDownloadTags(),
@@ -115,4 +117,8 @@ return [
             (new UserData())
                 ->addType(Data\Uploads::class),
         ]),
+
+    (new Extend\Settings())
+        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
+        ->default('fof-upload.mimeTypes', Util::defaultMimeTypes()),
 ];

@@ -35,7 +35,7 @@ class Util
     /**
      * @return Collection
      */
-    public function getAvailableUploadMethods()
+    public static function getAvailableUploadMethods()
     {
         return resolve(Manager::class)->adapters()
             ->filter(function ($available) {
@@ -68,12 +68,23 @@ class Util
     {
         $mimeTypes = resolve(SettingsRepositoryInterface::class)->get('fof-upload.mimeTypes');
 
-        $adapters = $this->getAvailableUploadMethods();
-
         return $this->getJsonValue(
             $mimeTypes,
-            collect(['^image\/.*' => ['adapter' => $adapters->flip()->last(), 'template' => 'image-preview']])
         )->filter();
+    }
+
+    public static function defaultMimeTypes(): string
+    {
+        $adapters = self::getAvailableUploadMethods();
+
+        return json_encode(
+            [
+                '^image\/.*' => [
+                    'adapter'  => $adapters->flip()->last(),
+                    'template' => 'image-preview',
+                ],
+            ]
+        );
     }
 
     /**

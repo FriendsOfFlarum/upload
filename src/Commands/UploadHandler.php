@@ -13,10 +13,8 @@
 namespace FoF\Upload\Commands;
 
 use enshrined\svgSanitize\Sanitizer;
-use Exception;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
-use Flarum\Locale\Translator;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
@@ -30,6 +28,7 @@ use Illuminate\Support\Str;
 use Psr\Http\Message\UploadedFileInterface;
 use SoftCreatR\MimeDetector\MimeDetector;
 use SoftCreatR\MimeDetector\MimeDetectorException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadHandler
 {
@@ -39,7 +38,7 @@ class UploadHandler
         protected Util $util,
         protected FileRepository $files,
         protected MimeDetector $mimeDetector,
-        protected Translator $translator,
+        protected TranslatorInterface $translator,
         protected Sanitizer $sanitizer
     ) {
     }
@@ -56,9 +55,9 @@ class UploadHandler
         $command->actor->assertCan('fof-upload.upload');
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
-            try {
-                $upload = $this->files->moveUploadedFileToTemp($file);
+            $upload = $this->files->moveUploadedFileToTemp($file);
 
+            try {
                 try {
                     $this->mimeDetector->setFile($upload->getPathname());
                 } catch (MimeDetectorException $e) {
@@ -70,7 +69,7 @@ class UploadHandler
                 if (!Arr::has($uploadFileData, 'mime')) {
                     try {
                         $uploadFileData['mime'] = mime_content_type($upload->getPathname());
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
                     }
                 }
@@ -140,7 +139,7 @@ class UploadHandler
                 $this->events->dispatch(
                     new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->files->removeFromTemp($upload);
 
                 throw $e;

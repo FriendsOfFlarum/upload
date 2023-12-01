@@ -14,6 +14,7 @@ namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
 use Flarum\Foundation\Paths;
+use Flarum\Foundation\ValidationException;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -113,13 +114,25 @@ class FileRepository
             true
         );
 
+        if ($file->getSize() && $this->bytesToKiloBytes($file->getSize()) > $this->settings->get('fof-upload.maxFileSize')) {
+            $this->removeFromTemp($file);
+
+            throw new ValidationException($this->validator->getMessages());
+        }
+
         $this->validator->assertValid(compact('file'));
 
         return $file;
     }
 
+    protected function bytesToKiloBytes(int $bytes): int
+    {
+        return (int) round($bytes / 1024);
+    }
+
     protected function handleUploadError($code): void
     {
+        print_r($code);
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
                 throw new InvalidUploadException('max_upload_file_size_ini', 413);
