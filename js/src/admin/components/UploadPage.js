@@ -93,13 +93,7 @@ export default class UploadPage extends ExtensionPage {
     // Set a sane default in case no mimeTypes have been configured yet.
     // Since 'local' (or others) can now be disabled, pick the last entry in the object for default
     this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1];
-    this.values.mimeTypes() ||
-      (this.values.mimeTypes = Stream({
-        '^image\\/.*': {
-          adapter: this.defaultAdap,
-          template: 'image-preview',
-        },
-      }));
+    this.values.mimeTypes()
 
     this.newMimeType = {
       regex: Stream(''),
@@ -129,7 +123,7 @@ export default class UploadPage extends ExtensionPage {
                 m('legend', app.translator.trans('fof-upload.admin.labels.preferences.title')),
                 m('label', app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')),
                 m('input.FormControl', {
-                  value: this.values.maxFileSize() || 2048,
+                  value: this.values.maxFileSize(),
                   oninput: withAttr('value', this.values.maxFileSize),
                   type: 'number',
                   min: '0',

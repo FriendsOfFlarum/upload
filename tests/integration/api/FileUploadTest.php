@@ -44,6 +44,21 @@ class FileUploadTest extends EnhancedTestCase
         );
     }
 
+    protected function addType(string $mime, string $adapter = 'local', string $template = 'just-url')
+    {
+        $this->setting('fof-upload.mimeTypes', json_encode([
+            $mime => [
+                'adapter' => $adapter,
+                'template'  => $template,
+            ],
+        ]));
+    }
+
+    protected function setMaxUploadSize(int $max)
+    {
+        $this->setting('fof-upload.maxFileSize', $max);
+    }
+
     protected function uploadFile(string $path)
     {
         if (!file_exists($path)) {
@@ -113,5 +128,76 @@ class FileUploadTest extends EnhancedTestCase
         );
 
         $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function user_with_permission_cannot_upload_an_unconfigured_file_type()
+    {
+        $this->giveNormalUserUploadPermission();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('Plain.txt')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertEquals('validation_error', $json['errors'][0]['code']);
+        $this->assertEquals('/data/attributes/upload', $json['errors'][0]['source']['pointer']);
+    }
+
+    /**
+     * @test
+     */
+    public function user_with_permission_can_upload_a_configured_type()
+    {
+        $this->addType('text\/plain', 'local', 'text-preview');
+        $this->giveNormalUserUploadPermission();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('Plain.txt')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function user_with_permission_cannot_upload_a_file_that_is_too_large()
+    {
+        $this->setMaxUploadSize(10);
+        $this->giveNormalUserUploadPermission();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertEquals('validation_error', $json['errors'][0]['code']);
+        $this->assertEquals('/data/attributes/max', $json['errors'][0]['source']['pointer']);
     }
 }
