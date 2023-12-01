@@ -13,8 +13,8 @@
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\RequestUtil;
 use Flarum\User\Exception\PermissionDeniedException;
-use Flarum\User\User;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\EmptyResponse;
@@ -26,8 +26,7 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
 {
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var User */
-        $actor = $request->getAttribute('actor');
+        $actor = RequestUtil::getActor($request);
         $actor->assertRegistered();
 
         $uuid = Arr::get($request->getParsedBody(), 'uuid');

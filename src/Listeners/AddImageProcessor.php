@@ -17,15 +17,9 @@ use FoF\Upload\Processors\ImageProcessor;
 
 class AddImageProcessor
 {
-    /**
-     * @var ImageProcessor
-     */
-    public $processor;
-
-    public function __construct(ImageProcessor $processor)
-    {
-        $this->processor = $processor;
-    }
+    public function __construct(
+        public ImageProcessor $processor
+    ) {}
 
     public function handle(WillBeUploaded $event)
     {

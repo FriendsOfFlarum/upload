@@ -17,15 +17,9 @@ use FoF\Upload\Helpers\Util;
 
 class AddAvailableOptionsInAdmin
 {
-    /**
-     * @var Util
-     */
-    protected $util;
-
-    public function __construct(Util $util)
-    {
-        $this->util = $util;
-    }
+    public function __construct(
+        protected Util $util
+    ) {}
 
     public function handle(Deserializing $event)
     {

@@ -12,18 +12,13 @@
 
 namespace FoF\Upload\Providers;
 
+use Flarum\Foundation\AbstractServiceProvider;
 use FoF\Upload\Adapters\Manager;
-use Illuminate\Support\ServiceProvider;
 
-class StorageServiceProvider extends ServiceProvider
+class StorageServiceProvider extends AbstractServiceProvider
 {
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
     public function register()
     {
-        $this->app->singleton(Manager::class);
+        $this->container->singleton(Manager::class);
     }
 }

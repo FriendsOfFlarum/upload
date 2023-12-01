@@ -13,6 +13,7 @@
 namespace FoF\Upload\Adapters;
 
 use Carbon\Carbon;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use League\Flysystem\AdapterInterface;
@@ -22,19 +23,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var AdapterInterface
-     */
-    protected $adapter;
-
-    /**
      * @var array|false
      */
     protected $meta;
 
-    public function __construct(AdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
-    }
+    public function __construct(
+        protected AdapterInterface $adapter,
+        protected SettingsRepositoryInterface $settings
+    ) {}
 
     /**
      * Define adapter-specific configuration.
@@ -113,7 +109,7 @@ abstract class Flysystem implements UploadAdapter
      *
      * @return bool
      */
-    public function forMime($mime)
+    public function forMime($mime): bool
     {
         // We allow all, no checking.
         return true;
@@ -122,7 +118,7 @@ abstract class Flysystem implements UploadAdapter
     /**
      * @return bool
      */
-    public function supportsStreams()
+    public function supportsStreams(): bool
     {
         return true;
     }

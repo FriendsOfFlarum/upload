@@ -14,6 +14,7 @@ namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\ShowForumController;
 use Flarum\Foundation\Paths;
+use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -25,18 +26,14 @@ use Tobscure\JsonApi\Document;
 
 class WatermarkUploadController extends ShowForumController
 {
-    protected $settings;
-    protected $paths;
-
-    public function __construct(SettingsRepositoryInterface $settings, Paths $paths)
-    {
-        $this->settings = $settings;
-        $this->paths = $paths;
-    }
+    public function __construct(
+        protected SettingsRepositoryInterface $settings,
+        protected Paths $paths
+    ) { }
 
     public function data(ServerRequestInterface $request, Document $document)
     {
-        $request->getAttribute('actor')->assertAdmin();
+        RequestUtil::getActor($request)->assertAdmin();
 
         $file = Arr::get($request->getUploadedFiles(), 'fof/watermark');
 

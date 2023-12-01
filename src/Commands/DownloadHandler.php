@@ -26,27 +26,11 @@ class DownloadHandler
 {
     protected static $downloader = [];
 
-    /**
-     * @var FileRepository
-     */
-    private $files;
-
-    /**
-     * @var Dispatcher
-     */
-    private $events;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    private $settings;
-
-    public function __construct(FileRepository $files, Dispatcher $events, SettingsRepositoryInterface $settings)
-    {
-        $this->files = $files;
-        $this->events = $events;
-        $this->settings = $settings;
-    }
+    public function __construct(
+        protected FileRepository $files,
+        protected Dispatcher $events,
+        protected SettingsRepositoryInterface $settings
+    ) { }
 
     /**
      * @param Download $command

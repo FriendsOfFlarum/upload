@@ -16,16 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InvalidUploadException extends \Exception
 {
-    public $type = null;
-    public $status = null;
-    public $params = [];
-
-    public function __construct(string $type, int $status, array $params = [])
+    public function __construct(public string $type, public int $status, public array $params = [])
     {
-        $this->type = $type;
-        $this->status = $status;
-        $this->params = $params;
-
         parent::__construct(
             $this->constructMessage()
         );

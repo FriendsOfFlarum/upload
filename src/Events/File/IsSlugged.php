@@ -22,6 +22,5 @@ class IsSlugged
         public User $user,
         public string $mime,
         public string $slug
-    ) {
-    }
+    ) {}
 }

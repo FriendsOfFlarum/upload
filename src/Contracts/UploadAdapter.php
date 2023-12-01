@@ -24,14 +24,14 @@ interface UploadAdapter
      *
      * @return bool
      */
-    public function forMime($mime);
+    public function forMime($mime): bool;
 
     /**
      * Whether the upload supports a stream.
      *
      * @return bool
      */
-    public function supportsStreams();
+    public function supportsStreams(): bool;
 
     /**
      * Attempt to upload to the (remote) filesystem.

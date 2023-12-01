@@ -32,57 +32,15 @@ use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class UploadHandler
 {
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var Util
-     */
-    protected $util;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $events;
-    /**
-     * @var FileRepository
-     */
-    protected $files;
-
-    /**
-     * @var MimeDetector
-     */
-    protected $mimeDetector;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var Sanitizer
-     */
-    protected $sanitizer;
-
     public function __construct(
-        Application $app,
-        Dispatcher $events,
-        Util $util,
-        FileRepository $files,
-        MimeDetector $mimeDetector,
-        Translator $translator,
-        Sanitizer $sanitizer
-    ) {
-        $this->app = $app;
-        $this->util = $util;
-        $this->events = $events;
-        $this->files = $files;
-        $this->mimeDetector = $mimeDetector;
-        $this->translator = $translator;
-        $this->sanitizer = $sanitizer;
-    }
+        protected Application $app,
+        protected Dispatcher $events,
+        protected Util $util,
+        protected FileRepository $files,
+        protected MimeDetector $mimeDetector,
+        protected Translator $translator,
+        protected Sanitizer $sanitizer
+    ) {}
 
     /**
      * @param Upload $command

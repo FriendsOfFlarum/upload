@@ -15,7 +15,6 @@ namespace FoF\Upload\Validators;
 use Flarum\Foundation\AbstractValidator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Helpers\Util;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadValidator extends AbstractValidator
 {
@@ -31,11 +30,8 @@ class UploadValidator extends AbstractValidator
 
     protected function getMessages()
     {
-        /** @var TranslatorInterface $translator */
-        $translator = resolve('translator');
-
         return [
-            'max' => $translator->trans('fof-upload.forum.validation.max_size', [
+            'max' => $this->translator->trans('fof-upload.forum.validation.max_size', [
                 'max' => $this->maxFilesize(),
             ]),
         ];

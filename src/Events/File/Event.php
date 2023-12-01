@@ -23,6 +23,5 @@ abstract class Event
         public File $file,
         public UploadedFile $uploadedFile,
         public string $mime
-    ) {
-    }
+    ) {}
 }
