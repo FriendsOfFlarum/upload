@@ -56,7 +56,7 @@ class Local extends Flysystem implements UploadAdapter
 
         /** @var UrlGenerator $generator */
         $generator = resolve(UrlGenerator::class);
-        
+
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
 

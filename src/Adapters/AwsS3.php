@@ -41,7 +41,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
-        
+
         $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
 
         if (!$cdnUrl) {

@@ -23,7 +23,7 @@ class Qiniu extends Flysystem implements UploadAdapter
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
-        
+
         $path = $file->getAttribute('path');
         if ($cdnUrl = $settings->get('fof-upload.cdnUrl')) {
             $file->url = sprintf('%s/%s', $cdnUrl, $path);

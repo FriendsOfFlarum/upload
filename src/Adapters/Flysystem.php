@@ -13,7 +13,6 @@
 namespace FoF\Upload\Adapters;
 
 use Carbon\Carbon;
-use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use League\Flysystem\AdapterInterface;
