@@ -114,20 +114,9 @@ class FileRepository
             true
         );
 
-        if ($file->getSize() && $this->bytesToKiloBytes($file->getSize()) > $this->settings->get('fof-upload.maxFileSize')) {
-            $this->removeFromTemp($file);
-
-            throw new ValidationException($this->validator->getMessages());
-        }
-
         $this->validator->assertValid(compact('file'));
 
         return $file;
-    }
-
-    protected function bytesToKiloBytes(int $bytes): int
-    {
-        return (int) round($bytes / 1024);
     }
 
     protected function handleUploadError($code): void

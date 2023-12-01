@@ -28,6 +28,7 @@ use Illuminate\Support\Str;
 use Psr\Http\Message\UploadedFileInterface;
 use SoftCreatR\MimeDetector\MimeDetector;
 use SoftCreatR\MimeDetector\MimeDetectorException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadHandler
@@ -55,9 +56,8 @@ class UploadHandler
         $command->actor->assertCan('fof-upload.upload');
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
-            $upload = $this->files->moveUploadedFileToTemp($file);
-
             try {
+                $upload = $this->files->moveUploadedFileToTemp($file);
                 try {
                     $this->mimeDetector->setFile($upload->getPathname());
                 } catch (MimeDetectorException $e) {
@@ -140,7 +140,9 @@ class UploadHandler
                     new Events\File\WasSaved($command->actor, $file, $upload, $uploadFileData['mime'])
                 );
             } catch (\Exception $e) {
-                $this->files->removeFromTemp($upload);
+                if (isset($upload)) {
+                    $this->files->removeFromTemp($upload);
+                }
 
                 throw $e;
             }

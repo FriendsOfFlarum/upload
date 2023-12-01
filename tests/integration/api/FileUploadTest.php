@@ -198,6 +198,6 @@ class FileUploadTest extends EnhancedTestCase
 
         $this->assertArrayHasKey('errors', $json);
         $this->assertEquals('validation_error', $json['errors'][0]['code']);
-        $this->assertEquals('/data/attributes/max', $json['errors'][0]['source']['pointer']);
+        $this->assertEquals('/data/attributes/file', $json['errors'][0]['source']['pointer']);
     }
 }
