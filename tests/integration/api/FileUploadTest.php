@@ -13,6 +13,7 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
 
 class FileUploadTest extends EnhancedTestCase
@@ -88,6 +89,13 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals('milkyway.jpg', $json['data'][0]['attributes']['baseName']);
         $this->assertEquals('image/jpeg', $json['data'][0]['attributes']['type']);
         $this->assertEquals('image-preview', $json['data'][0]['attributes']['tag']);
+
+        $file = File::where('uuid', $json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNotNull($file);
+
+        $this->assertEquals('milkyway.jpg', $file->base_name);
+        $this->assertEquals(2, $file->actor_id);
     }
 
     /**
