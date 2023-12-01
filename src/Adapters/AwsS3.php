@@ -15,15 +15,13 @@ namespace FoF\Upload\Adapters;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 
 class AwsS3 extends Flysystem implements UploadAdapter
 {
-    /**
-     * @var AwsS3Adapter
-     */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
     protected function getConfig()
     {
@@ -40,10 +38,15 @@ class AwsS3 extends Flysystem implements UploadAdapter
         $cdnUrl = (string) $this->settings->get('fof-upload.cdnUrl');
 
         if (!$cdnUrl) {
-            $region = $this->adapter->getClient()->getRegion();
-            $bucket = $this->adapter->getBucket();
+            // Ensure that $this->adapter is an instance of AwsS3Adapter
+            if ($this->adapter instanceof AwsS3Adapter) {
+                $region = $this->adapter->getClient()->getRegion();
+                $bucket = $this->adapter->getBucket();
 
-            $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+                $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+            } else {
+                throw new \RuntimeException("Expected adapter to be an instance of AwsS3Adapter, got ".get_class($this->adapter));
+            }
         }
 
         $file->url = sprintf('%s/%s', $cdnUrl, Arr::get($this->meta, 'path', $file->path));

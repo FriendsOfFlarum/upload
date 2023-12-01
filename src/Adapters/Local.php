@@ -21,14 +21,15 @@ use League\Flysystem\AdapterInterface;
 
 class Local extends Flysystem implements UploadAdapter
 {
-    /**
-     * @var AdapterInterface|AdapterLocal
-     */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
     protected function generateUrl(File $file)
     {
         $publicPath = resolve(Paths::class)->public;
+
+        if (!($this->adapter instanceof AdapterLocal)) {
+            throw new \RuntimeException('Local adapter is not an instance of League\Flysystem\Adapter\Local');
+        }
 
         $searches = [];
         $replaces = [];
