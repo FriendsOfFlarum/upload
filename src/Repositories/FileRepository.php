@@ -85,7 +85,7 @@ class FileRepository
         ]);
     }
 
-    public function moveUploadedFileToTemp(UploadedFileInterface $upload): Upload
+    public function moveUploadedFileToTemp(UploadedFileInterface $upload): ?Upload
     {
         $this->handleUploadError($upload->getError());
 
