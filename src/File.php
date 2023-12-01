@@ -32,7 +32,7 @@ use Illuminate\Support\Str;
  * @property string                $humanSize
  * @property string                $upload_method
  * @property string                $remote_id
- * @property string                $tag
+ * @property Template|null         $tag
  * @property Collection|Post[]     $posts
  * @property int                   $actor_id
  * @property User                  $actor

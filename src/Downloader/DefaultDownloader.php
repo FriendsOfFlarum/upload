@@ -23,24 +23,12 @@ use Psr\Http\Message\ResponseInterface;
 
 class DefaultDownloader implements Downloader
 {
-    /**
-     * @var Client
-     */
-    private $api;
-
-    public function __construct(Client $api)
-    {
-        $this->api = $api;
+    public function __construct(
+        private Client $api
+    ) {
     }
 
-    /**
-     * Whether the upload adapter works on a specific mime type.
-     *
-     * @param File $file
-     *
-     * @return bool
-     */
-    public function forFile(File $file)
+    public function forFile(File $file): bool
     {
         return true;
     }

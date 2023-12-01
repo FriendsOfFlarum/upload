@@ -25,23 +25,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageProcessor implements Processable
 {
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    /**
-     * @var Paths
-     */
-    protected $paths;
-
-    public function __construct(SettingsRepositoryInterface $settings, Paths $paths)
-    {
-        $this->settings = $settings;
-        $this->paths = $paths;
+    public function __construct(
+        protected SettingsRepositoryInterface $settings,
+        protected Paths $paths
+    ) {
     }
 
-    public function process(File $file, UploadedFile $upload, string $mimeType)
+    public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
         if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
             try {

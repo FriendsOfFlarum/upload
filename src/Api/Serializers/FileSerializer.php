@@ -20,8 +20,9 @@ class FileSerializer extends AbstractSerializer
 {
     protected $type = 'files';
 
-    public function __construct(protected Util $util)
-    {
+    public function __construct(
+        protected Util $util
+    ) {
     }
 
     /**

@@ -18,14 +18,12 @@ use FoF\Upload\Repositories\FileRepository;
 
 class LinkImageToPostOnSave
 {
-    private FileRepository $files;
-
-    public function __construct(FileRepository $files)
-    {
-        $this->files = $files;
+    public function __construct(
+        private FileRepository $files
+    ) {
     }
 
-    public function handle(Posted|Revised $event)
+    public function handle(Posted|Revised $event): void
     {
         $this->files->matchFilesForPost($event->post);
     }

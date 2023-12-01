@@ -21,32 +21,17 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Imgur implements UploadAdapter
 {
-    /**
-     * @var Guzzle
-     */
-    protected $api;
-
-    public function __construct(Guzzle $api)
-    {
-        $this->api = $api;
+    public function __construct(
+        protected Guzzle $api
+    ) {
     }
 
-    /**
-     * Whether the upload adapter works on a specific mime type.
-     *
-     * @param string $mime
-     *
-     * @return bool
-     */
-    public function forMime($mime)
+    public function forMime($mime): bool
     {
         return Str::startsWith($mime, 'image/');
     }
 
-    /**
-     * @return bool
-     */
-    public function supportsStreams()
+    public function supportsStreams(): bool
     {
         return false;
     }

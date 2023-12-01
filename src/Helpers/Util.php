@@ -18,6 +18,7 @@ use FoF\Upload\Contracts\Template;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Util
 {
@@ -36,15 +37,12 @@ class Util
      */
     public function getAvailableUploadMethods()
     {
-        /** @var Manager $manager */
-        $manager = resolve(Manager::class);
-
-        return $manager->adapters()
+        return resolve(Manager::class)->adapters()
             ->filter(function ($available) {
                 return $available;
             })
             ->map(function ($available, $item) {
-                return resolve('translator')->trans('fof-upload.admin.upload_methods.'.$item);
+                return resolve(TranslatorInterface::class)->trans('fof-upload.admin.upload_methods.'.$item);
             });
     }
 
@@ -68,8 +66,7 @@ class Util
      */
     public function getMimeTypesConfiguration()
     {
-        $settings = resolve(SettingsRepositoryInterface::class);
-        $mimeTypes = $settings->get('fof-upload.mimeTypes');
+        $mimeTypes = resolve(SettingsRepositoryInterface::class)->get('fof-upload.mimeTypes');
 
         $adapters = $this->getAvailableUploadMethods();
 
@@ -124,7 +121,7 @@ class Util
     }
 
     /**
-     * @param string $template
+     * @param string|Template|null $template
      *
      * @return Template|null
      */

@@ -17,17 +17,12 @@ use FoF\Upload\Processors\ImageProcessor;
 
 class AddImageProcessor
 {
-    /**
-     * @var ImageProcessor
-     */
-    public $processor;
-
-    public function __construct(ImageProcessor $processor)
-    {
-        $this->processor = $processor;
+    public function __construct(
+        public ImageProcessor $processor
+    ) {
     }
 
-    public function handle(WillBeUploaded $event)
+    public function handle(WillBeUploaded $event): void
     {
         if ($this->validateMime($event->mime)) {
             $this->processor->process($event->file, $event->uploadedFile, $event->mime);

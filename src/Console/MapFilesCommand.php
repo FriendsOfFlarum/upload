@@ -27,7 +27,7 @@ class MapFilesCommand extends Command
         ';
     protected $description = 'Helps restore mapping of uploaded files to their relative posts';
 
-    public function handle(FileRepository $files)
+    public function handle(FileRepository $files): void
     {
         $map = $this->option('map');
         $cleanup = $this->option('cleanup');

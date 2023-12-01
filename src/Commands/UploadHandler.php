@@ -18,6 +18,7 @@ use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
 use Flarum\Locale\Translator;
 use FoF\Upload\Adapters\Manager;
+use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
@@ -32,56 +33,15 @@ use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class UploadHandler
 {
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * @var Util
-     */
-    protected $util;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $events;
-    /**
-     * @var FileRepository
-     */
-    protected $files;
-
-    /**
-     * @var MimeDetector
-     */
-    protected $mimeDetector;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var Sanitizer
-     */
-    protected $sanitizer;
-
     public function __construct(
-        Application $app,
-        Dispatcher $events,
-        Util $util,
-        FileRepository $files,
-        MimeDetector $mimeDetector,
-        Translator $translator,
-        Sanitizer $sanitizer
+        protected Application $app,
+        protected Dispatcher $events,
+        protected Util $util,
+        protected FileRepository $files,
+        protected MimeDetector $mimeDetector,
+        protected Translator $translator,
+        protected Sanitizer $sanitizer
     ) {
-        $this->app = $app;
-        $this->util = $util;
-        $this->events = $events;
-        $this->files = $files;
-        $this->mimeDetector = $mimeDetector;
-        $this->translator = $translator;
-        $this->sanitizer = $sanitizer;
     }
 
     /**
@@ -193,11 +153,11 @@ class UploadHandler
     }
 
     /**
-     * @param $adapter
+     * @param ?string $adapter
      *
      * @return UploadAdapter|null
      */
-    protected function getAdapter($adapter)
+    protected function getAdapter(?string $adapter)
     {
         if (!$adapter) {
             return null;
@@ -209,7 +169,7 @@ class UploadHandler
         return $manager->instantiate($adapter);
     }
 
-    protected function getTemplate($template)
+    protected function getTemplate($template): ?Template
     {
         return $this->util->getTemplate($template);
     }
@@ -219,7 +179,7 @@ class UploadHandler
      *
      * @return mixed
      */
-    protected function getMimeConfiguration($mime)
+    protected function getMimeConfiguration(?string $mime)
     {
         return $this->util->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
             return preg_match("/$regex/", $mime);

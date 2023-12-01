@@ -16,17 +16,15 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 
 class AwsS3 extends Flysystem implements UploadAdapter
 {
-    /**
-     * @var AwsS3Adapter
-     */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
-    protected function getConfig()
+    protected function getConfig(): Config
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
@@ -39,18 +37,23 @@ class AwsS3 extends Flysystem implements UploadAdapter
         return $config;
     }
 
-    protected function generateUrl(File $file)
+    protected function generateUrl(File $file): void
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
 
-        $cdnUrl = $settings->get('fof-upload.cdnUrl');
+        $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
 
         if (!$cdnUrl) {
-            $region = $this->adapter->getClient()->getRegion();
-            $bucket = $this->adapter->getBucket();
+            // Ensure that $this->adapter is an instance of AwsS3Adapter
+            if ($this->adapter instanceof AwsS3Adapter) {
+                $region = $this->adapter->getClient()->getRegion();
+                $bucket = $this->adapter->getBucket();
 
-            $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+                $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+            } else {
+                throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.$this->adapter::class);
+            }
         }
 
         $file->url = sprintf('%s/%s', $cdnUrl, Arr::get($this->meta, 'path', $file->path));

@@ -27,20 +27,10 @@ use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class InspectMimeController implements RequestHandlerInterface
 {
-    /**
-     * @var FileRepository
-     */
-    protected $files;
-
-    /**
-     * @var MimeDetector
-     */
-    protected $mimeDetector;
-
-    public function __construct(FileRepository $files, MimeDetector $mimeDetector)
-    {
-        $this->files = $files;
-        $this->mimeDetector = $mimeDetector;
+    public function __construct(
+        protected FileRepository $files,
+        protected MimeDetector $mimeDetector
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

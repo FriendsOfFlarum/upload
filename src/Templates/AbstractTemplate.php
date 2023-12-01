@@ -15,6 +15,7 @@ namespace FoF\Upload\Templates;
 use FoF\Upload\Contracts\Template;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTemplate implements Template
 {
@@ -23,6 +24,12 @@ abstract class AbstractTemplate implements Template
      */
     protected $tag;
 
+    public function __construct(
+        protected Factory $viewFactory,
+        protected TranslatorInterface $translator
+    ) {
+    }
+
     public function tag(): string
     {
         return $this->tag;
@@ -30,17 +37,11 @@ abstract class AbstractTemplate implements Template
 
     protected function getView(string $view, array $arguments = []): View
     {
-        return resolve(Factory::class)->make($view, $arguments);
+        return $this->viewFactory->make($view, $arguments);
     }
 
-    /**
-     * @param       $key
-     * @param array $params
-     *
-     * @return mixed
-     */
-    protected function trans($key, array $params = [])
+    protected function trans(string $key, array $params = []): string
     {
-        return resolve('translator')->trans($key, $params);
+        return $this->translator->trans($key, $params);
     }
 }

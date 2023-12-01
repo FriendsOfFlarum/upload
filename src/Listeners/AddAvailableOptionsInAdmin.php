@@ -17,17 +17,12 @@ use FoF\Upload\Helpers\Util;
 
 class AddAvailableOptionsInAdmin
 {
-    /**
-     * @var Util
-     */
-    protected $util;
-
-    public function __construct(Util $util)
-    {
-        $this->util = $util;
+    public function __construct(
+        protected Util $util
+    ) {
     }
 
-    public function handle(Deserializing $event)
+    public function handle(Deserializing $event): void
     {
         $event->settings['fof-upload.availableUploadMethods'] = $this->util->getAvailableUploadMethods()->toArray();
         $event->settings['fof-upload.availableTemplates'] = $this->util->getAvailableTemplates()->toArray();

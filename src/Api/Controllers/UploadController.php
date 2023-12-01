@@ -13,6 +13,7 @@
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractListController;
+use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\Commands\Upload;
@@ -28,20 +29,10 @@ class UploadController extends AbstractListController
 {
     public $serializer = FileSerializer::class;
 
-    /**
-     * @var Dispatcher
-     */
-    protected $bus;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    public function __construct(Dispatcher $bus, SettingsRepositoryInterface $settings)
-    {
-        $this->bus = $bus;
-        $this->settings = $settings;
+    public function __construct(
+        protected Dispatcher $bus,
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
     /**
@@ -52,7 +43,7 @@ class UploadController extends AbstractListController
      */
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        $actor = $request->getAttribute('actor');
+        $actor = RequestUtil::getActor($request);
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
         /** @var Collection $collection */

@@ -19,9 +19,7 @@ class AddUserAttributes
 {
     public function __invoke(UserSerializer $serializer, User $user, array $attributes): array
     {
-        /** @phpstan-ignore-next-line */
         $attributes['fof-upload-uploadCountCurrent'] = $user->foffiles_current_count;
-        /** @phpstan-ignore-next-line */
         $attributes['fof-upload-uploadCountAll'] = $user->foffiles_count;
 
         return $attributes;

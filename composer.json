@@ -32,7 +32,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
+        "php": "^8.0",
         "ext-json": "*",
         "enshrined/svg-sanitize": "^0.15.4",
         "flarum/core": "^1.8.3",

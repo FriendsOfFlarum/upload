@@ -25,7 +25,7 @@ interface Downloader
      *
      * @return bool
      */
-    public function forFile(File $file);
+    public function forFile(File $file): bool;
 
     /**
      * @param File     $file
@@ -33,5 +33,5 @@ interface Downloader
      *
      * @return ResponseInterface
      */
-    public function download(File $file, Download $command);
+    public function download(File $file, Download $command): ResponseInterface;
 }

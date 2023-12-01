@@ -20,14 +20,9 @@ use Illuminate\Contracts\Container\Container;
 
 class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
 {
-    /**
-     * @var string
-     */
-    private $path;
-
-    public function __construct(string $path)
-    {
-        $this->path = $path;
+    public function __construct(
+        private string $path
+    ) {
     }
 
     public function onEnable(Container $container, Extension $extension)

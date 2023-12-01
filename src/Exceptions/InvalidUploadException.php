@@ -16,16 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InvalidUploadException extends \Exception
 {
-    public $type = null;
-    public $status = null;
-    public $params = [];
-
-    public function __construct(string $type, int $status, array $params = [])
+    public function __construct(public string $type, public int $status, public array $params = [])
     {
-        $this->type = $type;
-        $this->status = $status;
-        $this->params = $params;
-
         parent::__construct(
             $this->constructMessage()
         );
@@ -38,7 +30,7 @@ class InvalidUploadException extends \Exception
         ];
     }
 
-    protected function constructMessage()
+    protected function constructMessage(): string
     {
         return resolve(TranslatorInterface::class)->trans('fof-upload.api.upload_errors.'.$this->type, $this->params);
     }

@@ -18,17 +18,19 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use League\Flysystem\Adapter\Local as AdapterLocal;
+use League\Flysystem\AdapterInterface;
 
 class Local extends Flysystem implements UploadAdapter
 {
-    /**
-     * @var AdapterLocal
-     */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
-    protected function generateUrl(File $file)
+    protected function generateUrl(File $file): void
     {
         $publicPath = resolve(Paths::class)->public;
+
+        if (!($this->adapter instanceof AdapterLocal)) {
+            throw new \RuntimeException('Local adapter is not an instance of League\Flysystem\Adapter\Local');
+        }
 
         $searches = [];
         $replaces = [];
@@ -52,10 +54,11 @@ class Local extends Flysystem implements UploadAdapter
             $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
-        /** @var SettingsRepositoryInterface $settings */
-        $settings = resolve(SettingsRepositoryInterface::class);
         /** @var UrlGenerator $generator */
         $generator = resolve(UrlGenerator::class);
+
+        /** @var SettingsRepositoryInterface $settings */
+        $settings = resolve(SettingsRepositoryInterface::class);
 
         if ($settings->get('fof-upload.cdnUrl')) {
             $file->url = $settings->get('fof-upload.cdnUrl').$file->url;

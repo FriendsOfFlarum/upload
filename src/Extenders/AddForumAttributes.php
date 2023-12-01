@@ -17,20 +17,12 @@ use Flarum\Settings\SettingsRepositoryInterface;
 
 class AddForumAttributes
 {
-    private $settings;
-
-    /**
-     * @param SettingsRepositoryInterface $settings
-     */
-    public function __construct(SettingsRepositoryInterface $settings)
-    {
-        $this->settings = $settings;
+    public function __construct(
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
-    /**
-     * @param ForumSerializer $serializer
-     */
-    public function __invoke(ForumSerializer $serializer)
+    public function __invoke(ForumSerializer $serializer): array
     {
         $attributes['fof-upload.canUpload'] = $serializer->getActor()->can('fof-upload.upload');
         $attributes['fof-upload.canDownload'] = $serializer->getActor()->can('fof-upload.download');

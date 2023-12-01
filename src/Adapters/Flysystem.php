@@ -22,18 +22,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var AdapterInterface
-     */
-    protected $adapter;
-
-    /**
      * @var array|false
      */
     protected $meta;
 
-    public function __construct(AdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
+    public function __construct(
+        protected AdapterInterface $adapter,
+    ) {
     }
 
     /**
@@ -76,7 +71,7 @@ abstract class Flysystem implements UploadAdapter
         return $file;
     }
 
-    protected function generateFilename(File $file)
+    protected function generateFilename(File $file): void
     {
         $today = (new Carbon());
 
@@ -88,7 +83,7 @@ abstract class Flysystem implements UploadAdapter
         );
     }
 
-    abstract protected function generateUrl(File $file);
+    abstract protected function generateUrl(File $file): void;
 
     /**
      * In case deletion is not possible, return false.
@@ -113,7 +108,7 @@ abstract class Flysystem implements UploadAdapter
      *
      * @return bool
      */
-    public function forMime($mime)
+    public function forMime($mime): bool
     {
         // We allow all, no checking.
         return true;
@@ -122,7 +117,7 @@ abstract class Flysystem implements UploadAdapter
     /**
      * @return bool
      */
-    public function supportsStreams()
+    public function supportsStreams(): bool
     {
         return true;
     }

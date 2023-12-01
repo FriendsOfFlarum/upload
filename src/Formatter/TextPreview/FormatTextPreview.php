@@ -19,20 +19,10 @@ use s9e\TextFormatter\Utils;
 
 class FormatTextPreview
 {
-    /**
-     * @var FileRepository
-     */
-    private $files;
-
-    /**
-     * @var Paths
-     */
-    private $paths;
-
-    public function __construct(FileRepository $files, Paths $paths)
-    {
-        $this->files = $files;
-        $this->paths = $paths;
+    public function __construct(
+        private FileRepository $files,
+        private Paths $paths
+    ) {
     }
 
     /**

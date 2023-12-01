@@ -32,30 +32,12 @@ use Qiniu\Http\Client as QiniuClient;
 
 class Manager
 {
-    /**
-     * @var Paths
-     */
-    protected $paths;
-    /**
-     * @var Dispatcher
-     */
-    protected $events;
-    /**
-     * @var Util
-     */
-    protected $util;
-
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    public function __construct(Dispatcher $events, Paths $paths, Util $util, SettingsRepositoryInterface $settings)
-    {
-        $this->events = $events;
-        $this->paths = $paths;
-        $this->util = $util;
-        $this->settings = $settings;
+    public function __construct(
+        protected Dispatcher $events,
+        protected Paths $paths,
+        protected Util $util,
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
     public function adapters(): Collection
@@ -123,7 +105,7 @@ class Manager
             new AwsS3Adapter(
                 new S3Client($s3Config),
                 $this->settings->get('fof-upload.awsS3Bucket')
-            )
+            ),
         );
     }
 
@@ -156,7 +138,7 @@ class Manager
     protected function local(Util $util)
     {
         return new Adapters\Local(
-            new FlyAdapters\Local($this->paths->public.'/assets/files')
+            new FlyAdapters\Local($this->paths->public.'/assets/files'),
         );
     }
 

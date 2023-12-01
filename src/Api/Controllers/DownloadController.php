@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Api\Controllers;
 
+use Flarum\Http\RequestUtil;
 use Flarum\Post\PostRepository;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Api\Serializers\FileSerializer;
@@ -26,31 +27,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DownloadController implements RequestHandlerInterface
 {
-    public $serializer = FileSerializer::class;
+    public string $serializer = FileSerializer::class;
 
-    /**
-     * @var Dispatcher
-     */
-    protected $bus;
-    /**
-     * @var PostRepository
-     */
-    private $posts;
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    private $settings;
-
-    public function __construct(Dispatcher $bus, PostRepository $posts, SettingsRepositoryInterface $settings)
-    {
-        $this->bus = $bus;
-        $this->posts = $posts;
-        $this->settings = $settings;
+    public function __construct(
+        protected Dispatcher $bus,
+        protected PostRepository $posts,
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $actor = $request->getAttribute('actor');
+        $actor = RequestUtil::getActor($request);
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
         $postId = Arr::get($request->getQueryParams(), 'post');
         $csrf = Arr::get($request->getQueryParams(), 'csrf');
