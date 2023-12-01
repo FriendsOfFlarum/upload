@@ -14,7 +14,6 @@ namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
 use Flarum\Foundation\Paths;
-use Flarum\Foundation\ValidationException;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
