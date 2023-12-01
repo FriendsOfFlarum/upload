@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Tests;
 
 use Flarum\Testing\integration\TestCase as BaseTestCase;
@@ -42,7 +52,6 @@ class EnhancedTestCase extends BaseTestCase
         }
 
         $request = new ServerRequest([], $uploadedFiles, $path, $method);
-
 
         // Authenticate as a given user
         if (isset($options['authenticatedAs'])) {

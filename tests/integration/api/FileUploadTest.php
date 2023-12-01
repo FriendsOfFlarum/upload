@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
@@ -40,16 +50,15 @@ class FileUploadTest extends EnhancedTestCase
         }
 
         return [
-            'name' => 'files',
+            'name'     => 'files',
             'contents' => $path,
             'filename' => basename($path),
         ];
     }
 
-
     protected function fixtures(string $file): string
     {
-        return __DIR__ . '/../../fixtures/' . $file;
+        return __DIR__.'/../../fixtures/'.$file;
     }
 
     /**
@@ -62,7 +71,7 @@ class FileUploadTest extends EnhancedTestCase
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
-                'multipart' => [
+                'multipart'       => [
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
             ])
@@ -89,7 +98,7 @@ class FileUploadTest extends EnhancedTestCase
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
-                'multipart' => [
+                'multipart'       => [
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
             ])
