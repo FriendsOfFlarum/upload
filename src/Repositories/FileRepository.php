@@ -127,7 +127,7 @@ class FileRepository
 
     protected function bytesToKiloBytes(int $bytes): int
     {
-        return round($bytes / 1024);
+        return (int) round($bytes / 1024);
     }
 
     protected function handleUploadError($code): void
