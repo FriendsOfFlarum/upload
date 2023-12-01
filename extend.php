@@ -33,18 +33,6 @@ use FoF\Upload\Extenders\LoadFilesRelationship;
 use FoF\Upload\Helpers\Util;
 
 return [
-    (new Extend\Routes('api'))
-        ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
-        ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
-        ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
-        ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
-        ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
-        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
-
-    (new Extend\Console())->command(Console\MapFilesCommand::class),
-
-    (new Extend\Csrf())->exemptRoute('fof-upload.download'),
-
     (new Extend\Frontend('admin'))
         ->css(__DIR__.'/resources/less/admin.less')
         ->js(__DIR__.'/js/dist/admin.js'),
@@ -59,8 +47,22 @@ return [
 
     new Extend\Locales(__DIR__.'/resources/locale'),
 
-    new Extenders\AddPostDownloadTags(),
-    new Extenders\CreateStorageFolder('tmp'),
+    (new Extend\View())
+        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
+
+    (new Extend\Routes('api'))
+        ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
+        ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
+        ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
+        ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
+        ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
+        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
+
+    (new Extend\Console())
+        ->command(Console\MapFilesCommand::class),
+
+    (new Extend\Csrf())
+        ->exemptRoute('fof-upload.download'),
 
     (new Extend\Model(User::class))
         ->cast('foffiles_current_count', 'int')
@@ -94,9 +96,6 @@ return [
         ->register(Providers\DownloadProvider::class)
         ->register(Providers\SanitizerProvider::class),
 
-    (new Extend\View())
-        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
-
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
 
@@ -112,13 +111,16 @@ return [
     (new Extend\ErrorHandling())
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
 
+    (new Extend\Settings())
+        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
+        ->default('fof-upload.mimeTypes', Util::defaultMimeTypes()),
+
+    new Extenders\AddPostDownloadTags(),
+    new Extenders\CreateStorageFolder('tmp'),
+
     (new Extend\Conditional())
         ->whenExtensionEnabled('blomstra-gdpr', fn () => [
             (new UserData())
                 ->addType(Data\Uploads::class),
         ]),
-
-    (new Extend\Settings())
-        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
-        ->default('fof-upload.mimeTypes', Util::defaultMimeTypes()),
 ];
