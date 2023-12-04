@@ -74,18 +74,16 @@ class Util
         )->filter();
     }
 
-    public function defaultMimeTypes(): string
+    public function defaultMimeTypes(): Collection
     {
         $adapters = $this->getAvailableUploadMethods();
 
-        return json_encode(
-            [
-                '^image\/.*' => [
-                    'adapter'  => $adapters->flip()->last(),
-                    'template' => 'image-preview',
-                ],
-            ]
-        );
+        return collect([
+            '^image\/.*' => [
+                'adapter'  => $adapters->flip()->last(),
+                'template' => 'image-preview',
+            ],
+        ]);
     }
 
     /**

@@ -97,7 +97,6 @@ class FileUploadTest extends EnhancedTestCase
 
         $json = json_decode($response->getBody()->getContents(), true);
 
-        $this->assertArrayHasKey('data', $json);
         $this->assertCount(1, $json['data']);
         $this->assertArrayHasKey('attributes', $json['data'][0]);
 
