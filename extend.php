@@ -112,8 +112,7 @@ return [
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
 
     (new Extend\Settings())
-        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
-        ->default('fof-upload.mimeTypes', Util::defaultMimeTypes()),
+        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

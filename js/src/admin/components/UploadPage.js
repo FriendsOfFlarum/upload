@@ -93,7 +93,13 @@ export default class UploadPage extends ExtensionPage {
     // Set a sane default in case no mimeTypes have been configured yet.
     // Since 'local' (or others) can now be disabled, pick the last entry in the object for default
     this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1];
-    this.values.mimeTypes();
+    this.values.mimeTypes() ||
+      (this.values.mimeTypes = Stream({
+        '^image\\/.*': {
+          adapter: this.defaultAdap,
+          template: 'image-preview',
+        },
+      }));
 
     this.newMimeType = {
       regex: Stream(''),

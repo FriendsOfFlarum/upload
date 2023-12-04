@@ -35,7 +35,7 @@ class Util
     /**
      * @return Collection
      */
-    public static function getAvailableUploadMethods()
+    public function getAvailableUploadMethods()
     {
         return resolve(Manager::class)->adapters()
             ->filter(function ($available) {
@@ -70,12 +70,13 @@ class Util
 
         return $this->getJsonValue(
             $mimeTypes,
+            $this->defaultMimeTypes()
         )->filter();
     }
 
-    public static function defaultMimeTypes(): string
+    public function defaultMimeTypes(): string
     {
-        $adapters = self::getAvailableUploadMethods();
+        $adapters = $this->getAvailableUploadMethods();
 
         return json_encode(
             [
