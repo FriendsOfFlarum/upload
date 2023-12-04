@@ -43,4 +43,21 @@ class ForumAttributesTest extends TestCase
         $this->assertArrayHasKey('fof-upload.canDownload', $json['data']['attributes']);
         $this->assertArrayHasKey('fof-upload.composerButtonVisiblity', $json['data']['attributes']);
     }
+
+    /**
+     * @test
+     */
+    public function forum_frontend_is_alive()
+    {
+        $response = $this->send(
+            $this->request(
+                'GET',
+                '/'
+            )
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertStringContainsString('<h1>All Discussions</h1>', $response->getBody()->getContents());
+    }
 }
