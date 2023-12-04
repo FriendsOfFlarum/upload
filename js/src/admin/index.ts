@@ -3,6 +3,8 @@ import UploadPage from './components/UploadPage';
 
 export * from './components';
 
+export { default as extend } from './extend';
+
 app.initializers.add('fof-upload', () => {
   app.extensionData
     .for('fof-upload')
