@@ -58,8 +58,9 @@ return [
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
 
-    (new Extend\Console())
-        ->command(Console\MapFilesCommand::class),
+    // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
+    // (new Extend\Console())
+    //     ->command(Console\MapFilesCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),
