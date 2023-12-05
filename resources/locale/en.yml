@@ -8,6 +8,17 @@ blomstra-gdpr:
 
 fof-upload:
   admin:
+    nav:
+      shared-uploads-button: Shared uploads
+    shared-uploads:
+      description: Upload files that can be used by all users of your forum.
+      introduction: |
+        Shared uploads are files that can be used by all users of your forum. They are not attached to any post, but can be inserted into posts by using the media manager.
+
+        <strong>Warning:</strong> Shared uploads are not protected by any permissions. Anyone with the URL can view them.
+      no-files: No shared files have been uploaded yet.
+      title: Shared uploads
+      upload-new-button: Upload new file
     pane:
       title: Upload
       description: Set up uploading services and preferences.
@@ -190,3 +201,6 @@ fof-upload:
       cannot_write_to_disk: Cannot write to disk.
       upload_blocked_by_php_extension: A php extension blocked the upload.
       no_files_made_it_to_upload: Please upload files no larger than {max} kb.
+  lib:
+    upload-shared-file-modal:
+      title: New shared file

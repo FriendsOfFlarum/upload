@@ -1,5 +1,7 @@
 import app from 'flarum/admin/app';
 import UploadPage from './components/UploadPage';
+import extendAdminNav from './extendAdminNav';
+import FileListState from '../common/states/FileListState';
 
 export * from './components';
 
@@ -46,4 +48,8 @@ app.initializers.add('fof-upload', () => {
       'moderate',
       50
     );
+
+  extendAdminNav();
+
+  app.fileListState = new FileListState();
 });

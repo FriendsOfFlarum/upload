@@ -1,0 +1,53 @@
+.SharedUploadPage--uploads {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.UploadedFile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: @body-bg; // Using Flarum's body background color
+    border-radius: @border-radius; // Using Flarum's border radius
+    box-shadow: 0 2px 4px @shadow-color; // Using Flarum's shadow color
+    padding: 15px;
+    margin-bottom: 16px; // Consistent with the grid gap
+}
+
+.UploadedFile--preview img,
+.UploadedFile--preview .icon-fallback {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: @border-radius;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+}
+
+.UploadedFile--actions {
+    margin-top: 10px;
+    .Button {
+        margin: 0 4px;
+        background-color: @control-bg; // Control background for buttons
+        color: @control-color; // Control text color for buttons
+        border: none;
+
+        &:hover,
+        &:focus {
+            background-color: darken(@control-bg, 10%); // Darken on hover/focus
+        }
+    }
+}
+
+.SharedUploadPage--main-actions .Button {
+    margin: 0 4px;
+}
+
+@media (max-width: 600px) {
+    .SharedUploadPage--uploads {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}

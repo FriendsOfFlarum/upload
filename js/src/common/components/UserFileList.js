@@ -1,4 +1,4 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 import Component from 'flarum/common/Component';
 
 import Button from 'flarum/common/components/Button';
@@ -8,7 +8,7 @@ import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
 import extractText from 'flarum/common/utils/extractText';
 
-import mimeToIcon from '../../common/mimeToIcon';
+import mimeToIcon from '../mimeToIcon';
 
 export default class UserFileList extends Component {
   oninit(vnode) {
@@ -33,7 +33,7 @@ export default class UserFileList extends Component {
 
   view() {
     /**
-     * @type {{empty(): boolean, files: import('../../common/models/File').default[]}}
+     * @type {{empty(): boolean, files: import('../models/File').default[]}}
      */
     const state = app.fileListState;
 
@@ -161,7 +161,7 @@ export default class UserFileList extends Component {
   /**
    * Execute function on file click
    *
-   * @param {import('../../common/models/File').default} file
+   * @param {import('../models/File').default} file
    */
   onFileClick(file) {
     // Custom functionality
@@ -180,7 +180,7 @@ export default class UserFileList extends Component {
   /**
    * Check if a file is selectable
    *
-   * @param {import('../../common/models/File').default} file
+   * @param {import('../models/File').default} file
    */
   isSelectable(file) {
     const fileType = file.type();
@@ -214,7 +214,7 @@ export default class UserFileList extends Component {
    * - Shows a native confirmation dialog
    * - If confirmed, sends AJAX request to the hide file API
    *
-   * @param {import('../../common/models/File').default} file File to hide
+   * @param {import('../models/File').default} file File to hide
    */
   hideFile(file) {
     /**
@@ -250,7 +250,7 @@ export default class UserFileList extends Component {
         .then(() => {
           // Remove hidden file from state
           /**
-           * @type {{ files: import('../../common/models/File').default[] }}
+           * @type {{ files: import('../models/File').default[] }}
            */
           const state = app.fileListState;
 

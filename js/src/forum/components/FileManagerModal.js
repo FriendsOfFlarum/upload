@@ -1,7 +1,7 @@
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import UploadButton from './UploadButton';
-import UserFileList from './UserFileList';
+import UserFileList from '../../common/components/UserFileList';
 import DragAndDrop from './DragAndDrop';
 
 export default class FileManagerModal extends Modal {

@@ -1,6 +1,6 @@
 import app from 'flarum/forum/app';
 import UserPage from 'flarum/forum/components/UserPage';
-import UserFileList from './UserFileList';
+import UserFileList from '../../common/components/UserFileList';
 
 export default class UploadsUserPage extends UserPage {
   oninit(vnode) {

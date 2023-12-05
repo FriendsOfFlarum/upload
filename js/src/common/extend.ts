@@ -3,5 +3,6 @@ import File from './models/File';
 
 export default [
   new Extend.Store() //
-    .add('files', File),
+    .add('files', File)
+    .add('shared-files', File),
 ];

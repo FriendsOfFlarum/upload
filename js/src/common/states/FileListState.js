@@ -1,4 +1,4 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 
 export default class FileListState {
   constructor() {
