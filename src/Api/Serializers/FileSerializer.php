@@ -46,7 +46,7 @@ class FileSerializer extends AbstractSerializer
             'tag'       => $model->tag,
             'hidden'    => $model->hide_from_media_manager,
             'bbcode'    => $this->util->getBbcodeForFile($model),
-            'shared'    => $model->shared
+            'shared'    => $model->shared,
         ];
     }
 }

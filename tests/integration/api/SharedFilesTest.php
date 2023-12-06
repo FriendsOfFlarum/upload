@@ -12,7 +12,6 @@
 
 namespace FoF\Upload\Tests\integration\api;
 
-use Flarum\Testing\integration\TestCase;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
 

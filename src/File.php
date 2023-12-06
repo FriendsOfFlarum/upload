@@ -48,7 +48,7 @@ class File extends AbstractModel
     protected $table = 'fof_upload_files';
 
     protected $appends = ['humanSize'];
-    
+
     protected $casts = [
         'hide_from_media_manager' => 'boolean',
         'shared'                  => 'boolean',

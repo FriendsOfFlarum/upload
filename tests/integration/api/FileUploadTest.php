@@ -18,7 +18,8 @@ use FoF\Upload\Tests\EnhancedTestCase;
 
 class FileUploadTest extends EnhancedTestCase
 {
-    use RetrievesAuthorizedUsers, UploadFileTrait;
+    use RetrievesAuthorizedUsers;
+    use UploadFileTrait;
 
     public function setUp(): void
     {
@@ -58,8 +59,6 @@ class FileUploadTest extends EnhancedTestCase
     {
         $this->setting('fof-upload.maxFileSize', $max);
     }
-
-    
 
     /**
      * @test

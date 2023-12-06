@@ -68,8 +68,7 @@ class FileRepository
         string $mime,
         bool $hideFromMediaManager = false,
         bool $sharedFile = false
-    ): File
-    {
+    ): File {
         // Generate a guaranteed unique Uuid.
         while ($uuid = Uuid::uuid4()->toString()) {
             if (!$this->findByUuid($uuid)) {
@@ -82,13 +81,13 @@ class FileRepository
         );
 
         return (new File())->forceFill([
-            'uuid'      => $uuid,
-            'base_name' => $event->slug,
-            'size'      => $file->getSize(),
-            'type'      => $mime,
-            'actor_id'  => $sharedFile ? null : ($actor ? $actor->id : null), // shared files are not associated with a user
+            'uuid'                    => $uuid,
+            'base_name'               => $event->slug,
+            'size'                    => $file->getSize(),
+            'type'                    => $mime,
+            'actor_id'                => $sharedFile ? null : ($actor ? $actor->id : null), // shared files are not associated with a user
             'hide_from_media_manager' => $hideFromMediaManager,
-            'shared' => $sharedFile,
+            'shared'                  => $sharedFile,
         ]);
     }
 
