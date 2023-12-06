@@ -57,13 +57,18 @@ class FileRepository
      */
     public function findByUuid($uuid)
     {
-        return File::query()
+        return File::byUuid($uuid)
             ->with('downloads')
-            ->where('uuid', $uuid)
             ->first();
     }
 
-    public function createFileFromUpload(Upload $file, User $actor, string $mime): File
+    public function createFileFromUpload(
+        Upload $file,
+        ?User $actor,
+        string $mime,
+        bool $hideFromMediaManager = false,
+        bool $sharedFile = false
+    ): File
     {
         // Generate a guaranteed unique Uuid.
         while ($uuid = Uuid::uuid4()->toString()) {
@@ -81,7 +86,9 @@ class FileRepository
             'base_name' => $event->slug,
             'size'      => $file->getSize(),
             'type'      => $mime,
-            'actor_id'  => $actor->id,
+            'actor_id'  => $sharedFile ? null : ($actor ? $actor->id : null), // shared files are not associated with a user
+            'hide_from_media_manager' => $hideFromMediaManager,
+            'shared' => $sharedFile,
         ]);
     }
 

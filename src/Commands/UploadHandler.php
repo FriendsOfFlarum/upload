@@ -104,7 +104,13 @@ class UploadHandler
                     throw new ValidationException(['upload' => resolve('translator')->trans('fof-upload.api.upload_errors.unsupported_type', ['mime' => $uploadFileData['mime']])]);
                 }
 
-                $file = $this->files->createFileFromUpload($upload, $command->actor, $uploadFileData['mime']);
+                $file = $this->files->createFileFromUpload(
+                    $upload,
+                    $command->actor,
+                    $uploadFileData['mime'],
+                    $command->hideFromMediaManager,
+                    $command->shared
+                );
 
                 $this->events->dispatch(
                     new Events\File\WillBeUploaded($command->actor, $file, $upload, $uploadFileData['mime'])
@@ -126,7 +132,6 @@ class UploadHandler
 
                 $file->upload_method = Str::lower(Str::afterLast($adapter::class, '\\'));
                 $file->tag = $template;
-                $file->actor_id = $command->actor->id;
 
                 $this->events->dispatch(
                     new Events\File\WillBeSaved($command->actor, $file, $upload, $uploadFileData['mime'])

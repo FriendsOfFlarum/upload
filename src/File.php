@@ -18,6 +18,7 @@ use Flarum\Post\Post;
 use Flarum\User\User;
 use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
@@ -40,14 +41,50 @@ use Illuminate\Support\Str;
  * @property Carbon                $created_at
  * @property bool                  $hide_from_media_manager
  * @property array                 $matched_post_ids
+ * @property bool                  $shared
  */
 class File extends AbstractModel
 {
     protected $table = 'fof_upload_files';
+
     protected $appends = ['humanSize'];
+    
     protected $casts = [
         'hide_from_media_manager' => 'boolean',
+        'shared'                  => 'boolean',
+        'created_at'              => 'datetime',
     ];
+
+    protected $fillable = [
+        'base_name',
+        'path',
+        'type',
+        'size',
+        'actor_id',
+        'uuid',
+        'hide_from_media_manager',
+        'shared',
+    ];
+
+    public static function filesFor(int $userId, User $actor): Builder
+    {
+        return static::query()
+            ->where('actor_id', $userId)
+            ->where('hide_from_media_manager', false)
+            ->where('shared', false);
+    }
+
+    public static function sharedFiles(): Builder
+    {
+        return static::query()
+            ->where('shared', true);
+    }
+
+    public static function byUuid(string $uuid): Builder
+    {
+        return static::query()
+            ->where('uuid', $uuid);
+    }
 
     public function actor()
     {

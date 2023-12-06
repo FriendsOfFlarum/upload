@@ -29,6 +29,10 @@ class AddCurrentUserAttributes
             $attributes['fof-upload-deleteOthersMediaLibrary'] = $deleteOthers;
         }
 
+        if ($uploadShared = $actor->hasPermission('fof-upload.upload-shared-files')) {
+            $attributes['fof-upload-uploadSharedFiles'] = $uploadShared;
+        }
+
         return $attributes;
     }
 }

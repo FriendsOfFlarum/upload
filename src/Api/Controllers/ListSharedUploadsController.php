@@ -41,10 +41,7 @@ class ListSharedUploadsController extends AbstractListController
         $offset = $this->extractOffset($request);
 
         // Build query
-        $query = File::query()
-            ->where('hide_from_media_manager', false);
-
-        // TODO: change query to only show shared files that are visible to the actor..
+        $query = File::sharedFiles();
 
         $results = $query
             ->skip($offset)
@@ -62,7 +59,7 @@ class ListSharedUploadsController extends AbstractListController
 
         // Add pagination to the request
         $document->addPaginationLinks(
-            $this->url->to('api')->route('fof-upload.list'),
+            $this->url->to('api')->route('fof-upload.shared-files.index'),
             $params,
             $offset,
             $limit,

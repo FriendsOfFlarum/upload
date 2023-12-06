@@ -41,11 +41,12 @@ class FileSerializer extends AbstractSerializer
             'type'      => $model->type,
             'size'      => $model->size,
             'humanSize' => $model->humanSize,
-            'createdAt' => $model->created_at,
+            'createdAt' => $this->formatDate($model->created_at),
             'uuid'      => $model->uuid,
             'tag'       => $model->tag,
             'hidden'    => $model->hide_from_media_manager,
             'bbcode'    => $this->util->getBbcodeForFile($model),
+            'shared'    => $model->shared
         ];
     }
 }

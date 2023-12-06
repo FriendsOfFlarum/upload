@@ -46,9 +46,14 @@ class UploadController extends AbstractListController
         $actor = RequestUtil::getActor($request);
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
+        $params = $request->getParsedBody();
+
+        $hideFromMediaManager = Arr::get($params, 'hideFromMediaManager', false);
+        $shared = Arr::get($params, 'shared', false);
+
         /** @var Collection $collection */
         $collection = $this->bus->dispatch(
-            new Upload($files, $actor)
+            new Upload($files, $actor, $hideFromMediaManager, $shared)
         );
 
         if ($collection->isEmpty()) {

@@ -19,7 +19,9 @@ class Upload
 {
     public function __construct(
         public Collection $files,
-        public User $actor
+        public User $actor,
+        public bool $hideFromMediaManager = false,
+        public bool $shared = false,
     ) {
     }
 }

@@ -18,7 +18,7 @@ use FoF\Upload\Tests\EnhancedTestCase;
 
 class FileUploadTest extends EnhancedTestCase
 {
-    use RetrievesAuthorizedUsers;
+    use RetrievesAuthorizedUsers, UploadFileTrait;
 
     public function setUp(): void
     {
@@ -59,23 +59,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->setting('fof-upload.maxFileSize', $max);
     }
 
-    protected function uploadFile(string $path)
-    {
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException("File not found at path: $path");
-        }
-
-        return [
-            'name'     => 'files',
-            'contents' => $path,
-            'filename' => basename($path),
-        ];
-    }
-
-    protected function fixtures(string $file): string
-    {
-        return __DIR__.'/../../fixtures/'.$file;
-    }
+    
 
     /**
      * @test
@@ -98,18 +82,23 @@ class FileUploadTest extends EnhancedTestCase
         $json = json_decode($response->getBody()->getContents(), true);
 
         $this->assertCount(1, $json['data']);
-        $this->assertArrayHasKey('attributes', $json['data'][0]);
 
-        $this->assertEquals('milkyway.jpg', $json['data'][0]['attributes']['baseName']);
-        $this->assertEquals('image/jpeg', $json['data'][0]['attributes']['type']);
-        $this->assertEquals('image-preview', $json['data'][0]['attributes']['tag']);
+        $fileInfo = $json['data'][0];
+        $this->assertArrayHasKey('attributes', $fileInfo);
 
-        $file = File::where('uuid', $json['data'][0]['attributes']['uuid'])->first();
+        $this->assertEquals('milkyway.jpg', $fileInfo['attributes']['baseName']);
+        $this->assertEquals('image/jpeg', $fileInfo['attributes']['type']);
+        $this->assertEquals('image-preview', $fileInfo['attributes']['tag']);
+        $this->assertFalse($fileInfo['attributes']['shared']);
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
 
         $this->assertNotNull($file);
 
         $this->assertEquals('milkyway.jpg', $file->base_name);
         $this->assertEquals(2, $file->actor_id);
+        $this->assertEquals('local', $file->upload_method);
+        $this->assertFalse($file->shared);
     }
 
     /**

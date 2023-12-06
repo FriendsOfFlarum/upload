@@ -38,11 +38,7 @@ return [
         ->js(__DIR__.'/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__.'/resources/less/forum/download.less')
-        ->css(__DIR__.'/resources/less/forum/upload.less')
-        ->css(__DIR__.'/resources/less/forum/fileManagerModal.less')
-        ->css(__DIR__.'/resources/less/forum/fileList.less')
-        ->css(__DIR__.'/resources/less/forum/textPreview.less')
+        ->css(__DIR__.'/resources/less/forum.less')
         ->js(__DIR__.'/js/dist/forum.js'),
 
     new Extend\Locales(__DIR__.'/resources/locale'),
@@ -55,6 +51,7 @@ return [
         ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
         ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
         ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
+        ->get('/fof/download/{uuid}/{csrf}', 'fof-upload.download.uuid', Api\Controllers\DownloadController::class)
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class)
         ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class),
