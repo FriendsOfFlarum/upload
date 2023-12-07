@@ -40,7 +40,7 @@ class FileSerializer extends AbstractSerializer
             'baseName'  => $model->base_name,
             'path'      => $model->path,
             'url'       => $this->isPrivateShared($model) ? $this->url->to('api')->route('fof-upload.download.uuid', [
-                'uuid' => $model->uuid
+                'uuid' => $model->uuid,
             ]) : $model->url,
             'type'      => $model->type,
             'size'      => $model->size,
