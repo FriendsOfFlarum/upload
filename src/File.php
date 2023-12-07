@@ -39,7 +39,7 @@ use Illuminate\Support\Str;
  * @property User                  $actor
  * @property Collection|Download[] $downloads
  * @property Carbon                $created_at
- * @property bool                  $hide_from_media_manager
+ * @property bool                  $hidden
  * @property array                 $matched_post_ids
  * @property bool                  $shared
  */
@@ -50,7 +50,7 @@ class File extends AbstractModel
     protected $appends = ['humanSize'];
 
     protected $casts = [
-        'hide_from_media_manager' => 'boolean',
+        'hidden' => 'boolean',
         'shared'                  => 'boolean',
         'created_at'              => 'datetime',
     ];
@@ -62,7 +62,7 @@ class File extends AbstractModel
         'size',
         'actor_id',
         'uuid',
-        'hide_from_media_manager',
+        'hidden',
         'shared',
     ];
 
@@ -70,7 +70,7 @@ class File extends AbstractModel
     {
         return static::query()
             ->where('actor_id', $userId)
-            ->where('hide_from_media_manager', false)
+            ->where('hidden', false)
             ->where('shared', false);
     }
 

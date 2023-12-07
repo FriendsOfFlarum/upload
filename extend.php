@@ -68,7 +68,7 @@ return [
         ->cast('foffiles_count', 'int')
         ->hasMany('foffiles', File::class, 'actor_id')
         ->relationship('foffilesCurrent', function (User $model) {
-            return $model->foffiles()->where('hide_from_media_manager', false);
+            return $model->foffiles()->where('hidden', false);
         }),
 
     (new Extend\ApiController(ShowUserController::class))

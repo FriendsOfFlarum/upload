@@ -80,6 +80,6 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertNull($file->actor_id, 'Actor should be null for shared files');
         $this->assertEquals('local', $file->upload_method);
         $this->assertTrue($file->shared);
-        $this->assertFalse($file->hide_from_media_manager);
+        $this->assertFalse($file->hidden);
     }
 }

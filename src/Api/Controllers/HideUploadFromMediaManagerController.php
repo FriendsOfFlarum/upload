@@ -42,7 +42,7 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
             throw new PermissionDeniedException();
         }
 
-        $fileUpload->hide_from_media_manager = true;
+        $fileUpload->hidden = true;
         $fileUpload->save();
 
         return new EmptyResponse(202);

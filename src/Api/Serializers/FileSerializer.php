@@ -44,7 +44,7 @@ class FileSerializer extends AbstractSerializer
             'createdAt' => $this->formatDate($model->created_at),
             'uuid'      => $model->uuid,
             'tag'       => $model->tag,
-            'hidden'    => $model->hide_from_media_manager,
+            'hidden'    => $model->hidden,
             'bbcode'    => $this->util->getBbcodeForFile($model),
             'shared'    => $model->shared,
         ];

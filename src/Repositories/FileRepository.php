@@ -86,7 +86,7 @@ class FileRepository
             'size'                    => $file->getSize(),
             'type'                    => $mime,
             'actor_id'                => $sharedFile ? null : ($actor ? $actor->id : null), // shared files are not associated with a user
-            'hide_from_media_manager' => $hideFromMediaManager,
+            'hidden' => $hideFromMediaManager,
             'shared'                  => $sharedFile,
         ]);
     }
