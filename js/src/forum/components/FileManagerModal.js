@@ -27,7 +27,7 @@ export default class FileManagerModal extends Modal {
     // Drag & drop
     this.dragDrop = null;
 
-    this.selectedFilesLibrary = 'user';
+    this.selectedFilesLibrary = vnode.attrs.defaultFilesLibrary || 'user';
 
     this.sharedUploads = null;
 
@@ -164,9 +164,10 @@ export default class FileManagerModal extends Modal {
 
     return (
       <div className="SharedFileList">
-        {this.sharedUploads.map((file) => {
-          return <UploadedFile file={file} callback={() => this.callback()} />;
-        })}
+        {this.sharedUploads &&
+          this.sharedUploads.map((file) => {
+            return <UploadedFile file={file} callback={() => this.callback()} onFileSelect={this.onFileSelect.bind(this)} />;
+          })}
       </div>
     );
   }
@@ -233,7 +234,7 @@ export default class FileManagerModal extends Modal {
 
     // Add selected files to composer
     this.selectedFiles.map((fileId) => {
-      const file = app.store.getById('files', fileId);
+      const file = app.store.getById('files', fileId) || app.store.getById('fof/upload/shared-files', fileId);
 
       app.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
     });

@@ -10,6 +10,7 @@ import app from 'flarum/admin/app';
 interface CustomAttrs extends ComponentAttrs {
   file: File;
   callback: () => void | undefined;
+  onFileSelect: (file: File) => void | undefined;
 }
 
 export default class UploadedFile extends Component<CustomAttrs> {
@@ -35,7 +36,7 @@ export default class UploadedFile extends Component<CustomAttrs> {
         <div className="UploadedFile--sharestatus">
           <span>{icon(statusIcon)}</span>
         </div>
-        <div className="UploadedFile--preview">
+        <div className="UploadedFile--preview" onclick={() => this.onFileClick(this.file)}>
           {isImage ? (
             this.imageLoaded ? (
               <img src={this.file.url()} loading="lazy" onerror={this.handleImageError} onload={this.handleImageLoad} />
@@ -109,4 +110,12 @@ export default class UploadedFile extends Component<CustomAttrs> {
     this.imageLoaded = true;
     m.redraw();
   };
+
+  onFileClick(file: File) {
+    console.log('click');
+    if (this.attrs.onFileSelect) {
+      this.attrs.onFileSelect(file);
+      return;
+    }
+  }
 }
