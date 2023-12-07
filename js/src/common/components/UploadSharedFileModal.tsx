@@ -34,7 +34,8 @@ export default class UploadSharedFileModal extends Modal {
       <div className="Modal-body">
         <div className="UploadSharedFileModal-files">
           <input type="file" multiple onchange={this.onFileChange.bind(this)} />
-          {this.files.map((file: File) => { // Add type assertion here
+          {this.files.map((file: File) => {
+            // Add type assertion here
             const isImage = file.type.startsWith('image/');
             return (
               <div className="UploadedFile">
