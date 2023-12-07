@@ -16,16 +16,14 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         $schema->table('fof_upload_files', function (Blueprint $table) {
-            $table->dropIndex(['actor_id', 'hide_from_media_manager']);
-            $table->index(['actor_id', 'hide_from_media_manager', 'shared']);
+            $table->index(['actor_id', 'hidden', 'shared']);
             $table->index('shared');
         });
     },
     'down' => function (Builder $schema) {
         $schema->table('fof_upload_files', function (Blueprint $table) {
-            $table->dropIndex(['actor_id', 'hide_from_media_manager', 'shared']);
+            $table->dropIndex(['actor_id', 'hidden', 'shared']);
             $table->dropIndex(['shared']);
-            $table->index(['actor_id', 'hide_from_media_manager']);
         });
     },
 ];
