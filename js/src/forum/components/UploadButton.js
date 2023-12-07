@@ -26,24 +26,24 @@ export default class UploadButton extends Component {
 
     return (
       <Button
-          className={classList([
-            'Button',
-            'hasIcon',
-            'fof-upload-button',
-            !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
-            !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
-            this.attrs.uploader.uploading && 'uploading',
-          ])}
-          icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
-          onclick={this.uploadButtonClicked.bind(this)}
-          disabled={this.attrs.disabled}
-        >
-          {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
-          {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
-          <form>
-            <input type="file" multiple={true} onchange={this.process.bind(this)} />
-          </form>
-        </Button>
+        className={classList([
+          'Button',
+          'hasIcon',
+          'fof-upload-button',
+          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
+          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
+          this.attrs.uploader.uploading && 'uploading',
+        ])}
+        icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
+        onclick={this.uploadButtonClicked.bind(this)}
+        disabled={this.attrs.disabled}
+      >
+        {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
+        {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
+        <form>
+          <input type="file" multiple={true} onchange={this.process.bind(this)} />
+        </form>
+      </Button>
     );
   }
 

@@ -9,7 +9,7 @@ export default class UploadSharedFileModal extends Modal {
   fileInput = null;
   options = {
     shared: true,
-    hidden: false
+    hidden: false,
   };
 
   className() {

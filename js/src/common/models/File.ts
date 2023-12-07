@@ -49,6 +49,10 @@ export default class File extends Model {
     return Model.attribute<boolean>('shared').call(this);
   }
 
+  isPrivateShared() {
+    return Model.attribute<boolean>('isPrivateShared').call(this);
+  }
+
   apiEndpoint() {
     return '/fof/uploads' + (this.exists ? '/' + this.id() : '');
   }

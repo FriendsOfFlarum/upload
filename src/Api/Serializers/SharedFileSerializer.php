@@ -15,4 +15,13 @@ namespace FoF\Upload\Api\Serializers;
 class SharedFileSerializer extends FileSerializer
 {
     protected $type = 'shared-files';
+
+    protected function getDefaultAttributes($model)
+    {
+        $attributes = parent::getDefaultAttributes($model);
+
+        $attributes['isPrivateShared'] = $model->shared && $model->hidden;
+
+        return $attributes;
+    }
 }

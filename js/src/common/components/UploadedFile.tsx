@@ -24,9 +24,13 @@ export default class UploadedFile extends Component<CustomAttrs> {
     const isImage = this.file.type().startsWith('image/');
     const fileIcon = mimeToIcon(this.file.type());
     const errorIcon = 'fas fa-exclamation-triangle';
+    const statusIcon = this.file.isPrivateShared() ? 'fas fa-lock' : 'fas fa-unlock';
 
     return (
       <div className="UploadedFile">
+        <div className="UploadedFile--sharestatus">
+          <span>{icon(statusIcon)}</span>
+        </div>
         <div className="UploadedFile--preview">
           {isImage ? (
             this.imageLoaded ? (
