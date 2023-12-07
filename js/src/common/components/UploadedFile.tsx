@@ -73,8 +73,8 @@ export default class UploadedFile extends Component<CustomAttrs> {
 
     if (result) {
       await app.request({
-        'method': 'DELETE',
-        'url': app.forum.attribute('apiUrl') + '/fof/upload/delete/' + this.file.uuid(),
+        method: 'DELETE',
+        url: app.forum.attribute('apiUrl') + '/fof/upload/delete/' + this.file.uuid(),
       });
       //TODO: setup callback to remove file from list
     }
