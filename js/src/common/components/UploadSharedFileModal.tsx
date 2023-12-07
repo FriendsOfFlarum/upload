@@ -57,8 +57,8 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
           })}
         </div>
         <div className="UploadSharedFileModal-options Form-group">
-          <Switch state={!this.options.hidden} onchange={(value: boolean) => (this.options.hidden = !value)}>
-            {app.translator.trans('fof-upload.lib.upload-shared-file-modal.in-media-gallery')}
+          <Switch state={this.options.hidden} onchange={(value: boolean) => (this.options.hidden = value)}>
+            {app.translator.trans('fof-upload.lib.upload-shared-file-modal.hide-from-media-gallery')}
           </Switch>
         </div>
         <div className="UploadSharedFileModal-submit App-primaryControl">

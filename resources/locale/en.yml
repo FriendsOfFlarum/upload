@@ -205,5 +205,5 @@ fof-upload:
     upload-shared-file-modal:
       title: New shared file
       dropzone: Drag and drop files here or click to browse
-      in-media-gallery: Show in user's media gallery
+      hide-from-media-gallery: Hide from user's media gallery
       upload: Upload

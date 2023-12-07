@@ -46,10 +46,10 @@ class UploadController extends AbstractListController
         $actor = RequestUtil::getActor($request);
         $files = collect(Arr::get($request->getUploadedFiles(), 'files', []));
 
-        $params = $request->getParsedBody();
+        $params = $request->getParsedBody() ?? [];
 
-        $hideFromMediaManager = (bool) Arr::get($params, 'options.hidden', false);
-        $shared = (bool) Arr::get($params, 'options.shared', false);
+        $hideFromMediaManager = $this->getOption('hidden', $params);
+        $shared = $this->getOption('shared', $params);
 
         /** @var Collection $collection */
         $collection = $this->bus->dispatch(
@@ -63,5 +63,12 @@ class UploadController extends AbstractListController
         }
 
         return $collection;
+    }
+
+    protected function getOption(string $option, array $params): bool
+    {
+        $value = Arr::get($params, 'options.'.$option);
+
+        return $value === 'true' || $value === true;
     }
 }
