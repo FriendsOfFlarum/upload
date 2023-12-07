@@ -48,8 +48,8 @@ class UploadController extends AbstractListController
 
         $params = $request->getParsedBody();
 
-        $hideFromMediaManager = Arr::get($params, 'hideFromMediaManager', false);
-        $shared = Arr::get($params, 'options.shared', false);
+        $hideFromMediaManager = (bool) Arr::get($params, 'hideFromMediaManager', false);
+        $shared = (bool) Arr::get($params, 'options.shared', false);
 
         /** @var Collection $collection */
         $collection = $this->bus->dispatch(

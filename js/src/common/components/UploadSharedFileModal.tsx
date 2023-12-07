@@ -8,7 +8,7 @@ export default class UploadSharedFileModal extends Modal {
   files = [];
   fileInput = null;
   options = {
-    gallery: true,
+    shared: true,
   };
 
   className() {
@@ -44,7 +44,7 @@ export default class UploadSharedFileModal extends Modal {
           })}
         </div>
         <div className="UploadSharedFileModal-options Form-group">
-          <Switch state={this.options.gallery} onchange={(value) => (this.options.gallery = value)}>
+          <Switch state={this.options.shared} onchange={(value) => (this.options.shared = value)}>
             {app.translator.trans('fof-upload.lib.upload-shared-file-modal.in-media-gallery')}
           </Switch>
         </div>
@@ -58,19 +58,31 @@ export default class UploadSharedFileModal extends Modal {
   }
 
   upload() {
-    // TODO: handle and display errors
+    const formData = new FormData();
+
+    // Append each file to the form data
+    this.files.forEach((file) => {
+      formData.append('files[]', file);
+    });
+
+    Object.keys(this.options).forEach((key) => {
+      formData.append(`options[${key}]`, this.options[key]);
+    });
+
     app
       .request({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/fof/upload',
-        body: {
-          files: this.files,
-          options: this.options,
-        },
+        serialize: (raw) => raw, // Prevent mithril from trying to serialize FormData
+        body: formData,
       })
       .then(() => {
         this.files = [];
         this.hide();
+      })
+      .catch((error) => {
+        // TODO: Handle and display errors
+        console.error(error);
       });
   }
 }
