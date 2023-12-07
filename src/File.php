@@ -50,7 +50,7 @@ class File extends AbstractModel
     protected $appends = ['humanSize'];
 
     protected $casts = [
-        'hidden' => 'boolean',
+        'hidden'                  => 'boolean',
         'shared'                  => 'boolean',
         'created_at'              => 'datetime',
     ];
