@@ -58,6 +58,11 @@ export default class FileManagerModal extends Modal {
         <div className="Modal-content">
           <div className="fof-modal-buttons App-backControl">
             <UploadButton uploader={this.uploader} disabled={app.fileListState.isLoading()} isMediaUploadButton />
+            {app.session.user && app.session.user.uploadSharedFiles() && (
+              <Button className="Button" icon="fas fa-cloud-upload-alt">
+                {app.translator.trans('fof-upload.forum.buttons.upload_shared')}
+              </Button>
+            )}
           </div>
 
           <div className="fof-drag-and-drop">

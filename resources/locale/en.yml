@@ -153,6 +153,7 @@ fof-upload:
     buttons:
       attach: Attach
       upload: Upload
+      upload_shared: Shared
       user_uploads: User uploads
       cancel: Cancel
       media: My media

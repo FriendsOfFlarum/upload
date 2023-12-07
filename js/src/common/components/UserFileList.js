@@ -72,7 +72,7 @@ export default class UserFileList extends Component {
             const fileClassNames = classList([
               'fof-file',
               // File is image
-              fileIcon === 'image' && 'fof-file-type-image',
+              fileIcon === 'far fa-file-image' && 'fof-file-type-image',
               // File is selected
               this.attrs.selectedFiles && this.attrs.selectedFiles.indexOf(file.id()) >= 0 && 'fof-file-selected',
             ]);
@@ -104,7 +104,7 @@ export default class UserFileList extends Component {
                   aria-label={extractText(app.translator.trans('fof-upload.forum.file_list.select_file_a11y_label', { fileName }))}
                 >
                   <figure>
-                    {fileIcon === 'image' ? (
+                    {fileIcon === 'far fa-file-image' ? (
                       <img
                         src={file.url()}
                         className="fof-file-image-preview"
