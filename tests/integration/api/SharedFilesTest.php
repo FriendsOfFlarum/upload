@@ -52,7 +52,7 @@ class SharedFilesTest extends EnhancedTestCase
                 'json' => [
                     'options' => [
                         'shared' => true,
-                    ]
+                    ],
                 ],
             ])
         );
