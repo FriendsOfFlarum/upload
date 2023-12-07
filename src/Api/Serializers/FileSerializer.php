@@ -13,6 +13,7 @@
 namespace FoF\Upload\Api\Serializers;
 
 use Flarum\Api\Serializer\AbstractSerializer;
+use Flarum\Http\UrlGenerator;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
 
@@ -21,7 +22,8 @@ class FileSerializer extends AbstractSerializer
     protected $type = 'files';
 
     public function __construct(
-        protected Util $util
+        protected Util $util,
+        protected UrlGenerator $url
     ) {
     }
 
@@ -37,7 +39,9 @@ class FileSerializer extends AbstractSerializer
         return [
             'baseName'  => $model->base_name,
             'path'      => $model->path,
-            'url'       => $model->url,
+            'url'       => $this->isPrivateShared($model) ? $this->url->to('api')->route('fof-upload.download.uuid', [
+                'uuid' => $model->uuid
+            ]) : $model->url,
             'type'      => $model->type,
             'size'      => $model->size,
             'humanSize' => $model->humanSize,
@@ -48,5 +52,10 @@ class FileSerializer extends AbstractSerializer
             'bbcode'    => $this->util->getBbcodeForFile($model),
             'shared'    => $model->shared,
         ];
+    }
+
+    protected function isPrivateShared(File $model): bool
+    {
+        return $model->shared && $model->hidden;
     }
 }

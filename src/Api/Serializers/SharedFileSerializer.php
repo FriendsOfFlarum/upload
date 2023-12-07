@@ -20,7 +20,7 @@ class SharedFileSerializer extends FileSerializer
     {
         $attributes = parent::getDefaultAttributes($model);
 
-        $attributes['isPrivateShared'] = $model->shared && $model->hidden;
+        $attributes['isPrivateShared'] = $this->isPrivateShared($model);
 
         return $attributes;
     }

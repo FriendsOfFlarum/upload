@@ -24,8 +24,8 @@ export default class UploadSharedFileModal extends Modal {
     this.addFiles(Array.from(e.target.files));
   }
 
-  addFiles(newFiles) {
-    this.files.push(...newFiles);
+  addFiles(newFiles: File[]) {
+    (this.files as File[]).push(...newFiles);
     m.redraw();
   }
 
@@ -34,7 +34,7 @@ export default class UploadSharedFileModal extends Modal {
       <div className="Modal-body">
         <div className="UploadSharedFileModal-files">
           <input type="file" multiple onchange={this.onFileChange.bind(this)} />
-          {this.files.map((file) => {
+          {this.files.map((file: File) => { // Add type assertion here
             const isImage = file.type.startsWith('image/');
             return (
               <div className="UploadedFile">
@@ -45,7 +45,7 @@ export default class UploadSharedFileModal extends Modal {
           })}
         </div>
         <div className="UploadSharedFileModal-options Form-group">
-          <Switch state={!this.options.hidden} onchange={(value) => (this.options.hidden = !value)}>
+          <Switch state={!this.options.hidden} onchange={(value: boolean) => (this.options.hidden = !value)}>
             {app.translator.trans('fof-upload.lib.upload-shared-file-modal.in-media-gallery')}
           </Switch>
         </div>

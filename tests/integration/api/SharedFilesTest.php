@@ -128,4 +128,45 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertTrue($file->shared);
         $this->assertTrue($file->hidden);
     }
+
+    /**
+     * @test
+     */
+    public function shared_hidden_files_are_proxied_via_our_controller()
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+                'json' => [
+                    'options' => [
+                        'shared' => true,
+                        'hidden' => true,
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $downloadUrl = $json['data'][0]['attributes']['url'];
+
+        $this->assertStringContainsString('/api/fof/download/', $downloadUrl);
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNotNull($file);
+
+        $response = $this->send(
+            $this->request('GET', '/api/fof/download/'.$file->uuid, [
+                'authenticatedAs' => 1,
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

@@ -48,9 +48,8 @@ class DownloadController implements RequestHandlerInterface
         if ($postId !== null) {
             $post = $this->posts->findOrFail($postId, $actor);
             $discussionId = $post->discussion_id;
+            $this->validateCsrf($csrf, $request->getAttribute('session'));
         }
-
-        $this->validateCsrf($csrf, $request->getAttribute('session'));
 
         return $this->bus->dispatch(
             new Download($uuid, $actor, $discussionId, $postId)
