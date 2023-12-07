@@ -4,6 +4,7 @@ import Button from 'flarum/common/components/Button';
 import UploadButton from './UploadButton';
 import UserFileList from '../../common/components/UserFileList';
 import DragAndDrop from './DragAndDrop';
+import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 
 export default class FileManagerModal extends Modal {
   oninit(vnode) {
@@ -59,7 +60,13 @@ export default class FileManagerModal extends Modal {
           <div className="fof-modal-buttons App-backControl">
             <UploadButton uploader={this.uploader} disabled={app.fileListState.isLoading()} isMediaUploadButton />
             {app.session.user && app.session.user.uploadSharedFiles() && (
-              <Button className="Button" icon="fas fa-cloud-upload-alt">
+              <Button
+                className="Button"
+                icon="fas fa-cloud-upload-alt"
+                onclick={() => {
+                  app.modal.show(UploadSharedFileModal, {}, true);
+                }}
+              >
                 {app.translator.trans('fof-upload.forum.buttons.upload_shared')}
               </Button>
             )}

@@ -9,6 +9,7 @@ import classList from 'flarum/common/utils/classList';
 import extractText from 'flarum/common/utils/extractText';
 
 import mimeToIcon from '../mimeToIcon';
+import icon from 'flarum/common/helpers/icon';
 
 export default class UserFileList extends Component {
   oninit(vnode) {
@@ -128,7 +129,7 @@ export default class UserFileList extends Component {
                         // aware of a lack of a preview.
                         role="presentation"
                       >
-                        <i className={`fa-fw ${fileIcon}`} />
+                        {icon(`fa-fw ${fileIcon}`)}
                       </span>
                     )}
 
