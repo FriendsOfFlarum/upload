@@ -234,7 +234,7 @@ export default class FileManagerModal extends Modal {
 
     // Add selected files to composer
     this.selectedFiles.map((fileId) => {
-      const file = app.store.getById('files', fileId) || app.store.getById('fof/upload/shared-files', fileId);
+      const file = app.store.getById('files', fileId) || app.store.getById('shared-files', fileId);
 
       app.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
     });

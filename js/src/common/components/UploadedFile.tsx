@@ -112,7 +112,6 @@ export default class UploadedFile extends Component<CustomAttrs> {
   };
 
   onFileClick(file: File) {
-    console.log('click');
     if (this.attrs.onFileSelect) {
       this.attrs.onFileSelect(file);
       return;
