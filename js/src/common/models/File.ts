@@ -45,6 +45,10 @@ export default class File extends Model {
     return Model.attribute<string>('bbcode').call(this);
   }
 
+  isShared() {
+    return Model.attribute<boolean>('shared').call(this);
+  }
+
   apiEndpoint() {
     return '/fof/uploads' + (this.exists ? '/' + this.id() : '');
   }

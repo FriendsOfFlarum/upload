@@ -47,6 +47,14 @@ app.initializers.add('fof-upload', () => {
       },
       'moderate',
       50
+    )
+    .registerPermission(
+      {
+        icon: 'far fa-file-alt',
+        label: app.translator.trans('fof-upload.admin.permissions.upload_shared_label'),
+        permission: 'fof-upload.upload-shared-files',
+      },
+      'start'
     );
 
   extendAdminNav();

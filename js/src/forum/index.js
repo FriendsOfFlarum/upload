@@ -16,6 +16,7 @@ app.initializers.add('fof-upload', () => {
   User.prototype.deleteOthersMediaLibrary = Model.attribute('fof-upload-deleteOthersMediaLibrary');
   User.prototype.uploadCountCurrent = Model.attribute('fof-upload-uploadCountCurrent');
   User.prototype.uploadCountAll = Model.attribute('fof-upload-uploadCountAll');
+  User.prototype.uploadSharedFiles = Model.attribute('fof-upload-uploadSharedFiles');
 
   app.fileListState = new FileListState();
 

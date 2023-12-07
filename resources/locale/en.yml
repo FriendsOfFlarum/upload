@@ -204,3 +204,6 @@ fof-upload:
   lib:
     upload-shared-file-modal:
       title: New shared file
+      dropzone: Drag and drop files here or click to browse
+      in-media-gallery: Show in user's media gallery
+      upload: Upload

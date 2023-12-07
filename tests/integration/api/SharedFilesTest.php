@@ -50,7 +50,9 @@ class SharedFilesTest extends EnhancedTestCase
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
                 'json' => [
-                    'shared' => true,
+                    'options' => [
+                        'shared' => true,
+                    ]
                 ],
             ])
         );
