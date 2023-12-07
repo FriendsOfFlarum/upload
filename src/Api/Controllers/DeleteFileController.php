@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractDeleteController;
@@ -16,7 +26,7 @@ class DeleteFileController extends AbstractDeleteController
         protected Dispatcher $bus
     ) {
     }
-    
+
     public function delete(ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
