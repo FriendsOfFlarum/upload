@@ -5,6 +5,8 @@ import UploadButton from './UploadButton';
 import UserFileList from '../../common/components/UserFileList';
 import DragAndDrop from './DragAndDrop';
 import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
+import ItemList from 'flarum/common/utils/ItemList';
+import UploadedFile from '../../common/components/UploadedFile';
 
 export default class FileManagerModal extends Modal {
   oninit(vnode) {
@@ -24,6 +26,10 @@ export default class FileManagerModal extends Modal {
 
     // Drag & drop
     this.dragDrop = null;
+
+    this.selectedFilesLibrary = 'user';
+
+    this.sharedUploads = null;
 
     // Initialize uploads
     this.onUpload();
@@ -91,13 +97,9 @@ export default class FileManagerModal extends Modal {
           )}
 
           <div className="Modal-body">
-            <UserFileList
-              user={this.attrs.user}
-              selectable
-              onFileSelect={this.onFileSelect.bind(this)}
-              selectedFiles={this.selectedFiles}
-              restrictFileType={this.restrictFileType}
-            />
+            <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>
+            {this.selectedFilesLibrary === 'user' && this.userFilesContent()}
+            {this.selectedFilesLibrary === 'shared' && this.sharedFilesContent()}
           </div>
 
           <div className="Modal-footer">
@@ -116,6 +118,72 @@ export default class FileManagerModal extends Modal {
         </div>
       </div>
     );
+  }
+
+  fileLibraryButtonItems() {
+    const items = new ItemList();
+
+    items.add(
+      'user',
+      <Button className={`Button ${this.selectedFilesLibrary === 'user' ? 'active' : ''}`} onclick={() => this.setLibrary('user')}>
+        {app.translator.trans('fof-upload.forum.buttons.media')}
+      </Button>
+    );
+
+    items.add(
+      'shared',
+      <Button className={`Button ${this.selectedFilesLibrary === 'shared' ? 'active' : ''}`} onclick={() => this.setLibrary('shared')}>
+        {app.translator.trans('fof-upload.forum.buttons.shared_media')}
+      </Button>
+    );
+
+    return items;
+  }
+
+  setLibrary(library) {
+    this.selectedFilesLibrary = library;
+    m.redraw();
+  }
+
+  userFilesContent() {
+    return (
+      <UserFileList
+        user={this.attrs.user}
+        selectable
+        onFileSelect={this.onFileSelect.bind(this)}
+        selectedFiles={this.selectedFiles}
+        restrictFileType={this.restrictFileType}
+      />
+    );
+  }
+
+  sharedFilesContent() {
+    if (this.sharedUploads === null) {
+      this.loadSharedUploads();
+    }
+
+    return (
+      <div className="SharedFileList">
+        {this.sharedUploads.map((file) => {
+          return <UploadedFile file={file} callback={() => this.callback()} />;
+        })}
+      </div>
+    );
+  }
+
+  loadSharedUploads(page = 1) {
+    this.loading = true;
+
+    app.store
+      .find('fof/upload/shared-files')
+      .then((results) => {
+        this.sharedUploads = results;
+      })
+      .catch(() => {})
+      .then(() => {
+        this.loading = false;
+        m.redraw();
+      });
   }
 
   /**

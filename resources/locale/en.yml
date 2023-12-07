@@ -157,6 +157,7 @@ fof-upload:
       user_uploads: User uploads
       cancel: Cancel
       media: My media
+      shared_media: Shared media
 
     file_list:
       loading: Loading files...

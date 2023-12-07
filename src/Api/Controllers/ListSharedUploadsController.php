@@ -43,6 +43,10 @@ class ListSharedUploadsController extends AbstractListController
         // Build query
         $query = File::sharedFiles();
 
+        if ($actor->cannot('fof-upload.upload-shared-files')) {
+            $query->where('hidden', false);
+        }
+
         $results = $query
             ->skip($offset)
             ->take($limit + 1)
