@@ -41,7 +41,7 @@ class SharedFilesTest extends EnhancedTestCase
     /**
      * @test
      */
-    public function user_with_permission_can_upload_a_shared_file()
+    public function user_with_permission_can_upload_a_shared_file_and_is_not_hidden_by_default()
     {
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
@@ -81,5 +81,51 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertEquals('local', $file->upload_method);
         $this->assertTrue($file->shared);
         $this->assertFalse($file->hidden);
+    }
+
+    /**
+     * @test
+     */
+    public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested()
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+                'json' => [
+                    'options' => [
+                        'shared' => true,
+                        'hidden' => true,
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertCount(1, $json['data']);
+
+        $fileInfo = $json['data'][0];
+        $this->assertArrayHasKey('attributes', $fileInfo);
+
+        $this->assertEquals('milkyway.jpg', $fileInfo['attributes']['baseName']);
+        $this->assertEquals('image/jpeg', $fileInfo['attributes']['type']);
+        $this->assertEquals('image-preview', $fileInfo['attributes']['tag']);
+        $this->assertTrue($fileInfo['attributes']['shared'], 'File should be marked as shared');
+        $this->assertTrue($fileInfo['attributes']['hidden']);
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNotNull($file);
+
+        $this->assertEquals('milkyway.jpg', $file->base_name);
+        $this->assertNull($file->actor_id, 'Actor should be null for shared files');
+        $this->assertEquals('local', $file->upload_method);
+        $this->assertTrue($file->shared);
+        $this->assertTrue($file->hidden);
     }
 }

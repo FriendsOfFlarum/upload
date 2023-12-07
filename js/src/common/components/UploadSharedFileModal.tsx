@@ -9,6 +9,7 @@ export default class UploadSharedFileModal extends Modal {
   fileInput = null;
   options = {
     shared: true,
+    hidden: false
   };
 
   className() {
@@ -44,7 +45,7 @@ export default class UploadSharedFileModal extends Modal {
           })}
         </div>
         <div className="UploadSharedFileModal-options Form-group">
-          <Switch state={this.options.shared} onchange={(value) => (this.options.shared = value)}>
+          <Switch state={!this.options.hidden} onchange={(value) => (this.options.hidden = !value)}>
             {app.translator.trans('fof-upload.lib.upload-shared-file-modal.in-media-gallery')}
           </Switch>
         </div>

@@ -3,7 +3,6 @@ import Component from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
-import Tooltip from 'flarum/common/components/Tooltip';
 
 export default class UploadButton extends Component {
   oninit(vnode) {
@@ -26,8 +25,7 @@ export default class UploadButton extends Component {
       : app.translator.trans('fof-upload.forum.buttons.upload');
 
     return (
-      <Tooltip text={buttonText}>
-        <Button
+      <Button
           className={classList([
             'Button',
             'hasIcon',
@@ -46,7 +44,6 @@ export default class UploadButton extends Component {
             <input type="file" multiple={true} onchange={this.process.bind(this)} />
           </form>
         </Button>
-      </Tooltip>
     );
   }
 

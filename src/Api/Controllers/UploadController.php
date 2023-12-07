@@ -48,7 +48,7 @@ class UploadController extends AbstractListController
 
         $params = $request->getParsedBody();
 
-        $hideFromMediaManager = (bool) Arr::get($params, 'hideFromMediaManager', false);
+        $hideFromMediaManager = (bool) Arr::get($params, 'options.hidden', false);
         $shared = (bool) Arr::get($params, 'options.shared', false);
 
         /** @var Collection $collection */
