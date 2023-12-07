@@ -64,7 +64,10 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
 
   showUploadModal() {
     app.modal.show(UploadSharedFileModal, {
-      onUploadComplete: () => this.loadSharedUploads(),
+      onUploadComplete: () => {
+        this.loadSharedUploads(this.currentPage);
+        m.redraw();
+      },
     });
   }
 
