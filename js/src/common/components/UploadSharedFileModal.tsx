@@ -28,46 +28,11 @@ export default class UploadSharedFileModal extends Modal {
     m.redraw();
   }
 
-  onDragOver(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  onDrop(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.dataTransfer && e.dataTransfer.files) {
-      this.addFiles(Array.from(e.dataTransfer.files));
-    }
-  }
-
-  onDropzoneClick() {
-    if (this.fileInput) {
-      this.fileInput.click();
-    }
-  }
-
   content() {
     return (
       <div className="Modal-body">
-        <div
-          className="UploadSharedFileModal-dropzone"
-          onclick={() => this.fileInput && this.fileInput.click()}
-          ondragover={this.onDragOver.bind(this)}
-          ondrop={this.onDrop.bind(this)}
-        >
-          {app.translator.trans('fof-upload.lib.upload-shared-file-modal.dropzone')}
-          <input
-            type="file"
-            multiple
-            onchange={this.onFileChange.bind(this)}
-            style={{ opacity: 0, position: 'absolute', left: '-9999px' }}
-            ref={(input) => {
-              this.fileInput = input;
-            }}
-          />
-        </div>
         <div className="UploadSharedFileModal-files">
+          <input type="file" multiple onchange={this.onFileChange.bind(this)} />
           {this.files.map((file) => {
             const isImage = file.type.startsWith('image/');
             return (
@@ -93,7 +58,7 @@ export default class UploadSharedFileModal extends Modal {
   }
 
   upload() {
-    // TODO handle errors
+    // TODO: handle and display errors
     app
       .request({
         method: 'POST',
