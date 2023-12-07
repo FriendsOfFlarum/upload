@@ -34,7 +34,10 @@ export default class UploadedFile extends Component<CustomAttrs> {
     return (
       <div className="UploadedFile" key={this.file.uuid()}>
         <div className="UploadedFile--sharestatus">
-          <span>{icon(statusIcon)}{this.file.baseName()}</span>
+          <span>
+            {icon(statusIcon)}
+            {this.file.baseName()}
+          </span>
         </div>
         <div className="UploadedFile--preview" onclick={() => this.onFileClick(this.file)}>
           {isImage ? (
