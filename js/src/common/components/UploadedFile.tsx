@@ -5,7 +5,7 @@ import type Mithril from 'mithril';
 import mimeToIcon from '../mimeToIcon';
 import File from '../models/File';
 import icon from 'flarum/common/helpers/icon';
-import app from 'flarum/admin/app';
+import app from 'flarum/common/app';
 
 interface CustomAttrs extends ComponentAttrs {
   file: File;
