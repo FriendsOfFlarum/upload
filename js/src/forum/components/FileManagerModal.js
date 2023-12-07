@@ -70,7 +70,7 @@ export default class FileManagerModal extends Modal {
                 className="Button"
                 icon="fas fa-cloud-upload-alt"
                 onclick={() => {
-                  app.modal.show(UploadSharedFileModal, {}, true);
+                  this.showUploadModal();
                 }}
               >
                 {app.translator.trans('fof-upload.forum.buttons.upload_shared')}
@@ -238,5 +238,18 @@ export default class FileManagerModal extends Modal {
 
       app.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
     });
+  }
+
+  showUploadModal() {
+    app.modal.show(
+      UploadSharedFileModal,
+      {
+        onUploadComplete: () => {
+          this.loadSharedUploads(this.currentPage);
+          m.redraw();
+        },
+      },
+      true
+    );
   }
 }
