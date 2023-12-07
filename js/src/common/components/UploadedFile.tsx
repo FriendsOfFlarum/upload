@@ -5,6 +5,7 @@ import type Mithril from 'mithril';
 import mimeToIcon from '../mimeToIcon';
 import File from '../models/File';
 import icon from 'flarum/common/helpers/icon';
+import app from 'flarum/admin/app';
 
 interface CustomAttrs extends ComponentAttrs {
   file: File;
@@ -67,11 +68,14 @@ export default class UploadedFile extends Component<CustomAttrs> {
     return items;
   }
 
-  confirmDelete() {
+  async confirmDelete() {
     let result = confirm('Are you sure you want to delete this file?');
 
     if (result) {
-      this.file.delete();
+      await app.request({
+        'method': 'DELETE',
+        'url': app.forum.attribute('apiUrl') + '/fof/upload/delete/' + this.file.uuid(),
+      });
       //TODO: setup callback to remove file from list
     }
   }

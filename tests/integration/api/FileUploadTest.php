@@ -187,4 +187,39 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals('validation_error', $json['errors'][0]['code']);
         $this->assertEquals('/data/attributes/file', $json['errors'][0]['source']['pointer']);
     }
+
+    /**
+     * @test
+     */
+    public function admin_can_upload_a_file_and_then_delete_it()
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNotNull($file);
+
+        $response = $this->send(
+            $this->request('DELETE', '/api/fof/upload/delete/'.$file->uuid, [
+                'authenticatedAs' => 1,
+            ])
+        );
+
+        $this->assertEquals(204, $response->getStatusCode());
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNull($file);
+    }
 }

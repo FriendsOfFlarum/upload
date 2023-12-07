@@ -54,7 +54,8 @@ return [
         ->get('/fof/download/{uuid}', 'fof-upload.download.uuid', Api\Controllers\DownloadController::class)
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class)
-        ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class),
+        ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class)
+        ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
     // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
     // (new Extend\Console())

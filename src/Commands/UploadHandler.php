@@ -15,9 +15,6 @@ namespace FoF\Upload\Commands;
 use enshrined\svgSanitize\Sanitizer;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
-use FoF\Upload\Adapters\Manager;
-use FoF\Upload\Contracts\Template;
-use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Events;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
@@ -88,9 +85,9 @@ class UploadHandler
                     file_put_contents($upload->getPathname(), $cleanSvg, LOCK_EX);
                 }
 
-                $mimeConfiguration = $this->getMimeConfiguration($uploadFileData['mime']);
-                $adapter = $this->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
-                $template = $this->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
+                $mimeConfiguration = $this->util->getMimeConfiguration($uploadFileData['mime']);
+                $adapter = $this->util->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
+                $template = $this->util->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
                 $this->events->dispatch(
                     new Events\Adapter\Identified($command->actor, $upload, $adapter)
@@ -156,39 +153,5 @@ class UploadHandler
         });
 
         return $savedFiles->filter();
-    }
-
-    /**
-     * @param ?string $adapter
-     *
-     * @return UploadAdapter|null
-     */
-    protected function getAdapter(?string $adapter)
-    {
-        if (!$adapter) {
-            return null;
-        }
-
-        /** @var Manager $manager */
-        $manager = resolve(Manager::class);
-
-        return $manager->instantiate($adapter);
-    }
-
-    protected function getTemplate($template): ?Template
-    {
-        return $this->util->getTemplate($template);
-    }
-
-    /**
-     * @param $mime
-     *
-     * @return mixed
-     */
-    protected function getMimeConfiguration(?string $mime)
-    {
-        return $this->util->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
-            return preg_match("/$regex/", $mime);
-        });
     }
 }

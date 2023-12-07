@@ -169,4 +169,44 @@ class SharedFilesTest extends EnhancedTestCase
 
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    /**
+     * @test
+     */
+    public function admin_can_upload_a_shared_file_and_then_delete_it()
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+                'json' => [
+                    'options' => [
+                        'shared' => true,
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNotNull($file);
+
+        $response = $this->send(
+            $this->request('DELETE', '/api/fof/upload/delete/'.$file->uuid, [
+                'authenticatedAs' => 1,
+            ])
+        );
+
+        $this->assertEquals(204, $response->getStatusCode());
+
+        $file = File::byUuid($json['data'][0]['attributes']['uuid'])->first();
+
+        $this->assertNull($file);
+    }
 }

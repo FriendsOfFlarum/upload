@@ -15,6 +15,7 @@ namespace FoF\Upload\Helpers;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
+use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -150,5 +151,46 @@ class Util
         $template = $this->getTemplate($file->tag);
 
         return $template ? $template->preview($file) : null;
+    }
+
+    public function getAdapterForFile(File $file): ?UploadAdapter
+    {
+        return $this->getAdapterForMime($file->type);
+    }
+
+    public function getAdapterForMime(?string $mime): ?UploadAdapter
+    {
+        return $this->getAdapter(
+            Arr::get($this->getMimeConfiguration($mime), 'adapter')
+        );
+    }
+
+    /**
+     * @param $mime
+     *
+     * @return mixed
+     */
+    public function getMimeConfiguration(?string $mime)
+    {
+        return $this->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
+            return preg_match("/$regex/", $mime);
+        });
+    }
+
+    /**
+     * @param ?string $adapter
+     *
+     * @return UploadAdapter|null
+     */
+    public function getAdapter(?string $adapter)
+    {
+        if (!$adapter) {
+            return null;
+        }
+
+        /** @var Manager $manager */
+        $manager = resolve(Manager::class);
+
+        return $manager->instantiate($adapter);
     }
 }
