@@ -8,6 +8,7 @@ import addUserPageButton from './addUserPageButton';
 
 export { default as extend } from './extend';
 export * from './components';
+export * from '../common/components';
 
 app.initializers.add('fof-upload', () => {
   // Leaving these here for now.
