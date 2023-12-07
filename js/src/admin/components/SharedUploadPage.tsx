@@ -55,11 +55,17 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
           {!this.loading && this.sharedUploads.length === 0 && <p>{app.translator.trans('fof-upload.admin.shared-uploads.no-files')}</p>}
           {!this.loading &&
             this.sharedUploads.map((file: File) => {
-              return <UploadedFile file={file} />;
+              return <UploadedFile file={file} callback={() => this.callback()} />;
             })}
         </div>
       </div>
     );
+  }
+
+  showUploadModal() {
+    app.modal.show(UploadSharedFileModal, {
+      onUploadComplete: () => this.loadSharedUploads(),
+    });
   }
 
   mainActionItems(): ItemList<Mithril.Children> {
@@ -69,7 +75,7 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
 
     items.add(
       'upload-new',
-      <Button className="Button" icon="fas fa-upload" onclick={() => app.modal.show(UploadSharedFileModal)}>
+      <Button className="Button" icon="fas fa-upload" onclick={() => this.showUploadModal()}>
         {app.translator.trans('fof-upload.admin.shared-uploads.upload-new-button')}
       </Button>
     );
@@ -81,5 +87,10 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
     const items = new ItemList<Mithril.Children>();
 
     return items;
+  }
+
+  callback() {
+    this.loadSharedUploads(this.currentPage);
+    m.redraw();
   }
 }

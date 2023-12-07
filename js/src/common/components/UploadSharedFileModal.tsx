@@ -1,16 +1,28 @@
 import app from 'flarum/common/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Switch from 'flarum/common/components/Switch';
-import mimeToIcon from '../mimeToIcon'; // Adjust the path as needed
+import mimeToIcon from '../mimeToIcon';
 import Button from 'flarum/common/components/Button';
+import type Mithril from 'mithril';
 
-export default class UploadSharedFileModal extends Modal {
+interface CustomAttrs extends IInternalModalAttrs {
+  onUploadComplete: () => void;
+}
+
+export default class UploadSharedFileModal extends Modal<CustomAttrs> {
   files = [];
   fileInput = null;
   options = {
     shared: true,
     hidden: false,
   };
+  onUploadComplete!: () => void;
+
+  oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
+    super.oninit(vnode);
+
+    this.onUploadComplete = this.attrs.onUploadComplete;
+  }
 
   className() {
     return 'UploadSharedFileModal Modal--medium';
@@ -35,7 +47,6 @@ export default class UploadSharedFileModal extends Modal {
         <div className="UploadSharedFileModal-files">
           <input type="file" multiple onchange={this.onFileChange.bind(this)} />
           {this.files.map((file: File) => {
-            // Add type assertion here
             const isImage = file.type.startsWith('image/');
             return (
               <div className="UploadedFile">
@@ -75,12 +86,13 @@ export default class UploadSharedFileModal extends Modal {
       .request({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/fof/upload',
-        serialize: (raw) => raw, // Prevent mithril from trying to serialize FormData
+        serialize: (raw: FormData) => raw, // Prevent mithril from trying to serialize FormData
         body: formData,
       })
       .then(() => {
         this.files = [];
         this.hide();
+        this.onUploadComplete();
       })
       .catch((error) => {
         // TODO: Handle and display errors

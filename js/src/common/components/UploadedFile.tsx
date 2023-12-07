@@ -9,16 +9,19 @@ import app from 'flarum/admin/app';
 
 interface CustomAttrs extends ComponentAttrs {
   file: File;
+  callback: () => void | undefined;
 }
 
 export default class UploadedFile extends Component<CustomAttrs> {
   file!: File;
+  callback!: () => void | undefined;
   imageLoaded: boolean = true;
 
   oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
     super.oninit(vnode);
 
     this.file = this.attrs.file;
+    this.callback = this.attrs.callback;
   }
 
   view() {
@@ -28,7 +31,7 @@ export default class UploadedFile extends Component<CustomAttrs> {
     const statusIcon = this.file.isPrivateShared() ? 'fas fa-lock' : 'fas fa-unlock';
 
     return (
-      <div className="UploadedFile">
+      <div className="UploadedFile" key={this.file.uuid()}>
         <div className="UploadedFile--sharestatus">
           <span>{icon(statusIcon)}</span>
         </div>
@@ -61,7 +64,8 @@ export default class UploadedFile extends Component<CustomAttrs> {
       <Button className="Button Button--icon" icon="fas fa-download" onclick={() => window.open(this.file.url())} aria-label="download" />
     );
 
-    items.add('hide-file', <Button className="Button Button--icon" icon="fas fa-eye-slash" onclick={() => this.hideFile()} aria-label="hide" />);
+    const hideFileIcon = this.file.isPrivateShared() ? 'fas fa-lock' : this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash';
+    items.add('hide-file', <Button className="Button Button--icon" icon={hideFileIcon} onclick={() => this.hideFile()} aria-label="hide" />);
 
     items.add('delete', <Button className="Button Button--icon" icon="fas fa-trash" onclick={() => this.confirmDelete()} aria-label="delete" />);
 
@@ -72,11 +76,15 @@ export default class UploadedFile extends Component<CustomAttrs> {
     let result = confirm('Are you sure you want to delete this file?');
 
     if (result) {
+      const uuid = this.file.uuid();
       await app.request({
         method: 'DELETE',
-        url: app.forum.attribute('apiUrl') + '/fof/upload/delete/' + this.file.uuid(),
+        url: app.forum.attribute('apiUrl') + '/fof/upload/delete/' + uuid,
       });
-      //TODO: setup callback to remove file from list
+
+      if (this.callback) {
+        this.callback();
+      }
     }
   }
 
