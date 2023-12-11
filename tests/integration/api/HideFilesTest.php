@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Extend;
@@ -10,7 +20,7 @@ use FoF\Upload\File;
 class HideFilesTest extends TestCase
 {
     use RetrievesAuthorizedUsers;
-    
+
     public function setUp(): void
     {
         parent::setUp();
@@ -21,7 +31,7 @@ class HideFilesTest extends TestCase
             'users' => [
                 $this->normalUser(),
                 ['id' => 3, 'username' => 'normal2', 'email' => 'normal2@machine.local'],
-                ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local']
+                ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local'],
             ],
             'fof_upload_files' => [
                 ['id' => 1, 'base_name' => 'test_file.abc', 'uuid' => 'abc-123', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false],
@@ -33,7 +43,7 @@ class HideFilesTest extends TestCase
             'group_permission' => [
                 ['group_id' => 4, 'permission' => 'fof-upload.deleteUserUploads'],
                 ['group_id' => 4, 'permission' => 'fof-upload.viewUserUploads'],
-            ]
+            ],
         ]);
     }
 
@@ -46,7 +56,7 @@ class HideFilesTest extends TestCase
             (new Extend\Csrf())
                 ->exemptRoute('fof-upload.hide')
         );
-        
+
         $uuid = 'abc-123';
 
         $response = $this->send(
@@ -75,7 +85,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 2,
-                    'json' => [],
+                    'json'            => [],
                 ]
             )
         );
@@ -103,7 +113,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 2,
-                    'json' => [
+                    'json'            => [
                         'uuid' => $uuid,
                     ],
                 ]
@@ -131,7 +141,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 3,
-                    'json' => [
+                    'json'            => [
                         'uuid' => $uuid,
                     ],
                 ]
@@ -159,7 +169,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 2,
-                    'json' => [
+                    'json'            => [
                         'uuid' => $uuid,
                     ],
                 ]
@@ -182,7 +192,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 1,
-                    'json' => [
+                    'json'            => [
                         'uuid' => $uuid,
                     ],
                 ]
@@ -210,7 +220,7 @@ class HideFilesTest extends TestCase
                 '/api/fof/upload/hide',
                 [
                     'authenticatedAs' => 4,
-                    'json' => [
+                    'json'            => [
                         'uuid' => $uuid,
                     ],
                 ]

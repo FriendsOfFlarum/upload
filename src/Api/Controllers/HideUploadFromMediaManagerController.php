@@ -14,7 +14,6 @@ namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
-use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\EmptyResponse;
