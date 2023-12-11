@@ -8,6 +8,8 @@ import type Mithril from 'mithril';
 import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 import File from 'src/common/models/File';
 import UploadedFile from '../../common/components/UploadedFile';
+import DisplayFile from '../../common/components/DisplayFile';
+import SharedFileList from '../../common/components/SharedFileList';
 
 export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttrs> extends AdminPage<CustomAttrs> {
   sharedUploads: File[] = [];
@@ -16,7 +18,7 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
   oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
     super.oninit(vnode);
 
-    this.loadSharedUploads();
+    //this.loadSharedUploads();
   }
 
   headerInfo(): AdminHeaderAttrs {
@@ -51,12 +53,14 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
         <div className="SharedUploadPage--main-actions">{this.mainActionItems().toArray()}</div>
         <hr />
         <div className="SharedUploadPage--uploads">
-          {this.loading && <LoadingIndicator />}
+          {/* {this.loading && <LoadingIndicator />}
           {!this.loading && this.sharedUploads.length === 0 && <p>{app.translator.trans('fof-upload.admin.shared-uploads.no-files')}</p>}
           {!this.loading &&
             this.sharedUploads.map((file: File) => {
-              return <UploadedFile file={file} callback={() => this.callback()} />;
-            })}
+              //return <UploadedFile file={file} callback={() => this.callback()} />;
+              return <DisplayFile file={file} user={app.session.user} onHide={this.callback} />;
+            })} */}
+          <SharedFileList user={app.session.user} />
         </div>
       </div>
     );

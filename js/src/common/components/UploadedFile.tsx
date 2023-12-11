@@ -6,9 +6,12 @@ import mimeToIcon from '../mimeToIcon';
 import File from '../models/File';
 import icon from 'flarum/common/helpers/icon';
 import app from 'flarum/common/app';
+import classList from 'flarum/common/utils/classList';
 
 interface CustomAttrs extends ComponentAttrs {
   file: File;
+  selectable: boolean;
+  fileClassNames: string;
   callback: () => void | undefined;
   onFileSelect: (file: File) => void | undefined;
 }
@@ -42,7 +45,14 @@ export default class UploadedFile extends Component<CustomAttrs> {
         <div className="UploadedFile--preview" onclick={() => this.onFileClick(this.file)}>
           {isImage ? (
             this.imageLoaded ? (
-              <img src={this.file.url()} loading="lazy" onerror={this.handleImageError} onload={this.handleImageLoad} />
+              <img
+                className={this.attrs.fileClassNames}
+                src={this.file.url()}
+                loading="lazy"
+                onerror={this.handleImageError}
+                onload={this.handleImageLoad}
+                alt=""
+              />
             ) : (
               icon(errorIcon, { className: 'icon-fallback' }) // Error icon for failed image load
             )

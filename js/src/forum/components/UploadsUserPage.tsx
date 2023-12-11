@@ -1,9 +1,11 @@
 import app from 'flarum/forum/app';
 import UserPage from 'flarum/forum/components/UserPage';
 import UserFileList from '../../common/components/UserFileList';
+import type Mithril from 'mithril';
+import User from 'flarum/common/models/User';
 
 export default class UploadsUserPage extends UserPage {
-  oninit(vnode) {
+  oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
 
     this.user = null;
@@ -26,7 +28,7 @@ export default class UploadsUserPage extends UserPage {
     }
   }
 
-  show(user) {
+  show(user: User) {
     super.show(user);
     this.user = user;
   }

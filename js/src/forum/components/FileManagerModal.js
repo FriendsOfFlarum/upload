@@ -6,7 +6,7 @@ import UserFileList from '../../common/components/UserFileList';
 import DragAndDrop from './DragAndDrop';
 import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 import ItemList from 'flarum/common/utils/ItemList';
-import UploadedFile from '../../common/components/UploadedFile';
+import SharedFileList from '../../common/components/SharedFileList';
 
 export default class FileManagerModal extends Modal {
   oninit(vnode) {
@@ -158,33 +158,15 @@ export default class FileManagerModal extends Modal {
   }
 
   sharedFilesContent() {
-    if (this.sharedUploads === null) {
-      this.loadSharedUploads();
-    }
-
     return (
-      <div className="SharedFileList">
-        {this.sharedUploads &&
-          this.sharedUploads.map((file) => {
-            return <UploadedFile file={file} callback={() => this.callback()} onFileSelect={this.onFileSelect.bind(this)} />;
-          })}
-      </div>
+      <SharedFileList
+        selectable
+        onFileSelect={this.onFileSelect.bind(this)}
+        selectedFiles={this.selectedFiles}
+        restrictFileType={this.restrictFileType}
+        user={this.attrs.user}
+      />
     );
-  }
-
-  loadSharedUploads(page = 1) {
-    this.loading = true;
-
-    app.store
-      .find('fof/upload/shared-files')
-      .then((results) => {
-        this.sharedUploads = results;
-      })
-      .catch(() => {})
-      .then(() => {
-        this.loading = false;
-        m.redraw();
-      });
   }
 
   /**
