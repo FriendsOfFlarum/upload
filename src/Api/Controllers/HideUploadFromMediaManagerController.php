@@ -32,15 +32,12 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
         $uuid = Arr::get($request->getParsedBody(), 'uuid');
 
         if (empty($uuid)) {
-            throw new ValidationException(['UUID cannot be empty']);
+            throw new ValidationException(['uuid' => 'UUID cannot be empty.']);
         }
 
         $fileUpload = File::byUuid($uuid)->firstOrFail();
 
-        // If the actor does not own the file and the actor does not have edit uploads of others permission..
-        if ($actor->id !== $fileUpload->actor_id && !$actor->hasPermission('fof-upload.deleteUserUploads')) {
-            throw new PermissionDeniedException();
-        }
+        $actor->assertCan('hide', $fileUpload);
 
         $fileUpload->hidden = true;
         $fileUpload->save();

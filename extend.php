@@ -117,6 +117,9 @@ return [
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
 
+    (new Extend\Policy())
+        ->modelPolicy(File::class, Access\FilePolicy::class),
+
     (new Extend\Conditional())
         ->whenExtensionEnabled('blomstra-gdpr', fn () => [
             (new UserData())
