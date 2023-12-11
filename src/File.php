@@ -36,7 +36,7 @@ use Illuminate\Support\Str;
  * @property Template|null         $tag
  * @property Collection|Post[]     $posts
  * @property int                   $actor_id
- * @property User                  $actor
+ * @property User|null             $actor
  * @property Collection|Download[] $downloads
  * @property Carbon                $created_at
  * @property bool                  $hidden

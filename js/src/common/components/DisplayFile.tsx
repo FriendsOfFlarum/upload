@@ -72,9 +72,9 @@ export default class DisplayFile extends Component<CustomAttrs> {
         <div className="fof-file-actions">{this.actionItems(this.file).toArray()}</div>
 
         <div className="fof-file-name">
-            <Tooltip text={this.file.baseName()}>
-                <span>{this.file.baseName()}</span>
-            </Tooltip>
+          <Tooltip text={this.file.baseName()}>
+            <span>{this.file.baseName()}</span>
+          </Tooltip>
         </div>
 
         {this.isFileHiding && (
@@ -107,11 +107,12 @@ export default class DisplayFile extends Component<CustomAttrs> {
     const items = new ItemList<Mithril.Children>();
     const canDeleteOthersMediaLibrary = app.session.user?.deleteOthersMediaLibrary?.();
 
-    file.canViewInfo() && items.add(
-      'view-info',
-      <Button className="Button Button--icon fof-file-action" icon="fas fa-info-circle" aria-label="info" onclick={() => this.viewFileInfo()} />,
-      100
-    );
+    file.canViewInfo() &&
+      items.add(
+        'view-info',
+        <Button className="Button Button--icon fof-file-action" icon="fas fa-info-circle" aria-label="info" onclick={() => this.viewFileInfo()} />,
+        100
+      );
 
     file.canHide() &&
       items.add(
@@ -127,17 +128,17 @@ export default class DisplayFile extends Component<CustomAttrs> {
       );
 
     file.canDelete() &&
-        items.add(
-            'delete-file',
-            <Button
-            className="Button Button--icon fof-file-action"
-            icon="fas fa-trash"
-            aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
-            disabled={this.isFileHiding}
-            onclick={() => this.confirmDelete()}
-            />,
-            60
-        );
+      items.add(
+        'delete-file',
+        <Button
+          className="Button Button--icon fof-file-action"
+          icon="fas fa-trash"
+          aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
+          disabled={this.isFileHiding}
+          onclick={() => this.confirmDelete()}
+        />,
+        60
+      );
 
     return items;
   }
