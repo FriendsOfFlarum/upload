@@ -20,7 +20,7 @@ export default class FileManagerModal extends Modal {
     this.selectedFiles = [];
 
     // Allow multiselect
-    this.multiSelect = vnode.attrs.multiSelect || true;
+    this.multiSelect = vnode.attrs.multiSelect === undefined ? true : vnode.attrs.multiSelect;
 
     // Restrict file selection to specific types
     this.restrictFileType = vnode.attrs.restrictFileType || null;
@@ -65,13 +65,14 @@ export default class FileManagerModal extends Modal {
 
   view() {
     const fileCount = this.selectedFiles.length;
+    const { hideUser, hideShared } = this.attrs;
 
     return (
       <div className={`Modal modal-dialog ${this.className()}`}>
         <div className="Modal-content">
           <div className="fof-modal-buttons App-backControl">
-            <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
-            {app.session.user && app.session.user.uploadSharedFiles() && (
+            {!hideUser && <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />}
+            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && (
               <Button
                 className="Button"
                 icon="fas fa-cloud-upload-alt"
@@ -103,7 +104,7 @@ export default class FileManagerModal extends Modal {
           )}
 
           <div className="Modal-body">
-            <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>
+            {!hideUser && !hideShared && <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>}
             {this.selectedFilesLibrary === 'user' && this.userFilesContent()}
             {this.selectedFilesLibrary === 'shared' && this.sharedFilesContent()}
           </div>
