@@ -11,6 +11,10 @@ export default class Uploader {
     this.uploading = false;
   }
 
+  setState(fileState) {
+    this.fileState = fileState;
+  }
+
   on(type, callback) {
     this.callbacks[type].push(callback);
   }
@@ -68,7 +72,7 @@ export default class Uploader {
       const fileObj = app.store.pushObject(file);
 
       // Add file to media manager
-      app.fileListState.addToList(fileObj);
+      this.fileState.addToList(fileObj);
 
       // Dispatch
       this.dispatch('success', {

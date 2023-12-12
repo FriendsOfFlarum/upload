@@ -3,6 +3,7 @@ import UserPage from 'flarum/forum/components/UserPage';
 import UserFileList from '../../common/components/UserFileList';
 import type Mithril from 'mithril';
 import User from 'flarum/common/models/User';
+import FileListState from '../../common/states/FileListState';
 
 export default class UploadsUserPage extends UserPage {
   oninit(vnode: Mithril.Vnode) {
@@ -14,6 +15,7 @@ export default class UploadsUserPage extends UserPage {
   }
 
   content() {
+    const fileState = new FileListState();
     if (app.session.user && (app.session.user.viewOthersMediaLibrary() || this.user === app.session.user)) {
       return (
         this.user &&
@@ -21,6 +23,7 @@ export default class UploadsUserPage extends UserPage {
           user: this.user,
           selectable: false,
           downloadOnClick: true,
+          fileState,
         })
       );
     } else {

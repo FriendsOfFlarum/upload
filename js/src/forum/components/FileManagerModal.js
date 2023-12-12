@@ -35,6 +35,8 @@ export default class FileManagerModal extends Modal {
     this.userFileState = new FileListState();
     this.sharedFileState = new FileListState(true);
 
+    this.uploader.setState(this.userFileState);
+
     // Initialize uploads
     this.onUpload();
   }
