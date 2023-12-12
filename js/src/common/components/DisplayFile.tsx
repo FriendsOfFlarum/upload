@@ -34,10 +34,17 @@ export default class DisplayFile extends Component<CustomAttrs> {
     super.oninit(vnode);
 
     this.file = this.attrs.file;
-    this.isFileHiding = this.attrs.isFileHiding || false;
+    this.isFileHiding = this.attrs.isFileHiding === undefined ? false : this.attrs.isFileHiding;
     this.fileIcon = mimeToIcon(this.file.type());
-    this.isSelected = this.attrs.isSelected || false;
-    this.isSelectable = this.attrs.fileSelectable || true;
+    this.isSelected = this.attrs.isSelected === undefined ? false : this.attrs.isSelected;
+    this.isSelectable = this.attrs.fileSelectable === undefined ? true : this.attrs.fileSelectable;
+  }
+
+  onbeforeupdate(vnode: Mithril.VnodeDOM<CustomAttrs, this>): void {
+    super.onbeforeupdate(vnode);
+
+    // Make sure the isSelected property is updated
+    this.isSelected = this.attrs.isSelected === undefined ? false : this.attrs.isSelected;
   }
 
   view() {
