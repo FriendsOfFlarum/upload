@@ -7,6 +7,7 @@ import DragAndDrop from './DragAndDrop';
 import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 import ItemList from 'flarum/common/utils/ItemList';
 import SharedFileList from '../../common/components/SharedFileList';
+import FileListState from '../../common/states/FileListState';
 
 export default class FileManagerModal extends Modal {
   oninit(vnode) {
@@ -30,6 +31,9 @@ export default class FileManagerModal extends Modal {
     this.selectedFilesLibrary = vnode.attrs.defaultFilesLibrary || 'user';
 
     this.sharedUploads = null;
+
+    this.userFileState = new FileListState();
+    this.sharedFileState = new FileListState(true);
 
     // Initialize uploads
     this.onUpload();
@@ -64,7 +68,7 @@ export default class FileManagerModal extends Modal {
       <div className={`Modal modal-dialog ${this.className()}`}>
         <div className="Modal-content">
           <div className="fof-modal-buttons App-backControl">
-            <UploadButton uploader={this.uploader} disabled={app.fileListState.isLoading()} isMediaUploadButton />
+            <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
             {app.session.user && app.session.user.uploadSharedFiles() && (
               <Button
                 className="Button"
@@ -153,6 +157,8 @@ export default class FileManagerModal extends Modal {
         onFileSelect={this.onFileSelect.bind(this)}
         selectedFiles={this.selectedFiles}
         restrictFileType={this.restrictFileType}
+        fileState={this.userFileState}
+        onDelete={this.onDelete.bind(this)}
       />
     );
   }
@@ -165,6 +171,8 @@ export default class FileManagerModal extends Modal {
         selectedFiles={this.selectedFiles}
         restrictFileType={this.restrictFileType}
         user={this.attrs.user}
+        fileState={this.sharedFileState}
+        onDelete={this.onDelete.bind(this)}
       />
     );
   }
@@ -226,12 +234,16 @@ export default class FileManagerModal extends Modal {
     app.modal.show(
       UploadSharedFileModal,
       {
-        onUploadComplete: () => {
-          this.loadSharedUploads(this.currentPage);
-          m.redraw();
+        onUploadComplete: (files) => {
+          this.sharedFileState.addToList(files);
         },
       },
       true
     );
+  }
+
+  onDelete(file) {
+    this.sharedFileState.removeFromList(file);
+    this.userFileState.removeFromList(file);
   }
 }

@@ -18,6 +18,7 @@ interface CustomAttrs extends ComponentAttrs {
   isFileHiding: boolean;
   onHide: (file: File) => void | undefined;
   onFileClick: (file: File) => void | undefined;
+  onDelete: (file: File) => void | undefined;
   user: User;
 }
 
@@ -105,7 +106,6 @@ export default class DisplayFile extends Component<CustomAttrs> {
 
   actionItems(file: File): ItemList<Mithril.Children> {
     const items = new ItemList<Mithril.Children>();
-    const canDeleteOthersMediaLibrary = app.session.user?.deleteOthersMediaLibrary?.();
 
     file.canViewInfo() &&
       items.add(
@@ -179,8 +179,8 @@ export default class DisplayFile extends Component<CustomAttrs> {
         url: app.forum.attribute('apiUrl') + '/fof/upload/delete/' + uuid,
       });
 
-      if (this.attrs.onHide) {
-        this.attrs.onHide(this.file);
+      if (this.attrs.onDelete) {
+        this.attrs.onDelete(this.file);
       }
     }
   }

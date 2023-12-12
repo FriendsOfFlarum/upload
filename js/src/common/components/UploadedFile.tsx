@@ -12,7 +12,7 @@ interface CustomAttrs extends ComponentAttrs {
   file: File;
   selectable: boolean;
   fileClassNames: string;
-  callback: () => void | undefined;
+  onDelete: (file: File) => void | undefined;
   onFileSelect: (file: File) => void | undefined;
 }
 
@@ -25,7 +25,6 @@ export default class UploadedFile extends Component<CustomAttrs> {
     super.oninit(vnode);
 
     this.file = this.attrs.file;
-    this.callback = this.attrs.callback;
   }
 
   view() {
@@ -96,8 +95,8 @@ export default class UploadedFile extends Component<CustomAttrs> {
         url: app.forum.attribute('apiUrl') + '/fof/upload/delete/' + uuid,
       });
 
-      if (this.callback) {
-        this.callback();
+      if (this.attrs.onDelete) {
+        this.attrs.onDelete(this.file);
       }
     }
   }

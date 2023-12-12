@@ -4,9 +4,11 @@ import Switch from 'flarum/common/components/Switch';
 import mimeToIcon from '../mimeToIcon';
 import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
+import { ApiResponsePlural } from 'flarum/common/Store';
+import File from '../models/File';
 
 interface CustomAttrs extends IInternalModalAttrs {
-  onUploadComplete: () => void;
+  onUploadComplete: (files: File | File[]) => void;
 }
 
 export default class UploadSharedFileModal extends Modal<CustomAttrs> {
@@ -16,12 +18,10 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
     shared: true,
     hidden: false,
   };
-  onUploadComplete!: () => void;
+  loading: boolean = false;
 
   oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
     super.oninit(vnode);
-
-    this.onUploadComplete = this.attrs.onUploadComplete;
   }
 
   className() {
@@ -62,7 +62,12 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
           </Switch>
         </div>
         <div className="UploadSharedFileModal-submit App-primaryControl">
-          <Button className="Button Button--primary" onclick={this.upload.bind(this)} disabled={!this.files.length}>
+          <Button
+            className="Button Button--primary"
+            loading={this.loading}
+            onclick={this.upload.bind(this)}
+            disabled={!this.files.length || this.loading}
+          >
             {app.translator.trans('fof-upload.lib.upload-shared-file-modal.upload')}
           </Button>
         </div>
@@ -70,7 +75,10 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
     );
   }
 
-  upload() {
+  async upload() {
+    this.loading = true;
+    m.redraw();
+
     const formData = new FormData();
 
     // Append each file to the form data
@@ -82,21 +90,20 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
       formData.append(`options[${key}]`, this.options[key]);
     });
 
-    app
-      .request({
-        method: 'POST',
-        url: app.forum.attribute('apiUrl') + '/fof/upload',
-        serialize: (raw: FormData) => raw, // Prevent mithril from trying to serialize FormData
-        body: formData,
-      })
-      .then(() => {
-        this.files = [];
-        this.hide();
-        this.onUploadComplete();
-      })
-      .catch((error) => {
-        // TODO: Handle and display errors
-        console.error(error);
-      });
+    const results = await app.request<ApiResponsePlural<File>>({
+      method: 'POST',
+      url: app.forum.attribute('apiUrl') + '/fof/upload',
+      serialize: (raw: FormData) => raw, // Prevent mithril from trying to serialize FormData
+      body: formData,
+    });
+
+    const uploadedFiles = app.store.pushPayload(results);
+
+    this.attrs.onUploadComplete(uploadedFiles);
+    this.files = [];
+    this.hide();
+
+    this.loading = false;
+    m.redraw();
   }
 }

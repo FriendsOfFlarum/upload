@@ -3,42 +3,23 @@ import File from '../models/File';
 import AbstractFileList from './AbstractFIleList';
 
 export default class SharedFileList extends AbstractFileList {
-  loading: boolean = false;
-  sharedUploads: File[] = [];
-
-  loadFileList(): void {
-    this.loadSharedUploads();
-  }
-
-  loadSharedUploads(page = 1) {
-    this.loading = true;
-    m.redraw();
-
-    app.store
-      .find<File[]>('fof/upload/shared-files')
-      .then((results) => {
-        this.sharedUploads = results;
-      })
-      .catch(() => {})
-      .then(() => {
-        this.loading = false;
-        m.redraw();
-      });
+  public loadFileList(): void {
+    this.fileState.loadResults();
   }
 
   hasMoreResults() {
-    return false;
+    return this.fileState.hasMoreResults();
   }
 
   loadMore() {
-    //
+    this.fileState.loadMore();
   }
 
   isLoading(): boolean {
-    return this.loading;
+    return this.fileState.isLoading();
   }
 
   fileCollection(): File[] {
-    return this.sharedUploads;
+    return this.fileState.files;
   }
 }

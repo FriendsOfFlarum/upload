@@ -10,6 +10,7 @@ import Button from 'flarum/common/components/Button';
 import DisplayFile from './DisplayFile';
 import Alert from 'flarum/common/components/Alert';
 import extractText from 'flarum/common/utils/extractText';
+import FileListState from '../states/FileListState';
 
 export interface FileListAttrs extends ComponentAttrs {
   user: User | null;
@@ -18,6 +19,8 @@ export interface FileListAttrs extends ComponentAttrs {
   selectedFiles: string[];
   downloadOnClick: boolean;
   onFileSelect: (file: File) => void | undefined;
+  onDelete: (file: File) => void | undefined;
+  fileState: FileListState;
 }
 
 export default abstract class AbstractFileList extends Component<FileListAttrs> {
@@ -26,8 +29,9 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
   restrictFileType!: string | string[] | null;
   downloadOnClick!: boolean;
   filesBeingHidden!: string[];
+  fileState!: FileListState;
 
-  abstract loadFileList(): void;
+  public abstract loadFileList(): void;
   abstract hasMoreResults(): boolean;
   abstract loadMore(): void;
   abstract isLoading(): boolean;
@@ -40,6 +44,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
     this.restrictFileType = this.attrs.restrictFileType || null;
     this.downloadOnClick = this.attrs.downloadOnClick || false;
     this.filesBeingHidden = [];
+    this.fileState = this.attrs.fileState;
 
     this.loadFileList();
   }
@@ -88,6 +93,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
                   onHide={this.hideFile.bind(this)}
                   onFileClick={this.onFileClick.bind(this)}
                   user={this.attrs.user}
+                  onDelete={this.onDelete.bind(this)}
                 />
               </li>
             );
@@ -103,6 +109,12 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
         </ul>
       </div>
     );
+  }
+
+  onDelete(file: File) {
+    if (this.attrs.onDelete) {
+      this.attrs.onDelete(file);
+    }
   }
 
   // Common methods like onFileClick, isSelectable, hideFile...

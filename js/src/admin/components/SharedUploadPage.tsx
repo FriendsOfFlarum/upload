@@ -1,24 +1,23 @@
 import app from 'flarum/admin/app';
 import AdminPage, { AdminHeaderAttrs } from 'flarum/admin/components/AdminPage';
 import Button from 'flarum/common/components/Button';
-import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import { IPageAttrs } from 'flarum/common/components/Page';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
 import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 import File from 'src/common/models/File';
-import UploadedFile from '../../common/components/UploadedFile';
-import DisplayFile from '../../common/components/DisplayFile';
 import SharedFileList from '../../common/components/SharedFileList';
+import FileListState from '../../common/states/FileListState';
 
 export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttrs> extends AdminPage<CustomAttrs> {
   sharedUploads: File[] = [];
   currentPage: number = 1;
+  fileState!: FileListState;
 
   oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
     super.oninit(vnode);
 
-    //this.loadSharedUploads();
+    this.fileState = new FileListState(true);
   }
 
   headerInfo(): AdminHeaderAttrs {
@@ -30,21 +29,6 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
     };
   }
 
-  loadSharedUploads(page: number = 1) {
-    this.loading = true;
-
-    app.store
-      .find<File[]>('fof/upload/shared-files')
-      .then((results) => {
-        this.sharedUploads = results;
-      })
-      .catch(() => {})
-      .then(() => {
-        this.loading = false;
-        m.redraw();
-      });
-  }
-
   content(): Mithril.Children {
     return (
       <div className="SharedUploadPage--content">
@@ -53,14 +37,7 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
         <div className="SharedUploadPage--main-actions">{this.mainActionItems().toArray()}</div>
         <hr />
         <div className="SharedUploadPage--uploads">
-          {/* {this.loading && <LoadingIndicator />}
-          {!this.loading && this.sharedUploads.length === 0 && <p>{app.translator.trans('fof-upload.admin.shared-uploads.no-files')}</p>}
-          {!this.loading &&
-            this.sharedUploads.map((file: File) => {
-              //return <UploadedFile file={file} callback={() => this.callback()} />;
-              return <DisplayFile file={file} user={app.session.user} onHide={this.callback} />;
-            })} */}
-          <SharedFileList user={app.session.user} />
+          <SharedFileList user={app.session.user} selectable={false} fileState={this.fileState} onDelete={this.onDelete.bind(this)} />
         </div>
       </div>
     );
@@ -68,9 +45,8 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
 
   showUploadModal() {
     app.modal.show(UploadSharedFileModal, {
-      onUploadComplete: () => {
-        this.loadSharedUploads(this.currentPage);
-        m.redraw();
+      onUploadComplete: (files: File | File[]) => {
+        this.uploadComplete(files);
       },
     });
   }
@@ -78,7 +54,7 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
   mainActionItems(): ItemList<Mithril.Children> {
     const items = new ItemList<Mithril.Children>();
 
-    items.add('refresh', <Button className="Button Button--icon" icon="fas fa-sync" onclick={() => this.loadSharedUploads(this.currentPage)} />);
+    items.add('refresh', <Button className="Button Button--icon" icon="fas fa-sync" onclick={() => this.refresh()} />);
 
     items.add(
       'upload-new',
@@ -96,8 +72,16 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
     return items;
   }
 
-  callback() {
-    this.loadSharedUploads(this.currentPage);
-    m.redraw();
+  uploadComplete(files: File | File[]) {
+    console.log('upload complete', files);
+    this.fileState.addToList(files);
+  }
+
+  refresh() {
+    this.fileState.refresh();
+  }
+
+  onDelete(file: File) {
+    this.fileState.removeFromList(file);
   }
 }

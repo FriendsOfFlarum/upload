@@ -16,6 +16,7 @@ use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Api\Serializers\FileSerializer;
+use FoF\Upload\Api\Serializers\SharedFileSerializer;
 use FoF\Upload\Commands\Upload;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Helpers\Util;
@@ -50,6 +51,10 @@ class UploadController extends AbstractListController
 
         $hideFromMediaManager = $this->getOption('hidden', $params);
         $shared = $this->getOption('shared', $params);
+
+        if ($shared) {
+            $this->serializer = SharedFileSerializer::class;
+        }
 
         /** @var Collection $collection */
         $collection = $this->bus->dispatch(

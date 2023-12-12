@@ -18,7 +18,7 @@ app.initializers.add('fof-upload', () => {
   User.prototype.uploadCountAll = Model.attribute('fof-upload-uploadCountAll');
   User.prototype.uploadSharedFiles = Model.attribute('fof-upload-uploadSharedFiles');
 
-  app.fileListState = new FileListState();
+  //app.fileListState = new FileListState();
 
   addUploadButton();
   downloadButtonInteraction();

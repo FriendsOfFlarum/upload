@@ -21,7 +21,7 @@ class FilePolicy extends AbstractPolicy
     public function viewInfo(User $actor, File $file)
     {
         // for now..
-        return $this->deny();
+        return $file->actor?->id === $actor->id || $file->actor === null;
     }
 
     public function hide(User $actor, File $file)

@@ -4,16 +4,18 @@ import File from '../models/File';
 import { ApiQueryParamsPlural, ApiResponsePlural } from 'flarum/common/Store';
 
 export default class FileListState {
-  private user: User | null;
+  public user: User | null;
   public files: File[];
   private moreResults: boolean;
   private loading: boolean;
+  private sharedFiles: boolean;
 
-  constructor() {
+  constructor(sharedFiles: boolean = false) {
     this.user = null;
     this.files = [];
     this.moreResults = false;
     this.loading = false;
+    this.sharedFiles = sharedFiles;
   }
 
   /**
@@ -28,19 +30,38 @@ export default class FileListState {
     this.loadResults();
   }
 
+  public refresh(): void {
+    this.files = [];
+    this.loadResults();
+    m.redraw();
+  }
+
   /**
    * Load more files for the current user, starting from the given offset.
    * @param offset The starting index for loading more files.
    * @returns A promise resolving to the loaded files.
    */
   public async loadResults(offset: number = 0): Promise<ApiResponsePlural<File>> {
-    if (!this.user) return Promise.reject('User not set');
+    if (!this.sharedFiles && !this.user) return Promise.reject('User not set');
 
     this.loading = true;
-    const results = await app.store.find<File[]>('fof/uploads', {
-      filter: { user: this.user.id() },
-      page: { offset },
-    } as ApiQueryParamsPlural);
+
+    let route: string = 'fof/uploads';
+    let params: ApiQueryParamsPlural = {};
+
+    if (!this.sharedFiles && this.user) {
+      params = {
+        filter: { user: this.user.id() },
+        page: { offset },
+      } as ApiQueryParamsPlural;
+    } else {
+      route = 'fof/upload/shared-files';
+      params = {
+        page: { offset },
+      } as ApiQueryParamsPlural;
+    }
+
+    const results = await app.store.find<File[]>(route, params);
 
     return this.parseResults(results);
   }
@@ -53,13 +74,8 @@ export default class FileListState {
     return this.loadResults(this.files.length);
   }
 
-  /**
-   * Parse results and append them to the file list.
-   * @param results The files to be appended.
-   * @returns The appended files.
-   */
   private parseResults(results: ApiResponsePlural<File>): ApiResponsePlural<File> {
-    this.files.push(...results);
+    this.files = results;
     this.loading = false;
     this.moreResults = !!results.payload?.links?.next;
     m.redraw();
@@ -76,6 +92,21 @@ export default class FileListState {
     } else {
       this.files.unshift(files);
     }
+    m.redraw();
+  }
+
+  /**
+   * Remove files from the list.
+   * @param files The files to be removed.
+   */
+  public removeFromList(files: File | File[]): void {
+    if (Array.isArray(files)) {
+      this.files = this.files.filter((file) => !files.includes(file));
+    } else {
+      this.files = this.files.filter((file) => file !== files);
+    }
+
+    m.redraw();
   }
 
   /**

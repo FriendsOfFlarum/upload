@@ -59,5 +59,5 @@ app.initializers.add('fof-upload', () => {
 
   extendAdminNav();
 
-  app.fileListState = new FileListState();
+  //app.fileListState = new FileListState();
 });
