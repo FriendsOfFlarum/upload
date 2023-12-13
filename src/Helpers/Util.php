@@ -134,7 +134,7 @@ class Util
     /**
      * @param string|Template|null $template
      *
-     * @return Template|null
+     * @return Template|array|null
      */
     public function getTemplate($template)
     {
@@ -144,7 +144,7 @@ class Util
     /**
      * @param File $file
      *
-     * @return string|array|null
+     * @return string|null
      */
     public function getBbcodeForFile(File $file): ?string
     {
