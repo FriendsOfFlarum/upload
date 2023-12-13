@@ -41,17 +41,60 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
     m.redraw();
   }
 
+  onDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  onDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer && e.dataTransfer.files) {
+      this.addFiles(Array.from(e.dataTransfer.files));
+    }
+  }
+
+  onDropzoneClick() {
+    if (this.fileInput) {
+      this.fileInput.click();
+    }
+  }
+
   content() {
     return (
       <div className="Modal-body">
+        <div
+          className="UploadSharedFileModal-dropzone"
+          onclick={() => this.onDropzoneClick()}
+          ondragover={this.onDragOver.bind(this)}
+          ondrop={this.onDrop.bind(this)}
+        >
+          {app.translator.trans('fof-upload.lib.upload-shared-file-modal.dropzone')}
+          <input
+            type="file"
+            multiple
+            onchange={this.onFileChange.bind(this)}
+            style={{ opacity: 0, position: 'absolute', left: '-9999px' }}
+            oncreate={(vnode) => {
+              this.fileInput = vnode.dom;
+            }}
+          />
+        </div>
         <div className="UploadSharedFileModal-files">
-          <input type="file" multiple onchange={this.onFileChange.bind(this)} />
           {this.files.map((file: File) => {
             const isImage = file.type.startsWith('image/');
             return (
               <div className="UploadedFile">
                 {isImage ? <img src={URL.createObjectURL(file)} alt={file.name} /> : <i className={mimeToIcon(file.type)}></i>}
-                <div>{file.name}</div>
+                <div className="UploadedFile-name">{file.name}</div>
+                {/* Remove button */}
+                <Button
+                  className="Button Button--icon Button--link UploadedFile-remove"
+                  icon="fas fa-times"
+                  onclick={() => {
+                    this.files = this.files.filter((f) => f !== file);
+                  }}
+                />
               </div>
             );
           })}
