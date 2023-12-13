@@ -129,7 +129,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
           icon={this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash'}
           aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
           disabled={this.isFileHiding}
-          onclick={() => this.hide()}
+          onclick={(e: Event) => this.hide(e)}
         />,
         80
       );
@@ -168,7 +168,9 @@ export default class DisplayFile extends Component<CustomAttrs> {
     console.log('view file info');
   }
 
-  hide() {
+  hide(e: Event) {
+    e.stopPropagation();
+
     // TODO: local logic, then:
 
     if (this.attrs.onHide) {
