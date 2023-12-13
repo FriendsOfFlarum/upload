@@ -151,7 +151,7 @@ class SharedFilesTest extends EnhancedTestCase
 
         $this->assertEquals('milkyway.jpg', $file->base_name);
         $this->assertNull($file->actor_id, 'Actor should be null for shared files');
-        $this->assertEquals('local', $file->upload_method);
+        $this->assertEquals('private-shared', $file->upload_method);
         $this->assertTrue($file->shared);
         $this->assertTrue($file->hidden);
     }

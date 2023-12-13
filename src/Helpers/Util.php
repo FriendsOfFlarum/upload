@@ -157,8 +157,17 @@ class Util
         return $template ? $template->preview($file) : null;
     }
 
+    public function isPrivateShared(File $model): bool
+    {
+        return $model->shared && $model->hidden;
+    }
+
     public function getAdapterForFile(File $file): ?UploadAdapter
     {
+        if ($this->isPrivateShared($file)) {
+            return $this->getAdapter('private-shared');
+        }
+        
         return $this->getAdapterForMime($file->type);
     }
 

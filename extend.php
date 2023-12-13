@@ -34,17 +34,17 @@ use FoF\Upload\Helpers\Util;
 
 return [
     (new Extend\Frontend('admin'))
-        ->css(__DIR__.'/resources/less/admin.less')
-        ->js(__DIR__.'/js/dist/admin.js'),
+        ->css(__DIR__ . '/resources/less/admin.less')
+        ->js(__DIR__ . '/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__.'/resources/less/forum.less')
-        ->js(__DIR__.'/js/dist/forum.js'),
+        ->css(__DIR__ . '/resources/less/forum.less')
+        ->js(__DIR__ . '/js/dist/forum.js'),
 
-    new Extend\Locales(__DIR__.'/resources/locale'),
+    new Extend\Locales(__DIR__ . '/resources/locale'),
 
     (new Extend\View())
-        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
+        ->namespace('fof-upload.templates', __DIR__ . '/resources/templates'),
 
     (new Extend\Routes('api'))
         ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
@@ -89,6 +89,9 @@ return [
         ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
+
+    (new Extend\Filesystem())
+        ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
 
     (new Extend\ServiceProvider())
         ->register(Providers\UtilProvider::class)

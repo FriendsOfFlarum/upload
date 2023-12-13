@@ -13,7 +13,9 @@
 namespace FoF\Upload\Repositories;
 
 use Carbon\Carbon;
+use enshrined\svgSanitize\Sanitizer;
 use Flarum\Foundation\Paths;
+use Flarum\Foundation\ValidationException;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -27,12 +29,16 @@ use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
+use SoftCreatR\MimeDetector\MimeDetector;
+use SoftCreatR\MimeDetector\MimeDetectorException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileRepository
 {
@@ -45,7 +51,10 @@ class FileRepository
         Paths $paths,
         private UploadValidator $validator,
         private SettingsRepositoryInterface $settings,
-        private Dispatcher $events
+        private Dispatcher $events,
+        private Sanitizer $sanitizer,
+        private MimeDetector $mimeDetector,
+        private TranslatorInterface $translator
     ) {
         $this->path = $paths->storage;
     }
@@ -108,7 +117,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -189,11 +198,11 @@ class FileRepository
         );
     }
 
-    public function readUpload(Upload $upload, UploadAdapter $adapter)
+    public function readUpload(Upload $upload, ?UploadAdapter $adapter = null)
     {
         $filesystem = $this->getTempFilesystem($upload->getPath());
 
-        return $adapter->supportsStreams()
+        return $adapter?->supportsStreams()
             ? $filesystem->readStream($upload->getBasename())
             : $filesystem->read($upload->getBasename());
     }
@@ -231,10 +240,10 @@ class FileRepository
             // Files found in (new) content.
             ->orWhereExists(
                 fn ($query) => $query
-                ->select($db->raw(1))
-                ->from('posts')
-                ->where('posts.id', $post->id)
-                ->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
+                    ->select($db->raw(1))
+                    ->from('posts')
+                    ->where('posts.id', $post->id)
+                    ->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
             )
             // Loop over every found item to de- or attach.
             ->each(function (File $file) use ($post) {
@@ -305,5 +314,62 @@ class FileRepository
             });
 
         return $count;
+    }
+
+    /**
+     * If an SVG has been uploaded, remove any unwanted tags & attrs, if possible.
+     * 
+     * @throws ValidationException
+     *
+     * @param Upload $file
+     * @param string $mime
+     * @return void
+     */
+    public function sanitizeSvg(Upload $file, string $mime): void
+    {
+        if (!Str::startsWith($mime, 'image/svg')) {
+            return;
+        }
+
+        $cleanSvg = $this->sanitizer->sanitize(file_get_contents($file->getPathname()));
+
+        if (!$cleanSvg || $cleanSvg === false) {
+            //TODO maybe expose the error list via ValidationException?
+            //$issues = $this->sanitizer->getXmlIssues();
+            throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.svg_failure')]);
+        }
+
+        file_put_contents($file->getPathname(), $cleanSvg, LOCK_EX);
+    }
+
+    /**
+     * Determine the mime type of an uploaded file.
+     * 
+     * @throws ValidationException
+     *
+     * @param Upload $file
+     * @return string|null
+     */
+    public function determineMime(Upload $file): ?string
+    {
+        try {
+            $this->mimeDetector->setFile($file->getPathname());
+            $uploadFileData = $this->mimeDetector->getFileType();
+
+            if (Arr::has($uploadFileData, 'mime')) {
+                return $uploadFileData['mime'];
+            }
+
+            return mime_content_type($file->getPathname()) ?? null;
+        } catch (MimeDetectorException | \Exception $e) {
+            throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
+        }
+    }
+
+    public function generateFilenameFor(File $file): string
+    {
+        $today = (new Carbon());
+
+        return $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
     }
 }
