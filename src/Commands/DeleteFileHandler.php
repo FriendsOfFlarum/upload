@@ -31,7 +31,12 @@ class DeleteFileHandler
 
     public function handle(DeleteFile $command): void
     {
-        $command->actor->assertAdmin();
+        if ($command->file->shared && $command->file->actor === null) {
+            $command->actor->assertCan('fof-upload.upload-shared-files');
+        } else {
+            // We don't currently have a permission for this, so we'll just use admin.
+            $command->actor->assertAdmin();
+        }
 
         $adapter = $this->util->getAdapterForFile($command->file);
 

@@ -49,7 +49,11 @@ class UploadHandler
      */
     public function handle(Upload $command)
     {
-        $command->actor->assertCan('fof-upload.upload');
+        if ($command->shared) {
+            $command->actor->assertCan('fof-upload.upload-shared-files');
+        } else {
+            $command->actor->assertCan('fof-upload.upload');
+        }
 
         $savedFiles = $command->files->map(function (UploadedFileInterface $file) use ($command) {
             try {
