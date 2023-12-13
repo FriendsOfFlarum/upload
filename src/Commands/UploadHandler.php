@@ -84,7 +84,7 @@ class UploadHandler
                     if (!$adapter) {
                         throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.forbidden_type')]);
                     }
-    
+
                     if (!$adapter->forMime($mime)) {
                         throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.unsupported_type', ['mime' => $mime])]);
                     }

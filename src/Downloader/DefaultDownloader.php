@@ -25,12 +25,11 @@ use Psr\Http\Message\ResponseInterface;
 class DefaultDownloader implements Downloader
 {
     private $privateSharedDir;
-    
+
     public function __construct(
         private Client $api,
         private Factory $factory,
     ) {
-        
     }
 
     public function forFile(File $file): bool

@@ -167,7 +167,7 @@ class Util
         if ($this->isPrivateShared($file)) {
             return $this->getAdapter('private-shared');
         }
-        
+
         return $this->getAdapterForMime($file->type);
     }
 

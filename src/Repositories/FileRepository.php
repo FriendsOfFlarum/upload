@@ -117,7 +117,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -318,11 +318,13 @@ class FileRepository
 
     /**
      * If an SVG has been uploaded, remove any unwanted tags & attrs, if possible.
-     * 
-     * @throws ValidationException
+     *
      *
      * @param Upload $file
      * @param string $mime
+     *
+     * @throws ValidationException
+     *
      * @return void
      */
     public function sanitizeSvg(Upload $file, string $mime): void
@@ -344,10 +346,12 @@ class FileRepository
 
     /**
      * Determine the mime type of an uploaded file.
-     * 
-     * @throws ValidationException
+     *
      *
      * @param Upload $file
+     *
+     * @throws ValidationException
+     *
      * @return string|null
      */
     public function determineMime(Upload $file): ?string
@@ -361,7 +365,7 @@ class FileRepository
             }
 
             return mime_content_type($file->getPathname()) ?? null;
-        } catch (MimeDetectorException | \Exception $e) {
+        } catch (MimeDetectorException|\Exception $e) {
             throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
         }
     }
