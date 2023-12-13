@@ -83,7 +83,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
             const isFileHiding = this.filesBeingHidden.includes(file.uuid());
 
             return (
-              <li aria-busy={isFileHiding}>
+              <li aria-busy={isFileHiding} key={file.uuid()}>
                 <DisplayFile
                   file={file}
                   fileSelectable={fileSelectable}
