@@ -105,6 +105,7 @@ fof-upload:
       upload_label: Upload files
       view_user_uploads_label: View user uploads
       delete_uploads_of_others_label: Delete user uploads
+      upload_shared_label: Upload shared files
     templates:
       file: Default file download template
       file_description: |
