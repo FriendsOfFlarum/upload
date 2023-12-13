@@ -12,18 +12,22 @@
 
 namespace FoF\Upload\Api\Controllers;
 
+use Flarum\Api\Controller\AbstractShowController;
+use Flarum\Database\AbstractModel;
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
+use FoF\Upload\Api\Serializers\FileSerializer;
+use FoF\Upload\Api\Serializers\SharedFileSerializer;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
-use Laminas\Diactoros\Response\EmptyResponse;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Tobscure\JsonApi\Document;
 
-class HideUploadFromMediaManagerController implements RequestHandlerInterface
+class HideUploadFromMediaManagerController extends AbstractShowController
 {
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public $serializer = FileSerializer::class;
+
+    public function data(ServerRequestInterface $request, Document $document): AbstractModel
     {
         $actor = RequestUtil::getActor($request);
         $actor->assertRegistered();
@@ -38,9 +42,14 @@ class HideUploadFromMediaManagerController implements RequestHandlerInterface
 
         $actor->assertCan('hide', $fileUpload);
 
-        $fileUpload->hidden = true;
+        if ($fileUpload->shared) {
+            $this->serializer = SharedFileSerializer::class;
+        }
+
+        // Toggle the hidden state
+        $fileUpload->hidden = !$fileUpload->hidden;
         $fileUpload->save();
 
-        return new EmptyResponse(202);
+        return $fileUpload;
     }
 }

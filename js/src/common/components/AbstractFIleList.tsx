@@ -11,6 +11,7 @@ import DisplayFile from './DisplayFile';
 import Alert from 'flarum/common/components/Alert';
 import extractText from 'flarum/common/utils/extractText';
 import FileListState from '../states/FileListState';
+import { ApiPayloadSingle } from 'flarum/common/Store';
 
 export interface FileListAttrs extends ComponentAttrs {
   user: User | null;
@@ -83,7 +84,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
             const isFileHiding = this.filesBeingHidden.includes(file.uuid());
 
             return (
-              <li aria-busy={isFileHiding}>
+              <li aria-busy={isFileHiding} key={file.uuid()}>
                 <DisplayFile
                   file={file}
                   fileSelectable={fileSelectable}
@@ -165,7 +166,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
    * - Shows a native confirmation dialog
    * - If confirmed, sends AJAX request to the hide file API
    */
-  hideFile(file: File) {
+  async hideFile(file: File) {
     const uuid = file.uuid();
 
     if (this.filesBeingHidden.includes(uuid)) return;
@@ -177,37 +178,33 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
     );
 
     if (confirmHide) {
-      app
-        .request({
+      try {
+        const file = await app.request<ApiPayloadSingle>({
           method: 'PATCH',
           url: `${app.forum.attribute('apiUrl')}/fof/upload/hide`,
           body: { uuid },
-        })
-        .then(() => {
-          app.alerts.show(Alert, { type: 'success' }, app.translator.trans('fof-upload.forum.file_list.hide_file.hide_success'));
-        })
-        .catch(() => {
-          app.alerts.show(
-            Alert,
-            { type: 'error' },
-            app.translator.trans('fof-upload.forum.file_list.hide_file.hide_fail', { fileName: file.baseName() })
-          );
-        })
-        .then(() => {
-          // Remove hidden file from state
-          const state = app.fileListState;
-
-          const index = state.files.findIndex((file: File) => uuid === file.uuid());
-          state.files.splice(index, 1);
-
-          // Remove file from hiding list
-          const i = this.filesBeingHidden.indexOf(uuid);
-          this.filesBeingHidden.splice(i, 1);
         });
-    } else {
-      // Remove file from hiding list
-      const i = this.filesBeingHidden.indexOf(uuid);
-      this.filesBeingHidden.splice(i, 1);
+
+        app.store.pushPayload(file);
+        m.redraw();
+
+        app.alerts.show(Alert, { type: 'success' }, app.translator.trans('fof-upload.forum.file_list.hide_file.hide_success'));
+
+        if (this.fileState.user) {
+          const index = this.fileState.files.findIndex((file: File) => uuid === file.uuid());
+          this.fileState.files.splice(index, 1);
+        }
+      } catch (error) {
+        app.alerts.show(
+          Alert,
+          { type: 'error' },
+          app.translator.trans('fof-upload.forum.file_list.hide_file.hide_fail', { fileName: file.baseName() })
+        );
+      } finally {
+        // Remove file from hiding list
+        const i = this.filesBeingHidden.indexOf(uuid);
+        this.filesBeingHidden.splice(i, 1);
+      }
     }
   }
 }
