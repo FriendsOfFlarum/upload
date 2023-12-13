@@ -91,7 +91,7 @@ export default class FileManagerModal extends Modal {
             <div className="fof-drag-and-drop-release">
               <i className="fas fa-cloud-upload-alt" />
 
-              {app.translator.trans('fof-upload.forum.file_list.release_to_upload')}
+              {app.translator.trans('fof-upload.forum.lib.release_to_upload')}
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export default class FileManagerModal extends Modal {
               disabled={this.selectedFiles.length === 0 || (!this.multiSelect && this.selectedFiles.length > 1)}
               className="Button Button--primary"
             >
-              {app.translator.trans('fof-upload.forum.file_list.confirm_selection_btn', { fileCount })}
+              {app.translator.trans('fof-upload.lib.file_list.confirm_selection_btn', { fileCount })}
             </Button>
           </div>
         </div>

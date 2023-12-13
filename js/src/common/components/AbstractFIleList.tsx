@@ -12,6 +12,7 @@ import Alert from 'flarum/common/components/Alert';
 import extractText from 'flarum/common/utils/extractText';
 import FileListState from '../states/FileListState';
 import { ApiPayloadSingle } from 'flarum/common/Store';
+import icon from 'flarum/common/helpers/icon';
 
 export interface FileListAttrs extends ComponentAttrs {
   user: User | null;
@@ -56,7 +57,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
         {/* Loading */}
         {this.isLoading() && this.fileCollection().length === 0 && (
           <div className={'fof-upload-loading'}>
-            {app.translator.trans('fof-upload.forum.file_list.loading')}
+            {app.translator.trans('fof-upload.lib.file_list.loading')}
 
             <LoadingIndicator />
           </div>
@@ -64,7 +65,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
         {/* Empty file list */}
         {!this.isLoading() && this.fileCollection().length === 0 && (
           <div className="Placeholder">
-            <p className="fof-upload-empty">{app.translator.trans('fof-upload.forum.file_list.empty')}</p>
+            <p className="fof-upload-empty">{app.translator.trans('fof-upload.lib.file_list.empty')}</p>
           </div>
         )}
         {/* File list */}
@@ -103,7 +104,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
           {this.hasMoreResults() && (
             <div className={'fof-load-more-files'}>
               <Button className={'Button Button--primary'} disabled={this.isLoading()} loading={this.isLoading()} onclick={() => this.loadMore()}>
-                {app.translator.trans('fof-upload.forum.file_list.load_more_files_btn')}
+                {app.translator.trans('fof-upload.lib.file_list.load_more_files_btn')}
               </Button>
             </div>
           )}
@@ -173,22 +174,32 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
 
     this.filesBeingHidden.push(uuid);
 
-    const confirmHide = confirm(
-      extractText(app.translator.trans('fof-upload.forum.file_list.hide_file.hide_confirmation', { fileName: file.baseName() }))
+    const transPrefix = file.isShared() ? 'fof-upload.lib.file_list.hide_shared_file' : 'fof-upload.lib.file_list.hide_file';
+
+    const confirmToggleHide = confirm(
+      extractText(
+        app.translator.trans(file.hidden() ? `${transPrefix}.show_confirmation` : `${transPrefix}.hide_confirmation`, {
+          fileName: file.baseName(),
+        })
+      )
     );
 
-    if (confirmHide) {
+    if (confirmToggleHide) {
       try {
-        const file = await app.request<ApiPayloadSingle>({
+        const filePayload = await app.request<ApiPayloadSingle>({
           method: 'PATCH',
           url: `${app.forum.attribute('apiUrl')}/fof/upload/hide`,
           body: { uuid },
         });
 
-        app.store.pushPayload(file);
+        app.store.pushPayload(filePayload);
         m.redraw();
 
-        app.alerts.show(Alert, { type: 'success' }, app.translator.trans('fof-upload.forum.file_list.hide_file.hide_success'));
+        app.alerts.show(Alert, { type: 'success' }, [
+          icon(file.hidden() ? 'fas fa-eye-slash' : 'fas fa-eye'),
+          ' ',
+          app.translator.trans(file?.hidden() ? `${transPrefix}.hide_success` : `${transPrefix}.show_success`),
+        ]);
 
         if (this.fileState.user) {
           const index = this.fileState.files.findIndex((file: File) => uuid === file.uuid());
@@ -198,7 +209,9 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
         app.alerts.show(
           Alert,
           { type: 'error' },
-          app.translator.trans('fof-upload.forum.file_list.hide_file.hide_fail', { fileName: file.baseName() })
+          app.translator.trans(file?.hidden() ? `${transPrefix}.hide_fail` : `${transPrefix}.show_fail`, {
+            fileName: file.baseName(),
+          })
         );
       } finally {
         // Remove file from hiding list

@@ -86,7 +86,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
         </div>
 
         {this.isFileHiding && (
-          <div class="fof-file-loading" role="status" aria-label={app.translator.trans('fof-upload.forum.file_list.hide_file.loading')}>
+          <div class="fof-file-loading" role="status" aria-label={app.translator.trans('fof-upload.lib.file_list.hide_file.loading')}>
             <LoadingIndicator />
           </div>
         )}
@@ -121,13 +121,17 @@ export default class DisplayFile extends Component<CustomAttrs> {
         100
       );
 
+    const transPrefix = file.isShared() ? 'fof-upload.lib.file_list.hide_shared_file' : 'fof-upload.lib.file_list.hide_file';
+
     file.canHide() &&
       items.add(
         'hide-file',
         <Button
           className="Button Button--icon fof-file-action"
           icon={this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash'}
-          aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
+          aria-label={app.translator.trans(this.file.hidden() ? `${transPrefix}.btn_a11y_label_show` : `${transPrefix}.btn_a11y_label_hide`, {
+            fileName: file.baseName(),
+          })}
           disabled={this.isFileHiding}
           onclick={(e: Event) => this.hide(e)}
         />,
@@ -140,7 +144,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
         <Button
           className="Button Button--icon fof-file-action"
           icon="fas fa-trash"
-          aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
+          aria-label={app.translator.trans('fof-upload.lib.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
           disabled={this.isFileHiding}
           onclick={() => this.confirmDelete()}
         />,
