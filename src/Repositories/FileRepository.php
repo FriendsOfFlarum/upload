@@ -332,7 +332,7 @@ class FileRepository
         if (!Str::startsWith($mime, 'image/svg')) {
             return;
         }
-    
+
         $cleanSvg = $this->sanitizer->sanitize(file_get_contents($file->getPathname()));
 
         /** @phpstan-ignore-next-line */
