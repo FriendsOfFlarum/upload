@@ -150,6 +150,10 @@ class Util
     {
         $template = $this->getTemplate($file->tag);
 
+        if(is_array($template)) {
+            return null;
+        }
+
         return $template ? $template->preview($file) : null;
     }
 
