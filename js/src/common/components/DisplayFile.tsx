@@ -71,7 +71,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
             draggable={false}
             onerror={this.handleImageError}
             onload={this.handleImageLoad}
-            alt=""
+            alt={this.file.baseName()}
           />
         ) : (
           this.displayIcon(this.fileIcon)
