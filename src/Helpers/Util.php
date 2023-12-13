@@ -144,7 +144,7 @@ class Util
     /**
      * @param File $file
      *
-     * @return string|null
+     * @return string|array|null
      */
     public function getBbcodeForFile(File $file): ?string
     {
