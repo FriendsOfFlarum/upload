@@ -50,7 +50,7 @@ export default class UploadedFile extends Component<CustomAttrs> {
                 loading="lazy"
                 onerror={this.handleImageError}
                 onload={this.handleImageLoad}
-                alt=""
+                alt={this.file.baseName()}
               />
             ) : (
               icon(errorIcon, { className: 'icon-fallback' }) // Error icon for failed image load
