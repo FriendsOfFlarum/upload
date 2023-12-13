@@ -33,6 +33,10 @@ class AddCurrentUserAttributes
             $attributes['fof-upload-uploadSharedFiles'] = $uploadShared;
         }
 
+        if ($accessShared = $actor->hasPermission('fof-upload.access-shared-files')) {
+            $attributes['fof-upload-accessSharedFiles'] = $accessShared;
+        }
+
         return $attributes;
     }
 }

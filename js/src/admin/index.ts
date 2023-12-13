@@ -55,6 +55,14 @@ app.initializers.add('fof-upload', () => {
         permission: 'fof-upload.upload-shared-files',
       },
       'start'
+    )
+    .registerPermission(
+      {
+        icon: 'far fa-file-alt',
+        label: app.translator.trans('fof-upload.admin.permissions.access_shared_label'),
+        permission: 'fof-upload.access-shared-files',
+      },
+      'start'
     );
 
   extendAdminNav();
