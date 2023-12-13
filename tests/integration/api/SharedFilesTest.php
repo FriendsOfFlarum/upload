@@ -12,18 +12,33 @@
 
 namespace FoF\Upload\Tests\integration\api;
 
+use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
 
 class SharedFilesTest extends EnhancedTestCase
 {
     use UploadFileTrait;
+    use RetrievesAuthorizedUsers;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->extension('fof-upload');
+
+        $this->prepareDatabase([
+            'users' => [
+                $this->normalUser(),
+                ['id' => 3, 'username' => 'moderator', 'email' => 'moderator@machine.local', 'is_email_confirmed' => true],
+            ],
+            'group_user' => [
+                ['user_id' => 3, 'group_id' => 4],
+            ],
+            'group_permission' => [
+                ['permission' => 'fof-upload.upload-shared-files', 'group_id' => 4],
+            ],
+        ]);
     }
 
     /**
@@ -38,14 +53,24 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    public function userIdWithPermissionsProvider()
+    {
+        return [
+            [1],
+            [3],
+        ];
+    }
+
     /**
+     * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
-    public function user_with_permission_can_upload_a_shared_file_and_is_not_hidden_by_default()
+    public function user_with_permission_can_upload_a_shared_file_and_is_not_hidden_by_default(int $userId)
     {
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
-                'authenticatedAs' => 1,
+                'authenticatedAs' => $userId,
                 'multipart'       => [
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
@@ -84,13 +109,15 @@ class SharedFilesTest extends EnhancedTestCase
     }
 
     /**
+     * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
-    public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested()
+    public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested(int $userId)
     {
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
-                'authenticatedAs' => 1,
+                'authenticatedAs' => $userId,
                 'multipart'       => [
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
@@ -171,13 +198,15 @@ class SharedFilesTest extends EnhancedTestCase
     }
 
     /**
+     * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
-    public function admin_can_upload_a_shared_file_and_then_delete_it()
+    public function users_with_permission_can_upload_a_shared_file_and_then_delete_it(int $userId)
     {
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
-                'authenticatedAs' => 1,
+                'authenticatedAs' => $userId,
                 'multipart'       => [
                     $this->uploadFile($this->fixtures('MilkyWay.jpg')),
                 ],
@@ -199,7 +228,7 @@ class SharedFilesTest extends EnhancedTestCase
 
         $response = $this->send(
             $this->request('DELETE', '/api/fof/upload/delete/'.$file->uuid, [
-                'authenticatedAs' => 1,
+                'authenticatedAs' => $userId,
             ])
         );
 

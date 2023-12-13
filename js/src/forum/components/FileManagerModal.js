@@ -71,16 +71,18 @@ export default class FileManagerModal extends Modal {
       <div className={`Modal modal-dialog ${this.className()}`}>
         <div className="Modal-content">
           <div className="fof-modal-buttons App-backControl">
-            {!hideUser && <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />}
-            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && (
+            {!hideUser && this.selectedFilesLibrary === 'user' && (
+              <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
+            )}
+            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
               <Button
                 className="Button"
-                icon="fas fa-cloud-upload-alt"
+                icon="fas fa-file-upload"
                 onclick={() => {
                   this.showUploadModal();
                 }}
               >
-                {app.translator.trans('fof-upload.forum.buttons.upload_shared')}
+                {app.translator.trans('fof-upload.forum.buttons.upload')}
               </Button>
             )}
           </div>
@@ -95,6 +97,7 @@ export default class FileManagerModal extends Modal {
 
           <div className="Modal-header">
             <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
+            {!hideUser && !hideShared && <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>}
           </div>
 
           {this.alertAttrs && (
@@ -104,7 +107,6 @@ export default class FileManagerModal extends Modal {
           )}
 
           <div className="Modal-body">
-            {!hideUser && !hideShared && <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>}
             {this.selectedFilesLibrary === 'user' && this.userFilesContent()}
             {this.selectedFilesLibrary === 'shared' && this.sharedFilesContent()}
           </div>
@@ -132,14 +134,14 @@ export default class FileManagerModal extends Modal {
 
     items.add(
       'user',
-      <Button className={`Button ${this.selectedFilesLibrary === 'user' ? 'active' : ''}`} onclick={() => this.setLibrary('user')}>
+      <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'user' ? 'active' : ''}`} onclick={() => this.setLibrary('user')}>
         {app.translator.trans('fof-upload.forum.buttons.media')}
       </Button>
     );
 
     items.add(
       'shared',
-      <Button className={`Button ${this.selectedFilesLibrary === 'shared' ? 'active' : ''}`} onclick={() => this.setLibrary('shared')}>
+      <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'shared' ? 'active' : ''}`} onclick={() => this.setLibrary('shared')}>
         {app.translator.trans('fof-upload.forum.buttons.shared_media')}
       </Button>
     );

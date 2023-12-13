@@ -120,7 +120,11 @@ class HideFilesTest extends TestCase
             )
         );
 
-        $this->assertEquals(202, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertTrue($json['data']['attributes']['hidden']);
 
         $file = File::byUuid($uuid)->first();
 
@@ -199,9 +203,13 @@ class HideFilesTest extends TestCase
             )
         );
 
-        $this->assertEquals(202, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
 
         $file = File::byUuid($uuid)->first();
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertTrue($json['data']['attributes']['hidden']);
 
         $this->assertNotNull($file);
         $this->assertTrue($file->hidden);
