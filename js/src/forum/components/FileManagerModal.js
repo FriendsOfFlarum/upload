@@ -71,16 +71,18 @@ export default class FileManagerModal extends Modal {
       <div className={`Modal modal-dialog ${this.className()}`}>
         <div className="Modal-content">
           <div className="fof-modal-buttons App-backControl">
-            {!hideUser && <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />}
-            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && (
+            {!hideUser && this.selectedFilesLibrary === 'user' && (
+              <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
+            )}
+            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
               <Button
                 className="Button"
-                icon="fas fa-cloud-upload-alt"
+                icon="fas fa-file-upload"
                 onclick={() => {
                   this.showUploadModal();
                 }}
               >
-                {app.translator.trans('fof-upload.forum.buttons.upload_shared')}
+                {app.translator.trans('fof-upload.forum.buttons.upload')}
               </Button>
             )}
           </div>
