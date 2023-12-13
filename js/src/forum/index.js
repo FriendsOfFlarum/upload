@@ -1,7 +1,6 @@
 import app from 'flarum/forum/app';
 import User from 'flarum/common/models/User';
 import Model from 'flarum/common/Model';
-import FileListState from '../common/states/FileListState';
 import downloadButtonInteraction from './downloadButtonInteraction';
 import addUploadButton from './addUploadButton';
 import addUserPageButton from './addUserPageButton';
@@ -17,6 +16,7 @@ app.initializers.add('fof-upload', () => {
   User.prototype.uploadCountCurrent = Model.attribute('fof-upload-uploadCountCurrent');
   User.prototype.uploadCountAll = Model.attribute('fof-upload-uploadCountAll');
   User.prototype.uploadSharedFiles = Model.attribute('fof-upload-uploadSharedFiles');
+  User.prototype.accessSharedFiles = Model.attribute('fof-upload-accessSharedFiles');
 
   //app.fileListState = new FileListState();
 

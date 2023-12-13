@@ -97,7 +97,9 @@ export default class FileManagerModal extends Modal {
 
           <div className="Modal-header">
             <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
-            {!hideUser && !hideShared && <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>}
+            {app.session.user?.accessSharedFiles() && !hideUser && !hideShared && (
+              <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>
+            )}
           </div>
 
           {this.alertAttrs && (
