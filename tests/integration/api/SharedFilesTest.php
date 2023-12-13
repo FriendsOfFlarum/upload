@@ -18,7 +18,8 @@ use FoF\Upload\Tests\EnhancedTestCase;
 
 class SharedFilesTest extends EnhancedTestCase
 {
-    use UploadFileTrait, RetrievesAuthorizedUsers;
+    use UploadFileTrait;
+    use RetrievesAuthorizedUsers;
 
     public function setUp(): void
     {
@@ -62,6 +63,7 @@ class SharedFilesTest extends EnhancedTestCase
 
     /**
      * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
     public function user_with_permission_can_upload_a_shared_file_and_is_not_hidden_by_default(int $userId)
@@ -108,9 +110,10 @@ class SharedFilesTest extends EnhancedTestCase
 
     /**
      * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
-    public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested(int  $userId)
+    public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested(int $userId)
     {
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
@@ -196,6 +199,7 @@ class SharedFilesTest extends EnhancedTestCase
 
     /**
      * @dataProvider userIdWithPermissionsProvider
+     *
      * @test
      */
     public function users_with_permission_can_upload_a_shared_file_and_then_delete_it(int $userId)
