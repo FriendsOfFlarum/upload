@@ -332,9 +332,10 @@ class FileRepository
         if (!Str::startsWith($mime, 'image/svg')) {
             return;
         }
-
+    
         $cleanSvg = $this->sanitizer->sanitize(file_get_contents($file->getPathname()));
 
+        /** @phpstan-ignore-next-line */
         if (!$cleanSvg || $cleanSvg === false) {
             //TODO maybe expose the error list via ValidationException?
             //$issues = $this->sanitizer->getXmlIssues();
@@ -364,7 +365,7 @@ class FileRepository
                 return $uploadFileData['mime'];
             }
 
-            return mime_content_type($file->getPathname()) ?? null;
+            return mime_content_type($file->getPathname());
         } catch (MimeDetectorException|\Exception $e) {
             throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
         }
