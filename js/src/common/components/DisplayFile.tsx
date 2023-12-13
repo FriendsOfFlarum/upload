@@ -126,7 +126,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
         'hide-file',
         <Button
           className="Button Button--icon fof-file-action"
-          icon="fas fa-eye-slash"
+          icon={this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash'}
           aria-label={app.translator.trans('fof-upload.forum.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
           disabled={this.isFileHiding}
           onclick={() => this.hide()}
