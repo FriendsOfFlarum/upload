@@ -5,6 +5,14 @@ export default class FileManagerModal extends Modal<import("flarum/common/compon
     multiSelect: any;
     restrictFileType: any;
     dragDrop: DragAndDrop | null | undefined;
+    selectedFilesLibrary: any;
+    sharedUploads: any;
+    userFileState: FileListState | undefined;
+    sharedFileState: FileListState | undefined;
+    fileLibraryButtonItems(): ItemList<any>;
+    setLibrary(library: any): void;
+    userFilesContent(): JSX.Element;
+    sharedFilesContent(): JSX.Element;
     /**
      * Add or remove file from selected files
      *
@@ -19,6 +27,10 @@ export default class FileManagerModal extends Modal<import("flarum/common/compon
      * Add selected files to the composer
      */
     onSelect(): void;
+    showUploadModal(): void;
+    onDelete(file: any): void;
 }
 import Modal from "flarum/common/components/Modal";
 import DragAndDrop from "./DragAndDrop";
+import FileListState from "../../common/states/FileListState";
+import ItemList from "flarum/common/utils/ItemList";

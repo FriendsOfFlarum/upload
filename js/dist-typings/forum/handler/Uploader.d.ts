@@ -6,6 +6,8 @@ export default class Uploader {
         uploaded: never[];
     };
     uploading: boolean;
+    setState(fileState: any): void;
+    fileState: any;
     on(type: any, callback: any): void;
     dispatch(type: any, response: any): void;
     upload(files: any, addBBcode?: boolean): Promise<void>;

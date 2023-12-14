@@ -1,10 +1,13 @@
-export default class FileManagerButton extends Component<any, undefined> {
-    constructor();
+/// <reference types="mithril" />
+import Component, { ComponentAttrs } from 'flarum/common/Component';
+interface FileManagerButtonAttrs extends ComponentAttrs {
+    uploader: any;
+}
+export default class FileManagerButton extends Component<FileManagerButtonAttrs> {
+    view(): JSX.Element;
     /**
      * Event handler for upload button being clicked
-     *
-     * @param {PointerEvent} e
      */
     fileManagerButtonClicked(e: PointerEvent): void;
 }
-import Component from "flarum/common/Component";
+export {};
