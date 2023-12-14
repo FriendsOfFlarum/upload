@@ -51,10 +51,7 @@ class ListUploadsController extends AbstractListController
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
 
-        // Build query
-        $query = File::query()
-            ->where('actor_id', $filterByUserId)
-            ->where('hide_from_media_manager', false);
+        $query = File::filesFor($filterByUserId, $actor);
 
         $results = $query
             ->skip($offset)

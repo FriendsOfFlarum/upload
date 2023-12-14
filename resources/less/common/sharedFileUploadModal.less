@@ -1,0 +1,54 @@
+.UploadSharedFileModal {
+    .UploadSharedFileModal-dropzone {
+        border: 2px dashed @muted-color; // Flarum's muted color for borders
+        border-radius: @border-radius;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 20px;
+
+        &:hover {
+            border-color: @primary-color; // Flarum's primary color for hover state
+        }
+
+        input[type="file"] {
+            display: none; // Hide the actual file input
+        }
+    }
+
+    .UploadedFile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        position: relative;
+
+        img {
+            max-width: 50px;
+            max-height: 50px;
+            margin-right: 10px;
+        }
+
+        .UploadedFile-name {
+            padding-top: 10px;
+        }
+
+        i {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .UploadedFile-remove {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+    }
+
+    .UploadSharedFileModal-files {
+        margin-bottom: 20px;
+    }
+
+    .UploadSharedFileModal-options {
+        // Styling for the options area
+    }
+}

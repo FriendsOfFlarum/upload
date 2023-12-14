@@ -53,6 +53,14 @@ class EnhancedTestCase extends BaseTestCase
 
         $request = new ServerRequest([], $uploadedFiles, $path, $method);
 
+        // Do we want a JSON request body?
+        if (isset($options['json'])) {
+            $request = $this->requestWithJsonBody(
+                $request,
+                $options['json']
+            );
+        }
+
         // Authenticate as a given user
         if (isset($options['authenticatedAs'])) {
             $request = $this->requestAsUser(

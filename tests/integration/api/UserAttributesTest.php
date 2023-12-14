@@ -30,7 +30,7 @@ class UserAttributes extends TestCase
                 $this->normalUser(),
             ],
             'fof_upload_files' => [
-                ['id' => 1, 'base_name' => 'test_file.abc', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2],
+                ['id' => 1, 'base_name' => 'test_file.abc', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false],
             ],
         ]);
     }
@@ -122,5 +122,49 @@ class UserAttributes extends TestCase
 
         $this->assertArrayNotHasKey('fof-upload-viewOthersMediaLibrary', $json['data']['attributes']);
         $this->assertArrayNotHasKey('fof-upload-deleteOthersMediaLibrary', $json['data']['attributes']);
+    }
+
+    /**
+     * @test
+     */
+    public function current_user_does_not_have_upload_shared_file_permission_attribute_when_no_permission()
+    {
+        $response = $this->send(
+            $this->request(
+                'GET',
+                '/api/users/2',
+                [
+                    'authenticatedAs' => 2,
+                ]
+            )
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertArrayNotHasKey('fof-upload-uploadSharedFiles', $json['data']['attributes']);
+    }
+
+    /**
+     * @test
+     */
+    public function current_user_has_upload_shared_file_permission_attribute_when_has_permission()
+    {
+        $response = $this->send(
+            $this->request(
+                'GET',
+                '/api/users/1',
+                [
+                    'authenticatedAs' => 1,
+                ]
+            )
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        $this->assertTrue($json['data']['attributes']['fof-upload-uploadSharedFiles']);
     }
 }

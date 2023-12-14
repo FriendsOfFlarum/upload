@@ -1,7 +1,11 @@
 import app from 'flarum/admin/app';
 import UploadPage from './components/UploadPage';
+import extendAdminNav from './extendAdminNav';
+import FileListState from '../common/states/FileListState';
 
 export * from './components';
+
+export { default as extend } from './extend';
 
 app.initializers.add('fof-upload', () => {
   app.extensionData
@@ -43,5 +47,25 @@ app.initializers.add('fof-upload', () => {
       },
       'moderate',
       50
+    )
+    .registerPermission(
+      {
+        icon: 'far fa-file-alt',
+        label: app.translator.trans('fof-upload.admin.permissions.upload_shared_label'),
+        permission: 'fof-upload.upload-shared-files',
+      },
+      'start'
+    )
+    .registerPermission(
+      {
+        icon: 'far fa-file-alt',
+        label: app.translator.trans('fof-upload.admin.permissions.access_shared_label'),
+        permission: 'fof-upload.access-shared-files',
+      },
+      'start'
     );
+
+  extendAdminNav();
+
+  //app.fileListState = new FileListState();
 });

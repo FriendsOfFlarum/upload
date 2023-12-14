@@ -38,11 +38,7 @@ return [
         ->js(__DIR__.'/js/dist/admin.js'),
 
     (new Extend\Frontend('forum'))
-        ->css(__DIR__.'/resources/less/forum/download.less')
-        ->css(__DIR__.'/resources/less/forum/upload.less')
-        ->css(__DIR__.'/resources/less/forum/fileManagerModal.less')
-        ->css(__DIR__.'/resources/less/forum/fileList.less')
-        ->css(__DIR__.'/resources/less/forum/textPreview.less')
+        ->css(__DIR__.'/resources/less/forum.less')
         ->js(__DIR__.'/js/dist/forum.js'),
 
     new Extend\Locales(__DIR__.'/resources/locale'),
@@ -55,8 +51,11 @@ return [
         ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
         ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
         ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
+        ->get('/fof/download/{uuid}', 'fof-upload.download.uuid', Api\Controllers\DownloadController::class)
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
-        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class),
+        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class)
+        ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class)
+        ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
     // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
     // (new Extend\Console())
@@ -70,7 +69,7 @@ return [
         ->cast('foffiles_count', 'int')
         ->hasMany('foffiles', File::class, 'actor_id')
         ->relationship('foffilesCurrent', function (User $model) {
-            return $model->foffiles()->where('hide_from_media_manager', false);
+            return $model->foffiles()->where('hidden', false);
         }),
 
     (new Extend\ApiController(ShowUserController::class))
@@ -90,6 +89,9 @@ return [
         ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
+
+    (new Extend\Filesystem())
+        ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
 
     (new Extend\ServiceProvider())
         ->register(Providers\UtilProvider::class)
@@ -117,6 +119,9 @@ return [
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
+
+    (new Extend\Policy())
+        ->modelPolicy(File::class, Access\FilePolicy::class),
 
     (new Extend\Conditional())
         ->whenExtensionEnabled('blomstra-gdpr', fn () => [

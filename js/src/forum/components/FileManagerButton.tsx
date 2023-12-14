@@ -1,10 +1,14 @@
 import app from 'flarum/forum/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import FileManagerModal from './FileManagerModal';
 import Tooltip from 'flarum/common/components/Tooltip';
 
-export default class FileManagerButton extends Component {
+interface FileManagerButtonAttrs extends ComponentAttrs {
+  uploader: any;
+}
+
+export default class FileManagerButton extends Component<FileManagerButtonAttrs> {
   view() {
     return (
       <Tooltip text={app.translator.trans('fof-upload.forum.buttons.media')}>
@@ -19,10 +23,8 @@ export default class FileManagerButton extends Component {
 
   /**
    * Event handler for upload button being clicked
-   *
-   * @param {PointerEvent} e
    */
-  fileManagerButtonClicked(e) {
+  fileManagerButtonClicked(e: PointerEvent) {
     e.preventDefault();
 
     // Open dialog

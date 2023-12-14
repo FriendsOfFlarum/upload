@@ -8,6 +8,17 @@ blomstra-gdpr:
 
 fof-upload:
   admin:
+    nav:
+      shared-uploads-button: Shared uploads
+    shared-uploads:
+      description: Upload files that can be used by all users of your forum.
+      introduction: |
+        Shared uploads are files that can be used by all users of your forum. They are not attached to any post, but can be inserted into posts by using the media manager.
+
+        <strong>Warning:</strong> Shared uploads are not protected by any permissions. Anyone with the URL can view them.
+      no-files: No shared files have been uploaded yet.
+      title: Shared uploads
+      upload-new-button: Upload new file
     pane:
       title: Upload
       description: Set up uploading services and preferences.
@@ -94,6 +105,8 @@ fof-upload:
       upload_label: Upload files
       view_user_uploads_label: View user uploads
       delete_uploads_of_others_label: Delete user uploads
+      upload_shared_label: Upload shared files
+      access_shared_label: Access shared files in Media Manager
     templates:
       file: Default file download template
       file_description: |
@@ -142,25 +155,11 @@ fof-upload:
     buttons:
       attach: Attach
       upload: Upload
+      upload_shared: Shared
       user_uploads: User uploads
       cancel: Cancel
       media: My media
-
-    file_list:
-      loading: Loading files...
-      empty: There are no files to show.
-      release_to_upload: Release to upload
-      modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
-      modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
-      select_file_a11y_label: Select file "{fileName}"
-      confirm_selection_btn: "{fileCount, plural, =0 {None selected} one {Select file} other {Select files}}"
-      load_more_files_btn: Load more files
-      hide_file:
-        btn_a11y_label: Hide "{fileName}" from media manager
-        hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
-        hide_success: File hidden
-        hide_fail: Couldn't hide file "{fileName}"
-        loading: Hiding file...
+      shared_media: Shared media
 
     states:
       error: Error
@@ -190,3 +189,41 @@ fof-upload:
       cannot_write_to_disk: Cannot write to disk.
       upload_blocked_by_php_extension: A php extension blocked the upload.
       no_files_made_it_to_upload: Please upload files no larger than {max} kb.
+  lib:
+    upload-shared-file-modal:
+      title: New shared file
+      dropzone: Drag and drop files here or click to browse
+      hide-from-media-gallery: Hide from user's media gallery
+      upload: Upload
+
+    file_list:
+      loading: Loading files...
+      empty: There are no files to show.
+      release_to_upload: Release to upload
+      modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
+      modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
+      select_file_a11y_label: Select file "{fileName}"
+      confirm_selection_btn: "{fileCount, plural, =0 {None selected} one {Select file} other {Select files}}"
+      load_more_files_btn: Load more files
+      delete_file_a11y_label: Delete file "{fileName}"
+
+      hide_file:
+        btn_a11y_label_hide: Hide "{fileName}" from media manager
+        btn_a11y_label_show: Show "{fileName}" in media manager
+        hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
+        hide_success: File hidden
+        show_confirmation: Are you sure you want to show "{fileName}"? Showing a file will make it visible in your media manager.
+        show_success: File shown
+        hide_fail: Couldn't hide file "{fileName}"
+        show_fail: Couldn't show file "{fileName}"
+        loading: Hiding file...
+      hide_shared_file:
+        btn_a11y_label_hide: Make "{fileName}" private (no public URL)
+        btn_a11y_label_show: Make "{fileName}" public (with public URL)
+        hide_confirmation: Are you sure you want to make "{fileName}" private? Making a file private will remove its public URL, but it will not affect existing posts. It will also no longer be visible in the media manager to unauthorized users.
+        hide_success: File made private
+        show_confirmation: Are you sure you want to make "{fileName}" public? Making a file public will make it accessible to anyone with a public URL and anyone can share it using the media manager.
+        show_success: File made public
+        hide_fail: Couldn't make file "{fileName}" private
+        show_fail: Couldn't make file "{fileName}" public
+        loading: Making file private...

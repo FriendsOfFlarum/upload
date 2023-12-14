@@ -1,0 +1,109 @@
+.fof-upload-file-list {
+    ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+  
+    .UploadedFile {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: @border-radius;
+      overflow: hidden;
+      box-shadow: 0 2px 4px @shadow-color;
+      border: 2px solid transparent; // Transparent border to maintain spacing when selected
+      transition: box-shadow 150ms ease-in-out;
+      background: @body-bg; // Use the background variable for the card background
+      height: auto;
+      min-height: 150px; // Maintain a minimum height
+  
+      &:hover {
+        box-shadow: 0 4px 6px darken(@shadow-color, 5%);
+  
+        .fof-file-actions {
+          opacity: 1; // Show actions on hover
+        }
+  
+        .fof-file-name {
+          opacity: 1; // Highlight file name on hover
+        }
+      }
+  
+      &.selected {
+        border: 2px solid @primary-color;
+        box-shadow: 0 0 0 3px fade(@primary-color, 20%);
+    
+        .fof-file-name {
+          background-color: darken(@primary-color, 10%);
+        }
+      }
+  
+      .fof-file-image-preview,
+      .fof-file-icon {
+        width: 100%; // Icons and images should fill the container
+        height: auto; // Height should be auto to maintain aspect ratio
+      }
+  
+      .fof-file-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4em;
+        color: @muted-color;
+      }
+  
+      .fof-file-actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        gap: 4px; // Spacing between buttons
+        padding: 4px;
+        opacity: 0.7;
+        transition: opacity 150ms ease-out;
+        z-index: 2; // Ensure the actions are above other elements
+      }
+  
+      .fof-file-action {
+        background-color: fade(@body-bg, 70%); // Button background with transparency
+        //border-radius: 50%;
+        color: @muted-color;
+        &:hover,
+        &:focus {
+          color: @link-color; // Change color on hover/focus
+        }
+      }
+  
+      .fof-file-name {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: fade(@text-color, 70%); // Semi-transparent overlay
+        color: @body-bg; // Text color
+        padding: 4px;
+        text-align: center;
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        opacity: 0.8;
+        transition: opacity 150ms ease-out;
+        z-index: 1; // Ensure the file name is above the image/icon
+      }
+  
+      .fof-file-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3; // Loading indicator should be on top of all
+      }
+    }
+  }
+  
