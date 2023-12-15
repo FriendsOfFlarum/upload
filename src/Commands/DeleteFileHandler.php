@@ -28,7 +28,7 @@ class DeleteFileHandler
      * @var Cloud
      */
     protected $sharedPrivateDir;
-    
+
     public function __construct(
         protected FileRepository $files,
         protected Dispatcher $events,
@@ -43,7 +43,7 @@ class DeleteFileHandler
     public function handle(DeleteFile $command): void
     {
         $privateShared = $this->util->isPrivateShared($command->file);
-        
+
         if ($privateShared) {
             $command->actor->assertCan('fof-upload.upload-shared-files');
         } else {
