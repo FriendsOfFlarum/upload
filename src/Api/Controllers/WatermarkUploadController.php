@@ -52,7 +52,7 @@ class WatermarkUploadController extends ShowForumController
 
         $file->moveTo($tmpFile);
 
-        $uploadName = 'fof-upload-watermark-'.Str::lower(Str::random(8)) ."-" . $file->getClientFilename();
+        $uploadName = 'fof-upload-watermark-'.Str::lower(Str::random(8)).'-'.$file->getClientFilename();
 
         $this->assetsDir->put($uploadName, file_get_contents($tmpFile));
 

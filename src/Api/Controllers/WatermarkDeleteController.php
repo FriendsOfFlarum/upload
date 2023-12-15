@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Api\Controllers;
 
 use Flarum\Api\Controller\AbstractDeleteController;
@@ -12,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class WatermarkDeleteController extends AbstractDeleteController
 {
     const SETTINGS_KEY = 'fof-watermark_path';
-    
+
     /**
      * @var Cloud
      */
@@ -24,7 +34,7 @@ class WatermarkDeleteController extends AbstractDeleteController
     ) {
         $this->assetsDir = $factory->disk('flarum-assets');
     }
-    
+
     public function delete(ServerRequestInterface $request)
     {
         RequestUtil::getActor($request)->assertAdmin();

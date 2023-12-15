@@ -30,7 +30,7 @@ class ImageProcessor implements Processable
      * @var Cloud
      */
     protected $assetsDir;
-    
+
     public function __construct(
         protected SettingsRepositoryInterface $settings,
         Factory $factory

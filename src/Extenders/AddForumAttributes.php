@@ -23,7 +23,7 @@ class AddForumAttributes
      * @var Cloud
      */
     protected $assetsDir;
-    
+
     public function __construct(
         protected SettingsRepositoryInterface $settings,
         Factory $factory
