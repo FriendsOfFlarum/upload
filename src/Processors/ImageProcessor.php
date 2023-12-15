@@ -12,12 +12,13 @@
 
 namespace FoF\Upload\Processors;
 
-use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\Processable;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
+use Illuminate\Contracts\Filesystem\Cloud;
+use Illuminate\Contracts\Filesystem\Factory;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
@@ -25,10 +26,16 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageProcessor implements Processable
 {
+    /**
+     * @var Cloud
+     */
+    protected $assetsDir;
+
     public function __construct(
         protected SettingsRepositoryInterface $settings,
-        protected Paths $paths
+        Factory $factory
     ) {
+        $this->assetsDir = $factory->disk('flarum-assets');
     }
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
@@ -78,9 +85,9 @@ class ImageProcessor implements Processable
      */
     protected function watermark(Image $image)
     {
-        if ($this->settings->get('fof-upload.watermark')) {
+        if ($this->settings->get('fof-watermark_path')) {
             $image->insert(
-                $this->paths->storage.DIRECTORY_SEPARATOR.$this->settings->get('fof-upload.watermark'),
+                $this->assetsDir->get($this->settings->get('fof-watermark_path')),
                 $this->settings->get('fof-upload.watermarkPosition', 'bottom-right')
             );
         }

@@ -4,7 +4,7 @@ import saveSettings from 'flarum/admin/utils/saveSettings';
 import Alert from 'flarum/common/components/Alert';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
-import UploadImageButton from 'flarum/admin/components/UploadImageButton';
+import UploadImageButton from './UploadImageButton';
 import withAttr from 'flarum/common/utils/withAttr';
 import Stream from 'flarum/common/utils/Stream';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
@@ -280,7 +280,8 @@ export default class UploadPage extends ExtensionPage {
                 ]),
                 m('label', {}, app.translator.trans('fof-upload.admin.labels.watermark.file')),
                 UploadImageButton.component({
-                  name: 'fof/watermark',
+                  name: 'fof-watermark',
+                  path: 'fof/watermark',
                 }),
               ]),
               m('fieldset', [
