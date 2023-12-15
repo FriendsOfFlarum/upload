@@ -44,7 +44,7 @@ class DeleteFileHandler
     {
         $privateShared = $this->util->isPrivateShared($command->file);
 
-        if ($privateShared) {
+        if ($privateShared || $command->file->shared) {
             $command->actor->assertCan('fof-upload.upload-shared-files');
         } else {
             // We don't currently have a permission for this, so we'll just use admin.
