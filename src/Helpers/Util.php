@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Helpers;
 
+use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Contracts\Template;
@@ -165,7 +166,7 @@ class Util
     public function getAdapterForFile(File $file): ?UploadAdapter
     {
         if ($this->isPrivateShared($file)) {
-            return $this->getAdapter('private-shared');
+            throw new ValidationException(['shared-file' => 'Private shared files are handled differently, not by an adapter.']);
         }
 
         return $this->getAdapterForMime($file->type);
