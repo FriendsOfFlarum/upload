@@ -206,6 +206,7 @@ fof-upload:
       confirm_selection_btn: "{fileCount, plural, =0 {None selected} one {Select file} other {Select files}}"
       load_more_files_btn: Load more files
       delete_file_a11y_label: Delete file "{fileName}"
+      delete_confirmation: Are you sure you want to delete "{fileName}"?
 
       hide_file:
         btn_a11y_label_hide: Hide "{fileName}" from media manager
