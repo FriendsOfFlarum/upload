@@ -49,6 +49,7 @@ export default class Uploader {
         this.uploading = false;
         m.redraw();
 
+        console.log(error);
         const e = error.response.errors[0];
 
         if (!e.code.includes('fof-upload')) {
@@ -72,7 +73,7 @@ export default class Uploader {
       const fileObj = app.store.pushObject(file);
 
       // Add file to media manager
-      this.fileState.addToList(fileObj);
+      this.fileState?.addToList(fileObj);
 
       // Dispatch
       this.dispatch('success', {
