@@ -49,7 +49,6 @@ export default class Uploader {
         this.uploading = false;
         m.redraw();
 
-        console.log(error);
         const e = error.response.errors[0];
 
         if (!e.code.includes('fof-upload')) {
