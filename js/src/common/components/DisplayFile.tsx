@@ -9,6 +9,7 @@ import User from 'flarum/common/models/User';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
 import Tooltip from 'flarum/common/components/Tooltip';
+import extractText from 'flarum/common/utils/extractText';
 
 interface CustomAttrs extends ComponentAttrs {
   file: File;
@@ -146,7 +147,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
           icon="fas fa-trash"
           aria-label={app.translator.trans('fof-upload.lib.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
           disabled={this.isFileHiding}
-          onclick={() => this.confirmDelete()}
+          onclick={(e: MouseEvent) => this.confirmDelete(e)}
         />,
         60
       );
@@ -182,10 +183,10 @@ export default class DisplayFile extends Component<CustomAttrs> {
     }
   }
 
-  async confirmDelete() {
-    let result = confirm('Are you sure you want to delete this file?');
+  async confirmDelete(e: MouseEvent) {
+    e.stopPropagation();
 
-    if (result) {
+    if (confirm(extractText(app.translator.trans('fof-upload.lib.file_list.delete_confirmation', { fileName: this.file.baseName() })))) {
       const uuid = this.file.uuid();
       await app.request({
         method: 'DELETE',
