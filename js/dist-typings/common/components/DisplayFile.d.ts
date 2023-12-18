@@ -30,6 +30,6 @@ export default class DisplayFile extends Component<CustomAttrs> {
     handleImageLoad: () => void;
     viewFileInfo(): void;
     hide(e: Event): void;
-    confirmDelete(): Promise<void>;
+    confirmDelete(e: MouseEvent): Promise<void>;
 }
 export {};
