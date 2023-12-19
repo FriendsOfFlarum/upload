@@ -28,7 +28,6 @@ class DefaultDownloader implements Downloader
 
     public function __construct(
         private Client $api,
-        private Factory $factory,
     ) {
     }
 
@@ -81,9 +80,9 @@ class DefaultDownloader implements Downloader
 
     private function retrieveFromPrivateShared(File $file): ResponseInterface
     {
-        $this->privateSharedDir = $this->factory->disk('private-shared');
+        $privateSharedDir = resolve(Factory::class)->disk('private-shared');
 
-        $file_contents = $this->privateSharedDir->get($file->path);
+        $file_contents = $privateSharedDir->get($file->path);
 
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
     }
