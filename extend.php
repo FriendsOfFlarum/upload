@@ -43,9 +43,6 @@ return [
 
     new Extend\Locales(__DIR__.'/resources/locale'),
 
-    (new Extend\View())
-        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
-
     (new Extend\Routes('api'))
         ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
         ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
@@ -100,6 +97,9 @@ return [
         ->register(Providers\DownloadProvider::class)
         ->register(Providers\SanitizerProvider::class),
 
+    (new Extend\View())
+        ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
+
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
 
@@ -120,6 +120,9 @@ return [
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
+
+    (new Extend\Filesystem())
+        ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
 
     (new Extend\Policy())
         ->modelPolicy(File::class, Access\FilePolicy::class),

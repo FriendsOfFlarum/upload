@@ -24,8 +24,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class DefaultDownloader implements Downloader
 {
-    private $privateSharedDir;
-
     public function __construct(
         private Client $api,
     ) {
