@@ -45,7 +45,7 @@ class Imgur implements UploadAdapter
      *
      * @return File|bool
      */
-    public function upload(File $file, UploadedFile $upload, $contents)
+    public function upload(File $file, ?UploadedFile $upload, $contents)
     {
         $response = $this->api->post('upload', [
             'multipart' => [

@@ -68,7 +68,7 @@ class HideUploadFromMediaManagerController extends AbstractShowController
         }
 
         if ($this->util->isPrivateShared($file)) {
-            return $this->util->moveFileToPublic($file, $actor);
+            return $this->util->moveFileToPublic($file);
         } else {
             return $this->util->moveFileToPrivate($file, $actor);
         }
