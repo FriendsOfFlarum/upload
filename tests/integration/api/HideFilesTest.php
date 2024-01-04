@@ -13,13 +13,15 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Extend;
+use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
-use Flarum\Testing\integration\TestCase;
 use FoF\Upload\File;
+use FoF\Upload\Tests\EnhancedTestCase;
 
-class HideFilesTest extends TestCase
+class HideFilesTest extends EnhancedTestCase
 {
     use RetrievesAuthorizedUsers;
+    use UploadFileTrait;
 
     public function setUp(): void
     {
@@ -45,6 +47,29 @@ class HideFilesTest extends TestCase
                 ['group_id' => 4, 'permission' => 'fof-upload.viewUserUploads'],
             ],
         ]);
+    }
+
+    public function uploadSharedFileAndGetUuid(): string
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+                'json' => [
+                    'options' => [
+                        'shared' => true,
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        return $json['data'][0]['attributes']['uuid'];
     }
 
     /**
@@ -188,7 +213,7 @@ class HideFilesTest extends TestCase
      */
     public function admin_can_hide_shared_files()
     {
-        $uuid = 'def-456';
+        $uuid = $this->uploadSharedFileAndGetUuid();
 
         $response = $this->send(
             $this->request(
@@ -213,6 +238,11 @@ class HideFilesTest extends TestCase
 
         $this->assertNotNull($file);
         $this->assertTrue($file->hidden);
+
+        $paths = resolve(Paths::class);
+
+        $this->assertFileExists($paths->storage.'/private-shared/files/'.$file->path);
+        $this->assertFileDoesNotExist($paths->public.'/assets/files/'.$file->path);
     }
 
     /**
@@ -241,10 +271,9 @@ class HideFilesTest extends TestCase
     /**
      * @test
      */
-    //TODO investigate why this test fails and fix it
     // public function user_with_permission_can_hide_files_of_others()
     // {
-    //     $uuid = 'abc-123';
+    //     $uuid = $this->uploadSharedFileAndGetUuid();
 
     //     $response = $this->send(
     //         $this->request(

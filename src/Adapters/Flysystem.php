@@ -48,7 +48,7 @@ abstract class Flysystem implements UploadAdapter
      *
      * @return File|bool
      */
-    public function upload(File $file, UploadedFile $upload, $contents)
+    public function upload(File $file, ?UploadedFile $upload = null, $contents)
     {
         $this->generateFilename($file);
 

@@ -123,32 +123,39 @@ export default class DisplayFile extends Component<CustomAttrs> {
       );
 
     const transPrefix = file.isShared() ? 'fof-upload.lib.file_list.hide_shared_file' : 'fof-upload.lib.file_list.hide_file';
+    const hideTranslation = app.translator.trans(this.file.hidden() ? `${transPrefix}.btn_a11y_label_show` : `${transPrefix}.btn_a11y_label_hide`, {
+      fileName: file.baseName(),
+    });
 
     file.canHide() &&
       items.add(
         'hide-file',
-        <Button
-          className="Button Button--icon fof-file-action"
-          icon={this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash'}
-          aria-label={app.translator.trans(this.file.hidden() ? `${transPrefix}.btn_a11y_label_show` : `${transPrefix}.btn_a11y_label_hide`, {
-            fileName: file.baseName(),
-          })}
-          disabled={this.isFileHiding}
-          onclick={(e: Event) => this.hide(e)}
-        />,
+        <Tooltip text={hideTranslation} position="bottom">
+          <Button
+            className="Button Button--icon fof-file-action"
+            icon={this.file.hidden() ? 'fas fa-eye' : 'fas fa-eye-slash'}
+            aria-label={hideTranslation}
+            disabled={this.isFileHiding}
+            onclick={(e: Event) => this.hide(e)}
+          />
+        </Tooltip>,
         80
       );
+
+    const deleteTranslation = app.translator.trans('fof-upload.lib.file_list.delete_file_a11y_label', { fileName: file.baseName() });
 
     file.canDelete() &&
       items.add(
         'delete-file',
-        <Button
-          className="Button Button--icon fof-file-action"
-          icon="fas fa-trash"
-          aria-label={app.translator.trans('fof-upload.lib.file_list.delete_file_a11y_label', { fileName: file.baseName() })}
-          disabled={this.isFileHiding}
-          onclick={(e: MouseEvent) => this.confirmDelete(e)}
-        />,
+        <Tooltip text={deleteTranslation} position="bottom">
+          <Button
+            className="Button Button--icon fof-file-action"
+            icon="fas fa-trash"
+            aria-label={deleteTranslation}
+            disabled={this.isFileHiding}
+            onclick={(e: MouseEvent) => this.confirmDelete(e)}
+          />
+        </Tooltip>,
         60
       );
 
