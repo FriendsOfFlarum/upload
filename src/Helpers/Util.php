@@ -25,10 +25,9 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Laminas\Diactoros\Response\TextResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Util
@@ -221,7 +220,7 @@ class Util
     {
         $privatePath = $file->path;
         $contents = $this->getPrivateDir()->get($privatePath);
-        
+
         $adapter = $this->getAdapterForMime($file->type);
 
         $movedFile = $adapter->upload($file, null, $contents);
@@ -238,7 +237,7 @@ class Util
     public function moveFileToPrivate(File $file, User $actor): File
     {
         /** @var TextResponse $downloadedFile */
-        $downloadedFile = (resolve(Dispatcher::class))->dispatch(new Download($file->uuid, $actor));
+        $downloadedFile = resolve(Dispatcher::class)->dispatch(new Download($file->uuid, $actor));
 
         $originalFile = clone $file;
         $adapter = $this->getAdapterForFile($originalFile);
@@ -261,12 +260,13 @@ class Util
     {
         /** @var Factory $factory */
         $factory = resolve(Factory::class);
+
         return $factory->disk('private-shared');
     }
 
     private function getFilePrivateUrl(File $file): string
     {
-        return (resolve(UrlGenerator::class))->to('api')->route('fof-upload.download.uuid', [
+        return resolve(UrlGenerator::class)->to('api')->route('fof-upload.download.uuid', [
             'uuid' => $file->uuid,
         ]);
     }
