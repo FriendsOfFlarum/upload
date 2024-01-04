@@ -68,6 +68,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $json = json_decode($response->getBody()->getContents(), true);
+
         return $json['data'][0]['attributes']['uuid'];
     }
 
@@ -240,8 +241,8 @@ class HideFilesTest extends EnhancedTestCase
 
         $paths = resolve(Paths::class);
 
-        $this->assertFileExists($paths->storage."/private-shared/files/".$file->path);
-        $this->assertFileDoesNotExist($paths->public."/assets/files/".$file->path);
+        $this->assertFileExists($paths->storage.'/private-shared/files/'.$file->path);
+        $this->assertFileDoesNotExist($paths->public.'/assets/files/'.$file->path);
     }
 
     /**
