@@ -24,7 +24,6 @@ use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -106,12 +105,12 @@ class UploadHandler
 
                 if ($privateShared) {
                     $success = $this->privateSharedDir->put(
-                        $file->path = $this->files->generateFilenameFor($file),
+                        $file->path = $this->files->generateFilenameFor($file, true),
                         $this->files->readUpload($upload)
                     );
 
                     if ($success) {
-                        $file->upload_method = 'private-shared';
+                        $file->upload_method = $this->util->setMethod();
                         $file->url = $this->url->to('api')->route('fof-upload.download.uuid', [
                             'uuid' => $file->uuid,
                         ]);
@@ -135,7 +134,7 @@ class UploadHandler
                 $file = $response;
 
                 if (!$privateShared) {
-                    $file->upload_method = Str::lower(Str::afterLast($adapter::class, '\\'));
+                    $file->upload_method = $this->util->setMethod($adapter);
                 }
 
                 $file->tag = $template;

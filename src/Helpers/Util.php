@@ -13,13 +13,22 @@
 namespace FoF\Upload\Helpers;
 
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use FoF\Upload\Adapters\Manager;
+use FoF\Upload\Commands\Download;
 use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Filesystem\Cloud;
+use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Laminas\Diactoros\Response\TextResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Util
@@ -206,5 +215,64 @@ class Util
         $manager = resolve(Manager::class);
 
         return $manager->instantiate($adapter);
+    }
+
+    public function moveFileToPublic(File $file): File
+    {
+        $privatePath = $file->path;
+        $contents = $this->getPrivateDir()->get($privatePath);
+        
+        $adapter = $this->getAdapterForMime($file->type);
+
+        $movedFile = $adapter->upload($file, null, $contents);
+
+        if ($movedFile !== false) {
+            $this->getPrivateDir()->delete($privatePath);
+        }
+
+        $movedFile->upload_method = $this->setMethod($adapter);
+
+        return $movedFile;
+    }
+
+    public function moveFileToPrivate(File $file, User $actor): File
+    {
+        /** @var TextResponse $downloadedFile */
+        $downloadedFile = (resolve(Dispatcher::class))->dispatch(new Download($file->uuid, $actor));
+
+        $originalFile = clone $file;
+        $adapter = $this->getAdapterForFile($originalFile);
+
+        $success = $this->getPrivateDir()->put(
+            $file->path,
+            $downloadedFile->getBody()->getContents()
+        );
+
+        if ($success) {
+            $adapter->delete($originalFile);
+            $file->upload_method = $this->setMethod();
+            $file->url = $this->getFilePrivateUrl($file);
+        }
+
+        return $file;
+    }
+
+    private function getPrivateDir(): Cloud
+    {
+        /** @var Factory $factory */
+        $factory = resolve(Factory::class);
+        return $factory->disk('private-shared');
+    }
+
+    private function getFilePrivateUrl(File $file): string
+    {
+        return (resolve(UrlGenerator::class))->to('api')->route('fof-upload.download.uuid', [
+            'uuid' => $file->uuid,
+        ]);
+    }
+
+    public function setMethod(?UploadAdapter $adapter = null): string
+    {
+        return $adapter ? Str::lower(Str::afterLast($adapter::class, '\\')) : 'private-shared';
     }
 }

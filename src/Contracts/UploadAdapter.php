@@ -42,7 +42,7 @@ interface UploadAdapter
      *
      * @return File|bool
      */
-    public function upload(File $file, UploadedFile $upload, $contents);
+    public function upload(File $file, ?UploadedFile $upload, $contents);
 
     /**
      * In case deletion is not possible, return false.

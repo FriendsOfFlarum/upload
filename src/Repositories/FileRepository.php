@@ -371,10 +371,17 @@ class FileRepository
         }
     }
 
-    public function generateFilenameFor(File $file): string
+    public function generateFilenameFor(File $file, bool $withFolder = false): string
     {
         $today = (new Carbon());
 
-        return $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
+        $path = $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
+
+        return $withFolder ? sprintf(
+            '%s%s%s',
+            $today->toDateString(),
+            '/',
+            $path
+        ) : $path;
     }
 }
