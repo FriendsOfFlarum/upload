@@ -52,7 +52,7 @@ class FormatTextPreview
                 $first_five_lines = array_slice($lines, 0, 5);
                 $snippet = implode("\n", $first_five_lines);
 
-                if ($snippet !== $file_contents_normalised) {
+                if ($snippet == $file_contents_normalised) {
                     $attributes['has_snippet'] = 'false';
                 }
             }
