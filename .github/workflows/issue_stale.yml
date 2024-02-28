@@ -1,0 +1,28 @@
+name: "FoF Upload Issues"
+on:
+  workflow_dispatch:
+  schedule:
+    # This runs every day at 06:00 UTC: https://crontab.guru/#0_6_*_*_*
+    - cron: "0 6 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'FriendsOfFlarum'
+    steps:
+      - uses: actions/stale@v9
+        id: stale
+        name: "Close stale issues"
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          only-labels: "bug"
+          close-issue-message:
+            "This issue has been automatically closed because it received no activity for three
+            months. If you think it was closed by accident, please leave a comment. If you are
+            running into a similar issue on the latest version, please open a new issue. Thank you."
+          days-before-issue-stale: 60 # Issue will be marked as stale after 60 days of inactivity
+          days-before-issue-close: 30 # Issue will be closed after being stale for 30 days
+          days-before-pr-stale: -1 # PRs will never be marked as stale if set to a negative number
+          days-before-pr-close: -1 # PRs will never be closed if set to a negative number
+          exempt-issue-labels: "blocked,must,should,keep" # Issues with these labels will never be marked as stale
+          operations-per-run: 100
