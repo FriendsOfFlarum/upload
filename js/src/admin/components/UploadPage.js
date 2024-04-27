@@ -41,6 +41,7 @@ export default class UploadPage extends ExtensionPage {
       'awsS3Region',
       'awsS3Endpoint',
       'awsS3ACL',
+      'awsS3CustomUrl',
       // QIniu
       'qiniuKey',
       'qiniuSecret',
@@ -430,6 +431,11 @@ export default class UploadPage extends ExtensionPage {
               oninput: withAttr('value', this.values.awsS3ACL),
             }),
             m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.custom_url')),
+            m('input.FormControl', {
+              value: this.values.awsS3CustomUrl() || '',
+              oninput: withAttr('value', this.values.awsS3CustomUrl),
+            }),
           ]),
         ]),
         60
