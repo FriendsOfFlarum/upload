@@ -42,20 +42,29 @@ class AwsS3 extends Flysystem implements UploadAdapter
         /** @var SettingsRepositoryInterface $settings */
         $settings = resolve(SettingsRepositoryInterface::class);
 
-        $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
+        // Fetch custom S3 URL from settings
+        $customUrl = $settings->get('fof-upload.awsS3CustomUrl');
 
-        if (!$cdnUrl) {
-            // Ensure that $this->adapter is an instance of AwsS3Adapter
-            if ($this->adapter instanceof AwsS3Adapter) {
-                $region = $this->adapter->getClient()->getRegion();
-                $bucket = $this->adapter->getBucket();
+        if (!empty($customUrl)) {
+            // Use custom S3 URL if provided
+            $file->url = sprintf('%s/%s', rtrim($customUrl, '/'), Arr::get($this->meta, 'path', $file->path));
+        } else {
+            // Fallback to default URL construction if no custom URL is provided
+            $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
 
-                $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
-            } else {
-                throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.$this->adapter::class);
+            if (!$cdnUrl) {
+                // Ensure that $this->adapter is an instance of AwsS3Adapter
+                if ($this->adapter instanceof AwsS3Adapter) {
+                    $region = $this->adapter->getClient()->getRegion();
+                    $bucket = $this->adapter->getBucket();
+
+                    $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+                } else {
+                    throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got ' . $this->adapter::class);
+                }
             }
-        }
 
-        $file->url = sprintf('%s/%s', $cdnUrl, Arr::get($this->meta, 'path', $file->path));
+            $file->url = sprintf('%s/%s', $cdnUrl, Arr::get($this->meta, 'path', $file->path));
+        }
     }
 }
