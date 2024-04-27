@@ -436,6 +436,7 @@ export default class UploadPage extends ExtensionPage {
               value: this.values.awsS3CustomUrl() || '',
               oninput: withAttr('value', this.values.awsS3CustomUrl),
             }),
+            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.custom_s3_url')),
           ]),
         ]),
         60
