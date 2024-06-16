@@ -12,7 +12,7 @@ jobs:
 
       frontend_directory: ./js
       backend_directory: .
-      js_package_manager: npm
+      js_package_manager: yarn
       main_git_branch: master
 
     secrets:
