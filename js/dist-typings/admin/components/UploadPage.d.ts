@@ -1,6 +1,7 @@
 /// <reference types="flarum/@types/translator-icu-rich" />
 export default class UploadPage extends ExtensionPage<import("flarum/admin/components/ExtensionPage").ExtensionPageAttrs> {
     constructor();
+    oninit(vnode: any): void;
     fields: string[] | undefined;
     checkboxes: string[] | undefined;
     objects: string[] | undefined;
@@ -30,6 +31,12 @@ export default class UploadPage extends ExtensionPage<import("flarum/admin/compo
         adapter: any;
         template: any;
     } | undefined;
+    /**
+     * Show the actual ImageUploadPage.
+     *
+     * @returns {*}
+     */
+    content(): any;
     adaptorItems(): ItemList<any>;
     getTemplateOptionsForInput(): {};
     updateMimeTypeKey(mime: any, value: any): void;

@@ -1,6 +1,8 @@
 export default class UploadButton extends Component<any, undefined> {
     constructor();
+    oninit(vnode: any): void;
     isMediaUploadButton: any;
+    view(): JSX.Element;
     /**
      * Process the upload event.
      *

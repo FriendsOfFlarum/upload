@@ -1,7 +1,8 @@
 export default class FileManagerModal extends Modal<import("flarum/common/components/Modal").IInternalModalAttrs, undefined> {
     constructor();
+    oninit(vnode: any): void;
     uploader: any;
-    selectedFiles: any[] | undefined;
+    selectedFiles: any[] | any[] | undefined;
     multiSelect: any;
     restrictFileType: any;
     dragDrop: DragAndDrop | null | undefined;
@@ -9,6 +10,14 @@ export default class FileManagerModal extends Modal<import("flarum/common/compon
     sharedUploads: any;
     userFileState: FileListState | undefined;
     sharedFileState: FileListState | undefined;
+    /**
+     * Initialize drag & drop
+     */
+    oncreate(vnode: any): void;
+    /**
+     * Remove events from modal content
+     */
+    onremove(): void;
     fileLibraryButtonItems(): ItemList<any>;
     setLibrary(library: any): void;
     userFilesContent(): JSX.Element;
