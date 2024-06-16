@@ -60,7 +60,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
 
                     $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
                 } else {
-                    throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got ' . $this->adapter::class);
+                    throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.$this->adapter::class);
                 }
             }
 
