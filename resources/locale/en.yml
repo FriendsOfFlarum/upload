@@ -43,6 +43,8 @@ fof-upload:
         The following settings are only required when using S3 compatible storage. If you use AWS, you can leave them blank.
       s3_acl: |
         The ACL that should be applied to the uploaded object (default: private). For possible values, see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+      custom_s3_url: |
+        Use this setting if you are using an S3-compatible service that requires a specific URL format (e.g., Backblaze B2) or if you are experiencing issues with the default URL format. This setting is generally not necessary for most services. Ensure the URL includes the protocol (https://) and is correctly formatted. Example: https://your-bucket.s3.your-region.backblazeb2.com
       s3_instance_profile: |
         Leave key and secret empty to use credentials in instance profile.
       composer_buttons: |
@@ -58,6 +60,7 @@ fof-upload:
         endpoint: Endpoint
         use_path_style_endpoint: Use path style endpoint
         acl: Access Control List (ACL)
+        custom_url: Custom S3 URL
       disable-download-logging:
         title: Disable logging downloads
         toggle: Disable

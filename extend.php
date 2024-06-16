@@ -116,7 +116,8 @@ return [
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
 
     (new Extend\Settings())
-        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE),
+        ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
+        ->default('fof-upload.s3CustomUrl', ''),  // Default to empty, meaning use AWS default URL
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
