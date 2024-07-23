@@ -22,13 +22,13 @@ An extension that handles file uploads intelligently for your forum.
 Install manually:
 
 ```sh
-composer require fof/upload "*"
+composer require fof/upload:"*"
 ```
 
 ## Updating
 
 ```sh
-composer require fof/upload "*"
+composer require fof/upload:"*"
 php flarum migrate
 php flarum cache:clear
 ```
