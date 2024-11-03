@@ -101,7 +101,7 @@ class DefaultDownloader implements Downloader
 
         $response = $response->withHeader(
             'Content-Disposition',
-            sprintf('attachment; filename="%s"', $file->base_name)
+            sprintf('attachment; filename="%s"; filename*=utf-8\'\'%s', $file->base_name, urlencode($file->base_name))
         );
 
         return $response;
