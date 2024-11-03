@@ -50,7 +50,7 @@
     "require-dev": {
         "league/flysystem-aws-s3-v3": "^1.0",
         "overtrue/flysystem-qiniu": "1.0.4",
-        "blomstra/gdpr": "@beta",
+        "flarum/gdpr": "dev-main",
         "flarum/phpstan": "*",
         "flarum/testing": "^1.0.0"
     },

@@ -12,7 +12,7 @@
 
 namespace FoF\Upload\Data;
 
-use Blomstra\Gdpr\Data\Type;
+use Flarum\Gdpr\Data\Type;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\File;

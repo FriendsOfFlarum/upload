@@ -12,7 +12,7 @@
 
 namespace FoF\Upload;
 
-use Blomstra\Gdpr\Extend\UserData;
+use Flarum\Gdpr\Extend\UserData;
 use Flarum\Api\Controller\ListDiscussionsController;
 use Flarum\Api\Controller\ListPostsController;
 use Flarum\Api\Controller\ShowForumController;
@@ -129,7 +129,7 @@ return [
         ->modelPolicy(File::class, Access\FilePolicy::class),
 
     (new Extend\Conditional())
-        ->whenExtensionEnabled('blomstra-gdpr', fn () => [
+        ->whenExtensionEnabled('flarum-gdpr', fn () => [
             (new UserData())
                 ->addType(Data\Uploads::class),
         ]),
