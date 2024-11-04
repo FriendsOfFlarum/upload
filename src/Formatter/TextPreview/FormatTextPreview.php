@@ -43,7 +43,7 @@ class FormatTextPreview
             $snippet = '';
 
             if ($file) {
-                $file_contents = file_get_contents($this->paths->public . '/assets/files/' . $file->path);
+                $file_contents = file_get_contents($this->paths->public.'/assets/files/'.$file->path);
                 $lines = preg_split('/\R/', $file_contents);
                 $lines = array_filter($lines, 'trim');
 
