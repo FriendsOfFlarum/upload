@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Commands;
 
+use Flarum\User\Exception\PermissionDeniedException;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\Manager;
@@ -43,29 +44,37 @@ class DeleteFileHandler
     public function handle(DeleteFile $command): void
     {
         $privateShared = $this->util->isPrivateShared($command->file);
+        $fileIsShared = $privateShared || $command->file->shared;
 
-        if ($privateShared || $command->file->shared) {
-            $command->actor->assertCan('fof-upload.upload-shared-files');
+        $hasPermission = false;
+
+        if ($fileIsShared) {
+            $hasPermission = $command->actor->can('fof-upload.deleteSharedUploads');
         } else {
-            // We don't currently have a permission for this, so we'll just use admin.
-            $command->actor->assertAdmin();
+            if ($command->actor->id === $command->file->actor_id) {
+                $hasPermission = $command->actor->can('fof-upload.deleteUserUploads');
+            } else {
+                $hasPermission = $command->actor->can('fof-upload.deleteOtherUsersUploads');
+            }
         }
 
-        $success = false;
-
-        // Delete the file from storage.
-        if ($privateShared) {
-            $success = $this->deleteSharedFile($command->file);
-        } else {
-            $success = $this->deleteFileViaAdaptor($command->file);
+        /**
+         * If none of the above conditions are met, a `PermissionDeniedException`
+         * is thrown as a precaution.
+         */
+        if (!$hasPermission && !$command->actor->isAdmin()) {
+            throw new PermissionDeniedException();
         }
+
+        $success = $privateShared
+            ? $this->deleteSharedFile($command->file)
+            : $this->deleteFileViaAdaptor($command->file);
 
         if ($success === false) {
             throw new ValidationException(['file' => 'Could not delete file.']);
-        } else {
-            // Delete the file record from the database.
-            $command->file->delete();
         }
+
+        $command->file->delete();
     }
 
     protected function deleteSharedFile(File $file): bool
