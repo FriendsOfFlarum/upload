@@ -52,7 +52,7 @@ class FilePolicy extends AbstractPolicy
         }
 
         /**
-         * Deny by default if none of the above conditions are met
+         * Deny by default if none of the above conditions are met.
          */
         return $this->deny();
     }
@@ -79,7 +79,7 @@ class FilePolicy extends AbstractPolicy
         }
 
         /**
-         * Deny by default if none of the above conditions are met
+         * Deny by default if none of the above conditions are met.
          */
         return $this->deny();
     }

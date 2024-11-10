@@ -12,9 +12,9 @@
 
 namespace FoF\Upload\Commands;
 
-use Flarum\User\Exception\PermissionDeniedException;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
