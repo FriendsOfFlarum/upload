@@ -41,12 +41,57 @@ app.initializers.add('fof-upload', () => {
     )
     .registerPermission(
       {
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_own_uploads_label'),
+        permission: 'fof-upload.hideUserUploads',
+      },
+      'moderate',
+      42
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_uploads_of_others_label'),
+        permission: 'fof-upload.hideOtherUsersUploads',
+      },
+      'moderate',
+      41
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_shared_uploads_label'),
+        permission: 'fof-upload.hideSharedUploads',
+      },
+      'moderate',
+      40
+    )
+    .registerPermission(
+      {
         icon: 'fas fa-trash',
-        label: app.translator.trans('fof-upload.admin.permissions.delete_uploads_of_others_label'),
+        label: app.translator.trans('fof-upload.admin.permissions.delete_own_uploads_label'),
         permission: 'fof-upload.deleteUserUploads',
       },
       'moderate',
-      50
+      32
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_uploads_of_others_label'),
+        permission: 'fof-upload.deleteOtherUsersUploads',
+      },
+      'moderate',
+      31
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_shared_uploads_label'),
+        permission: 'fof-upload.deleteSharedUploads',
+      },
+      'moderate',
+      30
     )
     .registerPermission(
       {

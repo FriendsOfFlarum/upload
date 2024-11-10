@@ -107,7 +107,12 @@ fof-upload:
       download_label: Download files
       upload_label: Upload files
       view_user_uploads_label: View user uploads
-      delete_uploads_of_others_label: Delete user uploads
+      hide_own_uploads_label: Hide own uploads
+      hide_uploads_of_others_label: Hide uploads of other users
+      hide_shared_uploads_label: Hide shared uploads
+      delete_own_uploads_label: Delete own uploads
+      delete_uploads_of_others_label: Delete uploads of other users
+      delete_shared_uploads_label: Delete shared uploads
       upload_shared_label: Upload shared files
       access_shared_label: Access shared files in Media Manager
     templates:
