@@ -14,7 +14,7 @@
       align-items: center;
       justify-content: center;
       border-radius: @border-radius;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: 0 2px 4px @shadow-color;
       border: 2px solid transparent; // Transparent border to maintain spacing when selected
       transition: box-shadow 150ms ease-in-out;
@@ -70,6 +70,12 @@
 
         .tooltip {
           overflow: visible !important;
+
+          .tooltip-inner {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            text-wrap: wrap;
+          }
         }
       }
   
