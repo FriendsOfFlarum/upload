@@ -100,15 +100,15 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
               </li>
             );
           })}
-          {/* Load more files */}
-          {this.hasMoreResults() && (
-            <div className={'fof-load-more-files'}>
-              <Button className={'Button Button--primary'} disabled={this.isLoading()} loading={this.isLoading()} onclick={() => this.loadMore()}>
-                {app.translator.trans('fof-upload.lib.file_list.load_more_files_btn')}
-              </Button>
-            </div>
-          )}
         </ul>
+        {/* Load more files */}
+        {this.hasMoreResults() && (
+          <div className={'fof-load-more-files'}>
+            <Button className={'Button Button--primary'} disabled={this.isLoading()} loading={this.isLoading()} onclick={() => this.loadMore()}>
+              {app.translator.trans('fof-upload.lib.file_list.load_more_files_btn')}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
