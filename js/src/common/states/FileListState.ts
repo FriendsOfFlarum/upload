@@ -75,7 +75,7 @@ export default class FileListState {
   }
 
   private parseResults(results: ApiResponsePlural<File>): ApiResponsePlural<File> {
-    this.files = results;
+    this.files = this.files.concat(results);
     this.loading = false;
     this.moreResults = !!results.payload?.links?.next;
     m.redraw();
