@@ -5,17 +5,21 @@ import type Mithril from 'mithril';
 import User from 'flarum/common/models/User';
 import FileListState from '../../common/states/FileListState';
 
+import type File from '../../common/models/File';
+
 export default class UploadsUserPage extends UserPage {
-  oninit(vnode: Mithril.Vnode) {
+  fileState!: FileListState;
+
+  oninit(vnode: Mithril.Vnode<this>) {
     super.oninit(vnode);
 
     this.user = null;
+    this.fileState = new FileListState();
 
     this.loadUser(m.route.param('username'));
   }
 
   content() {
-    const fileState = new FileListState();
     if (app.session.user && (app.session.user.viewOthersMediaLibrary() || this.user === app.session.user)) {
       return (
         this.user &&
@@ -23,12 +27,17 @@ export default class UploadsUserPage extends UserPage {
           user: this.user,
           selectable: false,
           downloadOnClick: true,
-          fileState,
+          fileState: this.fileState,
+          onDelete: this.onDelete.bind(this),
         })
       );
     } else {
       return null;
     }
+  }
+
+  onDelete(file: File) {
+    this.fileState.removeFromList(file);
   }
 
   show(user: User) {
