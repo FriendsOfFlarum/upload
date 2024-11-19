@@ -107,6 +107,7 @@ return [
         ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
+        ->render(Formatter\ImagePreview\FormatImagePreview::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())

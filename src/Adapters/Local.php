@@ -13,8 +13,6 @@
 namespace FoF\Upload\Adapters;
 
 use Flarum\Foundation\Paths;
-use Flarum\Http\UrlGenerator;
-use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use League\Flysystem\Adapter\Local as AdapterLocal;
@@ -54,16 +52,10 @@ class Local extends Flysystem implements UploadAdapter
             $this->adapter->applyPathPrefix($this->meta['path'])
         );
 
-        /** @var UrlGenerator $generator */
-        $generator = resolve(UrlGenerator::class);
-
-        /** @var SettingsRepositoryInterface $settings */
-        $settings = resolve(SettingsRepositoryInterface::class);
-
-        if ($settings->get('fof-upload.cdnUrl')) {
-            $file->url = $settings->get('fof-upload.cdnUrl').$file->url;
+        if ($this->settings->get('fof-upload.cdnUrl')) {
+            $file->url = $this->settings->get('fof-upload.cdnUrl').$file->url;
         } else {
-            $file->url = $generator->to('forum')->path(ltrim($file->url, '/'));
+            $file->url = $this->url->to('forum')->path(ltrim($file->url, '/'));
         }
     }
 }

@@ -16,9 +16,12 @@ use Carbon\Carbon;
 use enshrined\svgSanitize\Sanitizer;
 use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\UrlGenerator;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters;
+use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
@@ -27,6 +30,7 @@ use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -54,9 +58,16 @@ class FileRepository
         private Dispatcher $events,
         private Sanitizer $sanitizer,
         private MimeDetector $mimeDetector,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private Manager $manager,
+        private UrlGenerator $url
     ) {
         $this->path = $paths->storage;
+    }
+
+    public function query(): Builder
+    {
+        return File::query();
     }
 
     /**
@@ -67,6 +78,13 @@ class FileRepository
     public function findByUuid($uuid)
     {
         return File::byUuid($uuid)
+            ->with('downloads')
+            ->first();
+    }
+
+    public function findByUrl($url)
+    {
+        return File::byUrl($url)
             ->with('downloads')
             ->first();
     }
@@ -383,5 +401,48 @@ class FileRepository
             '/',
             $path
         ) : $path;
+    }
+
+    /**
+     * Determine the hostname for the adapter used for this file.
+     *
+     * Currently only available for AwsS3.
+     *
+     * @param File $file
+     *
+     * @returns string|null
+     */
+    public function getHostnameForFile(File $file, UploadAdapter $adapter): ?string
+    {
+        if ($adapter instanceof AwsS3) {
+            return $adapter->hostName();
+        } elseif ($adapter instanceof Adapters\Local) {
+            return $this->url->to('forum')->path('assets/files');
+        }
+
+        return null;
+    }
+
+    /**
+     * Build and return the absolute URL for a file.
+     *
+     * @param File $file
+     *
+     * @returns string|null
+     */
+    public function getUrlForFile(File $file): ?string
+    {
+        $adapter = $this->manager->instantiate($file->upload_method);
+
+        $supportedAdapters = [
+            Adapters\Local::class,
+            Adapters\AwsS3::class,
+        ];
+
+        if (!in_array(get_class($adapter), $supportedAdapters)) {
+            return null;
+        }
+
+        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
     }
 }
