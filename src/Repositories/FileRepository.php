@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use enshrined\svgSanitize\Sanitizer;
 use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\UrlGenerator;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -42,7 +43,6 @@ use SoftCreatR\MimeDetector\MimeDetector;
 use SoftCreatR\MimeDetector\MimeDetectorException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Flarum\Http\UrlGenerator;
 
 class FileRepository
 {
@@ -416,7 +416,7 @@ class FileRepository
     {
         if ($adapter instanceof AwsS3) {
             return $adapter->hostName();
-        } else if ($adapter instanceof Adapters\Local) {
+        } elseif ($adapter instanceof Adapters\Local) {
             return $this->url->to('forum')->path('assets/files');
         }
 

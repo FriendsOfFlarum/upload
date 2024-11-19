@@ -46,13 +46,12 @@ class FormatImagePreview
             }
 
             if ($file) {
-
                 if ($fileUrl = $this->files->getUrlForFile($file)) {
                     $attributes['url'] = $fileUrl;
                 }
 
-                if ($attributes['alt'] === "{TEXT?}") {
-                    $attributes['alt'] = "";
+                if ($attributes['alt'] === '{TEXT?}') {
+                    $attributes['alt'] = '';
                 }
 
                 $attributes['title'] = $file->base_name;
