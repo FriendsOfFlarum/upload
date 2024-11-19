@@ -132,7 +132,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -251,10 +251,10 @@ class FileRepository
 
         File::query()
             // Files already mapped to the post.
-            ->whereHas('posts', fn($query) => $query->where('posts.id', $post->id))
+            ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
             ->orWhereExists(
-                fn($query) => $query
+                fn ($query) => $query
                     ->select($db->raw(1))
                     ->from('posts')
                     ->where('posts.id', $post->id)
@@ -381,7 +381,7 @@ class FileRepository
             }
 
             return mime_content_type($file->getPathname());
-        } catch (MimeDetectorException | \Exception $e) {
+        } catch (MimeDetectorException|\Exception $e) {
             throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
         }
     }
@@ -390,7 +390,7 @@ class FileRepository
     {
         $today = (new Carbon());
 
-        $path = $today->timestamp . '-' . $today->micro . '-' . $file->base_name;
+        $path = $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
 
         return $withFolder ? sprintf(
             '%s%s%s',
@@ -402,11 +402,11 @@ class FileRepository
 
     /**
      * Determine the hostname for the adapter used for this file.
-     * 
+     *
      * Currently only available for AwsS3.
-     * 
+     *
      * @param File $file
-     * 
+     *
      * @returns string|null
      */
     public function getHostnameForFile(File $file): ?string
@@ -422,12 +422,13 @@ class FileRepository
 
     /**
      * Build and return the absolute URL for a file.
-     * 
+     *
      * @param File $file
+     *
      * @returns string|null
      */
     public function getUrlForFile(File $file): ?string
     {
-        return $this->getHostnameForFile($file) . '/' . $file->path;
+        return $this->getHostnameForFile($file).'/'.$file->path;
     }
 }

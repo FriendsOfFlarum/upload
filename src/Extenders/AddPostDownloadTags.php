@@ -48,7 +48,6 @@ class AddPostDownloadTags extends Formatter
                 $template->bbcode(),
                 $template->template()->render()
             );
-            
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException("Failed importing $name due to {$e->getMessage()}");
         } catch (UnsafeTemplateException $e) {

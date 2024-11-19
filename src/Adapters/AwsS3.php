@@ -45,6 +45,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
      * Generate the URL for the given file.
      *
      * @param File $file
+     *
      * @return void
      */
     protected function generateUrl(File $file): void
@@ -57,8 +58,9 @@ class AwsS3 extends Flysystem implements UploadAdapter
     /**
      * Determine the hostname of the storage adapter.
      *
-     * @return string
      * @throws \RuntimeException If the adapter is not an instance of AwsS3Adapter.
+     *
+     * @return string
      */
     public function hostName(): string
     {
@@ -82,6 +84,6 @@ class AwsS3 extends Flysystem implements UploadAdapter
             return sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
         }
 
-        throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got ' . get_class($this->adapter));
+        throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.get_class($this->adapter));
     }
 }

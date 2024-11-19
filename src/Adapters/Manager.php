@@ -39,7 +39,8 @@ class Manager
         protected Util $util,
         protected SettingsRepositoryInterface $settings,
         protected UrlGenerator $url
-    ) {}
+    ) {
+    }
 
     public function adapters(): Collection
     {
@@ -126,7 +127,7 @@ class Manager
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers'  => [
-                    'Authorization' => 'Client-ID ' . $this->settings->get('fof-upload.imgurClientId'),
+                    'Authorization' => 'Client-ID '.$this->settings->get('fof-upload.imgurClientId'),
                 ],
             ]),
             $this->settings,
@@ -142,7 +143,7 @@ class Manager
     protected function local(Util $util)
     {
         return new Adapters\Local(
-            new FlyAdapters\Local($this->paths->public . '/assets/files'),
+            new FlyAdapters\Local($this->paths->public.'/assets/files'),
             $this->settings,
             $this->url
         );
