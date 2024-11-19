@@ -129,9 +129,7 @@ class Manager
                 'headers'  => [
                     'Authorization' => 'Client-ID '.$this->settings->get('fof-upload.imgurClientId'),
                 ],
-            ]),
-            $this->settings,
-            $this->url
+            ])
         );
     }
 
