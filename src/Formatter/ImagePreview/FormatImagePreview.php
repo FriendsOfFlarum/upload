@@ -51,6 +51,10 @@ class FormatImagePreview
                     $attributes['url'] = $fileUrl;
                 }
 
+                if ($attributes['alt'] === "{TEXT?}") {
+                    $attributes['alt'] = "";
+                }
+
                 $attributes['title'] = $file->base_name;
             }
 
