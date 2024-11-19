@@ -19,6 +19,7 @@ use Flarum\Foundation\ValidationException;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
@@ -27,6 +28,7 @@ use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Validators\UploadValidator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
@@ -54,9 +56,15 @@ class FileRepository
         private Dispatcher $events,
         private Sanitizer $sanitizer,
         private MimeDetector $mimeDetector,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private Manager $manager
     ) {
         $this->path = $paths->storage;
+    }
+
+    public function query(): Builder
+    {
+        return File::query();
     }
 
     /**
@@ -67,6 +75,13 @@ class FileRepository
     public function findByUuid($uuid)
     {
         return File::byUuid($uuid)
+            ->with('downloads')
+            ->first();
+    }
+
+    public function findByUrl($url)
+    {
+        return File::byUrl($url)
             ->with('downloads')
             ->first();
     }
@@ -117,7 +132,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -236,10 +251,10 @@ class FileRepository
 
         File::query()
             // Files already mapped to the post.
-            ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
+            ->whereHas('posts', fn($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
             ->orWhereExists(
-                fn ($query) => $query
+                fn($query) => $query
                     ->select($db->raw(1))
                     ->from('posts')
                     ->where('posts.id', $post->id)
@@ -366,7 +381,7 @@ class FileRepository
             }
 
             return mime_content_type($file->getPathname());
-        } catch (MimeDetectorException|\Exception $e) {
+        } catch (MimeDetectorException | \Exception $e) {
             throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
         }
     }
@@ -375,7 +390,7 @@ class FileRepository
     {
         $today = (new Carbon());
 
-        $path = $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
+        $path = $today->timestamp . '-' . $today->micro . '-' . $file->base_name;
 
         return $withFolder ? sprintf(
             '%s%s%s',
@@ -383,5 +398,36 @@ class FileRepository
             '/',
             $path
         ) : $path;
+    }
+
+    /**
+     * Determine the hostname for the adapter used for this file.
+     * 
+     * Currently only available for AwsS3.
+     * 
+     * @param File $file
+     * 
+     * @returns string|null
+     */
+    public function getHostnameForFile(File $file): ?string
+    {
+        $adapter = $this->manager->instantiate($file->upload_method);
+
+        if ($adapter instanceof AwsS3) {
+            return $adapter->hostName();
+        }
+
+        return null;
+    }
+
+    /**
+     * Build and return the absolute URL for a file.
+     * 
+     * @param File $file
+     * @returns string|null
+     */
+    public function getUrlForFile(File $file): ?string
+    {
+        return $this->getHostnameForFile($file) . '/' . $file->path;
     }
 }

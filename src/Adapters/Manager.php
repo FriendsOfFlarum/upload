@@ -15,6 +15,7 @@ namespace FoF\Upload\Adapters;
 use Aws\S3\S3Client;
 use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters;
 use FoF\Upload\Contracts\UploadAdapter;
@@ -36,14 +37,15 @@ class Manager
         protected Dispatcher $events,
         protected Paths $paths,
         protected Util $util,
-        protected SettingsRepositoryInterface $settings
-    ) {
-    }
+        protected SettingsRepositoryInterface $settings,
+        protected UrlGenerator $url
+    ) {}
 
     public function adapters(): Collection
     {
         $adapters = Collection::make([
             'aws-s3' => class_exists(S3Client::class),
+            'awss3'  => class_exists(S3Client::class),
             'imgur'  => true,
             'qiniu'  => class_exists(QiniuClient::class),
             'local'  => true,
@@ -101,12 +103,12 @@ class Manager
             ];
         }
 
-        return new Adapters\AwsS3(
-            new AwsS3Adapter(
-                new S3Client($s3Config),
-                $this->settings->get('fof-upload.awsS3Bucket')
-            ),
+        $leagueAdapter = new AwsS3Adapter(
+            new S3Client($s3Config),
+            $this->settings->get('fof-upload.awsS3Bucket')
         );
+
+        return new Adapters\AwsS3($leagueAdapter, $this->settings, $this->url);
     }
 
     /**
@@ -124,9 +126,11 @@ class Manager
             new Guzzle([
                 'base_uri' => 'https://api.imgur.com/3/',
                 'headers'  => [
-                    'Authorization' => 'Client-ID '.$this->settings->get('fof-upload.imgurClientId'),
+                    'Authorization' => 'Client-ID ' . $this->settings->get('fof-upload.imgurClientId'),
                 ],
-            ])
+            ]),
+            $this->settings,
+            $this->url
         );
     }
 
@@ -138,7 +142,9 @@ class Manager
     protected function local(Util $util)
     {
         return new Adapters\Local(
-            new FlyAdapters\Local($this->paths->public.'/assets/files'),
+            new FlyAdapters\Local($this->paths->public . '/assets/files'),
+            $this->settings,
+            $this->url
         );
     }
 
@@ -160,6 +166,6 @@ class Manager
             $this->settings->get('fof-upload.cdnUrl')
         );
 
-        return new Adapters\Qiniu($client);
+        return new Adapters\Qiniu($client, $this->settings, $this->url);
     }
 }

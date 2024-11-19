@@ -86,6 +86,12 @@ class File extends AbstractModel
             ->where('uuid', $uuid);
     }
 
+    public static function byUrl(string $url): Builder
+    {
+        return static::query()
+            ->where('url', $url);
+    }
+
     public function actor()
     {
         return $this->belongsTo(User::class, 'actor_id');
