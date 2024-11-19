@@ -12,7 +12,6 @@
 
 namespace FoF\Upload\Formatter\ImagePreview;
 
-use Flarum\Foundation\Paths;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Support\Arr;
 use s9e\TextFormatter\Renderer;
@@ -21,8 +20,7 @@ use s9e\TextFormatter\Utils;
 class FormatImagePreview
 {
     public function __construct(
-        private FileRepository $files,
-        private Paths $paths
+        private FileRepository $files
     ) {
     }
 
