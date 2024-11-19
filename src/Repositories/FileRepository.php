@@ -19,6 +19,7 @@ use Flarum\Foundation\ValidationException;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters;
 use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
@@ -41,6 +42,7 @@ use SoftCreatR\MimeDetector\MimeDetector;
 use SoftCreatR\MimeDetector\MimeDetectorException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Flarum\Http\UrlGenerator;
 
 class FileRepository
 {
@@ -57,7 +59,8 @@ class FileRepository
         private Sanitizer $sanitizer,
         private MimeDetector $mimeDetector,
         private TranslatorInterface $translator,
-        private Manager $manager
+        private Manager $manager,
+        private UrlGenerator $url
     ) {
         $this->path = $paths->storage;
     }
@@ -409,12 +412,12 @@ class FileRepository
      *
      * @returns string|null
      */
-    public function getHostnameForFile(File $file): ?string
+    public function getHostnameForFile(File $file, UploadAdapter $adapter): ?string
     {
-        $adapter = $this->manager->instantiate($file->upload_method);
-
         if ($adapter instanceof AwsS3) {
             return $adapter->hostName();
+        } else if ($adapter instanceof Adapters\Local) {
+            return $this->url->to('forum')->path('assets/files');
         }
 
         return null;
@@ -429,6 +432,17 @@ class FileRepository
      */
     public function getUrlForFile(File $file): ?string
     {
-        return $this->getHostnameForFile($file).'/'.$file->path;
+        $adapter = $this->manager->instantiate($file->upload_method);
+
+        $supportedAdapters = [
+            Adapters\Local::class,
+            Adapters\AwsS3::class,
+        ];
+
+        if (!in_array(get_class($adapter), $supportedAdapters)) {
+            return null;
+        }
+
+        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
     }
 }
