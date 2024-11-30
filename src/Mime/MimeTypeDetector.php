@@ -63,27 +63,31 @@ class MimeTypeDetector
         }
 
         try {
-            // Use existing MimeDetector library
-            $mimeDetector = new MimeDetector($this->filePath);
-            $type = $mimeDetector->getMimeType();
-
-            // If the MIME type is detected, return it
-            if (!empty($type)) {
-                return $type;
-            }
-
-            // Fallback to PHP's mime_content_type
-            $type = mime_content_type($this->filePath);
+            
+            $type = $this->getMimeInternally();
 
             // If mime_content_type returns application/zip or empty, perform magic byte detection
             if ($type === 'application/zip' || empty($type)) {
                 return $this->detectUsingMagicBytes();
             }
-
             return $type;
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
+    }
+
+    private function getMimeInternally(): ?string
+    {
+        // Use existing MimeDetector library
+        $mimeDetector = new MimeDetector($this->filePath);
+
+        $mime = $mimeDetector->getMimeType();
+
+        if (empty($mime)) {
+            $mime = mime_content_type($this->filePath);
+        }
+
+        return $mime;
     }
 
     /**
