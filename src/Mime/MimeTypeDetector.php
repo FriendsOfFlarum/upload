@@ -63,13 +63,13 @@ class MimeTypeDetector
         }
 
         try {
-            
             $type = $this->getMimeInternally();
 
             // If mime_content_type returns application/zip or empty, perform magic byte detection
             if ($type === 'application/zip' || empty($type)) {
                 return $this->detectUsingMagicBytes();
             }
+
             return $type;
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
