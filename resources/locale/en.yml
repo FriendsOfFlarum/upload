@@ -133,7 +133,8 @@ fof-upload:
       text-preview_description: |
         Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
     upload_methods:
-      aws-s3: S3/Compatible
+      aws-s3: S3 or Compatible
+      awss3: AWS S3
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS
