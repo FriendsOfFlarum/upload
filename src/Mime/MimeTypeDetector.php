@@ -76,7 +76,7 @@ class MimeTypeDetector
         }
     }
 
-    private function getMimeInternally(): ?string
+    private function getMimeInternally(): bool|string
     {
         // Use existing MimeDetector library
         $mimeDetector = new MimeDetector($this->filePath);
