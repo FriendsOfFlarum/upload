@@ -95,7 +95,8 @@ return [
         ->register(Providers\UtilProvider::class)
         ->register(Providers\StorageServiceProvider::class)
         ->register(Providers\DownloadProvider::class)
-        ->register(Providers\SanitizerProvider::class),
+        ->register(Providers\SanitizerProvider::class)
+        ->register(Providers\MimeMappingProvider::class),
 
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
