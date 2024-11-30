@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of fof/upload.
+ *
+ * Copyright (c) FriendsOfFlarum.
+ * Copyright (c) Flagrow.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FoF\Upload\Mime;
 
 use Flarum\Foundation\ValidationException;
@@ -15,11 +25,13 @@ class MimeTypeDetector
      * Set the file path for MIME type detection.
      *
      * @param string $filePath
+     *
      * @return $this
      */
     public function forFile(string $filePath): self
     {
         $this->filePath = $filePath;
+
         return $this;
     }
 
@@ -27,11 +39,13 @@ class MimeTypeDetector
      * Set the upload object for fallback extension guessing.
      *
      * @param UploadedFile $upload
+     *
      * @return $this
      */
     public function withUpload(UploadedFile $upload): self
     {
         $this->upload = $upload;
+
         return $this;
     }
 
@@ -39,6 +53,7 @@ class MimeTypeDetector
      * Determine the MIME type of the file.
      *
      * @throws ValidationException
+     *
      * @return string|null
      */
     public function getMimeType(): ?string
@@ -106,6 +121,7 @@ class MimeTypeDetector
      * Check if the file is a valid APK by inspecting its contents.
      *
      * @param string $filePath
+     *
      * @return bool
      */
     private function isApk(string $filePath): bool
@@ -117,22 +133,24 @@ class MimeTypeDetector
             foreach ($requiredFiles as $file) {
                 if ($zip->locateName($file) === false) {
                     $zip->close();
+
                     return false; // Required APK-specific file not found
                 }
             }
             $zip->close();
+
             return true; // All required files found
         }
 
         return false; // Not a valid ZIP file
     }
 
-
     /**
      * Determine the file extension based on the MIME type or original extension.
      *
-     * @param array $whitelistedExtensions Whitelisted extensions for validation
-     * @param string|null $originalExtension Original client extension
+     * @param array       $whitelistedExtensions Whitelisted extensions for validation
+     * @param string|null $originalExtension     Original client extension
+     *
      * @return string
      */
     public function getFileExtension(array $whitelistedExtensions = [], ?string $originalExtension = null): string
@@ -166,6 +184,7 @@ class MimeTypeDetector
      * Guess file extension based on MIME type.
      *
      * @param string|null $mimeType
+     *
      * @return string|null
      */
     private function guessExtensionFromMimeType(?string $mimeType): ?string

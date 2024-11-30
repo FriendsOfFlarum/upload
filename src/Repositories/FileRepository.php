@@ -133,7 +133,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -248,10 +248,10 @@ class FileRepository
 
         File::query()
             // Files already mapped to the post.
-            ->whereHas('posts', fn($query) => $query->where('posts.id', $post->id))
+            ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
             ->orWhereExists(
-                fn($query) => $query
+                fn ($query) => $query
                     ->select($db->raw(1))
                     ->from('posts')
                     ->where('posts.id', $post->id)
@@ -378,7 +378,7 @@ class FileRepository
     {
         $today = (new Carbon());
 
-        $path = $today->timestamp . '-' . $today->micro . '-' . $file->base_name;
+        $path = $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
 
         return $withFolder ? sprintf(
             '%s%s%s',
@@ -428,6 +428,6 @@ class FileRepository
             return null;
         }
 
-        return $this->getHostnameForFile($file, $adapter) . '/' . $file->path;
+        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
     }
 }
