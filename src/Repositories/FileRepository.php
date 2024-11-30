@@ -29,18 +29,16 @@ use FoF\Upload\Download;
 use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
+use FoF\Upload\Mime\MimeTypeDetector;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
-use SoftCreatR\MimeDetector\MimeDetector;
-use SoftCreatR\MimeDetector\MimeDetectorException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -57,10 +55,10 @@ class FileRepository
         private SettingsRepositoryInterface $settings,
         private Dispatcher $events,
         private Sanitizer $sanitizer,
-        private MimeDetector $mimeDetector,
         private TranslatorInterface $translator,
         private Manager $manager,
-        private UrlGenerator $url
+        private UrlGenerator $url,
+        private MimeTypeDetector $mimeTypeDetector
     ) {
         $this->path = $paths->storage;
     }
@@ -135,7 +133,7 @@ class FileRepository
          * Fatal error: Uncaught Laminas\HttpHandlerRunner\Exception\EmitterException:
          * Output has been emitted previously; cannot emit response
          */
-        $tempFile = @tempnam($this->path.'/tmp', 'fof.upload.');
+        $tempFile = @tempnam($this->path . '/tmp', 'fof.upload.');
         $upload->moveTo($tempFile);
 
         $file = new Upload(
@@ -183,7 +181,7 @@ class FileRepository
         return new Filesystem(new Local($path));
     }
 
-    protected function determineExtension(Upload $upload): string
+    public function determineExtension(Upload $upload): string
     {
         $whitelistedClientExtensions = explode(',', $this->settings->get('fof-upload.whitelistedClientExtensions', ''));
 
@@ -194,13 +192,9 @@ class FileRepository
             return $originalClientExtension;
         }
 
-        $guessed = $upload->guessExtension();
-
-        if ($guessed) {
-            return $guessed;
-        }
-
-        return 'bin';
+        return $this->mimeTypeDetector
+            ->withUpload($upload)
+            ->getFileExtension($whitelistedClientExtensions, $originalClientExtension);
     }
 
     protected function getBasename(Upload $upload, string $uuid): string
@@ -254,10 +248,10 @@ class FileRepository
 
         File::query()
             // Files already mapped to the post.
-            ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
+            ->whereHas('posts', fn($query) => $query->where('posts.id', $post->id))
             // Files found in (new) content.
             ->orWhereExists(
-                fn ($query) => $query
+                fn($query) => $query
                     ->select($db->raw(1))
                     ->from('posts')
                     ->where('posts.id', $post->id)
@@ -375,25 +369,16 @@ class FileRepository
      */
     public function determineMime(Upload $file): ?string
     {
-        try {
-            $this->mimeDetector->setFile($file->getPathname());
-            $uploadFileData = $this->mimeDetector->getFileType();
-
-            if (Arr::has($uploadFileData, 'mime')) {
-                return $uploadFileData['mime'];
-            }
-
-            return mime_content_type($file->getPathname());
-        } catch (MimeDetectorException|\Exception $e) {
-            throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
-        }
+        return $this->mimeTypeDetector
+            ->forFile($file->getPathname())
+            ->getMimeType();
     }
 
     public function generateFilenameFor(File $file, bool $withFolder = false): string
     {
         $today = (new Carbon());
 
-        $path = $today->timestamp.'-'.$today->micro.'-'.$file->base_name;
+        $path = $today->timestamp . '-' . $today->micro . '-' . $file->base_name;
 
         return $withFolder ? sprintf(
             '%s%s%s',
@@ -443,6 +428,6 @@ class FileRepository
             return null;
         }
 
-        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
+        return $this->getHostnameForFile($file, $adapter) . '/' . $file->path;
     }
 }

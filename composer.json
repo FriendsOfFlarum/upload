@@ -32,13 +32,13 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
-        "enshrined/svg-sanitize": "^0.15.4",
+        "enshrined/svg-sanitize": "^0",
         "flarum/core": "^1.8.3",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
-        "softcreatr/php-mime-detector": "^3.0"
+        "softcreatr/php-mime-detector": "^4.0"
     },
     "replace": {
         "flagrow/upload": "*"
