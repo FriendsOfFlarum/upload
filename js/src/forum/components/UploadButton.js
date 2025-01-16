@@ -1,6 +1,6 @@
 import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
-import Button from 'flarum/common/components/Button';
+import TextEditorButton from 'flarum/common/components/TextEditorButton';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
 
@@ -25,7 +25,7 @@ export default class UploadButton extends Component {
       : app.translator.trans('fof-upload.forum.buttons.upload');
 
     return (
-      <Button
+      <TextEditorButton
         className={classList([
           'Button',
           'hasIcon',
@@ -37,13 +37,14 @@ export default class UploadButton extends Component {
         icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
         onclick={this.uploadButtonClicked.bind(this)}
         disabled={this.attrs.disabled}
+        title={buttonText}
       >
         {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
         {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
         <form>
           <input type="file" multiple={true} onchange={this.process.bind(this)} />
         </form>
-      </Button>
+      </TextEditorButton>
     );
   }
 
