@@ -46,6 +46,11 @@ export default class FileListState {
 
     this.loading = true;
 
+    if (this.sharedFiles && this.files.length > 0 && offset === 0) {
+      this.loading = false;
+      return Promise.resolve({ files: this.files });
+    }
+
     let route: string = 'fof/uploads';
     let params: ApiQueryParamsPlural = {};
 
