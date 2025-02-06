@@ -173,7 +173,12 @@ class FileRepository
 
     public function removeFromTemp(Upload $file): bool
     {
-        return $this->getTempFilesystem($file->getPath())->delete($file->getBasename());
+        $filesystem = $this->getTempFilesystem($file->getPath());
+        if ($filesystem->has($file->getBasename())) {
+            return $filesystem->delete($file->getBasename());
+        }
+
+        return true;
     }
 
     protected function getTempFilesystem(string $path): Filesystem

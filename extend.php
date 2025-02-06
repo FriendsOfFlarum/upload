@@ -112,7 +112,9 @@ return [
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())
-        ->allowTag('animate'),
+        ->allowTag('animate')
+        ->removeTag('image')
+        ->removeTag('style'),
 
     (new Extend\ErrorHandling())
         ->handler(InvalidUploadException::class, ExceptionHandler::class),

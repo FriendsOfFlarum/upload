@@ -1,0 +1,7 @@
+FLIF<?xml foo="bar"?>
+<!DOCTYPE html><html>
+<script>
+alert("XSS Attack!");
+</script>
+<p>Blaklis!</p>
+</html>

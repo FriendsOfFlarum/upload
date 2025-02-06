@@ -31,4 +31,25 @@ trait UploadFileTrait
     {
         return __DIR__.'/../../fixtures/'.$file;
     }
+
+    protected function addType(string $mime, string $adapter = 'local', string $template = 'just-url')
+    {
+        $this->setting('fof-upload.mimeTypes', json_encode([
+            $mime => [
+                'adapter'   => $adapter,
+                'template'  => $template,
+            ],
+        ]));
+    }
+
+    protected function giveNormalUserUploadPermission()
+    {
+        $this->prepareDatabase(
+            [
+                'group_permission' => [
+                    ['group_id' => 3, 'permission' => 'fof-upload.upload'],
+                ],
+            ]
+        );
+    }
 }

@@ -63,14 +63,35 @@ class MimeTypeDetector
         }
 
         try {
-            $type = $this->getMimeInternally();
+            // Get MIME from php-mime-detector
+            $detectorMime = $this->getMimeInternally();
 
-            // If mime_content_type returns application/zip or empty, perform magic byte detection
-            if ($type === 'application/zip' || empty($type)) {
-                return $this->detectUsingMagicBytes();
+            // Get MIME from PHP Fileinfo
+            $fileinfoMime = mime_content_type($this->filePath);
+
+            // Special handling for APKs (before mismatch rejection)
+            if ($detectorMime === 'application/zip' || $fileinfoMime === 'application/zip') {
+                if ($this->isApk($this->filePath)) {
+                    return 'application/vnd.android.package-archive';
+                }
             }
 
-            return $type;
+            // Reject if MIME mismatch occurs (AFTER checking for APKs)
+            if ($detectorMime !== $fileinfoMime) {
+                $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
+                resolve('log')->error("[fof/upload] $message");
+
+                // Check if the file exists, if it does, delete it.
+                if (file_exists($this->filePath)) {
+                    unlink($this->filePath);
+                }
+
+                throw new ValidationException([
+                    'upload' => $message,
+                ]);
+            }
+
+            return $detectorMime;
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
@@ -91,37 +112,6 @@ class MimeTypeDetector
     }
 
     /**
-     * Detect MIME type using file magic bytes.
-     *
-     * @return string|null
-     */
-    private function detectUsingMagicBytes(): ?string
-    {
-        $handle = fopen($this->filePath, 'rb');
-        if (!$handle) {
-            return null;
-        }
-
-        $magicBytes = fread($handle, 4); // Read the first 4 bytes
-        fclose($handle);
-
-        foreach ($this->getMappings() as $mapping) {
-            foreach ($mapping['magicBytes'] as $bytes) {
-                if ($magicBytes === $bytes) {
-                    // Additional checks for APK-specific files
-                    if ($mapping['extension'] === 'apk' && !$this->isApk($this->filePath)) {
-                        continue; // Not an APK, fallback to other mappings
-                    }
-
-                    return $mapping['mime'];
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Check if the file is a valid APK by inspecting its contents.
      *
      * @param string $filePath
@@ -132,18 +122,19 @@ class MimeTypeDetector
     {
         $zip = new \ZipArchive();
         if ($zip->open($filePath) === true) {
-            // APKs should contain "AndroidManifest.xml" and "classes.dex"
             $requiredFiles = ['AndroidManifest.xml', 'classes.dex'];
+
             foreach ($requiredFiles as $file) {
                 if ($zip->locateName($file) === false) {
                     $zip->close();
 
-                    return false; // Required APK-specific file not found
+                    return false; // Required file not found, reject as non-APK
                 }
             }
+
             $zip->close();
 
-            return true; // All required files found
+            return true; // Valid APK structure detected
         }
 
         return false; // Not a valid ZIP file
