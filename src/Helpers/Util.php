@@ -195,6 +195,7 @@ class Util
     public function getMimeConfiguration(?string $mime)
     {
         return $this->getMimeTypesConfiguration()->first(function ($_, $regex) use ($mime) {
+            resolve('log')->debug("Checking $regex against $mime");
             return preg_match("/$regex/", $mime);
         });
     }

@@ -1,0 +1,11 @@
+89504E470D0A1A0A0000000D49484452000000640000006408060000005702F987...
+<!-- Fake PNG, actual content is HTML -->
+<!DOCTYPE html>
+<html>
+<head>
+    <script>alert("Spoofed MIME Attack!");</script>
+</head>
+<body>
+    <p>This file is not actually a PNG!</p>
+</body>
+</html>
