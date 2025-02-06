@@ -96,7 +96,7 @@ export default class UploadPage extends ExtensionPage {
     this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1];
     this.values.mimeTypes() ||
       (this.values.mimeTypes = Stream({
-        '^image\\/.*': {
+        '^image\\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\\+xml)$': {
           adapter: this.defaultAdap,
           template: 'image-preview',
         },
