@@ -36,7 +36,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
 
     /**
      * @test
-     * 
+     *
      * We allow SVG due to the built in santization. Here we test that <script> tags any any external content is removed.
      */
     public function user_with_permission_can_upload_svg_containing_malicious_content_and_is_sanitized()
@@ -59,7 +59,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $pathToFile = $json['data'][0]['attributes']['path'];
         $this->assertNotEmpty($pathToFile);
 
-        $file_contents = file_get_contents(resolve(Paths::class)->public . '/assets/files/' . $pathToFile);
+        $file_contents = file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$pathToFile);
 
         $this->assertNotEmpty($file_contents);
 
@@ -82,7 +82,6 @@ class FileUploadSecurityTest extends EnhancedTestCase
         // Check that inline CSS doesn't contain @import
         $this->assertStringNotContainsString('@import', $file_contents, 'SVG still contains @import in a <style> block.');
     }
-
 
     /**
      * @test
@@ -110,7 +109,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
             ['Polyglot.flif'],
             ['SpoofedMime.png'],
             ['TextFileWithPngExtension.png'],
-            ['Malicious.html']
+            ['Malicious.html'],
         ];
     }
 
