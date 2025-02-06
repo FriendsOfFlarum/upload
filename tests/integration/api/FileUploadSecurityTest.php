@@ -34,32 +34,14 @@ class FileUploadSecurityTest extends EnhancedTestCase
         ]);
     }
 
-    protected function giveNormalUserUploadPermission()
-    {
-        $this->prepareDatabase([
-            'group_permission' => [
-                ['group_id' => 3, 'permission' => 'fof-upload.upload'],
-            ],
-        ]);
-    }
-
-    protected function addType(string $mime, string $adapter = 'local', string $template = 'just-url')
-    {
-        $this->setting('fof-upload.mimeTypes', json_encode([
-            $mime => [
-                'adapter'   => $adapter,
-                'template'  => $template,
-            ],
-        ]));
-    }
-
     /**
      * @test
+     * 
+     * We allow SVG due to the built in santization. Here we test that <script> tags any any external content is removed.
      */
     public function user_with_permission_can_upload_svg_containing_malicious_content_and_is_sanitized()
     {
         $this->giveNormalUserUploadPermission();
-        //$this->addType('image\/svg+xml');
 
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
@@ -77,12 +59,30 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $pathToFile = $json['data'][0]['attributes']['path'];
         $this->assertNotEmpty($pathToFile);
 
-        $file_contents = file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$pathToFile);
+        $file_contents = file_get_contents(resolve(Paths::class)->public . '/assets/files/' . $pathToFile);
 
         $this->assertNotEmpty($file_contents);
 
-        $this->assertStringNotContainsString('<script', $file_contents);
+        // Check that JavaScript is removed
+        $this->assertStringNotContainsString('<script', $file_contents, 'SVG still contains a <script> tag.');
+        $this->assertStringNotContainsString('javascript:', $file_contents, 'SVG still contains JavaScript URLs.');
+        $this->assertStringNotContainsString('onload=', $file_contents, 'SVG still contains an onload event.');
+        $this->assertStringNotContainsString('onclick=', $file_contents, 'SVG still contains an onclick event.');
+
+        // Check that external resources are removed
+        $this->assertStringNotContainsString('xlink:href="http', $file_contents, 'SVG still contains an external xlink:href.');
+        $this->assertStringNotContainsString('href="http', $file_contents, 'SVG still contains an external href.');
+
+        // Check that data URIs are removed
+        $this->assertStringNotContainsString('data:image', $file_contents, 'SVG still contains a data URI.');
+
+        // Check that <foreignObject> is removed
+        $this->assertStringNotContainsString('<foreignObject', $file_contents, 'SVG still contains a <foreignObject>.');
+
+        // Check that inline CSS doesn't contain @import
+        $this->assertStringNotContainsString('@import', $file_contents, 'SVG still contains @import in a <style> block.');
     }
+
 
     /**
      * @test
@@ -90,7 +90,6 @@ class FileUploadSecurityTest extends EnhancedTestCase
     public function user_with_permission_can_upload_an_svg_if_safe()
     {
         $this->giveNormalUserUploadPermission();
-        //$this->addType('image\/svg+xml');
 
         $response = $this->send(
             $this->request('POST', '/api/fof/upload', [
@@ -104,29 +103,6 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function user_with_permission_cannot_upload_a_html_file_by_default()
-    {
-        $this->giveNormalUserUploadPermission();
-
-        $response = $this->send(
-            $this->request('POST', '/api/fof/upload', [
-                'authenticatedAs' => 2,
-                'multipart'       => [
-                    $this->uploadFile($this->fixtures('Malicious.html')),
-                ],
-            ])
-        );
-
-        $this->assertEquals(422, $response->getStatusCode());
-
-        $json = json_decode($response->getBody()->getContents(), true);
-        $this->assertArrayHasKey('errors', $json);
-        $this->assertEquals('validation_error', $json['errors'][0]['code']);
-    }
-
     public function MaliciousFiles(): array
     {
         return [
@@ -134,6 +110,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
             ['Polyglot.flif'],
             ['SpoofedMime.png'],
             ['TextFileWithPngExtension.png'],
+            ['Malicious.html']
         ];
     }
 

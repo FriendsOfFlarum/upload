@@ -87,14 +87,15 @@ class Util
     public function defaultMimeTypes(): Collection
     {
         $adapters = $this->getAvailableUploadMethods();
-
+    
         return collect([
-            '^image\/.*' => [
+            '^image\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\+xml)$' => [
                 'adapter'  => $adapters->flip()->last(),
                 'template' => 'image-preview',
             ],
         ]);
     }
+    
 
     /**
      * @param Template $template

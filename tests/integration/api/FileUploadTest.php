@@ -34,27 +34,6 @@ class FileUploadTest extends EnhancedTestCase
         ]);
     }
 
-    protected function giveNormalUserUploadPermission()
-    {
-        $this->prepareDatabase(
-            [
-                'group_permission' => [
-                    ['group_id' => 3, 'permission' => 'fof-upload.upload'],
-                ],
-            ]
-        );
-    }
-
-    protected function addType(string $mime, string $adapter = 'local', string $template = 'just-url')
-    {
-        $this->setting('fof-upload.mimeTypes', json_encode([
-            $mime => [
-                'adapter'   => $adapter,
-                'template'  => $template,
-            ],
-        ]));
-    }
-
     protected function setMaxUploadSize(int $max)
     {
         $this->setting('fof-upload.maxFileSize', $max);
