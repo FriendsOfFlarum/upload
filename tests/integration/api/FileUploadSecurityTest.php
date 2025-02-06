@@ -39,7 +39,6 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->prepareDatabase([
             'group_permission' => [
                 ['group_id' => 3, 'permission' => 'fof-upload.upload'],
-                ['group_id' => 3, 'permission' => 'fof-upload.download'],
             ],
         ]);
     }
@@ -78,7 +77,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $pathToFile = $json['data'][0]['attributes']['path'];
         $this->assertNotEmpty($pathToFile);
 
-        $file_contents = file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$pathToFile);
+        $file_contents = file_get_contents(resolve(Paths::class)->public . '/assets/files/' . $pathToFile);
 
         $this->assertNotEmpty($file_contents);
 
@@ -102,18 +101,13 @@ class FileUploadSecurityTest extends EnhancedTestCase
             ])
         );
 
-        if ($response->getStatusCode() !== 200) {
-            $json = json_decode($response->getBody()->getContents(), true);
-            print_r($json);
-        }
-
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
      * @test
      */
-    public function user_with_permission_cannot_upload_a_non_image_disguised_as_an_image()
+    public function user_with_permission_cannot_upload_a_html_file_by_default()
     {
         $this->giveNormalUserUploadPermission();
 
@@ -121,7 +115,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
                 'multipart'       => [
-                    $this->uploadFile($this->fixtures('TextFileWithPngExtension.png')),
+                    $this->uploadFile($this->fixtures('Malicious.html')),
                 ],
             ])
         );
@@ -133,10 +127,21 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->assertEquals('validation_error', $json['errors'][0]['code']);
     }
 
+    public function MaliciousFiles(): array
+    {
+        return [
+            ['Polyglot.jpg'],
+            ['Polyglot.flif'],
+            ['SpoofedMime.png'],
+            ['TextFileWithPngExtension.png']
+        ];
+    }
+
     /**
      * @test
+     * @dataProvider MaliciousFiles
      */
-    public function user_with_permission_cannot_upload_a_mime_spoofed_file()
+    public function user_with_permission_cannot_upload_malicious_files(string $fixture, ?string $allowMime = null)
     {
         $this->giveNormalUserUploadPermission();
 
@@ -144,7 +149,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
                 'multipart'       => [
-                    $this->uploadFile($this->fixtures('SpoofedMime.png')),
+                    $this->uploadFile($this->fixtures($fixture)),
                 ],
             ])
         );

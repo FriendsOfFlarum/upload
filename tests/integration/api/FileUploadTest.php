@@ -222,4 +222,44 @@ class FileUploadTest extends EnhancedTestCase
 
         $this->assertNull($file);
     }
+
+    /**
+     * @test
+     */
+    public function user_can_upload_zip_file_when_configured()
+    {
+        $this->addType('application\/zip');
+        $this->giveNormalUserUploadPermission();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('Example.zip')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_upload_apk_file_when_configured()
+    {
+        $this->addType('application\/vnd.android.package-archive');
+        $this->giveNormalUserUploadPermission();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('Example.apk')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
