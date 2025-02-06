@@ -77,7 +77,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $pathToFile = $json['data'][0]['attributes']['path'];
         $this->assertNotEmpty($pathToFile);
 
-        $file_contents = file_get_contents(resolve(Paths::class)->public . '/assets/files/' . $pathToFile);
+        $file_contents = file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$pathToFile);
 
         $this->assertNotEmpty($file_contents);
 
@@ -133,12 +133,13 @@ class FileUploadSecurityTest extends EnhancedTestCase
             ['Polyglot.jpg'],
             ['Polyglot.flif'],
             ['SpoofedMime.png'],
-            ['TextFileWithPngExtension.png']
+            ['TextFileWithPngExtension.png'],
         ];
     }
 
     /**
      * @test
+     *
      * @dataProvider MaliciousFiles
      */
     public function user_with_permission_cannot_upload_malicious_files(string $fixture, ?string $allowMime = null)

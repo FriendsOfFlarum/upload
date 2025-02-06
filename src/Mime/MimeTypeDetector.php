@@ -127,16 +127,18 @@ class MimeTypeDetector
             foreach ($requiredFiles as $file) {
                 if ($zip->locateName($file) === false) {
                     $zip->close();
+
                     return false; // Required file not found, reject as non-APK
                 }
             }
 
             $zip->close();
+
             return true; // Valid APK structure detected
         }
+
         return false; // Not a valid ZIP file
     }
-
 
     /**
      * Determine the file extension based on the MIME type or original extension.

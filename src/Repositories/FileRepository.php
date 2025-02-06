@@ -177,7 +177,7 @@ class FileRepository
         if ($filesystem->has($file->getBasename())) {
             return $filesystem->delete($file->getBasename());
         }
-        
+
         return true;
     }
 
