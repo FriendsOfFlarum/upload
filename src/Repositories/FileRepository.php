@@ -206,11 +206,16 @@ class FileRepository
     {
         $name = pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME);
 
-        $slug = trim(Str::slug($name));
+        $safeName = preg_replace_callback('/[^a-zA-Z0-9_\-\.]/u', function ($match) {
+            return urlencode($match[0]);
+        }, $name);
+
+        $safeName = str_replace(['%2F', '%5C'], '', $safeName);
+        $safeName = urldecode($safeName);
 
         return sprintf(
             '%s.%s',
-            empty($slug) ? $uuid : $slug,
+            empty($safeName) ? $uuid : $safeName,
             $this->determineExtension($upload)
         );
     }
