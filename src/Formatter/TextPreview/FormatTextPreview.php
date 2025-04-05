@@ -15,8 +15,6 @@ namespace FoF\Upload\Formatter\TextPreview;
 use Flarum\Foundation\Paths;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Repositories\FileRepository;
-use Illuminate\Contracts\Filesystem\Cloud;
-use Illuminate\Contracts\Filesystem\Factory;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
 
@@ -26,7 +24,8 @@ class FormatTextPreview
         private FileRepository $files,
         private Paths $paths,
         protected DefaultDownloader $downloader
-    ) {}
+    ) {
+    }
 
     /**
      * Configure rendering for text preview uploads.
