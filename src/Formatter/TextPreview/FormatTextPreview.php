@@ -12,7 +12,6 @@
 
 namespace FoF\Upload\Formatter\TextPreview;
 
-use Flarum\Foundation\Paths;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
@@ -22,7 +21,6 @@ class FormatTextPreview
 {
     public function __construct(
         private FileRepository $files,
-        private Paths $paths,
         protected DefaultDownloader $downloader
     ) {
     }
