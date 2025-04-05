@@ -54,7 +54,7 @@ class SvgSanitizer implements ExtenderInterface
         return $this;
     }
 
-    public function extend(Container $container, Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null)
     {
         $container->extend('fof.upload.sanitizer.svg_allowed_attrs', function ($items): array {
             return array_merge($items, $this->allowedAttrs);

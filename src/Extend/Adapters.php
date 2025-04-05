@@ -37,7 +37,7 @@ class Adapters implements ExtenderInterface
         return $this;
     }
 
-    public function extend(Container $container, Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null)
     {
         /** @var Dispatcher $events */
         $events = $container->make(Dispatcher::class);

@@ -308,7 +308,7 @@ class FileRepository
         return $changes;
     }
 
-    public function cleanUp(Carbon $before, callable $confirm = null): int
+    public function cleanUp(Carbon $before, ?callable $confirm = null): int
     {
         /** @var Manager $manager */
         $manager = resolve(Manager::class);
