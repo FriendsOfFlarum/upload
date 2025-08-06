@@ -49,7 +49,14 @@ export default class UploadPage extends ExtensionPage {
     ];
 
     // the checkboxes we need to watch and to save.
-    this.checkboxes = ['mustResize', 'addsWatermarks', 'disableHotlinkProtection', 'disableDownloadLogging', 'awsS3UsePathStyleEndpoint'];
+    this.checkboxes = [
+      'mustResize',
+      'addsWatermarks',
+      'disableHotlinkProtection',
+      'disableDownloadLogging',
+      'awsS3UsePathStyleEndpoint',
+      'svgAnimateAllowed',
+    ];
 
     // fields that are objects
     this.objects = ['mimeTypes'];
@@ -284,6 +291,20 @@ export default class UploadPage extends ExtensionPage {
                   name: 'fof-watermark',
                   path: 'fof/watermark',
                 }),
+              ]),
+              m('fieldset', [
+                m('legend', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.title')),
+                m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.help')),
+                m('div', [
+                  Switch.component(
+                    {
+                      state: this.values.svgAnimateAllowed() || false,
+                      onchange: this.values.svgAnimateAllowed,
+                    },
+                    app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate')
+                  ),
+                  m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate_help')),
+                ]),
               ]),
               m('fieldset', [
                 m('legend', app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')),
