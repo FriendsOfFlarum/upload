@@ -112,7 +112,6 @@ return [
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())
-        //->allowTag('animate')
         ->removeTag('image')
         ->removeTag('style'),
 
