@@ -112,7 +112,7 @@ return [
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())
-        ->allowTag('animate')
+        //->allowTag('animate')
         ->removeTag('image')
         ->removeTag('style'),
 
@@ -121,7 +121,8 @@ return [
 
     (new Extend\Settings())
         ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
-        ->default('fof-upload.s3CustomUrl', ''),  // Default to empty, meaning use AWS default URL
+        ->default('fof-upload.s3CustomUrl', '')  // Default to empty, meaning use AWS default URL
+        ->default('fof-upload.svgAnimateAllowed', false),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),
