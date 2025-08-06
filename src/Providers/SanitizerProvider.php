@@ -44,6 +44,7 @@ class SanitizerProvider extends AbstractServiceProvider
             /** @var SettingsRepositoryInterface $settings */
             $settings = $container->make(SettingsRepositoryInterface::class);
             $svgAnimateAllowed = (bool) $settings->get('fof-upload.svgAnimateAllowed');
+
             return $svgAnimateAllowed ? ['animate'] : [];
         });
 
