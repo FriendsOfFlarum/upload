@@ -294,7 +294,7 @@ export default class UploadPage extends ExtensionPage {
               ]),
               m('fieldset', [
                 m('legend', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.title')),
-                m('.helpText', app.translator.trans('fof-upload.admin.help_texts.svg-sanitizer')),
+                m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.help')),
                 m('div', [
                   Switch.component(
                     {
@@ -303,7 +303,7 @@ export default class UploadPage extends ExtensionPage {
                     },
                     app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate')
                   ),
-                  m('.helpText', app.translator.trans('fof-upload.admin.help_texts.svg-sanitizer.allow_animate_help')),
+                  m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate_help')),
                 ]),
               ]),
               m('fieldset', [
