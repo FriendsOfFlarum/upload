@@ -92,4 +92,22 @@ class ImageProcessor implements Processable
             );
         }
     }
+
+    public function addMetadata(File &$file, UploadedFile &$upload, string &$mime): void
+    {
+        try {
+            $image = (new ImageManager())->make('assets/files'.DIRECTORY_SEPARATOR.$file->path);
+        } catch (NotReadableException $e) {
+            throw new ValidationException(['upload' => 'Corrupted image']);
+        }
+
+        $file->imageMetadata()->create([
+            'upload_id' => $file->id,
+            'file_id' => $file->uuid ?? '',
+            'image_width' => $image->width(),
+            'image_height' => $image->height(),
+        ]);
+        $file->save();
+
+    }
 }

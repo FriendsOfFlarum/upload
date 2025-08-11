@@ -133,4 +133,12 @@ class File extends AbstractModel
 
         return sprintf("%.{$decimals}f", (int) $bytes / pow(1024, $factor)).@$size[$factor];
     }
+
+
+    public function imageMetadata(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ImageMetadata::class, 'upload_id', 'id');
+    }
+
+
 }
