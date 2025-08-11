@@ -25,12 +25,14 @@ use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
 use Flarum\Settings\Event\Deserializing;
 use Flarum\User\User;
+use FoF\Upload\Events\File\WasSaved;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Exceptions\ExceptionHandler;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 use FoF\Upload\Extenders\LoadFilesRelationship;
 use FoF\Upload\Helpers\Util;
+use s9e\TextFormatter\Configurator;
 
 return [
     (new Extend\Frontend('admin'))
@@ -86,7 +88,8 @@ return [
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
         ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
         ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
-        ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
+        ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class)
+        ->listen(WasSaved::class, Listeners\AddImageMetadataProcessor::class),
 
     (new Extend\Filesystem())
         ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
@@ -108,6 +111,11 @@ return [
         ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
+
+        ->configure(function (Configurator $config) {
+            // Remove the check that prevents dynamic content in CSS
+            $config->templateChecker->remove('DisallowUnsafeDynamicCSS');
+        })
         ->render(Formatter\ImagePreview\FormatImagePreview::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 

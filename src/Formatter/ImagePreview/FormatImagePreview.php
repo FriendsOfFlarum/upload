@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Formatter\ImagePreview;
 
+use FoF\Upload\ImageMetadata;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Support\Arr;
 use s9e\TextFormatter\Renderer;
@@ -55,6 +56,13 @@ class FormatImagePreview
                 }
 
                 $attributes['title'] = $file->base_name;
+            }
+
+            // Add aspect ratio if image metadata exists
+            $imageMetadata = ImageMetadata::byFile($file);
+
+            if ($imageMetadata && $imageMetadata->image_width && $imageMetadata->image_height) {
+                $attributes['aspectRatio'] = $imageMetadata->image_width . "/" . $imageMetadata->image_height;
             }
 
             return $attributes;
