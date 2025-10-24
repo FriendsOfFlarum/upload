@@ -35,7 +35,7 @@ class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
         // Nee, no, nein, nada, pas de rein.
     }
 
-    public function extend(Container $container, Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null)
     {
         // TODO: Clark thinks that this line should be removed.
         // Debating with him is tiring, because he's right.

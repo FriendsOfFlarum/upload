@@ -95,6 +95,11 @@ fof-upload:
         position: Watermark position
         title: Watermark images
         toggle: Watermark images
+      svg-sanitizer:
+        title: SVG Sanitizer
+        allow_animate: Allow SVG animations
+        help: Configure how SVG files are processed and sanitized when uploaded. SVG files can contain potentially harmful scripts and should be handled carefully. Uploaded SVGs are sanitized on upload and harmful scripts and tags are removed.
+        allow_animate_help: Enabling SVG animations may introduce security vulnerabilities as animated SVGs can contain malicious code. Enable this setting at your own risk and only if you trust your users.
       composer_buttons:
         title: Composer buttons
         options:
@@ -138,7 +143,8 @@ fof-upload:
       text-preview_description: |
         Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
     upload_methods:
-      aws-s3: S3/Compatible
+      aws-s3: S3 or Compatible
+      awss3: AWS S3
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS

@@ -37,12 +37,24 @@ php flarum cache:clear
 
 Enable the extension, a new tab will appear on the left hand side. This separate settings page allows you to further configure the extension.
 
+On new installations, a pre-defined regex will be inserted for you that enables image uploads, restricted to safe image types. We now include SVG as safe, due to our SVG sanitization method. Default image types allowed are:
+
+- JPEG
+- PNG
+- GIF
+- WebP
+- AVIF
+- BMP
+- TIFF
+- SVG
+
+The regex for these types is `^image\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\+xml)$`, and can be modified as required. We **STRONGLY** discourage the use of a wildcard such as `^image\/.*`, as this could introduce vulnerabilities in the uploaded files. Versions of `fof/upload` prior to `1.8.0` used this as default, and is considered insecure.
+
 Make sure you configure the upload permission on the permissions page as well.
 
 ### Mimetype regular expression
 
-Regular expressions allow you a lot of freedom, but they are also very difficult to understand. Here are some pointers, but feel free to ask
-for help on the official Flarum forums.
+Regular expressions allow you a lot of freedom, but they are also very difficult to understand. Here are some pointers, but feel free to ask for help on the official Flarum forums, or check out [regex101.com](https://regex101.com/) where you can interactively build and test your regex pattern.
 
 In case you want to allow all regular file types including video, music, compressed files and images, use this:
 
@@ -120,6 +132,30 @@ The following (to resume) will happen when this command is put into a recurring 
 - based on the interval of the cronjob (daily, weekly or however)
 - the command will go over all uploads to discover in which posts they have been used
 - delete those files that have been uploaded "last year" that have not been found in posts
+
+## Testing and Security Measures
+
+FoF Upload includes **automated tests** to ensure:
+
+✅ Valid files upload successfully
+✅ Restricted files are blocked
+✅ SVG sanitization removes potential XSS risks
+
+### 🔍 Security Tests for Malicious Files
+We specifically test against:
+- HTML Injection (`.html` disguised as an image)
+- MIME Spoofing (e.g., `.png` containing a script)
+- Polygot Files (Files that act as two different formats)
+- SVG Sanitization (`<script>`, `<foreignObject>`, event handlers, external styles, etc)
+- ZIP & APK Handling (Ensuring APKs are valid and ZIPs are not misclassified)
+
+### Submitting Additional Test Cases
+We welcome community contributes in all our extensions! Especially where security is concerned. If you find a new edge case or a file format that bypasses validation, please:
+- Open an issue on [GitHub](https://github.com/FriendsOfFlarum/upload/issues)
+- Submit a test case as a PR under `tests/`
+- Describe the expected behaviour (Should the file be accepted? Should it be sanitized?)
+
+🚀 These tests ensure FoF Upload remains secure and reliable for all Flarum users! 🚀
 
 ## FAQ
 

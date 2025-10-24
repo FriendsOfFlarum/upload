@@ -12,7 +12,7 @@
 
 namespace FoF\Upload\Formatter\TextPreview;
 
-use Flarum\Foundation\Paths;
+use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
@@ -21,7 +21,7 @@ class FormatTextPreview
 {
     public function __construct(
         private FileRepository $files,
-        private Paths $paths
+        protected DefaultDownloader $downloader
     ) {
     }
 
@@ -43,15 +43,21 @@ class FormatTextPreview
             $snippet = '';
 
             if ($file) {
-                $file_contents = file_get_contents($this->paths->public.'/assets/files/'.$file->path);
-                $lines = preg_split('/\R/', $file_contents);
-                $lines = array_filter($lines, 'trim');
+                $response = $this->downloader->download($file);
+                if ($response->getStatusCode() === 200) {
+                    $file_contents = $response->getBody()->getContents();
 
-                if (count($lines) <= 5) {
+                    $lines = preg_split('/\R/', $file_contents);
+                    $lines = array_filter($lines, 'trim');
+
+                    if (count($lines) <= 5) {
+                        $attributes['has_snippet'] = 'false';
+                    }
+
+                    $snippet = implode("\n", array_slice($lines, 0, 5));
+                } else {
                     $attributes['has_snippet'] = 'false';
                 }
-
-                $snippet = implode("\n", array_slice($lines, 0, 5));
             }
 
             $attributes['snippet'] = $snippet;

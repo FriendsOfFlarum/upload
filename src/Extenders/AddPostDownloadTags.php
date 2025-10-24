@@ -23,7 +23,7 @@ use s9e\TextFormatter\Configurator\Exceptions\UnsafeTemplateException;
 
 class AddPostDownloadTags extends Formatter
 {
-    public function extend(Container $container, Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null)
     {
         $this->configure(function (Configurator $configurator) use ($container) {
             foreach ($container->make(Util::class)->getRenderTemplates() as $name => $template) {

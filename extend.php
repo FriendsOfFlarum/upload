@@ -95,7 +95,8 @@ return [
         ->register(Providers\UtilProvider::class)
         ->register(Providers\StorageServiceProvider::class)
         ->register(Providers\DownloadProvider::class)
-        ->register(Providers\SanitizerProvider::class),
+        ->register(Providers\SanitizerProvider::class)
+        ->register(Providers\MimeMappingProvider::class),
 
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
@@ -107,17 +108,20 @@ return [
         ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
+        ->render(Formatter\ImagePreview\FormatImagePreview::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())
-        ->allowTag('animate'),
+        ->removeTag('image')
+        ->removeTag('style'),
 
     (new Extend\ErrorHandling())
         ->handler(InvalidUploadException::class, ExceptionHandler::class),
 
     (new Extend\Settings())
         ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
-        ->default('fof-upload.s3CustomUrl', ''),  // Default to empty, meaning use AWS default URL
+        ->default('fof-upload.s3CustomUrl', '')  // Default to empty, meaning use AWS default URL
+        ->default('fof-upload.svgAnimateAllowed', false),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

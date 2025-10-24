@@ -13,6 +13,8 @@
 namespace FoF\Upload\Adapters;
 
 use Carbon\Carbon;
+use Flarum\Http\UrlGenerator;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use League\Flysystem\AdapterInterface;
@@ -28,6 +30,8 @@ abstract class Flysystem implements UploadAdapter
 
     public function __construct(
         protected AdapterInterface $adapter,
+        protected SettingsRepositoryInterface $settings,
+        protected UrlGenerator $url
     ) {
     }
 
@@ -48,7 +52,7 @@ abstract class Flysystem implements UploadAdapter
      *
      * @return File|bool
      */
-    public function upload(File $file, ?UploadedFile $upload = null, $contents)
+    public function upload(File $file, ?UploadedFile $upload = null, $contents = null)
     {
         $this->generateFilename($file);
 

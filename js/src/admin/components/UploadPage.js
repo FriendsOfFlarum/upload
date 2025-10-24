@@ -49,7 +49,14 @@ export default class UploadPage extends ExtensionPage {
     ];
 
     // the checkboxes we need to watch and to save.
-    this.checkboxes = ['mustResize', 'addsWatermarks', 'disableHotlinkProtection', 'disableDownloadLogging', 'awsS3UsePathStyleEndpoint'];
+    this.checkboxes = [
+      'mustResize',
+      'addsWatermarks',
+      'disableHotlinkProtection',
+      'disableDownloadLogging',
+      'awsS3UsePathStyleEndpoint',
+      'svgAnimateAllowed',
+    ];
 
     // fields that are objects
     this.objects = ['mimeTypes'];
@@ -96,7 +103,7 @@ export default class UploadPage extends ExtensionPage {
     this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1];
     this.values.mimeTypes() ||
       (this.values.mimeTypes = Stream({
-        '^image\\/.*': {
+        '^image\\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\\+xml)$': {
           adapter: this.defaultAdap,
           template: 'image-preview',
         },
@@ -284,6 +291,20 @@ export default class UploadPage extends ExtensionPage {
                   name: 'fof-watermark',
                   path: 'fof/watermark',
                 }),
+              ]),
+              m('fieldset', [
+                m('legend', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.title')),
+                m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.help')),
+                m('div', [
+                  Switch.component(
+                    {
+                      state: this.values.svgAnimateAllowed() || false,
+                      onchange: this.values.svgAnimateAllowed,
+                    },
+                    app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate')
+                  ),
+                  m('.helpText', app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate_help')),
+                ]),
               ]),
               m('fieldset', [
                 m('legend', app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')),

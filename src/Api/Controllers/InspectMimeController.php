@@ -22,14 +22,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use SoftCreatR\MimeDetector\MimeDetector;
-use SoftCreatR\MimeDetector\MimeDetectorException;
 
 class InspectMimeController implements RequestHandlerInterface
 {
     public function __construct(
-        protected FileRepository $files,
-        protected MimeDetector $mimeDetector
+        protected FileRepository $files
     ) {
     }
 
@@ -60,14 +57,8 @@ class InspectMimeController implements RequestHandlerInterface
         ];
 
         try {
-            $this->mimeDetector->setFile($upload->getPathname());
-
-            $uploadFileData = $this->mimeDetector->getFileType();
-
-            if (isset($uploadFileData['mime'])) {
-                $data['mime_detector'] = $uploadFileData['mime'];
-            }
-        } catch (MimeDetectorException $e) {
+            $data['mime_detector'] = $this->files->determineMime($upload);
+        } catch (Exception $e) {
             // Ignore errors. The value will be absent in response
         }
 
@@ -78,7 +69,7 @@ class InspectMimeController implements RequestHandlerInterface
         }
 
         try {
-            $data['guessed_extension'] = $upload->guessExtension() ?: 'bin';
+            $data['guessed_extension'] = $this->files->determineExtension($upload);
         } catch (Exception $e) {
             // Ignore errors. The value will be absent in response
         }

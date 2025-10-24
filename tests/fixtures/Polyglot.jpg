@@ -1,0 +1,8 @@
+FFD8FFE000104A46494600010101006000600000FFDB00430008060607060508...
+<!-- HTML inside a JPEG file -->
+<!DOCTYPE html>
+<html>
+<body>
+    <script>alert('This is a Polyglot attack!');</script>
+</body>
+</html>

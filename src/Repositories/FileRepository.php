@@ -16,9 +16,12 @@ use Carbon\Carbon;
 use enshrined\svgSanitize\Sanitizer;
 use Flarum\Foundation\Paths;
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\UrlGenerator;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters;
+use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
@@ -26,17 +29,16 @@ use FoF\Upload\Download;
 use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
+use FoF\Upload\Mime\MimeTypeDetector;
 use FoF\Upload\Validators\UploadValidator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
-use SoftCreatR\MimeDetector\MimeDetector;
-use SoftCreatR\MimeDetector\MimeDetectorException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -53,10 +55,17 @@ class FileRepository
         private SettingsRepositoryInterface $settings,
         private Dispatcher $events,
         private Sanitizer $sanitizer,
-        private MimeDetector $mimeDetector,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private Manager $manager,
+        private UrlGenerator $url,
+        private MimeTypeDetector $mimeTypeDetector
     ) {
         $this->path = $paths->storage;
+    }
+
+    public function query(): Builder
+    {
+        return File::query();
     }
 
     /**
@@ -67,6 +76,13 @@ class FileRepository
     public function findByUuid($uuid)
     {
         return File::byUuid($uuid)
+            ->with('downloads')
+            ->first();
+    }
+
+    public function findByUrl($url)
+    {
+        return File::byUrl($url)
             ->with('downloads')
             ->first();
     }
@@ -157,7 +173,12 @@ class FileRepository
 
     public function removeFromTemp(Upload $file): bool
     {
-        return $this->getTempFilesystem($file->getPath())->delete($file->getBasename());
+        $filesystem = $this->getTempFilesystem($file->getPath());
+        if ($filesystem->has($file->getBasename())) {
+            return $filesystem->delete($file->getBasename());
+        }
+
+        return true;
     }
 
     protected function getTempFilesystem(string $path): Filesystem
@@ -165,7 +186,7 @@ class FileRepository
         return new Filesystem(new Local($path));
     }
 
-    protected function determineExtension(Upload $upload): string
+    public function determineExtension(Upload $upload): string
     {
         $whitelistedClientExtensions = explode(',', $this->settings->get('fof-upload.whitelistedClientExtensions', ''));
 
@@ -176,13 +197,9 @@ class FileRepository
             return $originalClientExtension;
         }
 
-        $guessed = $upload->guessExtension();
-
-        if ($guessed) {
-            return $guessed;
-        }
-
-        return 'bin';
+        return $this->mimeTypeDetector
+            ->withUpload($upload)
+            ->getFileExtension($whitelistedClientExtensions, $originalClientExtension);
     }
 
     protected function getBasename(Upload $upload, string $uuid): string
@@ -291,7 +308,7 @@ class FileRepository
         return $changes;
     }
 
-    public function cleanUp(Carbon $before, callable $confirm = null): int
+    public function cleanUp(Carbon $before, ?callable $confirm = null): int
     {
         /** @var Manager $manager */
         $manager = resolve(Manager::class);
@@ -357,18 +374,9 @@ class FileRepository
      */
     public function determineMime(Upload $file): ?string
     {
-        try {
-            $this->mimeDetector->setFile($file->getPathname());
-            $uploadFileData = $this->mimeDetector->getFileType();
-
-            if (Arr::has($uploadFileData, 'mime')) {
-                return $uploadFileData['mime'];
-            }
-
-            return mime_content_type($file->getPathname());
-        } catch (MimeDetectorException|\Exception $e) {
-            throw new ValidationException(['upload' => $this->translator->trans('fof-upload.api.upload_errors.could_not_detect_mime')]);
-        }
+        return $this->mimeTypeDetector
+            ->forFile($file->getPathname())
+            ->getMimeType();
     }
 
     public function generateFilenameFor(File $file, bool $withFolder = false): string
@@ -383,5 +391,48 @@ class FileRepository
             '/',
             $path
         ) : $path;
+    }
+
+    /**
+     * Determine the hostname for the adapter used for this file.
+     *
+     * Currently only available for AwsS3.
+     *
+     * @param File $file
+     *
+     * @returns string|null
+     */
+    public function getHostnameForFile(File $file, UploadAdapter $adapter): ?string
+    {
+        if ($adapter instanceof AwsS3) {
+            return $adapter->hostName();
+        } elseif ($adapter instanceof Adapters\Local) {
+            return $this->url->to('forum')->path('assets/files');
+        }
+
+        return null;
+    }
+
+    /**
+     * Build and return the absolute URL for a file.
+     *
+     * @param File $file
+     *
+     * @returns string|null
+     */
+    public function getUrlForFile(File $file): ?string
+    {
+        $adapter = $this->manager->instantiate($file->upload_method);
+
+        $supportedAdapters = [
+            Adapters\Local::class,
+            Adapters\AwsS3::class,
+        ];
+
+        if (!in_array(get_class($adapter), $supportedAdapters)) {
+            return null;
+        }
+
+        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
     }
 }

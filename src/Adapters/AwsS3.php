@@ -12,7 +12,6 @@
 
 namespace FoF\Upload\Adapters;
 
-use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
@@ -20,51 +19,71 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
 
+/**
+ * @method hostName() This is only available on the AWS S3 adapter at present.
+ */
 class AwsS3 extends Flysystem implements UploadAdapter
 {
     protected AdapterInterface $adapter;
 
+    /**
+     * Get the configuration settings for the S3 adapter.
+     *
+     * @return Config
+     */
     protected function getConfig(): Config
     {
-        /** @var SettingsRepositoryInterface $settings */
-        $settings = resolve(SettingsRepositoryInterface::class);
-
         $config = new Config();
-        if ($acl = $settings->get('fof-upload.awsS3ACL')) {
+        if ($acl = $this->settings->get('fof-upload.awsS3ACL')) {
             $config->set('ACL', $acl);
         }
 
         return $config;
     }
 
+    /**
+     * Generate the URL for the given file.
+     *
+     * @param File $file
+     *
+     * @return void
+     */
     protected function generateUrl(File $file): void
     {
-        /** @var SettingsRepositoryInterface $settings */
-        $settings = resolve(SettingsRepositoryInterface::class);
+        $host = $this->hostName();
 
+        $file->url = sprintf('%s/%s', rtrim($host, '/'), Arr::get($this->meta, 'path', $file->path));
+    }
+
+    /**
+     * Determine the hostname of the storage adapter.
+     *
+     * @throws \RuntimeException If the adapter is not an instance of AwsS3Adapter.
+     *
+     * @return string
+     */
+    public function hostName(): string
+    {
         // Fetch custom S3 URL from settings
-        $customUrl = $settings->get('fof-upload.awsS3CustomUrl');
-
+        $customUrl = $this->settings->get('fof-upload.awsS3CustomUrl');
         if (!empty($customUrl)) {
-            // Use custom S3 URL if provided
-            $file->url = sprintf('%s/%s', rtrim($customUrl, '/'), Arr::get($this->meta, 'path', $file->path));
-        } else {
-            // Fallback to default URL construction if no custom URL is provided
-            $cdnUrl = (string) $settings->get('fof-upload.cdnUrl');
-
-            if (!$cdnUrl) {
-                // Ensure that $this->adapter is an instance of AwsS3Adapter
-                if ($this->adapter instanceof AwsS3Adapter) {
-                    $region = $this->adapter->getClient()->getRegion();
-                    $bucket = $this->adapter->getBucket();
-
-                    $cdnUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
-                } else {
-                    throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.$this->adapter::class);
-                }
-            }
-
-            $file->url = sprintf('%s/%s', $cdnUrl, Arr::get($this->meta, 'path', $file->path));
+            return $customUrl;
         }
+
+        // Fallback to default URL construction if no custom URL is provided
+        $cdnUrl = (string) $this->settings->get('fof-upload.cdnUrl');
+        if (!empty($cdnUrl)) {
+            return $cdnUrl;
+        }
+
+        // Ensure that $this->adapter is an instance of AwsS3Adapter
+        if ($this->adapter instanceof AwsS3Adapter) {
+            $region = $this->adapter->getClient()->getRegion();
+            $bucket = $this->adapter->getBucket();
+
+            return sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+        }
+
+        throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.get_class($this->adapter));
     }
 }
