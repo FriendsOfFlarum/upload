@@ -45,7 +45,7 @@ app.initializers.add('fof-upload', () => {
         label: app.translator.trans('fof-upload.admin.permissions.hide_own_uploads_label'),
         permission: 'fof-upload.hideUserUploads',
       },
-      'moderate',
+      'reply',
       42
     )
     .registerPermission(
@@ -72,7 +72,7 @@ app.initializers.add('fof-upload', () => {
         label: app.translator.trans('fof-upload.admin.permissions.delete_own_uploads_label'),
         permission: 'fof-upload.deleteUserUploads',
       },
-      'moderate',
+      'reply',
       32
     )
     .registerPermission(
