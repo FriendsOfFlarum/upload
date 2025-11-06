@@ -19,6 +19,11 @@ use FoF\Upload\Helpers\Util;
 
 class FilePolicy extends AbstractPolicy
 {
+
+    private const PERM_HIDE_OWN    = 'fof-upload.hideUserUploads';
+    private const PERM_HIDE_OTHERS = 'fof-upload.hideOtherUsersUploads';
+    private const PERM_HIDE_SHARED = 'fof-upload.hideSharedUploads';
+
     public function __construct(
         protected Util $util
     ) {
@@ -32,29 +37,16 @@ class FilePolicy extends AbstractPolicy
 
     public function hide(User $actor, File $file)
     {
-        $privateShared = $this->util->isPrivateShared($file);
-        $fileIsShared = $privateShared || $file->shared;
+        $isShared = $this->util->isPrivateShared($file) || $file->shared;
 
-        if ($fileIsShared) {
-            if ($actor->can('fof-upload.hideSharedUploads')) {
-                return $this->allow();
-            }
-        } else {
-            if ($file->actor_id === $actor->id) {
-                if ($actor->can('fof-upload.hideUserUploads')) {
-                    return $this->allow();
-                }
-            } else {
-                if ($actor->can('fof-upload.hideOtherUsersUploads')) {
-                    return $this->allow();
-                }
-            }
-        }
+        $permission = match (true) {
+            $isShared => self::PERM_HIDE_SHARED,
+            $file->actor_id === $actor->id => self::PERM_HIDE_OWN,
+            default => self::PERM_HIDE_OTHERS,
+        };
 
-        /**
-         * Deny by default if none of the above conditions are met.
-         */
-        return $this->deny();
+        return $actor->can($permission) ? $this->allow() : $this->deny();
+
     }
 
     public function delete(User $actor, File $file)
