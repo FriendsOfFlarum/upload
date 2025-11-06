@@ -2,6 +2,7 @@ import app from 'flarum/admin/app';
 import UploadPage from './components/UploadPage';
 import extendAdminNav from './extendAdminNav';
 import FileListState from '../common/states/FileListState';
+import customizeGetRequiredPermissions from './extenders/customizeGetRequiredPermissions';
 
 export * from './components';
 
@@ -111,6 +112,7 @@ app.initializers.add('fof-upload', () => {
     );
 
   extendAdminNav();
+  customizeGetRequiredPermissions();
 
   //app.fileListState = new FileListState();
 });
