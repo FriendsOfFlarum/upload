@@ -24,6 +24,10 @@ class FilePolicy extends AbstractPolicy
     private const PERM_HIDE_OTHERS = 'fof-upload.hideOtherUsersUploads';
     private const PERM_HIDE_SHARED = 'fof-upload.hideSharedUploads';
 
+    private const PERM_DELETE_SHARED  = 'fof-upload.deleteSharedUploads';
+    private const PERM_DELETE_OWN     = 'fof-upload.deleteUserUploads';
+    private const PERM_DELETE_OTHERS  = 'fof-upload.deleteOtherUsersUploads';
+
     public function __construct(
         protected Util $util
     ) {
@@ -51,28 +55,14 @@ class FilePolicy extends AbstractPolicy
 
     public function delete(User $actor, File $file)
     {
-        $privateShared = $this->util->isPrivateShared($file);
-        $fileIsShared = $privateShared || $file->shared;
+        $isShared = $this->util->isPrivateShared($file) || $file->shared;
 
-        if ($fileIsShared) {
-            if ($actor->can('fof-upload.deleteSharedUploads')) {
-                return $this->allow();
-            }
-        } else {
-            if ($file->actor_id === $actor->id) {
-                if ($actor->can('fof-upload.deleteUserUploads')) {
-                    return $this->allow();
-                }
-            } else {
-                if ($actor->can('fof-upload.deleteOtherUsersUploads')) {
-                    return $this->allow();
-                }
-            }
-        }
+        $permission = match (true) {
+            $isShared => self::PERM_DELETE_SHARED,
+            $file->actor_id === $actor->id => self::PERM_DELETE_OWN,
+            default => self::PERM_DELETE_OTHERS,
+        };
 
-        /**
-         * Deny by default if none of the above conditions are met.
-         */
-        return $this->deny();
+        return $actor->can($permission) ? $this->allow() : $this->deny();
     }
 }
