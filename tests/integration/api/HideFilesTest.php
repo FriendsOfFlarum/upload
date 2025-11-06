@@ -13,6 +13,7 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Extend;
+use Flarum\Group\Group;
 use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
@@ -32,19 +33,29 @@ class HideFilesTest extends EnhancedTestCase
         $this->prepareDatabase([
             'users' => [
                 $this->normalUser(),
-                ['id' => 3, 'username' => 'normal2', 'email' => 'normal2@machine.local'],
-                ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local'],
+                ['id' => 3, 'username' => 'normal2', 'email' => 'normal2@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local', 'is_email_confirmed' => 1],
             ],
             'fof_upload_files' => [
                 ['id' => 1, 'base_name' => 'test_file.abc', 'uuid' => 'abc-123', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false],
                 ['id' => 2, 'base_name' => 'test_file2.abc', 'uuid' => 'def-456', 'path' => 'path/test_file2.abc', 'url' => 'http://localhost/test_file2.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'shared' => true],
             ],
             'group_user' => [
-                ['user_id' => 4, 'group_id' => 4],
+                ['user_id' => 4, 'group_id' => Group::MODERATOR_ID],
             ],
             'group_permission' => [
-                ['group_id' => 4, 'permission' => 'fof-upload.deleteUserUploads'],
-                ['group_id' => 4, 'permission' => 'fof-upload.viewUserUploads'],
+                // General permissions
+                ['group_id' => Group::MEMBER_ID, 'permission' => 'fof-upload.download'],
+                ['group_id' => Group::MEMBER_ID, 'permission' => 'fof-upload.viewUserUploads'],
+                ['group_id' => Group::MODERATOR_ID, 'permission' => 'fof-upload.download'],
+
+                // Hiding permissions
+                ['group_id' => Group::MEMBER_ID, 'permission' => 'fof-upload.hideUserUploads'],
+                ['group_id' => Group::MODERATOR_ID, 'permission' => 'fof-upload.hideOtherUsersUploads'],
+                ['group_id' => Group::MODERATOR_ID, 'permission' => 'fof-upload.hideSharedUploads'],
+
+                // Deletion permissions
+                ['group_id' => Group::MODERATOR_ID, 'permission' => 'fof-upload.deleteUserUploads'],
             ],
         ]);
     }
@@ -248,9 +259,9 @@ class HideFilesTest extends EnhancedTestCase
     /**
      * @test
      */
-    public function moderator_cannot_hide_shared_files()
+    public function moderator_can_hide_shared_files()
     {
-        $uuid = 'def-456';
+        $uuid = $this->uploadSharedFileAndGetUuid();
 
         $response = $this->send(
             $this->request(
@@ -264,8 +275,7 @@ class HideFilesTest extends EnhancedTestCase
                 ]
             )
         );
-
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
