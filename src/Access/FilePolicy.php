@@ -19,15 +19,6 @@ use FoF\Upload\Helpers\Util;
 
 class FilePolicy extends AbstractPolicy
 {
-
-    private const PERM_HIDE_OWN    = 'fof-upload.hideUserUploads';
-    private const PERM_HIDE_OTHERS = 'fof-upload.hideOtherUsersUploads';
-    private const PERM_HIDE_SHARED = 'fof-upload.hideSharedUploads';
-
-    private const PERM_DELETE_SHARED  = 'fof-upload.deleteSharedUploads';
-    private const PERM_DELETE_OWN     = 'fof-upload.deleteUserUploads';
-    private const PERM_DELETE_OTHERS  = 'fof-upload.deleteOtherUsersUploads';
-
     public function __construct(
         protected Util $util
     ) {
