@@ -43,28 +43,11 @@ class DeleteFileHandler
 
     public function handle(DeleteFile $command): void
     {
-        $privateShared = $this->util->isPrivateShared($command->file);
-        $fileIsShared = $privateShared || $command->file->shared;
-
-        $hasPermission = false;
-
-        if ($fileIsShared) {
-            $hasPermission = $command->actor->can('fof-upload.deleteSharedUploads');
-        } else {
-            if ($command->actor->id === $command->file->actor_id) {
-                $hasPermission = $command->actor->can('fof-upload.deleteUserUploads');
-            } else {
-                $hasPermission = $command->actor->can('fof-upload.deleteOtherUsersUploads');
-            }
-        }
-
-        /**
-         * If none of the above conditions are met, a `PermissionDeniedException`
-         * is thrown as a precaution.
-         */
-        if (!$hasPermission && !$command->actor->isAdmin()) {
+        if (!$command->actor->can('delete', $command->file)) {
             throw new PermissionDeniedException();
         }
+
+        $privateShared = $this->util->isPrivateShared($command->file);
 
         $success = $privateShared
             ? $this->deleteSharedFile($command->file)
