@@ -13,8 +13,8 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Extend;
-use Flarum\Group\Group;
 use Flarum\Foundation\Paths;
+use Flarum\Group\Group;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;

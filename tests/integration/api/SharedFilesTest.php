@@ -12,9 +12,9 @@
 
 namespace FoF\Upload\Tests\integration\api;
 
+use Flarum\Group\Group;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
-use Flarum\Group\Group;
 use FoF\Upload\Tests\EnhancedTestCase;
 
 class SharedFilesTest extends EnhancedTestCase
