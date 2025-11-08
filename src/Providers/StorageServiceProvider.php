@@ -14,11 +14,13 @@ namespace FoF\Upload\Providers;
 
 use Flarum\Foundation\AbstractServiceProvider;
 use FoF\Upload\Adapters\Manager;
+use FoF\Upload\Driver\Config;
 
 class StorageServiceProvider extends AbstractServiceProvider
 {
     public function register()
     {
         $this->container->singleton(Manager::class);
+        $this->container->singleton(Config::class);
     }
 }

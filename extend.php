@@ -35,7 +35,8 @@ use FoF\Upload\Helpers\Util;
 return [
     (new Extend\Frontend('admin'))
         ->css(__DIR__.'/resources/less/admin.less')
-        ->js(__DIR__.'/js/dist/admin.js'),
+        ->js(__DIR__.'/js/dist/admin.js')
+        ->content(Content\AdminPayload::class),
 
     (new Extend\Frontend('forum'))
         ->css(__DIR__.'/resources/less/forum.less')

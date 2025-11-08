@@ -4,6 +4,7 @@ import saveSettings from 'flarum/admin/utils/saveSettings';
 import Alert from 'flarum/common/components/Alert';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
+import Placeholder from 'flarum/common/components/Placeholder';
 import UploadImageButton from './UploadImageButton';
 import withAttr from 'flarum/common/utils/withAttr';
 import Stream from 'flarum/common/utils/Stream';
@@ -20,6 +21,10 @@ export default class UploadPage extends ExtensionPage {
     super.oninit(vnode);
     // whether we are saving the settings or not right now
     this.loading = false;
+
+    // Check if settings are configured via environment variables
+    this.uploadS3SetByEnv = app.data.uploadS3SetByEnv || false;
+    this.uploadLocalCdnSetByEnv = app.data.uploadLocalCdnSetByEnv || false;
 
     // the fields we need to watch and to save
     this.fields = [
@@ -326,14 +331,22 @@ export default class UploadPage extends ExtensionPage {
                   app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')
                 ),
               ]),
-              m('fieldset', [
-                m('legend', app.translator.trans('fof-upload.admin.labels.local.title')),
-                m('label', app.translator.trans('fof-upload.admin.labels.local.cdn_url')),
-                m('input.FormControl', {
-                  value: this.values.cdnUrl() || '',
-                  oninput: withAttr('value', this.values.cdnUrl),
-                }),
-              ]),
+              !this.uploadLocalCdnSetByEnv &&
+                m('fieldset', [
+                  m('legend', app.translator.trans('fof-upload.admin.labels.local.title')),
+                  m('label', app.translator.trans('fof-upload.admin.labels.local.cdn_url')),
+                  m('input.FormControl', {
+                    value: this.values.cdnUrl() || '',
+                    oninput: withAttr('value', this.values.cdnUrl),
+                  }),
+                ]),
+              this.uploadLocalCdnSetByEnv &&
+                m('fieldset', [
+                  m('legend', app.translator.trans('fof-upload.admin.labels.local.title')),
+                  Placeholder.component({
+                    text: app.translator.trans('fof-upload.admin.labels.configured_by_environment'),
+                  }),
+                ]),
 
               this.adaptorItems().toArray(),
 
@@ -404,64 +417,79 @@ export default class UploadPage extends ExtensionPage {
     }
 
     if (this.uploadMethodOptions['aws-s3'] !== undefined) {
-      items.add(
-        'aws-s3',
-        m('.aws', [
-          m('fieldset', [
-            m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
-            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_instance_profile')),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
-            m('input.FormControl', {
-              value: this.values.awsS3Key() || '',
-              oninput: withAttr('value', this.values.awsS3Key),
-            }),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
-            m('input.FormControl', {
-              value: this.values.awsS3Secret() || '',
-              oninput: withAttr('value', this.values.awsS3Secret),
-            }),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
-            m('input.FormControl', {
-              value: this.values.awsS3Bucket() || '',
-              oninput: withAttr('value', this.values.awsS3Bucket),
-            }),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
-            m('input.FormControl', {
-              value: this.values.awsS3Region() || '',
-              oninput: withAttr('value', this.values.awsS3Region),
-            }),
+      if (!this.uploadS3SetByEnv) {
+        items.add(
+          'aws-s3',
+          m('.aws', [
+            m('fieldset', [
+              m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
+              m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_instance_profile')),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.key')),
+              m('input.FormControl', {
+                value: this.values.awsS3Key() || '',
+                oninput: withAttr('value', this.values.awsS3Key),
+              }),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.secret')),
+              m('input.FormControl', {
+                value: this.values.awsS3Secret() || '',
+                oninput: withAttr('value', this.values.awsS3Secret),
+              }),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')),
+              m('input.FormControl', {
+                value: this.values.awsS3Bucket() || '',
+                oninput: withAttr('value', this.values.awsS3Bucket),
+              }),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.region')),
+              m('input.FormControl', {
+                value: this.values.awsS3Region() || '',
+                oninput: withAttr('value', this.values.awsS3Region),
+              }),
+            ]),
+            m('fieldset', [
+              m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
+              m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
+              m('input.FormControl', {
+                value: this.values.awsS3Endpoint() || '',
+                oninput: withAttr('value', this.values.awsS3Endpoint),
+              }),
+              Switch.component(
+                {
+                  state: this.values.awsS3UsePathStyleEndpoint() || false,
+                  onchange: this.values.awsS3UsePathStyleEndpoint,
+                },
+                app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')
+              ),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
+              m('input.FormControl', {
+                value: this.values.awsS3ACL() || '',
+                oninput: withAttr('value', this.values.awsS3ACL),
+              }),
+              m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
+              m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.custom_url')),
+              m('input.FormControl', {
+                value: this.values.awsS3CustomUrl() || '',
+                oninput: withAttr('value', this.values.awsS3CustomUrl),
+              }),
+              m('.helpText', app.translator.trans('fof-upload.admin.help_texts.custom_s3_url')),
+            ]),
           ]),
-          m('fieldset', [
-            m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')),
-            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')),
-            m('input.FormControl', {
-              value: this.values.awsS3Endpoint() || '',
-              oninput: withAttr('value', this.values.awsS3Endpoint),
-            }),
-            Switch.component(
-              {
-                state: this.values.awsS3UsePathStyleEndpoint() || false,
-                onchange: this.values.awsS3UsePathStyleEndpoint,
-              },
-              app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')
-            ),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.acl')),
-            m('input.FormControl', {
-              value: this.values.awsS3ACL() || '',
-              oninput: withAttr('value', this.values.awsS3ACL),
-            }),
-            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.s3_acl')),
-            m('label', app.translator.trans('fof-upload.admin.labels.aws-s3.custom_url')),
-            m('input.FormControl', {
-              value: this.values.awsS3CustomUrl() || '',
-              oninput: withAttr('value', this.values.awsS3CustomUrl),
-            }),
-            m('.helpText', app.translator.trans('fof-upload.admin.help_texts.custom_s3_url')),
+          60
+        );
+      } else {
+        items.add(
+          'aws-s3',
+          m('.aws', [
+            m('fieldset', [
+              m('legend', app.translator.trans('fof-upload.admin.labels.aws-s3.title')),
+              Placeholder.component({
+                text: app.translator.trans('fof-upload.admin.labels.configured_by_environment'),
+              }),
+            ]),
           ]),
-        ]),
-        60
-      );
+          60
+        );
+      }
     }
 
     return items;

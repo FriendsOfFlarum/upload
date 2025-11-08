@@ -74,6 +74,7 @@ fof-upload:
       local:
         cdn_url: Content Delivery URL (prefixes files)
         title: Local storage settings
+      configured_by_environment: Your storage settings have been pre-configured via environment variables.
       qiniu:
         title: Qiniu storage settings
         key: Key

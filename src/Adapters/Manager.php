@@ -19,6 +19,7 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters;
 use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\Driver\Config;
 use FoF\Upload\Events\Adapter\Collecting;
 use FoF\Upload\Events\Adapter\Instantiate;
 use FoF\Upload\Helpers\Util;
@@ -38,7 +39,8 @@ class Manager
         protected Paths $paths,
         protected Util $util,
         protected SettingsRepositoryInterface $settings,
-        protected UrlGenerator $url
+        protected UrlGenerator $url,
+        protected Config $config
     ) {
     }
 
@@ -88,28 +90,27 @@ class Manager
      */
     protected function awsS3(Util $util)
     {
+        $config = $this->config->getS3Config();
+
         $s3Config = [
-            'region'                  => empty($this->settings->get('fof-upload.awsS3Region')) ? null : $this->settings->get('fof-upload.awsS3Region'),
+            'region'                  => $config['region'],
             'version'                 => 'latest',
-            'endpoint'                => empty($this->settings->get('fof-upload.awsS3Endpoint')) ? null : $this->settings->get('fof-upload.awsS3Endpoint'),
-            'use_path_style_endpoint' => empty($this->settings->get('fof-upload.awsS3UsePathStyleEndpoint')) ? null : (bool) $this->settings->get('fof-upload.awsS3UsePathStyleEndpoint'),
+            'endpoint'                => $config['endpoint'],
+            'use_path_style_endpoint' => $config['use_path_style_endpoint'],
         ];
 
         // Only explicitly provide credentials if available.
         // Otherwise S3Client will attempt to use instance profile.
-        if ($this->settings->get('fof-upload.awsS3Key') && $this->settings->get('fof-upload.awsS3Secret')) {
-            $s3Config['credentials'] = [
-                'key'    => $this->settings->get('fof-upload.awsS3Key'),
-                'secret' => $this->settings->get('fof-upload.awsS3Secret'),
-            ];
+        if (isset($config['credentials'])) {
+            $s3Config['credentials'] = $config['credentials'];
         }
 
         $leagueAdapter = new AwsS3Adapter(
             new S3Client($s3Config),
-            $this->settings->get('fof-upload.awsS3Bucket')
+            $config['bucket']
         );
 
-        return new Adapters\AwsS3($leagueAdapter, $this->settings, $this->url);
+        return new Adapters\AwsS3($leagueAdapter, $this->settings, $this->url, $this->config);
     }
 
     /**
@@ -143,7 +144,8 @@ class Manager
         return new Adapters\Local(
             new FlyAdapters\Local($this->paths->public.'/assets/files'),
             $this->settings,
-            $this->url
+            $this->url,
+            $this->config
         );
     }
 
