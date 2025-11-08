@@ -26,9 +26,9 @@ class Config
      */
     public function shouldUseEnv(): bool
     {
-        return env('FOF_UPLOAD_AWS_S3_KEY') 
-            && env('FOF_UPLOAD_AWS_S3_SECRET') 
-            && env('FOF_UPLOAD_AWS_S3_BUCKET') 
+        return env('FOF_UPLOAD_AWS_S3_KEY')
+            && env('FOF_UPLOAD_AWS_S3_SECRET')
+            && env('FOF_UPLOAD_AWS_S3_BUCKET')
             && env('FOF_UPLOAD_AWS_S3_REGION');
     }
 
@@ -68,6 +68,7 @@ class Config
         }
 
         $settingCdnUrl = $this->settings->get('fof-upload.cdnUrl');
+
         return empty($settingCdnUrl) ? null : $settingCdnUrl;
     }
 
@@ -83,6 +84,7 @@ class Config
         }
 
         $acl = $this->settings->get('fof-upload.awsS3ACL');
+
         return empty($acl) ? null : $acl;
     }
 
@@ -98,6 +100,7 @@ class Config
         }
 
         $customUrl = $this->settings->get('fof-upload.awsS3CustomUrl');
+
         return empty($customUrl) ? null : $customUrl;
     }
 
@@ -113,6 +116,7 @@ class Config
         }
 
         $cdnUrl = $this->settings->get('fof-upload.cdnUrl');
+
         return empty($cdnUrl) ? null : $cdnUrl;
     }
 
@@ -132,20 +136,20 @@ class Config
         $cdnUrl = env('FOF_UPLOAD_CDN_URL');
 
         $config = [
-            'region' => empty($region) ? null : $region,
-            'endpoint' => empty($endpoint) ? null : $endpoint,
+            'region'                  => empty($region) ? null : $region,
+            'endpoint'                => empty($endpoint) ? null : $endpoint,
             'use_path_style_endpoint' => empty($pathStyle) ? null : (bool) $pathStyle,
-            'bucket' => $bucket,
-            'acl' => empty($acl) ? null : $acl,
-            'custom_url' => empty($customUrl) ? null : $customUrl,
-            'cdn_url' => empty($cdnUrl) ? null : $cdnUrl,
+            'bucket'                  => $bucket,
+            'acl'                     => empty($acl) ? null : $acl,
+            'custom_url'              => empty($customUrl) ? null : $customUrl,
+            'cdn_url'                 => empty($cdnUrl) ? null : $cdnUrl,
         ];
 
         // Only explicitly provide credentials if available.
         // Otherwise S3Client will attempt to use instance profile.
         if ($key && $secret) {
             $config['credentials'] = [
-                'key' => $key,
+                'key'    => $key,
                 'secret' => $secret,
             ];
         }
@@ -169,20 +173,20 @@ class Config
         $cdnUrl = $this->settings->get('fof-upload.cdnUrl');
 
         $config = [
-            'region' => empty($region) ? null : $region,
-            'endpoint' => empty($endpoint) ? null : $endpoint,
+            'region'                  => empty($region) ? null : $region,
+            'endpoint'                => empty($endpoint) ? null : $endpoint,
             'use_path_style_endpoint' => empty($pathStyle) ? null : (bool) $pathStyle,
-            'bucket' => $bucket,
-            'acl' => empty($acl) ? null : $acl,
-            'custom_url' => empty($customUrl) ? null : $customUrl,
-            'cdn_url' => empty($cdnUrl) ? null : $cdnUrl,
+            'bucket'                  => $bucket,
+            'acl'                     => empty($acl) ? null : $acl,
+            'custom_url'              => empty($customUrl) ? null : $customUrl,
+            'cdn_url'                 => empty($cdnUrl) ? null : $cdnUrl,
         ];
 
         // Only explicitly provide credentials if available.
         // Otherwise S3Client will attempt to use instance profile.
         if ($key && $secret) {
             $config['credentials'] = [
-                'key' => $key,
+                'key'    => $key,
                 'secret' => $secret,
             ];
         }
@@ -190,4 +194,3 @@ class Config
         return $config;
     }
 }
-

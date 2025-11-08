@@ -28,4 +28,3 @@ class AdminPayload
         $document->payload['uploadLocalCdnSetByEnv'] = $this->config->shouldUseLocalCdnEnv();
     }
 }
-
