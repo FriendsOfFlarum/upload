@@ -13,6 +13,7 @@
 namespace FoF\Upload\Adapters;
 
 use FoF\Upload\Contracts\UploadAdapter;
+use FoF\Upload\Driver\Config as UploadConfig;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
 use League\Flysystem\AdapterInterface;
@@ -26,6 +27,15 @@ class AwsS3 extends Flysystem implements UploadAdapter
 {
     protected AdapterInterface $adapter;
 
+    public function __construct(
+        AdapterInterface $adapter,
+        $settings,
+        $url,
+        protected ?UploadConfig $uploadConfig = null
+    ) {
+        parent::__construct($adapter, $settings, $url);
+    }
+
     /**
      * Get the configuration settings for the S3 adapter.
      *
@@ -34,7 +44,8 @@ class AwsS3 extends Flysystem implements UploadAdapter
     protected function getConfig(): Config
     {
         $config = new Config();
-        if ($acl = $this->settings->get('fof-upload.awsS3ACL')) {
+        $acl = $this->uploadConfig ? $this->uploadConfig->getS3Acl() : $this->settings->get('fof-upload.awsS3ACL');
+        if ($acl) {
             $config->set('ACL', $acl);
         }
 
@@ -64,16 +75,16 @@ class AwsS3 extends Flysystem implements UploadAdapter
      */
     public function hostName(): string
     {
-        // Fetch custom S3 URL from settings
-        $customUrl = $this->settings->get('fof-upload.awsS3CustomUrl');
+        // Fetch custom S3 URL from config (ENV or settings)
+        $customUrl = $this->uploadConfig ? $this->uploadConfig->getS3CustomUrl() : $this->settings->get('fof-upload.awsS3CustomUrl');
         if (!empty($customUrl)) {
             return $customUrl;
         }
 
         // Fallback to default URL construction if no custom URL is provided
-        $cdnUrl = (string) $this->settings->get('fof-upload.cdnUrl');
+        $cdnUrl = $this->uploadConfig ? $this->uploadConfig->getS3CdnUrl() : $this->settings->get('fof-upload.cdnUrl');
         if (!empty($cdnUrl)) {
-            return $cdnUrl;
+            return (string) $cdnUrl;
         }
 
         // Ensure that $this->adapter is an instance of AwsS3Adapter
