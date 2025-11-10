@@ -26,12 +26,24 @@ class Config
      */
     public function shouldUseEnv(): bool
     {
-        $key = getenv('FOF_UPLOAD_AWS_S3_KEY');
-        $secret = getenv('FOF_UPLOAD_AWS_S3_SECRET');
         $bucket = getenv('FOF_UPLOAD_AWS_S3_BUCKET');
         $region = getenv('FOF_UPLOAD_AWS_S3_REGION');
+        $key = getenv('FOF_UPLOAD_AWS_S3_KEY');
+        $secret = getenv('FOF_UPLOAD_AWS_S3_SECRET');
+        $useIam = getenv('FOF_UPLOAD_AWS_S3_USE_IAM');
 
-        return !empty($key) && !empty($secret) && !empty($bucket) && !empty($region);
+        // Basic requirement: bucket and region must be set
+        if (empty($bucket) || empty($region)) {
+            return false;
+        }
+
+        // Explicit IAM mode - only bucket and region required
+        if (!empty($useIam) && filter_var($useIam, FILTER_VALIDATE_BOOLEAN)) {
+            return true;
+        }
+
+        // Traditional mode - all 4 required (key, secret, bucket, region)
+        return !empty($key) && !empty($secret);
     }
 
     /**

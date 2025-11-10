@@ -52,6 +52,122 @@ The regex for these types is `^image\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\+xml)
 
 Make sure you configure the upload permission on the permissions page as well.
 
+### Storage Configuration
+
+FoF Upload supports configuration via both the admin panel (database settings) and environment variables. **Environment variables take precedence** over database settings when configured.
+
+#### Environment Variable Configuration
+
+You can configure storage adapters using environment variables, which is particularly useful for:
+- Docker/containerized deployments
+- CI/CD pipelines
+- Multi-environment setups (dev/staging/production)
+- Keeping credentials out of the database
+
+##### AWS S3 / S3-Compatible Storage
+
+To configure S3 via environment variables, set **all four required variables**:
+
+```bash
+# Required (all 4 must be set)
+FOF_UPLOAD_AWS_S3_KEY=your-access-key
+FOF_UPLOAD_AWS_S3_SECRET=your-secret-key
+FOF_UPLOAD_AWS_S3_BUCKET=your-bucket-name
+FOF_UPLOAD_AWS_S3_REGION=us-east-1
+
+# Optional
+FOF_UPLOAD_AWS_S3_ACL=public-read                    # Object ACL (public-read, private, etc.)
+FOF_UPLOAD_AWS_S3_ENDPOINT=https://s3.example.com    # For S3-compatible services (MinIO, Wasabi, etc.)
+FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT=true           # Required for MinIO and some S3-compatible services
+FOF_UPLOAD_AWS_S3_CUSTOM_URL=https://cdn.example.com # Custom domain for your bucket
+FOF_UPLOAD_CDN_URL=https://cdn.example.com           # CDN URL for serving files
+```
+
+**IAM Role Authentication (EC2/ECS/EKS)**:
+
+For environments with IAM roles (EC2 instances, ECS tasks, EKS pods), you can omit credentials:
+
+```bash
+# Required for IAM mode
+FOF_UPLOAD_AWS_S3_BUCKET=your-bucket-name
+FOF_UPLOAD_AWS_S3_REGION=us-east-1
+FOF_UPLOAD_AWS_S3_USE_IAM=true  # Enable IAM role authentication
+
+# Optional (same as above)
+FOF_UPLOAD_AWS_S3_ACL=public-read
+FOF_UPLOAD_CDN_URL=https://cdn.example.com
+```
+
+When `FOF_UPLOAD_AWS_S3_USE_IAM=true`, credentials are not required and the AWS SDK will automatically use the instance/pod IAM role.
+
+**Important Notes:**
+- Traditional mode: All 4 variables (`KEY`, `SECRET`, `BUCKET`, `REGION`) must be set
+- IAM mode: Only `BUCKET`, `REGION`, and `USE_IAM=true` are required
+- If any required variable is missing, the extension falls back to database settings
+- Environment variables always override database settings when fully configured
+
+##### S3-Compatible Services
+
+**LocalStack** (local development):
+```bash
+FOF_UPLOAD_AWS_S3_KEY=test
+FOF_UPLOAD_AWS_S3_SECRET=test
+FOF_UPLOAD_AWS_S3_BUCKET=uploads
+FOF_UPLOAD_AWS_S3_REGION=us-east-1
+FOF_UPLOAD_AWS_S3_ENDPOINT=http://localhost:4566
+FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT=true  # Required for LocalStack!
+```
+
+**MinIO** (self-hosted):
+```bash
+FOF_UPLOAD_AWS_S3_KEY=minioadmin
+FOF_UPLOAD_AWS_S3_SECRET=minioadmin
+FOF_UPLOAD_AWS_S3_BUCKET=uploads
+FOF_UPLOAD_AWS_S3_REGION=us-east-1
+FOF_UPLOAD_AWS_S3_ENDPOINT=https://minio.example.com
+FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT=true  # Required for MinIO!
+```
+
+**DigitalOcean Spaces**:
+```bash
+FOF_UPLOAD_AWS_S3_KEY=your-spaces-key
+FOF_UPLOAD_AWS_S3_SECRET=your-spaces-secret
+FOF_UPLOAD_AWS_S3_BUCKET=your-space-name
+FOF_UPLOAD_AWS_S3_REGION=nyc3
+FOF_UPLOAD_AWS_S3_ENDPOINT=https://nyc3.digitaloceanspaces.com
+```
+
+**Wasabi**:
+```bash
+FOF_UPLOAD_AWS_S3_KEY=your-wasabi-key
+FOF_UPLOAD_AWS_S3_SECRET=your-wasabi-secret
+FOF_UPLOAD_AWS_S3_BUCKET=your-bucket
+FOF_UPLOAD_AWS_S3_REGION=us-east-1
+FOF_UPLOAD_AWS_S3_ENDPOINT=https://s3.wasabisys.com
+```
+
+**Backblaze B2**:
+```bash
+FOF_UPLOAD_AWS_S3_KEY=your-key-id
+FOF_UPLOAD_AWS_S3_SECRET=your-application-key
+FOF_UPLOAD_AWS_S3_BUCKET=your-bucket
+FOF_UPLOAD_AWS_S3_REGION=us-west-004
+FOF_UPLOAD_AWS_S3_ENDPOINT=https://s3.us-west-004.backblazeb2.com
+```
+
+##### Local Storage with CDN
+
+For local storage with a CDN in front:
+```bash
+FOF_UPLOAD_CDN_URL=https://cdn.example.com
+```
+
+#### Configuration Priority
+
+1. **Environment Variables** (highest priority - when all required vars are set)
+2. **Database Settings** (admin panel configuration)
+3. **Defaults** (null values if neither is configured)
+
 ### Mimetype regular expression
 
 Regular expressions allow you a lot of freedom, but they are also very difficult to understand. Here are some pointers, but feel free to ask for help on the official Flarum forums, or check out [regex101.com](https://regex101.com/) where you can interactively build and test your regex pattern.

@@ -54,6 +54,7 @@ class ConfigTest extends TestCase
             'FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT',
             'FOF_UPLOAD_AWS_S3_ACL',
             'FOF_UPLOAD_AWS_S3_CUSTOM_URL',
+            'FOF_UPLOAD_AWS_S3_USE_IAM',
             'FOF_UPLOAD_CDN_URL',
         ];
 
@@ -86,6 +87,49 @@ class ConfigTest extends TestCase
         putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
 
         $this->assertTrue($this->config->shouldUseEnv());
+    }
+
+    /** @test */
+    public function shouldUseEnv_returns_true_when_iam_flag_set_with_bucket_and_region()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_BUCKET=test-bucket');
+        putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+
+        $this->assertTrue($this->config->shouldUseEnv());
+    }
+
+    /** @test */
+    public function shouldUseEnv_returns_true_when_iam_flag_set_with_various_truthy_values()
+    {
+        $truthyValues = ['true', 'TRUE', '1', 'yes', 'YES', 'on', 'ON'];
+
+        foreach ($truthyValues as $value) {
+            $this->clearEnvVars();
+            putenv('FOF_UPLOAD_AWS_S3_BUCKET=test-bucket');
+            putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
+            putenv("FOF_UPLOAD_AWS_S3_USE_IAM={$value}");
+
+            $this->assertTrue($this->config->shouldUseEnv(), "Failed for value: {$value}");
+        }
+    }
+
+    /** @test */
+    public function shouldUseEnv_returns_false_when_iam_flag_set_but_missing_bucket()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+
+        $this->assertFalse($this->config->shouldUseEnv());
+    }
+
+    /** @test */
+    public function shouldUseEnv_returns_false_when_iam_flag_set_but_missing_region()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_BUCKET=test-bucket');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+
+        $this->assertFalse($this->config->shouldUseEnv());
     }
 
     /** @test */
@@ -198,6 +242,23 @@ class ConfigTest extends TestCase
         $config = $this->config->getS3Config();
 
         $this->assertArrayNotHasKey('credentials', $config);
+    }
+
+    /** @test */
+    public function getS3Config_omits_credentials_when_iam_flag_enabled()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_BUCKET=iam-bucket');
+        putenv('FOF_UPLOAD_AWS_S3_REGION=us-east-1');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+
+        $config = $this->config->getS3Config();
+
+        $this->assertEquals('iam-bucket', $config['bucket']);
+        $this->assertEquals('us-east-1', $config['region']);
+        $this->assertArrayNotHasKey('credentials', $config);
+
+        // Settings should not be called
+        $this->settings->shouldNotHaveReceived('get');
     }
 
     /** @test */
