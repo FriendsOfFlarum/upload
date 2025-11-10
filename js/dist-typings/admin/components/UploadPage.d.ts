@@ -2,6 +2,8 @@
 export default class UploadPage extends ExtensionPage<import("flarum/admin/components/ExtensionPage").ExtensionPageAttrs> {
     constructor();
     oninit(vnode: any): void;
+    uploadS3SetByEnv: {} | undefined;
+    uploadLocalCdnSetByEnv: {} | undefined;
     fields: string[] | undefined;
     checkboxes: string[] | undefined;
     objects: string[] | undefined;
