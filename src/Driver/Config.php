@@ -26,10 +26,12 @@ class Config
      */
     public function shouldUseEnv(): bool
     {
-        return env('FOF_UPLOAD_AWS_S3_KEY')
-            && env('FOF_UPLOAD_AWS_S3_SECRET')
-            && env('FOF_UPLOAD_AWS_S3_BUCKET')
-            && env('FOF_UPLOAD_AWS_S3_REGION');
+        $key = getenv('FOF_UPLOAD_AWS_S3_KEY');
+        $secret = getenv('FOF_UPLOAD_AWS_S3_SECRET');
+        $bucket = getenv('FOF_UPLOAD_AWS_S3_BUCKET');
+        $region = getenv('FOF_UPLOAD_AWS_S3_REGION');
+
+        return !empty($key) && !empty($secret) && !empty($bucket) && !empty($region);
     }
 
     /**
@@ -37,7 +39,7 @@ class Config
      */
     public function shouldUseLocalCdnEnv(): bool
     {
-        return (bool) env('FOF_UPLOAD_CDN_URL');
+        return !empty(getenv('FOF_UPLOAD_CDN_URL'));
     }
 
     /**
@@ -62,7 +64,7 @@ class Config
      */
     public function getLocalCdnUrl(): ?string
     {
-        $envCdnUrl = env('FOF_UPLOAD_CDN_URL');
+        $envCdnUrl = getenv('FOF_UPLOAD_CDN_URL');
         if ($envCdnUrl) {
             return $envCdnUrl;
         }
@@ -80,7 +82,7 @@ class Config
         $useEnv = $this->shouldUseEnv();
 
         if ($useEnv) {
-            return env('FOF_UPLOAD_AWS_S3_ACL') ?: null;
+            return getenv('FOF_UPLOAD_AWS_S3_ACL') ?: null;
         }
 
         $acl = $this->settings->get('fof-upload.awsS3ACL');
@@ -96,7 +98,7 @@ class Config
         $useEnv = $this->shouldUseEnv();
 
         if ($useEnv) {
-            return env('FOF_UPLOAD_AWS_S3_CUSTOM_URL') ?: null;
+            return getenv('FOF_UPLOAD_AWS_S3_CUSTOM_URL') ?: null;
         }
 
         $customUrl = $this->settings->get('fof-upload.awsS3CustomUrl');
@@ -112,7 +114,7 @@ class Config
         $useEnv = $this->shouldUseEnv();
 
         if ($useEnv) {
-            return env('FOF_UPLOAD_CDN_URL') ?: null;
+            return getenv('FOF_UPLOAD_CDN_URL') ?: null;
         }
 
         $cdnUrl = $this->settings->get('fof-upload.cdnUrl');
@@ -125,15 +127,15 @@ class Config
      */
     protected function buildS3ConfigFromEnv(): array
     {
-        $region = env('FOF_UPLOAD_AWS_S3_REGION');
-        $endpoint = env('FOF_UPLOAD_AWS_S3_ENDPOINT');
-        $pathStyle = env('FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT', false);
-        $key = env('FOF_UPLOAD_AWS_S3_KEY');
-        $secret = env('FOF_UPLOAD_AWS_S3_SECRET');
-        $bucket = env('FOF_UPLOAD_AWS_S3_BUCKET');
-        $acl = env('FOF_UPLOAD_AWS_S3_ACL');
-        $customUrl = env('FOF_UPLOAD_AWS_S3_CUSTOM_URL');
-        $cdnUrl = env('FOF_UPLOAD_CDN_URL');
+        $region = getenv('FOF_UPLOAD_AWS_S3_REGION');
+        $endpoint = getenv('FOF_UPLOAD_AWS_S3_ENDPOINT');
+        $pathStyle = getenv('FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT');
+        $key = getenv('FOF_UPLOAD_AWS_S3_KEY');
+        $secret = getenv('FOF_UPLOAD_AWS_S3_SECRET');
+        $bucket = getenv('FOF_UPLOAD_AWS_S3_BUCKET');
+        $acl = getenv('FOF_UPLOAD_AWS_S3_ACL');
+        $customUrl = getenv('FOF_UPLOAD_AWS_S3_CUSTOM_URL');
+        $cdnUrl = getenv('FOF_UPLOAD_CDN_URL');
 
         $config = [
             'region'                  => empty($region) ? null : $region,
