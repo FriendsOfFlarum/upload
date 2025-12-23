@@ -202,7 +202,7 @@ class AdaptersExtenderTest extends TestCase
                 ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
                 ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
                     '^image\/(jpeg|png|gif)$' => [
-                        'adapter' => 'awss3',
+                        'adapter'  => 'awss3',
                         'template' => 'image-preview',
                     ],
                 ])],
@@ -246,7 +246,7 @@ class AdaptersExtenderTest extends TestCase
                 ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
                 ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
                     '^image\/(jpeg|png|gif)$' => [
-                        'adapter' => 'aws-s3',
+                        'adapter'  => 'aws-s3',
                         'template' => 'image-preview',
                     ],
                 ])],
@@ -290,7 +290,7 @@ class AdaptersExtenderTest extends TestCase
                 ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
                 ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
                     '^image\/(jpeg|png|gif)$' => [
-                        'adapter' => 'awss3',
+                        'adapter'  => 'awss3',
                         'template' => 'image-preview',
                     ],
                 ])],
@@ -331,7 +331,7 @@ class AdaptersExtenderTest extends TestCase
                 ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
                 ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
                     '^image\/(jpeg|png|gif)$' => [
-                        'adapter' => 'aws-s3',
+                        'adapter'  => 'aws-s3',
                         'template' => 'image-preview',
                     ],
                 ])],

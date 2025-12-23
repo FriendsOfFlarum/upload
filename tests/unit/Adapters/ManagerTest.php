@@ -108,12 +108,12 @@ class ManagerTest extends TestCase
 
         // Mock the config to return valid S3 configuration
         $this->config->shouldReceive('getS3Config')->once()->andReturn([
-            'region' => 'us-east-1',
-            'version' => 'latest',
-            'endpoint' => null,
+            'region'                  => 'us-east-1',
+            'version'                 => 'latest',
+            'endpoint'                => null,
             'use_path_style_endpoint' => false,
-            'credentials' => [
-                'key' => 'test-key',
+            'credentials'             => [
+                'key'    => 'test-key',
                 'secret' => 'test-secret',
             ],
             'bucket' => 'test-bucket',
@@ -141,12 +141,12 @@ class ManagerTest extends TestCase
 
         // Mock the config to return valid S3 configuration
         $this->config->shouldReceive('getS3Config')->once()->andReturn([
-            'region' => 'us-east-1',
-            'version' => 'latest',
-            'endpoint' => null,
+            'region'                  => 'us-east-1',
+            'version'                 => 'latest',
+            'endpoint'                => null,
             'use_path_style_endpoint' => false,
-            'credentials' => [
-                'key' => 'test-key',
+            'credentials'             => [
+                'key'    => 'test-key',
                 'secret' => 'test-secret',
             ],
             'bucket' => 'test-bucket',
