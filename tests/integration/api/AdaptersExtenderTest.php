@@ -189,25 +189,21 @@ class AdaptersExtenderTest extends TestCase
      */
     public function force_aws_s3_when_db_has_awss3_configuration()
     {
-        $this->extend(
-            (new Adapters())->force('aws-s3')
-        );
+        // Mock adapter that will be returned instead of trying to create real S3Client
+        $mockAdapter = \Mockery::mock(\FoF\Upload\Contracts\UploadAdapter::class);
 
-        // Configure with awss3 in MIME types (as stored in DB)
-        $this->prepareDatabase([
-            'settings' => [
-                ['key' => 'fof-upload.awsS3Region', 'value' => 'us-east-1'],
-                ['key' => 'fof-upload.awsS3Bucket', 'value' => 'test-bucket'],
-                ['key' => 'fof-upload.awsS3Key', 'value' => 'test-key'],
-                ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
-                ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
-                    '^image\/(jpeg|png|gif)$' => [
-                        'adapter'  => 'awss3',
-                        'template' => 'image-preview',
-                    ],
-                ])],
-            ],
-        ]);
+        $this->extend(
+            (new Adapters())->force('aws-s3'),
+
+            // Use event listener to provide mock adapter for instantiation
+            (new \Flarum\Extend\Event())
+                ->listen(\FoF\Upload\Events\Adapter\Instantiate::class, function ($event) use ($mockAdapter) {
+                    // Return mock for both 'awss3' and 'aws-s3' to test bidirectional compatibility
+                    if (in_array($event->adapter, ['awss3', 'aws-s3'])) {
+                        return $mockAdapter;
+                    }
+                })
+        );
 
         $this->app();
 
@@ -220,10 +216,10 @@ class AdaptersExtenderTest extends TestCase
         $this->assertFalse($adapters->has('awss3'));
         $this->assertEquals(1, $adapters->count());
 
-        // With bidirectional compatibility, 'awss3' should be instantiable when 'aws-s3' is forced
+        // With bidirectional compatibility, 'awss3' CAN be instantiated when 'aws-s3' is forced
         // This allows old files with upload_method='awss3' to still work
-        // We can't fully test instantiation without valid AWS credentials in CI,
-        // but the normalization logic in Manager ensures it will map to the correct method
+        $adapter = $manager->instantiate('awss3');
+        $this->assertSame($mockAdapter, $adapter);
     }
 
     /**
@@ -233,25 +229,21 @@ class AdaptersExtenderTest extends TestCase
      */
     public function force_awss3_when_db_has_aws_s3_configuration()
     {
-        $this->extend(
-            (new Adapters())->force('awss3')
-        );
+        // Mock adapter that will be returned instead of trying to create real S3Client
+        $mockAdapter = \Mockery::mock(\FoF\Upload\Contracts\UploadAdapter::class);
 
-        // Configure with aws-s3 in MIME types (as stored in DB)
-        $this->prepareDatabase([
-            'settings' => [
-                ['key' => 'fof-upload.awsS3Region', 'value' => 'us-east-1'],
-                ['key' => 'fof-upload.awsS3Bucket', 'value' => 'test-bucket'],
-                ['key' => 'fof-upload.awsS3Key', 'value' => 'test-key'],
-                ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
-                ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
-                    '^image\/(jpeg|png|gif)$' => [
-                        'adapter'  => 'aws-s3',
-                        'template' => 'image-preview',
-                    ],
-                ])],
-            ],
-        ]);
+        $this->extend(
+            (new Adapters())->force('awss3'),
+
+            // Use event listener to provide mock adapter for instantiation
+            (new \Flarum\Extend\Event())
+                ->listen(\FoF\Upload\Events\Adapter\Instantiate::class, function ($event) use ($mockAdapter) {
+                    // Return mock for both 'awss3' and 'aws-s3' to test bidirectional compatibility
+                    if (in_array($event->adapter, ['awss3', 'aws-s3'])) {
+                        return $mockAdapter;
+                    }
+                })
+        );
 
         $this->app();
 
@@ -264,10 +256,10 @@ class AdaptersExtenderTest extends TestCase
         $this->assertFalse($adapters->has('aws-s3'));
         $this->assertEquals(1, $adapters->count());
 
-        // With bidirectional compatibility, 'aws-s3' should be instantiable when 'awss3' is forced
+        // With bidirectional compatibility, 'aws-s3' CAN be instantiated when 'awss3' is forced
         // This allows old files with upload_method='aws-s3' to still work
-        // We can't fully test instantiation without valid AWS credentials in CI,
-        // but the normalization logic in Manager ensures it will map to the correct method
+        $adapter = $manager->instantiate('aws-s3');
+        $this->assertSame($mockAdapter, $adapter);
     }
 
     /**
@@ -277,25 +269,20 @@ class AdaptersExtenderTest extends TestCase
      */
     public function awss3_instantiation_works_with_normalization()
     {
-        $this->extend(
-            (new Adapters())->force('awss3')
-        );
+        // Mock adapter that will be returned instead of trying to create real S3Client
+        $mockAdapter = \Mockery::mock(\FoF\Upload\Contracts\UploadAdapter::class);
 
-        // Configure S3 settings
-        $this->prepareDatabase([
-            'settings' => [
-                ['key' => 'fof-upload.awsS3Region', 'value' => 'us-east-1'],
-                ['key' => 'fof-upload.awsS3Bucket', 'value' => 'test-bucket'],
-                ['key' => 'fof-upload.awsS3Key', 'value' => 'test-key'],
-                ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
-                ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
-                    '^image\/(jpeg|png|gif)$' => [
-                        'adapter'  => 'awss3',
-                        'template' => 'image-preview',
-                    ],
-                ])],
-            ],
-        ]);
+        $this->extend(
+            (new Adapters())->force('awss3'),
+
+            // Use event listener to provide mock adapter for instantiation
+            (new \Flarum\Extend\Event())
+                ->listen(\FoF\Upload\Events\Adapter\Instantiate::class, function ($event) use ($mockAdapter) {
+                    if (in_array($event->adapter, ['awss3', 'aws-s3'])) {
+                        return $mockAdapter;
+                    }
+                })
+        );
 
         $this->app();
 
@@ -307,9 +294,9 @@ class AdaptersExtenderTest extends TestCase
         $this->assertTrue($adapters->has('awss3'));
         $this->assertEquals(1, $adapters->count());
 
-        // With normalization (awss3 -> aws-s3 -> awsS3 method), instantiation should work
-        // We can't fully test instantiation without valid AWS credentials in CI,
-        // but the adapter is available in the collection thanks to the fix
+        // This should work thanks to normalization (awss3 -> aws-s3 -> awsS3 method)
+        $adapter = $manager->instantiate('awss3');
+        $this->assertSame($mockAdapter, $adapter);
     }
 
     /**
@@ -318,25 +305,20 @@ class AdaptersExtenderTest extends TestCase
      */
     public function aws_s3_instantiation_works_as_standard()
     {
-        $this->extend(
-            (new Adapters())->force('aws-s3')
-        );
+        // Mock adapter that will be returned instead of trying to create real S3Client
+        $mockAdapter = \Mockery::mock(\FoF\Upload\Contracts\UploadAdapter::class);
 
-        // Configure S3 settings
-        $this->prepareDatabase([
-            'settings' => [
-                ['key' => 'fof-upload.awsS3Region', 'value' => 'us-east-1'],
-                ['key' => 'fof-upload.awsS3Bucket', 'value' => 'test-bucket'],
-                ['key' => 'fof-upload.awsS3Key', 'value' => 'test-key'],
-                ['key' => 'fof-upload.awsS3Secret', 'value' => 'test-secret'],
-                ['key' => 'fof-upload.mimeTypes', 'value' => json_encode([
-                    '^image\/(jpeg|png|gif)$' => [
-                        'adapter'  => 'aws-s3',
-                        'template' => 'image-preview',
-                    ],
-                ])],
-            ],
-        ]);
+        $this->extend(
+            (new Adapters())->force('aws-s3'),
+
+            // Use event listener to provide mock adapter for instantiation
+            (new \Flarum\Extend\Event())
+                ->listen(\FoF\Upload\Events\Adapter\Instantiate::class, function ($event) use ($mockAdapter) {
+                    if (in_array($event->adapter, ['awss3', 'aws-s3'])) {
+                        return $mockAdapter;
+                    }
+                })
+        );
 
         $this->app();
 
@@ -349,7 +331,7 @@ class AdaptersExtenderTest extends TestCase
         $this->assertEquals(1, $adapters->count());
 
         // Standard case (aws-s3 -> awsS3 method) should work
-        // We can't fully test instantiation without valid AWS credentials in CI,
-        // but the adapter is available in the collection as expected
+        $adapter = $manager->instantiate('aws-s3');
+        $this->assertSame($mockAdapter, $adapter);
     }
 }
