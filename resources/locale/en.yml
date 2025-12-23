@@ -140,6 +140,7 @@ fof-upload:
         Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
     upload_methods:
       aws-s3: S3 or Compatible
+      # TODO: Flarum 2.0 - Remove 'awss3' backward compatibility translation
       awss3: AWS S3
       imgur: Imgur
       local: Local
