@@ -1,0 +1,17 @@
+name: Notify Flarum on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-flarum:
+    uses: FriendsOfFlarum/extension-releases/.github/workflows/REUSABLE_flarum-release-notification.yml@2.x
+    with:
+      changelog: ${{ github.event.release.body || '' }}
+      tag_name: ${{ github.event.release.tag_name }}
+      release_url: ${{ github.event.release.html_url }}
+      author: ${{ github.event.release.author.login || github.actor || '' }}
+      ref: ${{ github.ref }}
+    secrets:
+      flarum_api_token: ${{ secrets.FLARUM_EXTENSION_UPDATES_API_TOKEN }}
