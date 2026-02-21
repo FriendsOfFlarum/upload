@@ -103,16 +103,16 @@ return [
     (new Extend\ApiResource(Resource\UserResource::class))
         ->fields(fn () => [
             Schema\Boolean::make('fof-upload-viewOthersMediaLibrary')
-                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->hidden(fn (User $user, Context $context) => $context->getActor()->id !== $user->id || !$context->getActor()->hasPermission('fof-upload.viewUserUploads'))
                 ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.viewUserUploads')),
             Schema\Boolean::make('fof-upload-deleteOthersMediaLibrary')
-                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->hidden(fn (User $user, Context $context) => $context->getActor()->id !== $user->id || !$context->getActor()->hasPermission('fof-upload.deleteUserUploads'))
                 ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.deleteUserUploads')),
             Schema\Boolean::make('fof-upload-uploadSharedFiles')
-                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->hidden(fn (User $user, Context $context) => $context->getActor()->id !== $user->id || !$context->getActor()->hasPermission('fof-upload.upload-shared-files'))
                 ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.upload-shared-files')),
             Schema\Boolean::make('fof-upload-accessSharedFiles')
-                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->hidden(fn (User $user, Context $context) => $context->getActor()->id !== $user->id || !$context->getActor()->hasPermission('fof-upload.access-shared-files'))
                 ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.access-shared-files')),
             Schema\Number::make('fof-upload-uploadCountCurrent')
                 ->countRelation('foffilesCurrent'),
