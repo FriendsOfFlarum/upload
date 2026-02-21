@@ -22,6 +22,7 @@ use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManagerTest extends TestCase
 {
@@ -60,7 +61,7 @@ class ManagerTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function adapters_returns_collection_with_aws_s3_when_s3client_available()
     {
         $this->events->shouldReceive('dispatch')->once();
@@ -72,7 +73,7 @@ class ManagerTest extends TestCase
         $this->assertTrue($adapters->get('awss3'));
     }
 
-    /** @test */
+    #[Test]
     public function adapters_always_includes_local_and_imgur()
     {
         $this->events->shouldReceive('dispatch')->once();
@@ -83,7 +84,7 @@ class ManagerTest extends TestCase
         $this->assertTrue($adapters->get('imgur'));
     }
 
-    /** @test */
+    #[Test]
     public function instantiate_throws_exception_for_unconfigured_adapter()
     {
         $this->expectException(ValidationException::class);
@@ -95,9 +96,9 @@ class ManagerTest extends TestCase
     }
 
     /**
-     * @test
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function instantiate_normalizes_awss3_to_aws_s3()
     {
         // Mock the Collecting event dispatch
@@ -130,7 +131,7 @@ class ManagerTest extends TestCase
         $this->assertInstanceOf(\FoF\Upload\Adapters\AwsS3::class, $adapter);
     }
 
-    /** @test */
+    #[Test]
     public function instantiate_works_with_aws_s3_hyphenated_name()
     {
         // Mock the Collecting event dispatch
@@ -163,7 +164,7 @@ class ManagerTest extends TestCase
         $this->assertInstanceOf(\FoF\Upload\Adapters\AwsS3::class, $adapter);
     }
 
-    /** @test */
+    #[Test]
     public function instantiate_works_with_local_adapter()
     {
         // Mock the Collecting event dispatch

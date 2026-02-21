@@ -15,6 +15,7 @@ namespace FoF\Upload\Tests\integration\api;
 use Flarum\Testing\integration\TestCase;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Extend\Adapters;
+use PHPUnit\Framework\Attributes\Test;
 
 class AdaptersExtenderTest extends TestCase
 {
@@ -26,9 +27,9 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function force_extender_limits_available_adapters_to_awss3()
     {
         $this->extend(
@@ -50,9 +51,9 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function force_extender_allows_instantiation_of_forced_awss3_adapter()
     {
         $this->extend(
@@ -85,9 +86,7 @@ class AdaptersExtenderTest extends TestCase
         $this->assertEquals(1, $adapters->count());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function force_extender_limits_available_adapters_to_aws_s3()
     {
         $this->extend(
@@ -108,9 +107,7 @@ class AdaptersExtenderTest extends TestCase
         $this->assertEquals(1, $adapters->count());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function force_extender_works_with_local_adapter()
     {
         $this->extend(
@@ -135,9 +132,7 @@ class AdaptersExtenderTest extends TestCase
         $this->assertInstanceOf(\FoF\Upload\Adapters\Local::class, $adapter);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function disable_extender_removes_specified_adapters()
     {
         $this->extend(
@@ -162,9 +157,7 @@ class AdaptersExtenderTest extends TestCase
         $this->assertTrue($adapters->has('local'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function without_extender_all_adapters_are_available()
     {
         $this->app();
@@ -183,10 +176,10 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * Tests the scenario: DB has awss3, forced to aws-s3
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function force_aws_s3_when_db_has_awss3_configuration()
     {
         // Mock adapter that will be returned instead of trying to create real S3Client
@@ -223,10 +216,10 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * Tests the scenario: DB has aws-s3, forced to awss3
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function force_awss3_when_db_has_aws_s3_configuration()
     {
         // Mock adapter that will be returned instead of trying to create real S3Client
@@ -263,10 +256,10 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * Tests that awss3 can be instantiated when forced, demonstrating the normalization fix
      * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
      */
+    #[Test]
     public function awss3_instantiation_works_with_normalization()
     {
         // Mock adapter that will be returned instead of trying to create real S3Client
@@ -300,9 +293,9 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * @test
      * Tests that aws-s3 continues to work as expected
      */
+    #[Test]
     public function aws_s3_instantiation_works_as_standard()
     {
         // Mock adapter that will be returned instead of trying to create real S3Client

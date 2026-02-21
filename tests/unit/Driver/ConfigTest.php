@@ -16,6 +16,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Driver\Config;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ConfigTest extends TestCase
 {
@@ -63,13 +64,13 @@ class ConfigTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_false_when_no_env_vars_set()
     {
         $this->assertFalse($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_false_when_only_some_env_vars_set()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=test-key');
@@ -78,7 +79,7 @@ class ConfigTest extends TestCase
         $this->assertFalse($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_true_when_all_required_env_vars_set()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=test-key');
@@ -89,7 +90,7 @@ class ConfigTest extends TestCase
         $this->assertTrue($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_true_when_iam_flag_set_with_bucket_and_region()
     {
         putenv('FOF_UPLOAD_AWS_S3_BUCKET=test-bucket');
@@ -99,7 +100,7 @@ class ConfigTest extends TestCase
         $this->assertTrue($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_true_when_iam_flag_set_with_various_truthy_values()
     {
         $truthyValues = ['true', 'TRUE', '1', 'yes', 'YES', 'on', 'ON'];
@@ -114,7 +115,7 @@ class ConfigTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_false_when_iam_flag_set_but_missing_bucket()
     {
         putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
@@ -123,7 +124,7 @@ class ConfigTest extends TestCase
         $this->assertFalse($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseEnv_returns_false_when_iam_flag_set_but_missing_region()
     {
         putenv('FOF_UPLOAD_AWS_S3_BUCKET=test-bucket');
@@ -132,13 +133,13 @@ class ConfigTest extends TestCase
         $this->assertFalse($this->config->shouldUseEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseLocalCdnEnv_returns_false_when_not_set()
     {
         $this->assertFalse($this->config->shouldUseLocalCdnEnv());
     }
 
-    /** @test */
+    #[Test]
     public function shouldUseLocalCdnEnv_returns_true_when_set()
     {
         putenv('FOF_UPLOAD_CDN_URL=https://cdn.example.com');
@@ -146,7 +147,7 @@ class ConfigTest extends TestCase
         $this->assertTrue($this->config->shouldUseLocalCdnEnv());
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_uses_settings_when_env_not_configured()
     {
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Region')->andReturn('us-east-1');
@@ -169,7 +170,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('settings-secret', $config['credentials']['secret']);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_uses_env_when_configured()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=env-key');
@@ -191,7 +192,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldNotHaveReceived('get');
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_includes_optional_env_vars_when_set()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=env-key');
@@ -211,7 +212,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('https://cdn.example.com', $config['cdn_url']);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_includes_credentials_when_both_key_and_secret_provided_in_env()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=test-key');
@@ -226,7 +227,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('test-secret', $config['credentials']['secret']);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_omits_credentials_when_not_provided_in_settings()
     {
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Region')->andReturn('us-east-1');
@@ -244,7 +245,7 @@ class ConfigTest extends TestCase
         $this->assertArrayNotHasKey('credentials', $config);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_omits_credentials_when_iam_flag_enabled()
     {
         putenv('FOF_UPLOAD_AWS_S3_BUCKET=iam-bucket');
@@ -261,7 +262,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldNotHaveReceived('get');
     }
 
-    /** @test */
+    #[Test]
     public function getS3Config_returns_null_values_when_neither_env_nor_settings_configured()
     {
         // When S3 is not configured at all (no env vars, no settings)
@@ -287,7 +288,7 @@ class ConfigTest extends TestCase
         $this->assertArrayNotHasKey('credentials', $config);
     }
 
-    /** @test */
+    #[Test]
     public function getLocalCdnUrl_returns_env_value_when_set()
     {
         putenv('FOF_UPLOAD_CDN_URL=https://cdn.example.com');
@@ -300,7 +301,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldNotHaveReceived('get');
     }
 
-    /** @test */
+    #[Test]
     public function getLocalCdnUrl_returns_settings_value_when_env_not_set()
     {
         $this->settings->shouldReceive('get')
@@ -312,7 +313,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('https://settings-cdn.example.com', $url);
     }
 
-    /** @test */
+    #[Test]
     public function getLocalCdnUrl_returns_null_when_neither_env_nor_settings_set()
     {
         $this->settings->shouldReceive('get')
@@ -324,7 +325,7 @@ class ConfigTest extends TestCase
         $this->assertNull($url);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Acl_returns_env_value_when_s3_env_configured()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=env-key');
@@ -338,7 +339,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('public-read', $acl);
     }
 
-    /** @test */
+    #[Test]
     public function getS3Acl_returns_settings_value_when_env_not_configured()
     {
         $this->settings->shouldReceive('get')
@@ -350,7 +351,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('private', $acl);
     }
 
-    /** @test */
+    #[Test]
     public function getS3CustomUrl_returns_env_value_when_s3_env_configured()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=env-key');
@@ -364,7 +365,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('https://custom.example.com', $url);
     }
 
-    /** @test */
+    #[Test]
     public function getS3CustomUrl_returns_settings_value_when_env_not_configured()
     {
         $this->settings->shouldReceive('get')
@@ -376,7 +377,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('https://settings-custom.example.com', $url);
     }
 
-    /** @test */
+    #[Test]
     public function getS3CdnUrl_returns_env_value_when_s3_env_configured()
     {
         putenv('FOF_UPLOAD_AWS_S3_KEY=env-key');
@@ -390,7 +391,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('https://s3-cdn.example.com', $url);
     }
 
-    /** @test */
+    #[Test]
     public function getS3CdnUrl_returns_settings_value_when_env_not_configured()
     {
         $this->settings->shouldReceive('get')

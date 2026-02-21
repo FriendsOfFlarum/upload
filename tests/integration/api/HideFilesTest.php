@@ -17,6 +17,8 @@ use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
+use PHPUnit\Framework\Attributes\Test;
+use Flarum\User\User;
 
 class HideFilesTest extends EnhancedTestCase
 {
@@ -30,7 +32,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 $this->normalUser(),
                 ['id' => 3, 'username' => 'normal2', 'email' => 'normal2@machine.local'],
                 ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local'],
@@ -72,9 +74,7 @@ class HideFilesTest extends EnhancedTestCase
         return $json['data'][0]['attributes']['uuid'];
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function guest_cannot_set_file_as_hidden()
     {
         $this->extend(
@@ -99,9 +99,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_cannot_hide_with_no_data()
     {
         $response = $this->send(
@@ -125,9 +123,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertEquals('UUID cannot be empty.', $json['errors'][0]['detail']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_can_hide_own_file()
     {
         $uuid = 'abc-123';
@@ -157,9 +153,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertTrue($file->hidden);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_cannot_hide_other_users_file()
     {
         $uuid = 'abc-123';
@@ -185,9 +179,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertFalse($file->hidden);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_cannot_hide_shared_files()
     {
         $uuid = 'def-456';
@@ -208,9 +200,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertEquals(403, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function admin_can_hide_shared_files()
     {
         $uuid = $this->uploadSharedFileAndGetUuid();
@@ -245,9 +235,7 @@ class HideFilesTest extends EnhancedTestCase
         $this->assertFileDoesNotExist($paths->public.'/assets/files/'.$file->path);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function moderator_cannot_hide_shared_files()
     {
         $uuid = 'def-456';

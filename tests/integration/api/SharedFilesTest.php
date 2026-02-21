@@ -15,6 +15,9 @@ namespace FoF\Upload\Tests\integration\api;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use Flarum\User\User;
 
 class SharedFilesTest extends EnhancedTestCase
 {
@@ -28,7 +31,7 @@ class SharedFilesTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 $this->normalUser(),
                 ['id' => 3, 'username' => 'moderator', 'email' => 'moderator@machine.local', 'is_email_confirmed' => true],
             ],
@@ -41,9 +44,7 @@ class SharedFilesTest extends EnhancedTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function list_shared_files()
     {
         $response = $this->send(
@@ -53,7 +54,7 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function userIdWithPermissionsProvider()
+    public static function userIdWithPermissionsProvider()
     {
         return [
             [1],
@@ -61,11 +62,8 @@ class SharedFilesTest extends EnhancedTestCase
         ];
     }
 
-    /**
-     * @dataProvider userIdWithPermissionsProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('userIdWithPermissionsProvider')]
     public function user_with_permission_can_upload_a_shared_file_and_is_not_hidden_by_default(int $userId)
     {
         $response = $this->send(
@@ -108,11 +106,8 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertFalse($file->hidden);
     }
 
-    /**
-     * @dataProvider userIdWithPermissionsProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('userIdWithPermissionsProvider')]
     public function user_with_permission_can_upload_a_shared_file_and_is_hidden_if_requested(int $userId)
     {
         $response = $this->send(
@@ -156,9 +151,7 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertTrue($file->hidden);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shared_hidden_files_are_proxied_via_our_controller()
     {
         $response = $this->send(
@@ -197,11 +190,8 @@ class SharedFilesTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider userIdWithPermissionsProvider
-     *
-     * @test
-     */
+    #[Test]
+    #[DataProvider('userIdWithPermissionsProvider')]
     public function users_with_permission_can_upload_a_shared_file_and_then_delete_it(int $userId)
     {
         $response = $this->send(
