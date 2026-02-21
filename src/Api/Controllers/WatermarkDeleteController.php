@@ -35,7 +35,7 @@ class WatermarkDeleteController extends AbstractDeleteController
         $this->assetsDir = $factory->disk('flarum-assets');
     }
 
-    public function delete(ServerRequestInterface $request)
+    public function delete(ServerRequestInterface $request): void
     {
         RequestUtil::getActor($request)->assertAdmin();
 
