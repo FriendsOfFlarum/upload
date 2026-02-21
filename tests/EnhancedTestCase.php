@@ -59,6 +59,8 @@ class EnhancedTestCase extends BaseTestCase
                 $request,
                 $options['json']
             );
+            // Ensure parsed body is available for handlers that use getParsedBody()
+            $request = $request->withParsedBody($options['json']);
         }
 
         // Authenticate as a given user

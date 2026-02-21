@@ -38,8 +38,8 @@ class HideFilesTest extends EnhancedTestCase
                 ['id' => 4, 'username' => 'moderator', 'email' => 'moderator@machine.local'],
             ],
             'fof_upload_files' => [
-                ['id' => 1, 'base_name' => 'test_file.abc', 'uuid' => 'abc-123', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false],
-                ['id' => 2, 'base_name' => 'test_file2.abc', 'uuid' => 'def-456', 'path' => 'path/test_file2.abc', 'url' => 'http://localhost/test_file2.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'shared' => true],
+                ['id' => 1, 'base_name' => 'test_file.abc', 'uuid' => 'abc-123', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false, 'created_at' => '2024-01-01 00:00:00'],
+                ['id' => 2, 'base_name' => 'test_file2.abc', 'uuid' => 'def-456', 'path' => 'path/test_file2.abc', 'url' => 'http://localhost/test_file2.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'shared' => true, 'created_at' => '2024-01-01 00:00:00'],
             ],
             'group_user' => [
                 ['user_id' => 4, 'group_id' => 4],
@@ -141,9 +141,10 @@ class HideFilesTest extends EnhancedTestCase
             )
         );
 
+        $body = $response->getBody()->getContents();
         $this->assertEquals(200, $response->getStatusCode());
 
-        $json = json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($body, true);
 
         $this->assertTrue($json['data']['attributes']['hidden']);
 
@@ -218,11 +219,12 @@ class HideFilesTest extends EnhancedTestCase
             )
         );
 
+        $body = $response->getBody()->getContents();
         $this->assertEquals(200, $response->getStatusCode());
 
         $file = File::byUuid($uuid)->first();
 
-        $json = json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($body, true);
 
         $this->assertTrue($json['data']['attributes']['hidden']);
 

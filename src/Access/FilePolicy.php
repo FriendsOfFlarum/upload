@@ -26,7 +26,13 @@ class FilePolicy extends AbstractPolicy
 
     public function hide(User $actor, File $file): ?string
     {
-        if (($file->actor?->id === $actor->id || $actor->hasPermission('fof-upload.deleteUserUploads')) && $file->actor !== null) {
+        // User can hide their own file
+        if ($file->actor !== null && $file->actor->id === $actor->id) {
+            return $this->allow();
+        }
+
+        // Users with deleteUserUploads can hide others' files or shared files (actor is null)
+        if ($actor->hasPermission('fof-upload.deleteUserUploads')) {
             return $this->allow();
         }
 

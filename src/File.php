@@ -52,7 +52,7 @@ class File extends AbstractModel
     protected $casts = [
         'hidden'                  => 'boolean',
         'shared'                  => 'boolean',
-        'created_at'              => 'datetime',
+        'created_at'              => \FoF\Upload\Casts\FlexibleDateTime::class,
     ];
 
     protected $fillable = [

@@ -86,10 +86,12 @@ class Util
     {
         $mimeTypes = resolve(SettingsRepositoryInterface::class)->get('fof-upload.mimeTypes');
 
-        return $this->getJsonValue(
+        $config = $this->getJsonValue(
             $mimeTypes,
             $this->defaultMimeTypes()
         )->filter();
+
+        return $config->isEmpty() ? $this->defaultMimeTypes() : $config;
     }
 
     public function defaultMimeTypes(): Collection

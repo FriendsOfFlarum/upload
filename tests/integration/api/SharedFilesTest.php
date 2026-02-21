@@ -47,8 +47,11 @@ class SharedFilesTest extends EnhancedTestCase
     #[Test]
     public function list_shared_files()
     {
+        // FileResource index endpoint requires authentication
         $response = $this->send(
-            $this->request('GET', '/api/fof/upload/shared-files')
+            $this->request('GET', '/api/fof/upload/shared-files', [
+                'authenticatedAs' => 1,
+            ])
         );
 
         $this->assertEquals(200, $response->getStatusCode());

@@ -34,6 +34,8 @@ class FileUploadTest extends EnhancedTestCase
                 $this->normalUser(),
             ],
         ]);
+
+        // Use default mime types (image/* with local adapter) - no need to set explicitly
     }
 
     protected function setMaxUploadSize(int $max)
@@ -55,9 +57,10 @@ class FileUploadTest extends EnhancedTestCase
             ])
         );
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody()->getContents();
+        $this->assertEquals(200, $response->getStatusCode(), 'Upload failed: '.$body);
 
-        $json = json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($body, true);
 
         $this->assertCount(1, $json['data']);
 
@@ -145,7 +148,7 @@ class FileUploadTest extends EnhancedTestCase
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
                 'multipart'       => [
-                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                    $this->uploadFile($this->fixtures('LargeFile.jpg')),
                 ],
             ])
         );
