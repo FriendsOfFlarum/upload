@@ -31,6 +31,10 @@ use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 use FoF\Upload\Extenders\LoadFilesRelationship;
 use FoF\Upload\Helpers\Util;
+use Flarum\Api\Context;
+use Flarum\Api\Endpoint;
+use Flarum\Api\Resource;
+use Flarum\Api\Schema;
 
 return [
     (new Extend\Frontend('admin'))
@@ -71,15 +75,20 @@ return [
             return $model->foffiles()->where('hidden', false);
         }),
 
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiController(ShowUserController::class))
         ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiController(ShowForumController::class))
         ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiController(ListDiscussionsController::class))
         ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiController(ListPostsController::class))
         ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
 
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(Extenders\AddForumAttributes::class),
 
@@ -102,9 +111,11 @@ return [
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
 
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiSerializer(CurrentUserSerializer::class))
         ->attributes(Extenders\AddCurrentUserAttributes::class),
 
+    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
     (new Extend\ApiSerializer(UserSerializer::class))
         ->attributes(Extenders\AddUserAttributes::class),
 
@@ -138,4 +149,5 @@ return [
             (new UserData())
                 ->addType(Data\Uploads::class),
         ]),
+    new Extend\ApiResource(Api\Resource\FileResource::class),
 ];
