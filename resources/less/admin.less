@@ -4,27 +4,85 @@
 @import "./common/fileList.less";
 
 .UploadPage {
-    padding: 20px 0;
+  padding: 1.5rem 0;
 
-    @media @desktop-up {
-        .container {
-            max-width: 900px;
-            margin: 0;
-        }
-
-        fieldset {
-            margin-bottom: 30px;
-        }
+  @media @desktop-up {
+    &-container.container {
+      max-width: 900px;
+      margin: 0;
     }
 
-    .MimeTypes {
-        width: 49%;
-        float: left;
+    fieldset {
+      margin-bottom: 2rem;
+    }
+  }
+
+  &-mimeTypes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &-mimeTypeRow {
+    display: grid;
+    grid-template-columns: minmax(180px, 2fr) minmax(140px, 1fr) minmax(240px, 2fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &-mimeTypeRow .Select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+
+    select {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  &-mimeTypeInput {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &-mimeTypeRow--invalid input.UploadPage-mimeTypeInput {
+    border-color: var(--alert-error-color);
+    box-shadow: 0 0 0 1px var(--alert-error-color);
+  }
+
+  &-mimeTypeAdd {
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--muted-color);
+  }
+
+  &-templateList {
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &-composerButtons {
+    .Form-group {
+      margin-bottom: 0;
+    }
+  }
+
+  &-adapter {
+    margin-top: 1rem;
+
+    &--imgur .icon {
+      color: #ffcc00;
     }
 
-    .imgur {
-        .icon {
-            color: #ffcc00;
-        }
+    fieldset {
+      margin-bottom: 1.5rem;
     }
+  }
 }

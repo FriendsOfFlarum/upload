@@ -36,10 +36,10 @@
 
         &.selected {
             border: 2px solid var(--primary-color);
-            box-shadow: 0 0 0 3px fade(@primary-color, 20%);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
 
             .fof-file-name {
-                background-color: darken(@primary-color, 10%);
+                background-color: color-mix(in srgb, var(--primary-color) 90%, black);
             }
         }
 

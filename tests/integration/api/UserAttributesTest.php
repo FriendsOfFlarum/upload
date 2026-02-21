@@ -17,7 +17,7 @@ use Flarum\Testing\integration\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Flarum\User\User;
 
-class UserAttributes extends TestCase
+class UserAttributesTest extends TestCase
 {
     use RetrievesAuthorizedUsers;
 

@@ -18,23 +18,27 @@ use FoF\Upload\File;
 
 class FilePolicy extends AbstractPolicy
 {
-    public function viewInfo(User $actor, File $file)
+    public function viewInfo(User $actor, File $file): string
     {
         // for now..
         return $this->deny();
     }
 
-    public function hide(User $actor, File $file)
+    public function hide(User $actor, File $file): ?string
     {
         if (($file->actor?->id === $actor->id || $actor->hasPermission('fof-upload.deleteUserUploads')) && $file->actor !== null) {
             return $this->allow();
         }
+
+        return null;
     }
 
-    public function delete(User $actor, File $file)
+    public function delete(User $actor, File $file): ?string
     {
         if ($actor->can('fof-upload.deleteUserUploads') && $file->actor !== null) {
             return $this->allow();
         }
+
+        return null;
     }
 }

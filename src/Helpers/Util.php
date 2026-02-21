@@ -56,13 +56,20 @@ class Util
             });
     }
 
+    /**
+     * @param string|null $json
+     * @param mixed $default
+     * @param string|null $attribute
+     * @return mixed
+     */
     public function getJsonValue($json, $default = null, $attribute = null)
     {
         if (empty($json)) {
             return $default;
         }
 
-        $collect = collect(json_decode($json, true));
+        $decoded = json_decode($json, true);
+        $collect = collect(is_array($decoded) ? $decoded : []);
 
         if ($attribute) {
             return $collect->get($attribute, $default);
@@ -99,7 +106,7 @@ class Util
     /**
      * @param Template $template
      */
-    public function addRenderTemplate(Template $template)
+    public function addRenderTemplate(Template $template): void
     {
         $this->renderTemplates[$template->tag()] = $template;
     }
@@ -115,7 +122,7 @@ class Util
     /**
      * @param Template[] $templates
      */
-    public function setRenderTemplates(array $templates)
+    public function setRenderTemplates(array $templates): void
     {
         $this->renderTemplates = $templates;
     }
@@ -273,6 +280,17 @@ class Util
 
     public function setMethod(?UploadAdapter $adapter = null): string
     {
-        return $adapter ? Str::lower(Str::afterLast($adapter::class, '\\')) : 'private-shared';
+        if (!$adapter) {
+            return 'private-shared';
+        }
+
+        $className = Str::afterLast($adapter::class, '\\');
+        // Map adapter class names to canonical Manager keys
+        $canonical = match ($className) {
+            'AwsS3' => 'aws-s3',
+            default => Str::lower($className),
+        };
+
+        return $canonical;
     }
 }

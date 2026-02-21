@@ -33,12 +33,13 @@ class DeleteFileController extends AbstractDeleteController
     ) {
     }
 
-    public function delete(ServerRequestInterface $request): void
+    protected function delete(ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
 
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
 
+        /** @var File $file */
         $file = File::byUuid($uuid)->firstOrFail();
 
         $this->bus->dispatch(

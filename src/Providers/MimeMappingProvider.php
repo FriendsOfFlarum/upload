@@ -27,13 +27,12 @@ class MimeMappingProvider extends AbstractServiceProvider
         $this->container->singleton('fof-upload.mime-mappings', function () use ($mappings) {
             $registeredMappings = [];
             foreach ($mappings as $mappingClass) {
-                if (is_subclass_of($mappingClass, AbstractMimeMap::class)) {
-                    $registeredMappings[] = [
-                        'mime'       => $mappingClass::getMimeType(),
-                        'extension'  => $mappingClass::getExtension(),
-                        'magicBytes' => $mappingClass::getMagicBytes(),
-                    ];
-                }
+                /** @var class-string<AbstractMimeMap> $mappingClass */
+                $registeredMappings[] = [
+                    'mime'       => $mappingClass::getMimeType(),
+                    'extension'  => $mappingClass::getExtension(),
+                    'magicBytes' => $mappingClass::getMagicBytes(),
+                ];
             }
 
             return $registeredMappings;

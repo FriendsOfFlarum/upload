@@ -69,8 +69,6 @@ class ManagerTest extends TestCase
         $adapters = $this->manager->adapters();
 
         $this->assertTrue($adapters->get('aws-s3'));
-        // TODO: Flarum 2.0 - Remove 'awss3' assertion when backward compatibility is dropped
-        $this->assertTrue($adapters->get('awss3'));
     }
 
     #[Test]
@@ -93,42 +91,6 @@ class ManagerTest extends TestCase
         $this->events->shouldReceive('dispatch')->once();
 
         $this->manager->instantiate('nonexistent');
-    }
-
-    /**
-     * TODO: Flarum 2.0 - Remove this test when 'awss3' backward compatibility is dropped
-     */
-    #[Test]
-    public function instantiate_normalizes_awss3_to_aws_s3()
-    {
-        // Mock the Collecting event dispatch
-        $this->events->shouldReceive('dispatch')->once();
-
-        // Mock the Instantiate event dispatch - should return null so Manager uses its own method
-        $this->events->shouldReceive('until')->once()->andReturn(null);
-
-        // Mock the config to return valid S3 configuration
-        $this->config->shouldReceive('getS3Config')->once()->andReturn([
-            'region'                  => 'us-east-1',
-            'version'                 => 'latest',
-            'endpoint'                => null,
-            'use_path_style_endpoint' => false,
-            'credentials'             => [
-                'key'    => 'test-key',
-                'secret' => 'test-secret',
-            ],
-            'bucket' => 'test-bucket',
-        ]);
-
-        // Mock settings for AwsS3 adapter constructor
-        $this->settings->shouldReceive('get')->andReturn(null);
-        $this->url->shouldReceive('to')->andReturnSelf();
-        $this->url->shouldReceive('route')->andReturn('http://example.com');
-
-        // This should NOT throw an exception - 'awss3' should be normalized to 'aws-s3'
-        $adapter = $this->manager->instantiate('awss3');
-
-        $this->assertInstanceOf(\FoF\Upload\Adapters\AwsS3::class, $adapter);
     }
 
     #[Test]

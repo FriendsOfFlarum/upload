@@ -1,43 +1,56 @@
 import app from 'flarum/forum/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
+import Alert from 'flarum/common/components/Alert';
 import UploadButton from './UploadButton';
 import UserFileList from '../../common/components/UserFileList';
 import DragAndDrop from './DragAndDrop';
-import UploadSharedFileModal from '../../common/components/UploadSharedFileModal';
 import ItemList from 'flarum/common/utils/ItemList';
 import SharedFileList from '../../common/components/SharedFileList';
 import FileListState from '../../common/states/FileListState';
+import type Uploader from '../handler/Uploader';
+import type File from '../../common/models/File';
+import type User from 'flarum/common/models/User';
+import type Mithril from 'mithril';
 
-export default class FileManagerModal extends Modal {
-  oninit(vnode) {
+type FilesLibrary = 'user' | 'shared';
+
+interface FileManagerModalAttrs {
+  uploader: Uploader;
+  user?: User | null;
+  hideUser?: boolean;
+  hideShared?: boolean;
+  multiSelect?: boolean;
+  restrictFileType?: string | null;
+  defaultFilesLibrary?: FilesLibrary;
+  onSelect?: (selectedFileIds: string[]) => void;
+}
+
+export default class FileManagerModal extends (Modal as any)<FileManagerModalAttrs, undefined> {
+  uploader!: Uploader;
+  selectedFiles: string[] = [];
+  multiSelect = true;
+  restrictFileType: string | null = null;
+  dragDrop: DragAndDrop | null = null;
+  selectedFilesLibrary: FilesLibrary = 'user';
+  userFileState!: FileListState;
+  sharedFileState!: FileListState;
+
+  oninit(vnode: Mithril.Vnode<FileManagerModalAttrs, this>) {
     super.oninit(vnode);
 
-    // Initialize upload managers
     this.uploader = vnode.attrs.uploader;
-
-    // Current selected files
     this.selectedFiles = [];
-
-    // Allow multiselect
     this.multiSelect = vnode.attrs.multiSelect === undefined ? true : vnode.attrs.multiSelect;
-
-    // Restrict file selection to specific types
     this.restrictFileType = vnode.attrs.restrictFileType || null;
-
-    // Drag & drop
     this.dragDrop = null;
-
     this.selectedFilesLibrary = vnode.attrs.defaultFilesLibrary || 'user';
-
-    this.sharedUploads = null;
 
     this.userFileState = new FileListState();
     this.sharedFileState = new FileListState(true);
 
     this.uploader.setState(this.userFileState);
 
-    // Initialize uploads
     this.onUpload();
   }
 
@@ -45,18 +58,20 @@ export default class FileManagerModal extends Modal {
     return 'Modal--large fof-file-manager-modal';
   }
 
-  /**
-   * Initialize drag & drop
-   */
-  oncreate(vnode) {
+  title() {
+    return '';
+  }
+
+  content() {
+    return null;
+  }
+
+  oncreate(vnode: Mithril.VnodeDOM<FileManagerModalAttrs, this>) {
     super.oncreate(vnode);
 
     this.dragDrop = new DragAndDrop((files) => this.uploader.upload(files, false), this.$().find('.Modal-content')[0]);
   }
 
-  /**
-   * Remove events from modal content
-   */
   onremove() {
     if (this.dragDrop) {
       this.dragDrop.unload();
@@ -74,7 +89,7 @@ export default class FileManagerModal extends Modal {
             {!hideUser && this.selectedFilesLibrary === 'user' && (
               <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
             )}
-            {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
+            {app.session.user && (app.session.user as unknown as { uploadSharedFiles(): boolean }).uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
               <Button
                 className="Button"
                 icon="fas fa-file-upload"
@@ -97,7 +112,7 @@ export default class FileManagerModal extends Modal {
 
           <div className="Modal-header">
             <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
-            {app.session.user?.accessSharedFiles() && !hideUser && !hideShared && (
+            {app.session.user && (app.session.user as unknown as { accessSharedFiles(): boolean }).accessSharedFiles() && !hideUser && !hideShared && (
               <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>
             )}
           </div>
@@ -132,7 +147,7 @@ export default class FileManagerModal extends Modal {
   }
 
   fileLibraryButtonItems() {
-    const items = new ItemList();
+    const items = new ItemList<Mithril.Children>();
 
     items.add(
       'user',
@@ -151,7 +166,7 @@ export default class FileManagerModal extends Modal {
     return items;
   }
 
-  setLibrary(library) {
+  setLibrary(library: FilesLibrary) {
     this.selectedFilesLibrary = library;
     m.redraw();
   }
@@ -184,64 +199,57 @@ export default class FileManagerModal extends Modal {
     );
   }
 
-  /**
-   * Add or remove file from selected files
-   *
-   * @param {File} file
-   */
-  onFileSelect(file) {
-    const itemPosition = this.selectedFiles.indexOf(file.id());
+  onFileSelect(file: File) {
+    const fileId = file.id();
+    if (!fileId) return;
+    const itemPosition = this.selectedFiles.indexOf(fileId);
 
     if (itemPosition >= 0) {
       this.selectedFiles.splice(itemPosition, 1);
     } else {
       if (this.multiSelect) {
-        this.selectedFiles.push(file.id());
+        this.selectedFiles.push(fileId);
       } else {
-        this.selectedFiles = [file.id()];
+        this.selectedFiles = [fileId];
       }
     }
   }
 
-  /**
-   * Add files to file list after upload
-   */
   onUpload() {
-    this.uploader.on('success', ({ file }) => {
-      if (this.multiSelect) {
-        this.selectedFiles.push(file.id());
-      } else {
-        this.selectedFiles = [file.id()];
+    this.uploader.on('success', (response: unknown) => {
+      const { file } = response as { file: File };
+      const fileId = file.id();
+      if (fileId) {
+        if (this.multiSelect) {
+          this.selectedFiles.push(fileId);
+        } else {
+          this.selectedFiles = [fileId];
+        }
       }
     });
   }
 
-  /**
-   * Add selected files to the composer
-   */
   onSelect() {
     this.hide();
 
-    // Custom callback
     if (this.attrs.onSelect) {
       this.attrs.onSelect(this.selectedFiles);
-
       return;
     }
 
-    // Add selected files to composer
-    this.selectedFiles.map((fileId) => {
-      const file = app.store.getById('files', fileId) || app.store.getById('shared-files', fileId);
-
-      app.composer.editor.insertAtCursor(file.bbcode() + '\n', false);
+    this.selectedFiles.forEach((fileId) => {
+      const file = app.store.getById('files', fileId) || app.store.getById('shared-files', fileId) as File | undefined;
+      if (file && typeof (file as File).bbcode === 'function' && app.composer.editor) {
+        app.composer.editor.insertAtCursor((file as File).bbcode() + '\n', false);
+      }
     });
   }
 
   showUploadModal() {
     app.modal.show(
-      UploadSharedFileModal,
+      () => import('../../common/components/UploadSharedFileModal'),
       {
-        onUploadComplete: (files) => {
+        onUploadComplete: (files: File[]) => {
           this.sharedFileState.addToList(files);
         },
       },
@@ -249,7 +257,7 @@ export default class FileManagerModal extends Modal {
     );
   }
 
-  onDelete(file) {
+  onDelete(file: File) {
     this.sharedFileState.removeFromList(file);
     this.userFileState.removeFromList(file);
   }

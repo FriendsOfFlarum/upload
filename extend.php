@@ -12,52 +12,51 @@
 
 namespace FoF\Upload;
 
-use Flarum\Api\Controller\ListDiscussionsController;
-use Flarum\Api\Controller\ListPostsController;
-use Flarum\Api\Controller\ShowForumController;
-use Flarum\Api\Controller\ShowUserController;
-use Flarum\Api\Serializer\CurrentUserSerializer;
-use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Api\Serializer\UserSerializer;
+use Flarum\Api\Context;
+use Flarum\Api\Resource;
+use Flarum\Api\Schema;
 use Flarum\Extend;
+use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Gdpr\Extend\UserData;
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
 use Flarum\Settings\Event\Deserializing;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Exceptions\ExceptionHandler;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
-use FoF\Upload\Extenders\LoadFilesRelationship;
 use FoF\Upload\Helpers\Util;
-use Flarum\Api\Context;
-use Flarum\Api\Endpoint;
-use Flarum\Api\Resource;
-use Flarum\Api\Schema;
+use Illuminate\Contracts\Filesystem\Factory;
 
 return [
     (new Extend\Frontend('admin'))
         ->css(__DIR__.'/resources/less/admin.less')
         ->js(__DIR__.'/js/dist/admin.js')
+        ->jsDirectory(__DIR__.'/js/dist/admin')
         ->content(Content\AdminPayload::class),
 
     (new Extend\Frontend('forum'))
         ->css(__DIR__.'/resources/less/forum.less')
-        ->js(__DIR__.'/js/dist/forum.js'),
+        ->js(__DIR__.'/js/dist/forum.js')
+        ->jsDirectory(__DIR__.'/js/dist/forum'),
+
+    (new Extend\Frontend('common'))
+        ->jsDirectory(__DIR__.'/js/dist/common'),
 
     new Extend\Locales(__DIR__.'/resources/locale'),
 
     (new Extend\Routes('api'))
-        ->get('/fof/uploads', 'fof-upload.list', Api\Controllers\ListUploadsController::class)
-        ->post('/fof/upload', 'fof-upload.upload', Api\Controllers\UploadController::class)
-        ->post('/fof/watermark', 'fof-upload.watermark', Api\Controllers\WatermarkUploadController::class)
+        ->get('/fof/uploads', 'fof-upload.list', Api\Handlers\ListFilesHandler::class)
+        ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Handlers\ListFilesHandler::class)
+        ->post('/fof/upload', 'fof-upload.upload', Api\Handlers\UploadHandler::class)
+        ->post('/fof/watermark', 'fof-upload.watermark', Api\Handlers\WatermarkUploadHandler::class)
         ->delete('/fof/watermark', 'fof-upload.watermark.delete', Api\Controllers\WatermarkDeleteController::class)
         ->get('/fof/download/{uuid}/{post}/{csrf}', 'fof-upload.download', Api\Controllers\DownloadController::class)
         ->get('/fof/download/{uuid}', 'fof-upload.download.uuid', Api\Controllers\DownloadController::class)
         ->post('/fof/upload/inspect-mime', 'fof-upload.inspect-mime', Api\Controllers\InspectMimeController::class)
-        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Controllers\HideUploadFromMediaManagerController::class)
-        ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class)
+        ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Handlers\HideUploadFromMediaManagerHandler::class)
         ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
     // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
@@ -75,22 +74,50 @@ return [
             return $model->foffiles()->where('hidden', false);
         }),
 
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiController(ShowUserController::class))
-        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiController(ShowForumController::class))
-        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiController(ListDiscussionsController::class))
-        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiController(ListPostsController::class))
-        ->prepareDataForSerialization([LoadFilesRelationship::class, 'countRelations']),
+    (new Extend\ApiResource(Resource\ForumResource::class))
+        ->fields(function () {
+            return [
+                Schema\Boolean::make('fof-upload.canUpload')
+                    ->get(fn (object $forum, Context $context) => $context->getActor()->can('fof-upload.upload')),
+                Schema\Boolean::make('fof-upload.canDownload')
+                    ->get(fn (object $forum, Context $context) => $context->getActor()->can('fof-upload.download')),
+                Schema\Str::make('fof-upload.composerButtonVisiblity')
+                    ->get(fn () => resolve(SettingsRepositoryInterface::class)->get('fof-upload.composerButtonVisiblity', 'both')),
+                Schema\Str::make('fof-watermarkUrl')
+                    ->visible(fn () => (bool) resolve(SettingsRepositoryInterface::class)->get('fof-watermark_path'))
+                    ->get(fn () => resolve(Factory::class)->disk('flarum-assets')->url(resolve(SettingsRepositoryInterface::class)->get('fof-watermark_path'))),
+            ];
+        })
+        ->endpoint('show', function ($endpoint) {
+            return $endpoint->after(function (Context $context, $data) {
+                $actor = $context->getActor();
+                if ($actor->isGuest() === false) {
+                    $actor->load('foffiles');
+                    $actor->load('foffilesCurrent');
+                }
+                return $data;
+            });
+        }),
 
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiSerializer(ForumSerializer::class))
-        ->attributes(Extenders\AddForumAttributes::class),
+    (new Extend\ApiResource(Resource\UserResource::class))
+        ->fields(fn () => [
+            Schema\Boolean::make('fof-upload-viewOthersMediaLibrary')
+                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.viewUserUploads')),
+            Schema\Boolean::make('fof-upload-deleteOthersMediaLibrary')
+                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.deleteUserUploads')),
+            Schema\Boolean::make('fof-upload-uploadSharedFiles')
+                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.upload-shared-files')),
+            Schema\Boolean::make('fof-upload-accessSharedFiles')
+                ->visible(fn (User $user, Context $context) => $context->getActor()->id === $user->id)
+                ->get(fn (User $user, Context $context) => $context->getActor()->hasPermission('fof-upload.access-shared-files')),
+            Schema\Number::make('fof-upload-uploadCountCurrent')
+                ->countRelation('foffilesCurrent'),
+            Schema\Number::make('fof-upload-uploadCountAll')
+                ->countRelation('foffiles'),
+        ]),
 
     (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
@@ -110,14 +137,6 @@ return [
 
     (new Extend\View())
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
-
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiSerializer(CurrentUserSerializer::class))
-        ->attributes(Extenders\AddCurrentUserAttributes::class),
-
-    // @TODO: Replace with the new implementation https://docs.flarum.org/2.x/extend/api#extending-api-resources
-    (new Extend\ApiSerializer(UserSerializer::class))
-        ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
         ->render(Formatter\ImagePreview\FormatImagePreview::class)
@@ -150,4 +169,10 @@ return [
                 ->addType(Data\Uploads::class),
         ]),
     new Extend\ApiResource(Api\Resource\FileResource::class),
+
+    (new Extend\SearchDriver(DatabaseSearchDriver::class))
+        ->addSearcher(File::class, Search\FileSearcher::class)
+        ->addFilter(Search\FileSearcher::class, Search\Filter\SharedFilter::class)
+        ->addFilter(Search\FileSearcher::class, Search\Filter\UserFilter::class)
+        ->addMutator(Search\FileSearcher::class, Search\FileSearchMutator::class),
 ];

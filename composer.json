@@ -14,9 +14,9 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Daniël Klabbers",
-            "email": "daniel@klabbers.email",
-            "homepage": "https://luceos.com/"
+            "name": "FoF Team",
+            "email": "team@friendsofflarum.org",
+            "homepage": "https://friendsofflarum.org"
         }
     ],
     "support": {
@@ -32,10 +32,9 @@
         }
     ],
     "require": {
-        "php": "^8.2",
         "ext-json": "*",
         "enshrined/svg-sanitize": "^0",
-        "flarum/core": "^2.0.0-beta",
+        "flarum/core": ">=2.0.0 <2.1",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^4.0"
@@ -48,11 +47,11 @@
         "overtrue/flysystem-qiniu": "Uploads to QiNiu using API."
     },
     "require-dev": {
-        "league/flysystem-aws-s3-v3": "^1.0",
-        "overtrue/flysystem-qiniu": "1.0.4",
-        "flarum/gdpr": "dev-main",
-        "flarum/phpstan": "^2.0.0-beta",
-        "flarum/testing": "^2.0.0-beta"
+        "league/flysystem-aws-s3-v3": "^3.31",
+        "overtrue/flysystem-qiniu": "^3.2",
+        "flarum/gdpr": "^2.0.0",
+        "flarum/phpstan": "^2.0.0",
+        "flarum/testing": "^2.0.0"
     },
     "extra": {
         "flarum-extension": {
@@ -102,5 +101,7 @@
         "psr-4": {
             "FoF\\Upload\\Tests\\": "tests/"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

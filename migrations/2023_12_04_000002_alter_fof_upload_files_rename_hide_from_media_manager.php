@@ -10,6 +10,24 @@
  * file that was distributed with this source code.
  */
 
-use Flarum\Database\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
-return Migration::renameColumn('fof_upload_files', 'hide_from_media_manager', 'hidden');
+return [
+    'up' => function (Builder $schema) {
+        if ($schema->hasColumn('fof_upload_files', 'hide_from_media_manager')
+            && ! $schema->hasColumn('fof_upload_files', 'hidden')) {
+            $schema->table('fof_upload_files', function (Blueprint $table) {
+                $table->renameColumn('hide_from_media_manager', 'hidden');
+            });
+        }
+    },
+    'down' => function (Builder $schema) {
+        if ($schema->hasColumn('fof_upload_files', 'hidden')
+            && ! $schema->hasColumn('fof_upload_files', 'hide_from_media_manager')) {
+            $schema->table('fof_upload_files', function (Blueprint $table) {
+                $table->renameColumn('hidden', 'hide_from_media_manager');
+            });
+        }
+    },
+];

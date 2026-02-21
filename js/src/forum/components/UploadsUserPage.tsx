@@ -20,7 +20,7 @@ export default class UploadsUserPage extends UserPage {
   }
 
   content() {
-    if (app.session.user && (app.session.user.viewOthersMediaLibrary() || this.user === app.session.user)) {
+    if (app.session.user && ((app.session.user as unknown as { viewOthersMediaLibrary(): boolean }).viewOthersMediaLibrary() || this.user === app.session.user)) {
       return (
         this.user &&
         UserFileList.component({
@@ -41,7 +41,7 @@ export default class UploadsUserPage extends UserPage {
   }
 
   show(user: User) {
-    super.show(user);
+    (super.show as (u: unknown) => void)(user);
     this.user = user;
   }
 }

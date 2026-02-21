@@ -10,8 +10,22 @@
  * file that was distributed with this source code.
  */
 
-use Flarum\Database\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
-return Migration::addColumns('fof_upload_files', [
-    'shared' => ['boolean', 'default' => false],
-]);
+return [
+    'up' => function (Builder $schema) {
+        if (! $schema->hasColumn('fof_upload_files', 'shared')) {
+            $schema->table('fof_upload_files', function (Blueprint $table) {
+                $table->boolean('shared')->default(false);
+            });
+        }
+    },
+    'down' => function (Builder $schema) {
+        if ($schema->hasColumn('fof_upload_files', 'shared')) {
+            $schema->table('fof_upload_files', function (Blueprint $table) {
+                $table->dropColumn('shared');
+            });
+        }
+    },
+];

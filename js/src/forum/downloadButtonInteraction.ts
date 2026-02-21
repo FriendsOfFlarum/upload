@@ -2,13 +2,11 @@ import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import Post from 'flarum/forum/components/Post';
 
-/* global $ */
-
-export default function () {
-  extend(Post.prototype, 'oncreate', function () {
+export default function downloadButtonInteraction(): void {
+  extend(Post.prototype, 'oncreate', function (this: InstanceType<typeof Post>) {
     this.$('[data-fof-upload-download-uuid]')
       .unbind('click')
-      .on('click', (e) => {
+      .on('click', (e: JQuery.TriggeredEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -17,10 +15,10 @@ export default function () {
           return;
         }
 
+        const target = e.currentTarget as HTMLElement;
         let url = app.forum.attribute('apiUrl') + '/fof/download';
-
-        url += '/' + encodeURIComponent(e.currentTarget.dataset.fofUploadDownloadUuid);
-        url += '/' + encodeURIComponent(this.attrs.post.id());
+        url += '/' + encodeURIComponent(target.dataset.fofUploadDownloadUuid || '');
+        url += '/' + encodeURIComponent(this.attrs.post.id() ?? '');
         url += '/' + encodeURIComponent(app.session.csrfToken);
 
         window.open(url);

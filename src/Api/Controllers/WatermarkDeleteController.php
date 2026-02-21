@@ -29,10 +29,7 @@ class WatermarkDeleteController extends AbstractDeleteController
 {
     const SETTINGS_KEY = 'fof-watermark_path';
 
-    /**
-     * @var Cloud
-     */
-    protected $assetsDir;
+    protected \Illuminate\Contracts\Filesystem\Filesystem $assetsDir;
 
     public function __construct(
         Factory $factory,
@@ -41,7 +38,7 @@ class WatermarkDeleteController extends AbstractDeleteController
         $this->assetsDir = $factory->disk('flarum-assets');
     }
 
-    public function delete(ServerRequestInterface $request): void
+    protected function delete(ServerRequestInterface $request): void
     {
         RequestUtil::getActor($request)->assertAdmin();
 

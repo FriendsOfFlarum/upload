@@ -1,7 +1,7 @@
 import app from 'flarum/common/app';
 import User from 'flarum/common/models/User';
 import File from '../models/File';
-import { ApiQueryParamsPlural, ApiResponsePlural } from 'flarum/common/Store';
+import { ApiQueryParamsPlural } from 'flarum/common/Store';
 
 export default class FileListState {
   public user: User | null;
@@ -41,14 +41,14 @@ export default class FileListState {
    * @param offset The starting index for loading more files.
    * @returns A promise resolving to the loaded files.
    */
-  public async loadResults(offset: number = 0): Promise<ApiResponsePlural<File>> {
+  public async loadResults(offset: number = 0): Promise<File[]> {
     if (!this.sharedFiles && !this.user) return Promise.reject('User not set');
 
     this.loading = true;
 
     if (this.sharedFiles && this.files.length > 0 && offset === 0) {
       this.loading = false;
-      return Promise.resolve({ files: this.files });
+      return Promise.resolve(this.files);
     }
 
     let route: string = 'fof/uploads';
@@ -68,21 +68,21 @@ export default class FileListState {
 
     const results = await app.store.find<File[]>(route, params);
 
-    return this.parseResults(results);
+    return this.parseResults(results as File[]);
   }
 
   /**
    * Load the next set of results.
    */
-  public async loadMore(): Promise<ApiResponsePlural<File>> {
+  public async loadMore(): Promise<File[]> {
     this.loading = true;
     return this.loadResults(this.files.length);
   }
 
-  private parseResults(results: ApiResponsePlural<File>): ApiResponsePlural<File> {
+  private parseResults(results: File[]): File[] {
     this.files = this.files.concat(results);
     this.loading = false;
-    this.moreResults = !!results.payload?.links?.next;
+    this.moreResults = !!(results as unknown as { payload?: { links?: { next?: string } } })?.payload?.links?.next;
     m.redraw();
     return results;
   }
