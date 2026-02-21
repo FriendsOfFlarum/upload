@@ -28,7 +28,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use League\Flysystem\Adapter as FlyAdapters;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use Overtrue\Flysystem\Qiniu\QiniuAdapter;
 use Qiniu\Http\Client as QiniuClient;
 
@@ -123,7 +123,7 @@ class Manager
             $s3Config['credentials'] = $config['credentials'];
         }
 
-        $leagueAdapter = new AwsS3Adapter(
+        $leagueAdapter = new AwsS3V3Adapter(
             new S3Client($s3Config),
             $config['bucket']
         );

@@ -16,8 +16,8 @@ use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Driver\Config as UploadConfig;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Config;
 
 /**
@@ -25,10 +25,10 @@ use League\Flysystem\Config;
  */
 class AwsS3 extends Flysystem implements UploadAdapter
 {
-    protected AdapterInterface $adapter;
+    protected FilesystemAdapter $adapter;
 
     public function __construct(
-        AdapterInterface $adapter,
+        FilesystemAdapter $adapter,
         $settings,
         $url,
         protected ?UploadConfig $uploadConfig = null
@@ -88,7 +88,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
         }
 
         // Ensure that $this->adapter is an instance of AwsS3Adapter
-        if ($this->adapter instanceof AwsS3Adapter) {
+        if ($this->adapter instanceof AwsS3V3Adapter) {
             $region = $this->adapter->getClient()->getRegion();
             $bucket = $this->adapter->getBucket();
 

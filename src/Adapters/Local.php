@@ -16,15 +16,15 @@ use Flarum\Foundation\Paths;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Driver\Config as UploadConfig;
 use FoF\Upload\File;
-use League\Flysystem\Adapter\Local as AdapterLocal;
-use League\Flysystem\AdapterInterface;
+use League\Flysystem\Local\LocalFilesystemAdapter as AdapterLocal;
+use League\Flysystem\FilesystemAdapter;
 
 class Local extends Flysystem implements UploadAdapter
 {
-    protected AdapterInterface $adapter;
+    protected FilesystemAdapter $adapter;
 
     public function __construct(
-        AdapterInterface $adapter,
+        FilesystemAdapter $adapter,
         $settings,
         $url,
         protected ?UploadConfig $uploadConfig = null

@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
@@ -183,7 +183,7 @@ class FileRepository
 
     protected function getTempFilesystem(string $path): Filesystem
     {
-        return new Filesystem(new Local($path));
+        return new Filesystem(new LocalFilesystemAdapter($path));
     }
 
     public function determineExtension(Upload $upload): string

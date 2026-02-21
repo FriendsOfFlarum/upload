@@ -17,7 +17,7 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
-use League\Flysystem\AdapterInterface;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Config;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -29,7 +29,7 @@ abstract class Flysystem implements UploadAdapter
     protected $meta;
 
     public function __construct(
-        protected AdapterInterface $adapter,
+        protected FilesystemAdapter $adapter,
         protected SettingsRepositoryInterface $settings,
         protected UrlGenerator $url
     ) {
@@ -82,7 +82,7 @@ abstract class Flysystem implements UploadAdapter
         $file->path = sprintf(
             '%s%s%s',
             $today->toDateString(),
-            $this instanceof Local ? DIRECTORY_SEPARATOR : '/',
+            $this instanceof LocalFilesystemAdapter ? DIRECTORY_SEPARATOR : '/',
             $today->timestamp.'-'.$today->micro.'-'.$file->base_name
         );
     }
