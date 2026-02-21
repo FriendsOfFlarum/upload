@@ -58,8 +58,9 @@ class Util
 
     /**
      * @param string|null $json
-     * @param mixed $default
+     * @param mixed       $default
      * @param string|null $attribute
+     *
      * @return mixed
      */
     public function getJsonValue($json, $default = null, $attribute = null)

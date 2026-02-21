@@ -21,8 +21,8 @@ use FoF\Upload\Driver\Config;
 use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
 class ManagerTest extends TestCase
 {

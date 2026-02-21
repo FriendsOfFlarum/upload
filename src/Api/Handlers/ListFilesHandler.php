@@ -14,7 +14,6 @@ namespace FoF\Upload\Api\Handlers;
 
 use Flarum\Api\JsonApi;
 use FoF\Upload\Api\Resource\FileResource;
-use Laminas\Diactoros\Uri;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;

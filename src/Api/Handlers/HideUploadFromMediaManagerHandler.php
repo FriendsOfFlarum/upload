@@ -54,7 +54,7 @@ class HideUploadFromMediaManagerHandler implements RequestHandlerInterface
             $fileUpload = $this->moveStorage($fileUpload, $actor);
         }
 
-        $fileUpload->setAttribute('hidden', ! $fileUpload->getAttribute('hidden'));
+        $fileUpload->setAttribute('hidden', !$fileUpload->getAttribute('hidden'));
         $fileUpload->save();
 
         $collection = $this->api->getCollection(FileResource::class);
@@ -67,7 +67,7 @@ class HideUploadFromMediaManagerHandler implements RequestHandlerInterface
         [$data, $included] = $serializer->serialize();
 
         $document = ['data' => $data[0]];
-        if (! empty($included)) {
+        if (!empty($included)) {
             $document['included'] = $included;
         }
 
@@ -76,7 +76,7 @@ class HideUploadFromMediaManagerHandler implements RequestHandlerInterface
 
     private function moveStorage(File $file, \Flarum\User\User $actor): File
     {
-        if (! $file->shared) {
+        if (!$file->shared) {
             return $file;
         }
 

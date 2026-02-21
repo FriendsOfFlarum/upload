@@ -15,7 +15,7 @@ use Illuminate\Database\Schema\Builder;
 
 return [
     'up' => function (Builder $schema) {
-        if (! $schema->hasColumn('fof_upload_files', 'shared')) {
+        if (!$schema->hasColumn('fof_upload_files', 'shared')) {
             $schema->table('fof_upload_files', function (Blueprint $table) {
                 $table->boolean('shared')->default(false);
             });

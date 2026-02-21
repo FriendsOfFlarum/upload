@@ -15,10 +15,10 @@ namespace FoF\Upload\Tests\integration\api;
 use Flarum\Extend;
 use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\User\User;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
 use PHPUnit\Framework\Attributes\Test;
-use Flarum\User\User;
 
 class HideFilesTest extends EnhancedTestCase
 {

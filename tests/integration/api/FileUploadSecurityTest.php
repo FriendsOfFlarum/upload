@@ -14,10 +14,10 @@ namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\User\User;
 use FoF\Upload\Tests\EnhancedTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Flarum\User\User;
 
 class FileUploadSecurityTest extends EnhancedTestCase
 {
@@ -38,7 +38,6 @@ class FileUploadSecurityTest extends EnhancedTestCase
     }
 
     /**
-     *
      * We allow SVG due to the built in santization. Here we test that <script> tags any any external content is removed.
      */
     #[Test]

@@ -16,10 +16,10 @@ use Flarum\Api\Context;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
 use Flarum\Extend;
-use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Gdpr\Extend\UserData;
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
+use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Settings\Event\Deserializing;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -95,6 +95,7 @@ return [
                     $actor->load('foffiles');
                     $actor->load('foffilesCurrent');
                 }
+
                 return $data;
             });
         }),

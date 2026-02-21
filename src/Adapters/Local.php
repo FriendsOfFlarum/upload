@@ -38,7 +38,7 @@ class Local extends Flysystem implements UploadAdapter
     {
         $publicPath = resolve(Paths::class)->public;
 
-        if (! ($this->adapter instanceof AdapterLocal)) {
+        if (!($this->adapter instanceof AdapterLocal)) {
             throw new \RuntimeException('Local adapter is not an instance of League\Flysystem\Local\LocalFilesystemAdapter');
         }
 

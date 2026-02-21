@@ -46,7 +46,7 @@ class SharedFilter implements FilterInterface
     private function isTruthy(string|array $value): bool
     {
         if (is_array($value)) {
-            return ! empty($value);
+            return !empty($value);
         }
 
         $str = trim((string) $value, '"');

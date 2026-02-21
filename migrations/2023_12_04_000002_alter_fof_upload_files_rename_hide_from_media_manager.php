@@ -16,7 +16,7 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         if ($schema->hasColumn('fof_upload_files', 'hide_from_media_manager')
-            && ! $schema->hasColumn('fof_upload_files', 'hidden')) {
+            && !$schema->hasColumn('fof_upload_files', 'hidden')) {
             $schema->table('fof_upload_files', function (Blueprint $table) {
                 $table->renameColumn('hide_from_media_manager', 'hidden');
             });
@@ -24,7 +24,7 @@ return [
     },
     'down' => function (Builder $schema) {
         if ($schema->hasColumn('fof_upload_files', 'hidden')
-            && ! $schema->hasColumn('fof_upload_files', 'hide_from_media_manager')) {
+            && !$schema->hasColumn('fof_upload_files', 'hide_from_media_manager')) {
             $schema->table('fof_upload_files', function (Blueprint $table) {
                 $table->renameColumn('hidden', 'hide_from_media_manager');
             });

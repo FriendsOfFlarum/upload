@@ -13,10 +13,10 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\User\User;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
 use PHPUnit\Framework\Attributes\Test;
-use Flarum\User\User;
 
 class FileUploadTest extends EnhancedTestCase
 {

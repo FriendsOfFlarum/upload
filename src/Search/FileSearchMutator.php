@@ -20,7 +20,7 @@ class FileSearchMutator
 {
     public function __invoke(SearchState $state, SearchCriteria $criteria): void
     {
-        if (! $state instanceof DatabaseSearchState) {
+        if (!$state instanceof DatabaseSearchState) {
             return;
         }
 

@@ -15,8 +15,8 @@ namespace FoF\Upload\Tests\unit\Driver;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Driver\Config;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {

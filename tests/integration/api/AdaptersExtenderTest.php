@@ -111,7 +111,7 @@ class AdaptersExtenderTest extends TestCase
     }
 
     /**
-     * Tests that aws-s3 continues to work as expected
+     * Tests that aws-s3 continues to work as expected.
      */
     #[Test]
     public function aws_s3_instantiation_works_as_standard()
