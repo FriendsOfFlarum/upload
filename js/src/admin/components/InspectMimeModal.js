@@ -1,8 +1,8 @@
 import app from 'flarum/admin/app';
-import Modal from 'flarum/common/components/Modal';
+import FormModal from 'flarum/common/components/FormModal';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 
-export default class InspectMimeModal extends Modal {
+export default class InspectMimeModal extends FormModal {
   oninit(vnode) {
     super.oninit(vnode);
 

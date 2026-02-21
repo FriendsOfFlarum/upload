@@ -8,7 +8,7 @@ export * from './components';
 export { default as extend } from './extend';
 
 app.initializers.add('fof-upload', () => {
-  app.extensionData
+  app.registry
     .for('fof-upload')
     .registerPage(UploadPage)
     .registerPermission(

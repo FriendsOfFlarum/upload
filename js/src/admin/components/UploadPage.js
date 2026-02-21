@@ -11,7 +11,7 @@ import Stream from 'flarum/common/utils/Stream';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import ItemList from 'flarum/common/utils/ItemList';
 import InspectMimeModal from './InspectMimeModal';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import Link from 'flarum/common/components/Link';
 
 /* global m */
@@ -295,6 +295,9 @@ export default class UploadPage extends ExtensionPage {
                 UploadImageButton.component({
                   name: 'fof-watermark',
                   path: 'fof/watermark',
+                  routePath: 'fof-watermark',
+                  value: app.data.settings['fof-watermark_path'],
+                  url: app.forum.attribute('fof-watermarkUrl'),
                 }),
               ]),
               m('fieldset', [
@@ -376,7 +379,9 @@ export default class UploadPage extends ExtensionPage {
           <fieldset>
             <legend>{app.translator.trans('fof-upload.admin.labels.imgur.title')}</legend>
             <p>
-              {icon('fas fa-exclamation-circle')}{' '}
+              {Icon.component({
+                name: 'fas fa-exclamation-circle',
+              })}{' '}
               {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
                 a: <Link href="https://imgur.com/tos" external={true} target="_blank" />,
               })}

@@ -1,5 +1,6 @@
 import app from 'flarum/common/app';
-import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import { IFormModalAttrs } from 'flarum/common/components/FormModal';
+import FormModal from 'flarum/common/components/FormModal';
 import Switch from 'flarum/common/components/Switch';
 import mimeToIcon from '../mimeToIcon';
 import Button from 'flarum/common/components/Button';
@@ -7,11 +8,11 @@ import type Mithril from 'mithril';
 import { ApiResponsePlural } from 'flarum/common/Store';
 import File from '../models/File';
 
-interface CustomAttrs extends IInternalModalAttrs {
+interface CustomAttrs extends IFormModalAttrs {
   onUploadComplete: (files: File | File[]) => void;
 }
 
-export default class UploadSharedFileModal extends Modal<CustomAttrs> {
+export default class UploadSharedFileModal extends FormModal<CustomAttrs> {
   files = [];
   fileInput = null;
   options = {

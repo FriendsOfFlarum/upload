@@ -3,7 +3,7 @@ import Component, { ComponentAttrs } from 'flarum/common/Component';
 import File from '../models/File';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import Button from 'flarum/common/components/Button';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import mimeToIcon from '../mimeToIcon';
 import User from 'flarum/common/models/User';
 import ItemList from 'flarum/common/utils/ItemList';
@@ -107,7 +107,7 @@ export default class DisplayFile extends Component<CustomAttrs> {
           height: '100%', // Ensure the container takes up the necessary space
         }}
       >
-        {icon(`fa-fw ${fileIcon}`)}
+        <Icon name={`fa-fw ${fileIcon}`} />
       </span>
     );
   }

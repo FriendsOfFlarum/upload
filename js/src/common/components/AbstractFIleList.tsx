@@ -12,7 +12,7 @@ import Alert from 'flarum/common/components/Alert';
 import extractText from 'flarum/common/utils/extractText';
 import FileListState from '../states/FileListState';
 import { ApiPayloadSingle } from 'flarum/common/Store';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 
 export interface FileListAttrs extends ComponentAttrs {
   user: User | null;
@@ -196,7 +196,7 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
         m.redraw();
 
         app.alerts.show(Alert, { type: 'success' }, [
-          icon(file.hidden() ? 'fas fa-eye-slash' : 'fas fa-eye'),
+          <Icon name={file.hidden() ? 'fas fa-eye-slash' : 'fas fa-eye'} />,
           ' ',
           app.translator.trans(file?.hidden() ? `${transPrefix}.hide_success` : `${transPrefix}.show_success`),
         ]);
