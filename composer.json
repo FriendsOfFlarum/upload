@@ -32,10 +32,10 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "enshrined/svg-sanitize": "^0",
-        "flarum/core": "^1.8.3",
+        "flarum/core": "^2.0.0-beta",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^4.0"
@@ -51,8 +51,8 @@
         "league/flysystem-aws-s3-v3": "^1.0",
         "overtrue/flysystem-qiniu": "1.0.4",
         "flarum/gdpr": "dev-main",
-        "flarum/phpstan": "*",
-        "flarum/testing": "^1.0.0"
+        "flarum/phpstan": "^2.0.0-beta",
+        "flarum/testing": "^2.0.0-beta"
     },
     "extra": {
         "flarum-extension": {
