@@ -89,17 +89,20 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
             {!hideUser && this.selectedFilesLibrary === 'user' && (
               <UploadButton uploader={this.uploader} disabled={this.userFileState.isLoading()} isMediaUploadButton />
             )}
-            {app.session.user && (app.session.user as unknown as { uploadSharedFiles(): boolean }).uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
-              <Button
-                className="Button"
-                icon="fas fa-file-upload"
-                onclick={() => {
-                  this.showUploadModal();
-                }}
-              >
-                {app.translator.trans('fof-upload.forum.buttons.upload')}
-              </Button>
-            )}
+            {app.session.user &&
+              (app.session.user as unknown as { uploadSharedFiles(): boolean }).uploadSharedFiles() &&
+              !hideShared &&
+              this.selectedFilesLibrary === 'shared' && (
+                <Button
+                  className="Button"
+                  icon="fas fa-file-upload"
+                  onclick={() => {
+                    this.showUploadModal();
+                  }}
+                >
+                  {app.translator.trans('fof-upload.forum.buttons.upload')}
+                </Button>
+              )}
           </div>
 
           <div className="fof-drag-and-drop">
@@ -112,9 +115,10 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
 
           <div className="Modal-header">
             <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
-            {app.session.user && (app.session.user as unknown as { accessSharedFiles(): boolean }).accessSharedFiles() && !hideUser && !hideShared && (
-              <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>
-            )}
+            {app.session.user &&
+              (app.session.user as unknown as { accessSharedFiles(): boolean }).accessSharedFiles() &&
+              !hideUser &&
+              !hideShared && <div className="LibrarySelection">{this.fileLibraryButtonItems().toArray()}</div>}
           </div>
 
           {this.alertAttrs && (
@@ -238,7 +242,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
     }
 
     this.selectedFiles.forEach((fileId) => {
-      const file = app.store.getById('files', fileId) || app.store.getById('shared-files', fileId) as File | undefined;
+      const file = app.store.getById('files', fileId) || (app.store.getById('shared-files', fileId) as File | undefined);
       if (file && typeof (file as File).bbcode === 'function' && app.composer.editor) {
         app.composer.editor.insertAtCursor((file as File).bbcode() + '\n', false);
       }

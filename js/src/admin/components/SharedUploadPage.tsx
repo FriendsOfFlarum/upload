@@ -43,14 +43,11 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
   }
 
   showUploadModal() {
-    app.modal.show(
-      () => import('../../common/components/UploadSharedFileModal'),
-      {
-        onUploadComplete: (files: File | File[]) => {
-          this.uploadComplete(files);
-        },
-      }
-    );
+    app.modal.show(() => import('../../common/components/UploadSharedFileModal'), {
+      onUploadComplete: (files: File | File[]) => {
+        this.uploadComplete(files);
+      },
+    });
   }
 
   mainActionItems(): ItemList<Mithril.Children> {

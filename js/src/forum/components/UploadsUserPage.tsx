@@ -20,7 +20,10 @@ export default class UploadsUserPage extends UserPage {
   }
 
   content() {
-    if (app.session.user && ((app.session.user as unknown as { viewOthersMediaLibrary(): boolean }).viewOthersMediaLibrary() || this.user === app.session.user)) {
+    if (
+      app.session.user &&
+      ((app.session.user as unknown as { viewOthersMediaLibrary(): boolean }).viewOthersMediaLibrary() || this.user === app.session.user)
+    ) {
       return (
         this.user &&
         UserFileList.component({

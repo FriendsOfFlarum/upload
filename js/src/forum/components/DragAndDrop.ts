@@ -24,11 +24,7 @@ export default class DragAndDrop {
 
   supportsFileDragging(): boolean {
     const div = document.createElement('div');
-    return (
-      ('draggable' in div || ('ondragstart' in div && 'ondrop' in div)) &&
-      'FormData' in window &&
-      'FileReader' in window
-    );
+    return ('draggable' in div || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
   }
 
   unload(): void {
