@@ -4,7 +4,7 @@ on: [workflow_dispatch, push, pull_request]
 
 jobs:
   run:
-    uses: flarum/framework/.github/workflows/REUSABLE_frontend.yml@1.x
+    uses: flarum/framework/.github/workflows/REUSABLE_frontend.yml@2.x
     with:
       enable_bundlewatch: false
       enable_prettier: true

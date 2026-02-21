@@ -9,5 +9,4 @@ parameters:
     - src
   excludePaths:
     - *.blade.php
-  checkMissingIterableValueType: false
   databaseMigrationsPath: ['migrations']
