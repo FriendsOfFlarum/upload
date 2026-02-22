@@ -65,8 +65,10 @@ class FormatImagePreview
                 }
 
                 // Always set thumbnail_url so the template always has a valid src.
+                // Derived from thumbnail_path + live hostname so CDN domain changes
+                // are reflected automatically, same as getUrlForFile() does for url.
                 // Falls back to the main URL when no thumbnail exists (old posts, Imgur, etc.).
-                $attributes['thumbnail_url'] = $file->thumbnail_url ?: $attributes['url'];
+                $attributes['thumbnail_url'] = $this->files->getThumbnailUrlForFile($file) ?: $attributes['url'];
             }
 
             return $attributes;

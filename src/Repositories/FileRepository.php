@@ -453,4 +453,35 @@ class FileRepository
 
         return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
     }
+
+    /**
+     * Build and return the absolute URL for a file's thumbnail, using the live
+     * hostname so that CDN domain changes are reflected automatically.
+     *
+     * Returns null when the file has no thumbnail or the adapter does not support
+     * dynamic URL generation (e.g. Imgur).
+     *
+     * @param File $file
+     *
+     * @returns string|null
+     */
+    public function getThumbnailUrlForFile(File $file): ?string
+    {
+        if (!$file->thumbnail_path) {
+            return null;
+        }
+
+        $adapter = $this->manager->instantiate($file->upload_method);
+
+        $supportedAdapters = [
+            Adapters\Local::class,
+            Adapters\AwsS3::class,
+        ];
+
+        if (!in_array(get_class($adapter), $supportedAdapters)) {
+            return null;
+        }
+
+        return $this->getHostnameForFile($file, $adapter).'/'.$file->thumbnail_path;
+    }
 }
