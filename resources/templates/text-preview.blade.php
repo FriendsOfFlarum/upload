@@ -28,6 +28,11 @@ $translator = resolve('translator');
         </div>
     </button>
 
+    <a href="{@url}" target="_blank" rel="noopener noreferrer" class="Button hasIcon FofUpload-TextPreviewDownload">
+        <i aria-hidden="true" class="icon fas fa-download Button-icon"></i>
+        <span class="Button-label">@php echo($translator->trans('fof-upload.forum.text_preview.download')); @endphp</span>
+    </a>
+
     <div class="FofUpload-TextPreviewError">
         <p>
             <i aria-hidden="true" class="icon fas fa-exclamation-circle"></i>
@@ -41,6 +46,7 @@ $translator = resolve('translator');
 
             const previewEl = figure.querySelector('.FofUpload-TextPreviewFull');
             const toggleBtn = figure.querySelector('.FofUpload-TextPreviewToggle');
+            const downloadLink = figure.querySelector('.FofUpload-TextPreviewDownload');
 
             function createCodeHtml(text) {
                 const codeEl = document.createElement('code');
@@ -70,9 +76,11 @@ $translator = resolve('translator');
             const isCrossOrigin = url && forumOrigin.origin !== url.origin;
 
             // Cross-origin files (e.g. CDN) cannot be fetched from the browser —
-            // hide the expand toggle but still show the filename and snippet.
+            // hide the expand toggle and show a download link instead.
             if (isCrossOrigin) {
                 toggleBtn.style.display = 'none';
+            } else {
+                downloadLink.style.display = 'none';
             }
 
             let fileContent = null;

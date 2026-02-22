@@ -190,6 +190,7 @@ fof-upload:
     text_preview:
       expand: Expand preview
       collapse: Collapse preview
+      download: Download file
       error: |
         Error previewing file. It may have been deleted, or the provided file ID is invalid.
       no_snippet_preview: "<preview will appear here after posting>"
