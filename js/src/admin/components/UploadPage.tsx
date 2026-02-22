@@ -189,10 +189,16 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
   content(vnode: Mithril.VnodeDOM<ExtensionPageAttrs, this>) {
     const maxPost = app.data.settings[this.addPrefix('php_ini.post_max_size')];
     const maxUpload = app.data.settings[this.addPrefix('php_ini.upload_max_filesize')];
+    const fileinfoAvailable = app.data.settings[this.addPrefix('fileinfo_available')] as unknown as boolean | undefined;
 
     return (
       <div className="UploadPage">
         <div className="UploadPage-container container">
+          {fileinfoAvailable === false && (
+            <Alert type="warning" dismissible={false}>
+              {app.translator.trans('fof-upload.admin.warnings.fileinfo_missing')}
+            </Alert>
+          )}
           <form
             className="Form"
             onsubmit={(e: Event) => {

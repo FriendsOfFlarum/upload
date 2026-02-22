@@ -17,6 +17,7 @@ use Flarum\Group\Permission;
 use Flarum\Settings\Event\Deserializing;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Helpers\Util;
+use FoF\Upload\Mime\MimeTypeDetector;
 
 class AddAvailableOptionsInAdmin
 {
@@ -32,6 +33,7 @@ class AddAvailableOptionsInAdmin
         $event->settings['fof-upload.availableTemplates'] = $this->util->getAvailableTemplates()->toArray();
         $event->settings['fof-upload.php_ini.post_max_size'] = ini_get('post_max_size');
         $event->settings['fof-upload.php_ini.upload_max_filesize'] = ini_get('upload_max_filesize');
+        $event->settings['fof-upload.fileinfo_available'] = MimeTypeDetector::fileinfoAvailable();
 
         // Expose mime-type permissions for dynamic frontend registration in the permission grid
         $mimePermissions = $this->util->getMimePermissions();

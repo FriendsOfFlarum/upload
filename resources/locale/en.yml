@@ -126,6 +126,9 @@ fof-upload:
           media-btn: Media manager button only
       inspect-mime: Test file MIME type
 
+    warnings:
+      fileinfo_missing: |
+        The PHP <strong>fileinfo</strong> extension is not loaded on this server. FoF Upload will still work, but MIME type cross-validation is disabled, which reduces protection against spoofed file types. Enable the extension in your PHP configuration for best security.
     permissions:
       download_label: Download files
       upload_label: Upload files (base permission, required for all uploads)

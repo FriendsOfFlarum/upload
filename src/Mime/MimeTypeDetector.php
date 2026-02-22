@@ -63,38 +63,58 @@ class MimeTypeDetector
         }
 
         try {
-            // Get MIME from php-mime-detector
+            // Get MIME from php-mime-detector (magic-byte based; always available)
             $detectorMime = $this->getMimeInternally();
 
-            // Get MIME from PHP Fileinfo
-            $fileinfoMime = mime_content_type($this->filePath);
+            if (self::fileinfoAvailable()) {
+                // Get MIME from PHP Fileinfo for cross-validation
+                $fileinfoMime = mime_content_type($this->filePath);
 
-            // Special handling for APKs (before mismatch rejection)
-            if ($detectorMime === 'application/zip' || $fileinfoMime === 'application/zip') {
-                if ($this->isApk($this->filePath)) {
+                // Special handling for APKs (before mismatch rejection)
+                if ($detectorMime === 'application/zip' || $fileinfoMime === 'application/zip') {
+                    if ($this->isApk($this->filePath)) {
+                        return 'application/vnd.android.package-archive';
+                    }
+                }
+
+                // Reject if MIME mismatch occurs (AFTER checking for APKs)
+                if ($detectorMime !== $fileinfoMime) {
+                    $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
+                    resolve('log')->error("[fof/upload] $message");
+
+                    // Check if the file exists, if it does, delete it.
+                    if (file_exists($this->filePath)) {
+                        unlink($this->filePath);
+                    }
+
+                    throw new ValidationException([
+                        'upload' => $message,
+                    ]);
+                }
+            } else {
+                // fileinfo not loaded — APK check still possible via ZipArchive
+                if ($detectorMime === 'application/zip' && $this->isApk($this->filePath)) {
                     return 'application/vnd.android.package-archive';
                 }
-            }
 
-            // Reject if MIME mismatch occurs (AFTER checking for APKs)
-            if ($detectorMime !== $fileinfoMime) {
-                $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
-                resolve('log')->error("[fof/upload] $message");
-
-                // Check if the file exists, if it does, delete it.
-                if (file_exists($this->filePath)) {
-                    unlink($this->filePath);
-                }
-
-                throw new ValidationException([
-                    'upload' => $message,
-                ]);
+                resolve('log')->warning('[fof/upload] PHP fileinfo extension is not loaded. MIME cross-validation is disabled; uploads rely solely on the MimeDetector library.');
             }
 
             return $detectorMime;
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
+    }
+
+    /**
+     * Whether the PHP fileinfo extension is available.
+     * Centralised here so tests can mock it and the admin listener can reuse it.
+     */
+    public static function fileinfoAvailable(): bool
+    {
+        return extension_loaded('fileinfo');
     }
 
     private function getMimeInternally(): bool|string
@@ -104,7 +124,7 @@ class MimeTypeDetector
 
         $mime = $mimeDetector->getMimeType();
 
-        if (empty($mime)) {
+        if (empty($mime) && self::fileinfoAvailable()) {
             $mime = mime_content_type($this->filePath);
         }
 
