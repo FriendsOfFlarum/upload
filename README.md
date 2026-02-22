@@ -337,6 +337,41 @@ For ongoing maintenance, a daily cronjob is a sensible setup:
 php flarum fof:upload --map --cleanup --force
 ```
 
+### BackfillImageDimensionsCommand
+
+The `php flarum fof:upload:backfill-dimensions` command retroactively stores `image_width` and `image_height` for existing JPEG, PNG, and GIF uploads that were created before the dimension-storage feature was introduced.
+
+The command downloads each image (using whatever storage backend the file was uploaded to — local, S3, CDN, etc.), reads its dimensions with Intervention Image, and saves them to the database. Images that already have dimensions stored are skipped automatically.
+
+#### Options
+
+| Option | Description |
+|---|---|
+| `--chunk=N` | Process files in batches of N (default: `100`). Reduce this if memory is a concern. |
+| `--dry-run` | Print how many images would be processed without making any changes. |
+
+#### Examples
+
+Preview how many images need backfilling:
+
+```bash
+php flarum fof:upload:backfill-dimensions --dry-run
+```
+
+Run the backfill with the default chunk size:
+
+```bash
+php flarum fof:upload:backfill-dimensions
+```
+
+Run with a smaller chunk size on a large forum:
+
+```bash
+php flarum fof:upload:backfill-dimensions --chunk=25
+```
+
+> **Note:** The command is safe to run multiple times — it only processes images where `image_width` is still `NULL`. If a file is unreachable (e.g. deleted from storage) it is skipped with a warning and the command continues.
+
 ## Testing and Security Measures
 
 FoF Upload includes **automated tests** to ensure:
