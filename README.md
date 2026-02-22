@@ -111,7 +111,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 
 #### How it works
 
-1. After the image is processed (resize, watermark, orientation), a copy is scaled down to a configurable maximum width (default: **1200 px**).
+1. After the image is processed (resize, watermark, orientation), a copy is scaled down to a configurable maximum width (default: **1000 px**).
 2. The thumbnail is encoded as **WebP** by default (~30% smaller than JPEG at equivalent quality) or in the original format if WebP is disabled.
 3. The thumbnail is stored alongside the original in the same storage backend (Local, S3, Qiniu). Imgur uploads are excluded — Imgur manages its own thumbnails.
 4. The thumbnail URL is stored in the database and injected at render time; no BBCode changes are required for existing posts.
@@ -122,7 +122,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 |---|---|---|
 | **Generate thumbnails on upload** | On | Master toggle. Disable to revert to full-resolution images in the Image Preview template. |
 | **Encode thumbnails as WebP** | On | Use WebP encoding for the thumbnail. Disable to use the original image format (JPEG/PNG/GIF). |
-| **Thumbnail max width (px)** | `1200` | Thumbnails are scaled down so neither dimension exceeds this value. Images smaller than this are not upscaled. |
+| **Thumbnail max width (px)** | `1000` | Thumbnails are scaled down so neither dimension exceeds this value. Images smaller than this are not upscaled. |
 
 #### Backwards compatibility
 

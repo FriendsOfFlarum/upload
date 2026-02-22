@@ -73,7 +73,7 @@ class ImageProcessor implements Processable
         // Generate a downscaled thumbnail for faster page loads.
         // Re-read from the already-processed temp file to get a clean copy for scaling.
         if ($this->settings->get('fof-upload.generateThumbnails', true)) {
-            $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth', 1200));
+            $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth', 1000));
             $thumb = $this->imageManager->read($upload->getRealPath());
             $thumb->scaleDown(width: $maxWidth);
 

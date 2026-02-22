@@ -41,7 +41,7 @@ class BackfillThumbnailsCommand extends Command
         $dryRun = (bool) $this->option('dry-run');
 
         $useWebp = (bool) $settings->get('fof-upload.thumbnailWebp', true);
-        $maxWidth = max(1, (int) $settings->get('fof-upload.thumbnailMaxWidth', 1200));
+        $maxWidth = max(1, (int) $settings->get('fof-upload.thumbnailMaxWidth', 1000));
 
         $query = File::query()
             ->whereIn('type', $supportedMimes)

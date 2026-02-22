@@ -352,7 +352,11 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                   </Switch>
                 </div>
                 <div className="Form-group">
-                  <Switch state={this.values.thumbnailWebp() || false} onchange={this.values.thumbnailWebp} disabled={!this.values.generateThumbnails()}>
+                  <Switch
+                    state={this.values.thumbnailWebp() || false}
+                    onchange={this.values.thumbnailWebp}
+                    disabled={!this.values.generateThumbnails()}
+                  >
                     {app.translator.trans('fof-upload.admin.labels.thumbnails.webp_toggle')}
                   </Switch>
                 </div>
@@ -363,7 +367,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                     type="number"
                     min="100"
                     max="4000"
-                    value={this.values.thumbnailMaxWidth() ?? 1200}
+                    value={this.values.thumbnailMaxWidth() ?? 1000}
                     oninput={withAttr('value', this.values.thumbnailMaxWidth)}
                     disabled={!this.values.generateThumbnails()}
                   />
