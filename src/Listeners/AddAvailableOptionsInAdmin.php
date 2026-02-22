@@ -49,7 +49,14 @@ class AddAvailableOptionsInAdmin
             if (in_array($slug, $seeded, true)) {
                 continue;
             }
-            Permission::insert(['permission' => 'fof-upload.upload-mime.'.$slug, 'group_id' => Group::MEMBER_ID]);
+            // Mark as seeded regardless — if a row already exists (left over from a previous
+            // version of this code) we skip the insert to avoid a duplicate-key error, but we
+            // still record the slug so we never attempt to seed it again.
+            if (!Permission::where('permission', 'fof-upload.upload-mime.'.$slug)
+                           ->where('group_id', Group::MEMBER_ID)
+                           ->exists()) {
+                Permission::insert(['permission' => 'fof-upload.upload-mime.'.$slug, 'group_id' => Group::MEMBER_ID]);
+            }
             $seeded[] = $slug;
             $newlySeeded = true;
         }
