@@ -247,12 +247,18 @@ class MimePermissionTest extends EnhancedTestCase
         // SLUG_TEXT permission NOT granted
 
         // Image upload should succeed
-        $this->assertEquals(200, $this->uploadImage()->getStatusCode(),
-            'Image upload should succeed with image permission');
+        $this->assertEquals(
+            200,
+            $this->uploadImage()->getStatusCode(),
+            'Image upload should succeed with image permission'
+        );
 
         // Text upload should be denied
-        $this->assertEquals(403, $this->uploadText()->getStatusCode(),
-            'Text upload should fail without document permission');
+        $this->assertEquals(
+            403,
+            $this->uploadText()->getStatusCode(),
+            'Text upload should fail without document permission'
+        );
     }
 
     #[Test]
@@ -264,12 +270,18 @@ class MimePermissionTest extends EnhancedTestCase
         // SLUG_IMAGE permission NOT granted
 
         // Text upload should succeed
-        $this->assertEquals(200, $this->uploadText()->getStatusCode(),
-            'Text upload should succeed with document permission');
+        $this->assertEquals(
+            200,
+            $this->uploadText()->getStatusCode(),
+            'Text upload should succeed with document permission'
+        );
 
         // Image upload should be denied
-        $this->assertEquals(403, $this->uploadImage()->getStatusCode(),
-            'Image upload should fail without image permission');
+        $this->assertEquals(
+            403,
+            $this->uploadImage()->getStatusCode(),
+            'Image upload should fail without image permission'
+        );
     }
 
     #[Test]
@@ -280,10 +292,16 @@ class MimePermissionTest extends EnhancedTestCase
         $this->grantPermission('fof-upload.upload-mime.'.self::SLUG_IMAGE);
         $this->grantPermission('fof-upload.upload-mime.'.self::SLUG_TEXT);
 
-        $this->assertEquals(200, $this->uploadImage()->getStatusCode(),
-            'Image upload should succeed');
-        $this->assertEquals(200, $this->uploadText()->getStatusCode(),
-            'Text upload should succeed');
+        $this->assertEquals(
+            200,
+            $this->uploadImage()->getStatusCode(),
+            'Image upload should succeed'
+        );
+        $this->assertEquals(
+            200,
+            $this->uploadText()->getStatusCode(),
+            'Text upload should succeed'
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -319,11 +337,17 @@ class MimePermissionTest extends EnhancedTestCase
                 ],
             ])
         );
-        $this->assertEquals(200, $response->getStatusCode(),
-            'Zip upload should succeed — no mime permission required');
+        $this->assertEquals(
+            200,
+            $response->getStatusCode(),
+            'Zip upload should succeed — no mime permission required'
+        );
 
         // Image (restricted) should still be denied
-        $this->assertEquals(403, $this->uploadImage()->getStatusCode(),
-            'Image upload should still require mime permission');
+        $this->assertEquals(
+            403,
+            $this->uploadImage()->getStatusCode(),
+            'Image upload should still require mime permission'
+        );
     }
 }

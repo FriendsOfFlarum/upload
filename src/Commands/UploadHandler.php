@@ -75,7 +75,7 @@ class UploadHandler
 
                 $mimePermSlug = Arr::get($mimeConfiguration, 'permission_slug');
                 if ($mimePermSlug) {
-                    $command->actor->assertCan('fof-upload.upload-mime.' . $mimePermSlug);
+                    $command->actor->assertCan('fof-upload.upload-mime.'.$mimePermSlug);
                 }
 
                 $adapter = $this->util->getAdapter(Arr::get($mimeConfiguration, 'adapter'));

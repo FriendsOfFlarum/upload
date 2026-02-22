@@ -37,7 +37,7 @@ class AddAvailableOptionsInAdmin
 
         // Seed the default group (Member) for any new mime permission that has no assignment yet
         foreach ($mimePermissions as $perm) {
-            $permKey = 'fof-upload.upload-mime.' . $perm['slug'];
+            $permKey = 'fof-upload.upload-mime.'.$perm['slug'];
             if (!Permission::where('permission', $permKey)->exists()) {
                 Permission::insert(['permission' => $permKey, 'group_id' => Group::MEMBER_ID]);
             }
