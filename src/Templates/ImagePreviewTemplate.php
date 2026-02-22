@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Templates;
 
+use FoF\Upload\File;
 use Illuminate\Contracts\View\View;
 
 class ImagePreviewTemplate extends AbstractTextFormatterTemplate
@@ -48,5 +49,10 @@ class ImagePreviewTemplate extends AbstractTextFormatterTemplate
     public function bbcode(): string
     {
         return '[upl-image-preview uuid={IDENTIFIER} url={URL?} alt={TEXT?}]';
+    }
+
+    public function preview(File $file): string
+    {
+        return "[upl-image-preview uuid={$file->uuid} url={$file->url} alt={$file->base_name}]";
     }
 }
