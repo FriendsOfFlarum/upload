@@ -1,45 +1,46 @@
-export default class FileManagerModal extends Modal<import("flarum/common/components/Modal").IInternalModalAttrs, undefined> {
-    constructor();
-    oninit(vnode: any): void;
-    uploader: any;
-    selectedFiles: any[] | any[] | undefined;
-    multiSelect: any;
-    restrictFileType: any;
-    dragDrop: DragAndDrop | null | undefined;
-    selectedFilesLibrary: any;
-    sharedUploads: any;
-    userFileState: FileListState | undefined;
-    sharedFileState: FileListState | undefined;
-    /**
-     * Initialize drag & drop
-     */
-    oncreate(vnode: any): void;
-    /**
-     * Remove events from modal content
-     */
+import DragAndDrop from './DragAndDrop';
+import ItemList from 'flarum/common/utils/ItemList';
+import FileListState from '../../common/states/FileListState';
+import type Uploader from '../handler/Uploader';
+import type File from '../../common/models/File';
+import type User from 'flarum/common/models/User';
+import type Mithril from 'mithril';
+type FilesLibrary = 'user' | 'shared';
+interface FileManagerModalAttrs {
+    uploader: Uploader;
+    user?: User | null;
+    hideUser?: boolean;
+    hideShared?: boolean;
+    multiSelect?: boolean;
+    restrictFileType?: string | null;
+    defaultFilesLibrary?: FilesLibrary;
+    onSelect?: (selectedFileIds: string[]) => void;
+}
+declare const FileManagerModal_base: any;
+export default class FileManagerModal extends FileManagerModal_base<FileManagerModalAttrs, undefined> {
+    uploader: Uploader;
+    selectedFiles: string[];
+    multiSelect: boolean;
+    restrictFileType: string | null;
+    dragDrop: DragAndDrop | null;
+    selectedFilesLibrary: FilesLibrary;
+    userFileState: FileListState;
+    sharedFileState: FileListState;
+    oninit(vnode: Mithril.Vnode<FileManagerModalAttrs, this>): void;
+    className(): string;
+    title(): string;
+    content(): null;
+    oncreate(vnode: Mithril.VnodeDOM<FileManagerModalAttrs, this>): void;
     onremove(): void;
-    fileLibraryButtonItems(): ItemList<any>;
-    setLibrary(library: any): void;
+    view(): JSX.Element;
+    fileLibraryButtonItems(): ItemList<Mithril.Children>;
+    setLibrary(library: FilesLibrary): void;
     userFilesContent(): JSX.Element;
     sharedFilesContent(): JSX.Element;
-    /**
-     * Add or remove file from selected files
-     *
-     * @param {File} file
-     */
     onFileSelect(file: File): void;
-    /**
-     * Add files to file list after upload
-     */
     onUpload(): void;
-    /**
-     * Add selected files to the composer
-     */
     onSelect(): void;
     showUploadModal(): void;
-    onDelete(file: any): void;
+    onDelete(file: File): void;
 }
-import Modal from "flarum/common/components/Modal";
-import DragAndDrop from "./DragAndDrop";
-import FileListState from "../../common/states/FileListState";
-import ItemList from "flarum/common/utils/ItemList";
+export {};

@@ -1,13 +1,13 @@
 export default class DragAndDrop {
-    constructor(upload: any, composerElement: any);
-    upload: any;
-    composerElement: any;
-    handlers: {};
+    private upload;
+    private composerElement;
+    private over;
+    private handlers;
+    constructor(upload: (files: FileList) => void, composerElement: Element);
     supportsFileDragging(): boolean;
     unload(): void;
-    isNotFile(event: any): boolean;
-    in(event: any): void;
-    over: boolean | undefined;
-    out(event: any): void;
-    dropping(event: any): void;
+    isNotFile(event: DragEvent): boolean;
+    in(event: DragEvent): void;
+    out(event: DragEvent): void;
+    dropping(event: DragEvent): void;
 }

@@ -1,6 +1,5 @@
 import User from 'flarum/common/models/User';
 import File from '../models/File';
-import { ApiResponsePlural } from 'flarum/common/Store';
 export default class FileListState {
     user: User | null;
     files: File[];
@@ -19,11 +18,11 @@ export default class FileListState {
      * @param offset The starting index for loading more files.
      * @returns A promise resolving to the loaded files.
      */
-    loadResults(offset?: number): Promise<ApiResponsePlural<File>>;
+    loadResults(offset?: number): Promise<File[]>;
     /**
      * Load the next set of results.
      */
-    loadMore(): Promise<ApiResponsePlural<File>>;
+    loadMore(): Promise<File[]>;
     private parseResults;
     /**
      * Add files to the beginning of the list.

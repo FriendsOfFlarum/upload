@@ -1,15 +1,13 @@
+import type FileListState from '../../common/states/FileListState';
+type NativeFile = globalThis.File;
 export default class Uploader {
-    callbacks: {
-        success: never[];
-        failure: never[];
-        uploading: never[];
-        uploaded: never[];
-    };
+    private callbacks;
     uploading: boolean;
-    setState(fileState: any): void;
-    fileState: any;
-    on(type: any, callback: any): void;
-    dispatch(type: any, response: any): void;
-    upload(files: any, addBBcode?: boolean): Promise<void>;
-    uploaded(result: any, addBBcode?: boolean): void;
+    fileState?: FileListState;
+    setState(fileState: FileListState): void;
+    on(type: 'success' | 'failure' | 'uploading' | 'uploaded', callback: (response?: unknown) => void): void;
+    private dispatch;
+    upload(files: FileList | NativeFile[], addBBcode?: boolean): Promise<void>;
+    private uploaded;
 }
+export {};

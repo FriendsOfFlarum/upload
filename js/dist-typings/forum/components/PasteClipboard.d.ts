@@ -1,5 +1,5 @@
 export default class PasteClipboard {
-    constructor(upload: any, element: any);
-    upload: any;
-    paste(e: any): void;
+    private upload;
+    constructor(upload: (files: globalThis.File[]) => void, element: Element);
+    paste(e: ClipboardEvent): void;
 }

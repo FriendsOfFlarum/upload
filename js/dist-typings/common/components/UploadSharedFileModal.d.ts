@@ -1,25 +1,27 @@
-/// <reference types="flarum/@types/translator-icu-rich" />
-import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import { IFormModalAttrs } from 'flarum/common/components/FormModal';
+import FormModal from 'flarum/common/components/FormModal';
 import type Mithril from 'mithril';
-import File from '../models/File';
-interface CustomAttrs extends IInternalModalAttrs {
+import type File from '../models/File';
+type NativeFile = globalThis.File;
+interface CustomAttrs extends IFormModalAttrs {
     onUploadComplete: (files: File | File[]) => void;
 }
-export default class UploadSharedFileModal extends Modal<CustomAttrs> {
-    files: never[];
-    fileInput: null;
-    options: {
-        shared: boolean;
-        hidden: boolean;
-    };
+interface UploadOptions {
+    shared: boolean;
+    hidden: boolean;
+}
+export default class UploadSharedFileModal extends FormModal<CustomAttrs> {
+    files: NativeFile[];
+    fileInput: HTMLInputElement | null;
+    options: UploadOptions;
     loading: boolean;
     oninit(vnode: Mithril.Vnode<CustomAttrs, this>): void;
     className(): string;
-    title(): import("@askvortsov/rich-icu-message-formatter").NestedStringArray;
-    onFileChange(e: any): void;
-    addFiles(newFiles: File[]): void;
-    onDragOver(e: any): void;
-    onDrop(e: any): void;
+    title(): string | any[];
+    onFileChange(e: Event): void;
+    addFiles(newFiles: NativeFile[]): void;
+    onDragOver(e: DragEvent): void;
+    onDrop(e: DragEvent): void;
     onDropzoneClick(): void;
     content(): JSX.Element;
     upload(): Promise<void>;
