@@ -86,7 +86,7 @@ class ImageProcessor implements Processable
                     default      => $thumb->toPng(),
                 };
 
-            $file->thumbnailContent   = $thumbEncoded->toString();
+            $file->thumbnailContent = $thumbEncoded->toString();
             $file->thumbnailExtension = $useWebp ? 'webp' : match ($mimeType) {
                 'image/jpeg' => 'jpg',
                 'image/gif'  => 'gif',

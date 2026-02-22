@@ -76,6 +76,7 @@ abstract class Flysystem implements UploadAdapter
         // Write thumbnail if ImageProcessor generated one.
         if ($file->thumbnailContent !== null) {
             $thumbPath = $this->thumbnailPath($file);
+
             try {
                 $this->adapter->write($thumbPath, $file->thumbnailContent, $this->getConfig());
                 $file->thumbnail_path = $thumbPath;
@@ -106,7 +107,7 @@ abstract class Flysystem implements UploadAdapter
 
     /**
      * Derive the thumbnail storage path from the main file path.
-     * e.g. 2026-02-22/1234-photo.jpg → 2026-02-22/1234-photo-thumb.webp
+     * e.g. 2026-02-22/1234-photo.jpg → 2026-02-22/1234-photo-thumb.webp.
      */
     protected function thumbnailPath(File $file): string
     {
@@ -123,14 +124,14 @@ abstract class Flysystem implements UploadAdapter
     protected function generateThumbnailUrl(File $file): void
     {
         $savedPath = $file->path;
-        $savedUrl  = $file->url;
+        $savedUrl = $file->url;
 
         $file->path = $file->thumbnail_path;
         $this->generateUrl($file);
         $file->thumbnail_url = $file->url;
 
         $file->path = $savedPath;
-        $file->url  = $savedUrl;
+        $file->url = $savedUrl;
     }
 
     /**
