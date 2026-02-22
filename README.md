@@ -114,7 +114,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 1. After the image is processed (resize, watermark, orientation), a copy is scaled down to a configurable maximum width (default: **1000 px**).
 2. The thumbnail is encoded as **WebP** by default (~30% smaller than JPEG at equivalent quality) or in the original format if WebP is disabled.
 3. The thumbnail is stored alongside the original in the same storage backend (Local, S3, Qiniu). Imgur uploads are excluded — Imgur manages its own thumbnails.
-4. The thumbnail URL is stored in the database and injected at render time; no BBCode changes are required for existing posts.
+4. The thumbnail **path** is stored in the database. The full URL is derived from the live storage hostname at render time (same as the main file URL), so CDN domain changes are reflected automatically without re-processing.
 
 #### Settings
 
@@ -126,7 +126,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 
 #### Backwards compatibility
 
-- **Old posts:** Existing posts have no `thumbnail_url` stored. The formatter falls back to the original full-resolution URL — no change in appearance.
+- **Old posts:** Existing posts have no `thumbnail_path` stored. The formatter falls back to the original full-resolution URL — no change in appearance.
 - **Imgur uploads:** Thumbnails are not generated (Imgur handles image hosting directly).
 - **Private-shared files:** Thumbnails are not generated for private files.
 
@@ -404,7 +404,7 @@ php flarum fof:upload:backfill-dimensions --chunk=25
 
 The `php flarum fof:upload:backfill-thumbnails` command generates thumbnails for existing JPEG, PNG, and GIF uploads that were created before the thumbnail feature was introduced (or while the feature was disabled).
 
-The command downloads each image via the same storage backend used to upload it, scales it to the configured thumbnail width, encodes it as WebP (or the original format if WebP is disabled), and writes the thumbnail file alongside the original. Uploads already having a thumbnail URL are skipped automatically.
+The command downloads each image via the same storage backend used to upload it, scales it to the configured thumbnail width, encodes it as WebP (or the original format if WebP is disabled), and writes the thumbnail file alongside the original. Uploads already having a `thumbnail_url` are skipped automatically.
 
 > **Note:** Imgur and private-shared uploads are skipped — thumbnails are not supported for those backends.
 
