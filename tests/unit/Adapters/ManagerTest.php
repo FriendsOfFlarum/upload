@@ -201,7 +201,9 @@ class ManagerTest extends TestCase
         $url = m::mock(UrlGenerator::class);
 
         $thirdPartyAdapter = new class($fsAdapter, $settings, $url) extends \FoF\Upload\Adapters\Flysystem {
-            protected function generateUrl(\FoF\Upload\File $file): void {}
+            protected function generateUrl(\FoF\Upload\File $file): void
+            {
+            }
         };
 
         // Manager::adapters() fires Collecting — use andReturnUsing to add the 'blomstra' key.

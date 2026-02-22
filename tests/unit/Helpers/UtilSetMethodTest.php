@@ -15,7 +15,6 @@ namespace FoF\Upload\Tests\unit\Helpers;
 use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Adapters\Imgur;
 use FoF\Upload\Adapters\Local;
-use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Helpers\Util;
 use League\Flysystem\FilesystemAdapter;
 use PHPUnit\Framework\Attributes\Test;
