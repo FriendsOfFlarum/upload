@@ -15,12 +15,14 @@ namespace FoF\Upload\Listeners;
 use Flarum\Group\Group;
 use Flarum\Group\Permission;
 use Flarum\Settings\Event\Deserializing;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Helpers\Util;
 
 class AddAvailableOptionsInAdmin
 {
     public function __construct(
-        protected Util $util
+        protected Util $util,
+        protected SettingsRepositoryInterface $settings
     ) {
     }
 
@@ -35,12 +37,25 @@ class AddAvailableOptionsInAdmin
         $mimePermissions = $this->util->getMimePermissions();
         $event->settings['fof-upload.mimePermissions'] = $mimePermissions->toArray();
 
-        // Seed the default group (Member) for any new mime permission that has no assignment yet
+        // Seed the default group (Member) for any mime permission slug that has never been
+        // seeded before. We track seeded slugs in a setting so that we do NOT re-seed on
+        // subsequent page loads — otherwise an admin setting a permission to "Admin only"
+        // (which deletes the group_permission row) would have it restored on the next visit.
+        $seeded = json_decode($this->settings->get('fof-upload.seededMimePermissions', '[]'), true) ?? [];
+
+        $newlySeeded = false;
         foreach ($mimePermissions as $perm) {
-            $permKey = 'fof-upload.upload-mime.'.$perm['slug'];
-            if (!Permission::where('permission', $permKey)->exists()) {
-                Permission::insert(['permission' => $permKey, 'group_id' => Group::MEMBER_ID]);
+            $slug = $perm['slug'];
+            if (in_array($slug, $seeded, true)) {
+                continue;
             }
+            Permission::insert(['permission' => 'fof-upload.upload-mime.' . $slug, 'group_id' => Group::MEMBER_ID]);
+            $seeded[] = $slug;
+            $newlySeeded = true;
+        }
+
+        if ($newlySeeded) {
+            $this->settings->set('fof-upload.seededMimePermissions', json_encode(array_values($seeded)));
         }
     }
 }
