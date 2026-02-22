@@ -301,13 +301,20 @@ class Util
             return 'private-shared';
         }
 
+        // Prefer the canonical key stamped by Manager::instantiate(), which is
+        // always the exact key used during adapter registration. This handles
+        // third-party adapters whose class name differs from their registration
+        // key (e.g. class BlomstraObjectStorage registered as 'blomstra').
+        if (property_exists($adapter, 'adapterKey') && $adapter->adapterKey !== '') {
+            return $adapter->adapterKey;
+        }
+
+        // Fallback for adapters constructed outside Manager (should be rare).
         $className = Str::afterLast($adapter::class, '\\');
-        // Map adapter class names to canonical Manager keys
-        $canonical = match ($className) {
+
+        return match ($className) {
             'AwsS3' => 'aws-s3',
             default => Str::lower($className),
         };
-
-        return $canonical;
     }
 }

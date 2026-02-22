@@ -25,6 +25,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class Flysystem implements UploadAdapter
 {
     /**
+     * The canonical key under which this adapter is registered in Manager.
+     * Set by Manager::instantiate() after construction so that Util::setMethod()
+     * can store the correct key in File::upload_method without guessing from
+     * the class name (which breaks third-party adapters with custom keys).
+     */
+    public string $adapterKey = '';
+
+    /**
      * @var array
      */
     protected $meta;

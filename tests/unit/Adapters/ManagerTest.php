@@ -160,4 +160,63 @@ class ManagerTest extends TestCase
             rmdir($tempDir);
         }
     }
+
+    #[Test]
+    public function instantiate_stamps_adapter_key_on_local_adapter()
+    {
+        $this->events->shouldReceive('dispatch')->once();
+        $this->events->shouldReceive('until')->once()->andReturn(null);
+
+        $tempDir = sys_get_temp_dir().'/fof-upload-test-'.uniqid();
+        mkdir($tempDir, 0777, true);
+        $this->paths->public = $tempDir;
+
+        $this->settings->shouldReceive('get')->andReturn(null);
+        $this->url->shouldReceive('to')->andReturnSelf();
+        $this->url->shouldReceive('route')->andReturn('http://example.com');
+
+        $adapter = $this->manager->instantiate('local');
+
+        $this->assertSame('local', $adapter->adapterKey);
+
+        // Clean up
+        if (is_dir($tempDir.'/assets/files')) {
+            rmdir($tempDir.'/assets/files');
+        }
+        if (is_dir($tempDir.'/assets')) {
+            rmdir($tempDir.'/assets');
+        }
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
+    }
+
+    #[Test]
+    public function instantiate_stamps_adapter_key_on_third_party_adapter_from_event()
+    {
+        // Simulate a third-party adapter registered under the key 'blomstra' that is
+        // returned by a listener on the Instantiate event (not via a Manager method).
+        $fsAdapter = m::mock(\League\Flysystem\FilesystemAdapter::class);
+        $settings = m::mock(SettingsRepositoryInterface::class);
+        $url = m::mock(UrlGenerator::class);
+
+        $thirdPartyAdapter = new class($fsAdapter, $settings, $url) extends \FoF\Upload\Adapters\Flysystem {
+            protected function generateUrl(\FoF\Upload\File $file): void
+            {
+            }
+        };
+
+        // Manager::adapters() fires Collecting — use andReturnUsing to add the 'blomstra' key.
+        $this->events->shouldReceive('dispatch')->once()->andReturnUsing(function ($event) {
+            if ($event instanceof \FoF\Upload\Events\Adapter\Collecting) {
+                $event->adapters->put('blomstra', true);
+            }
+        });
+        // Manager::instantiate() fires Instantiate — listener returns the third-party adapter.
+        $this->events->shouldReceive('until')->once()->andReturn($thirdPartyAdapter);
+
+        $adapter = $this->manager->instantiate('blomstra');
+
+        $this->assertSame('blomstra', $adapter->adapterKey);
+    }
 }
