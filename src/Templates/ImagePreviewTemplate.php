@@ -53,6 +53,8 @@ class ImagePreviewTemplate extends AbstractTextFormatterTemplate
 
     public function preview(File $file): string
     {
-        return "[upl-image-preview uuid={$file->uuid} url={$file->url} alt={$file->base_name}]";
+        $thumbnailUrl = $file->thumbnail_url ?: $file->url;
+
+        return "[upl-image-preview uuid={$file->uuid} url={$file->url} alt={$file->base_name} thumbnail_url={$thumbnailUrl}]";
     }
 }
