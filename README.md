@@ -9,6 +9,8 @@ An extension that handles file uploads intelligently for your forum.
 - For images:
   - Auto watermarks with proportional scaling, opacity and padding controls.
   - Auto resizing.
+  - Dimension storage (width × height) for JPEG, PNG, and GIF — prevents layout shifts when images lazy-load.
+  - Animated GIF support for resize operations.
 - Mime type to upload adapter mapping.
 - Whitelisting mime types.
 - Uploading on different storage services (local, imgur, AWS S3 for instance).
@@ -89,6 +91,16 @@ When **Watermark images** is enabled, FoF Upload stamps every uploaded JPEG or P
 5. Save — the settings are applied to every new image upload.
 
 > **Backwards compatibility:** Existing installs that used watermarks before these settings were introduced will use the defaults on next upload: 25% width, 100% opacity, 10 px padding. Set padding to `0` to restore the previous flush-edge behaviour.
+
+### Image Dimensions & Layout Shift Prevention
+
+FoF Upload automatically stores the width and height (in pixels) of every JPEG, PNG, and GIF processed at upload time. These are recorded after any resizing or EXIF orientation correction is applied, so they always reflect the **final image as stored**.
+
+The stored dimensions are injected as `width` and `height` HTML attributes on the `<img>` tag rendered by the **Image Preview** template. Modern browsers use these attributes to reserve the correct amount of layout space before the image has loaded, eliminating [Cumulative Layout Shift (CLS)](https://web.dev/cls/) in threads that contain lazy-loaded images.
+
+**No configuration is required** — this happens automatically for all new JPEG, PNG, and GIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
+
+> **GIF support:** Animated GIF uploads now also benefit from the **Resize images** setting. Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
 
 ### Storage Configuration
 

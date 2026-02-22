@@ -134,4 +134,31 @@ class FormatImagePreviewTest extends TestCase
 
         $this->assertStringContainsString('https://cdn.example.com/photo.jpg', $result);
     }
+
+    #[Test]
+    public function injects_width_and_height_when_file_has_dimensions(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file->image_width  = 1920;
+        $file->image_height = 1080;
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringContainsString('width="1920"', $result);
+        $this->assertStringContainsString('height="1080"', $result);
+    }
+
+    #[Test]
+    public function does_not_inject_dimensions_when_file_has_none(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        // image_width / image_height are not set (null)
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringNotContainsString('width="1', $result);
+        $this->assertStringNotContainsString('height="1', $result);
+    }
 }
