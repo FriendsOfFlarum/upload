@@ -133,7 +133,7 @@ return [
         ->listen(Revised::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
-    (new Extend\ModelObserver(Post::class, Listeners\CleanUpFilesOnPostDelete::class)),
+    new Extend\ModelObserver(Post::class, Listeners\CleanUpFilesOnPostDelete::class),
 
     (new Extend\Filesystem())
         ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
