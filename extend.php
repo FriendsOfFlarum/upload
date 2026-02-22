@@ -19,6 +19,7 @@ use Flarum\Extend;
 use Flarum\Gdpr\Extend\UserData;
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
+use Flarum\Post\Post;
 use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Settings\Event\Deserializing;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -132,6 +133,8 @@ return [
         ->listen(Revised::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
+    (new Extend\ModelObserver(Post::class, Listeners\CleanUpFilesOnPostDelete::class)),
+
     (new Extend\Filesystem())
         ->disk('private-shared', Extenders\PrivateSharedDiskConfig::class),
 
@@ -162,7 +165,8 @@ return [
         ->default('fof-upload.svgAnimateAllowed', false)
         ->default('fof-upload.generateThumbnails', true)
         ->default('fof-upload.thumbnailWebp', true)
-        ->default('fof-upload.thumbnailMaxWidth', 1000),
+        ->default('fof-upload.thumbnailMaxWidth', 1000)
+        ->default('fof-upload.deleteFilesOnPostDelete', false),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

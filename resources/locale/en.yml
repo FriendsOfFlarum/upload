@@ -23,6 +23,10 @@ fof-upload:
       title: Upload
       description: Set up uploading services and preferences.
     help_texts:
+      delete-files-on-post-delete: |
+        When enabled, files exclusively attached to a deleted post are immediately removed from storage and the database.
+        Files referenced by multiple posts are not affected. When disabled (default), orphaned files are only removed
+        when the cleanup command is run manually: php flarum fof:upload --cleanup
       disable-download-logging: |
         Disable logging every download made by users of your forum. Keeping it enabled allows you to view the number of downloads and other metrics in the nearby future.
       disable-hotlink-protection: |
@@ -67,6 +71,9 @@ fof-upload:
         use_path_style_endpoint: Use path style endpoint
         acl: Access Control List (ACL)
         custom_url: Custom S3 URL
+      delete-files-on-post-delete:
+        title: File cleanup on post deletion
+        toggle: Delete uploaded files when the containing post is deleted
       disable-download-logging:
         title: Disable logging downloads
         toggle: Disable

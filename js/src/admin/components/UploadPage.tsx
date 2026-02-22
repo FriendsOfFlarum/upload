@@ -120,6 +120,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       'addsWatermarks',
       'disableHotlinkProtection',
       'disableDownloadLogging',
+      'deleteFilesOnPostDelete',
       'awsS3UsePathStyleEndpoint',
       'svgAnimateAllowed',
     ];
@@ -477,6 +478,13 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                 <div className="Form-group">
                   <Switch state={this.values.disableDownloadLogging() || false} onchange={this.values.disableDownloadLogging}>
                     {app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')}
+                  </Switch>
+                </div>
+                <legend>{app.translator.trans('fof-upload.admin.labels.delete-files-on-post-delete.title')}</legend>
+                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.delete-files-on-post-delete')}</p>
+                <div className="Form-group">
+                  <Switch state={this.values.deleteFilesOnPostDelete() || false} onchange={this.values.deleteFilesOnPostDelete}>
+                    {app.translator.trans('fof-upload.admin.labels.delete-files-on-post-delete.toggle')}
                   </Switch>
                 </div>
               </fieldset>
