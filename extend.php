@@ -59,9 +59,8 @@ return [
         ->patch('/fof/upload/hide', 'fof-upload.hide', Api\Handlers\HideUploadFromMediaManagerHandler::class)
         ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
-    // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
-    // (new Extend\Console())
-    //     ->command(Console\MapFilesCommand::class),
+    (new Extend\Console())
+        ->command(Console\MapFilesCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),
@@ -85,7 +84,12 @@ return [
                     ->get(fn () => resolve(SettingsRepositoryInterface::class)->get('fof-upload.composerButtonVisiblity', 'both')),
                 Schema\Str::make('fof-watermarkUrl')
                     ->visible(fn () => (bool) resolve(SettingsRepositoryInterface::class)->get('fof-watermark_path'))
-                    ->get(fn () => resolve(Factory::class)->disk('flarum-assets')->url(resolve(SettingsRepositoryInterface::class)->get('fof-watermark_path'))),
+                    ->get(function () {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+                        $disk = resolve(Factory::class)->disk('flarum-assets');
+
+                        return $disk->url(resolve(SettingsRepositoryInterface::class)->get('fof-watermark_path'));
+                    }),
             ];
         })
         ->endpoint('show', function ($endpoint) {
@@ -122,8 +126,8 @@ return [
 
     (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
-        ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
-        ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
+        ->listen(Posted::class, Listeners\LinkFilesToPostOnSave::class)
+        ->listen(Revised::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
     (new Extend\Filesystem())

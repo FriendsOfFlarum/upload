@@ -258,17 +258,20 @@ class FileRepository
         File::query()
             // Files already mapped to the post.
             ->whereHas('posts', fn ($query) => $query->where('posts.id', $post->id))
-            // Files found in (new) content.
+            // Files found in (new) content — match by URL or UUID (some templates only embed the UUID).
             ->orWhereExists(
                 fn ($query) => $query
                     ->select($db->raw(1))
                     ->from('posts')
                     ->where('posts.id', $post->id)
-                    ->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
+                    ->where(function ($q) use ($table, $db, $prefix) {
+                        $q->whereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
+                          ->orWhereColumn('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.uuid, '%')"));
+                    })
             )
             // Loop over every found item to de- or attach.
             ->each(function (File $file) use ($post) {
-                if (Str::contains($post->content, $file->url)) {
+                if (Str::contains($post->content, $file->url) || Str::contains($post->content, $file->uuid)) {
                     $file->posts()->attach($post);
                 } else {
                     $file->posts()->detach($post);
@@ -284,24 +287,34 @@ class FileRepository
 
         $changes = 0;
 
+        // GROUP_CONCAT is MySQL/SQLite only; PostgreSQL uses STRING_AGG.
+        $isPostgres = $db->getDriverName() === 'pgsql';
+        $aggregateExpr = $isPostgres
+            ? "string_agg(distinct cast({$prefix}posts.id as text), ',')"
+            : "group_concat(distinct {$prefix}posts.id)";
+
         // Finds files and the posts they have been published in.
         File::query()
             // Sorting is required when using each, for bulk querying.
             ->orderBy("$table.id")
             // Load everything for files, and any matched post ids concatenated.
-            ->select("$table.*", $db->raw("group_concat(distinct {$prefix}posts.id) as matched_post_ids"))
-            // Join on the posts table so that we can find posts that contain the file url.
+            ->select("$table.*", $db->raw("$aggregateExpr as matched_post_ids"))
+            // Join on the posts table so that we can find posts that contain the file url or uuid.
+            // Some templates (e.g. FileTemplate) only embed the uuid in post content, not the url.
             ->leftJoin('posts', function (JoinClause $join) use ($table, $db, $prefix) {
                 $join
                     ->on("$table.actor_id", '=', 'posts.user_id')
-                    ->where('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"));
+                    ->where(function ($q) use ($table, $db, $prefix) {
+                        $q->where('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.url, '%')"))
+                          ->orWhere('posts.content', 'like', $db->raw("CONCAT('%', $prefix$table.uuid, '%')"));
+                    });
             })
             // Group the results by file id, this works together with the group_concat in the select.
             ->groupBy("$table.id")
             // Now loop over all discovered files.
             ->each(function (File $file) use (&$changes) {
                 // Sync attaches and detaches in one swoop. This updates the intermediate table.
-                // $file->matched_post_ids contains all posts by author that contain the file url.
+                // $file->matched_post_ids contains all posts by author that contain the file url or uuid.
                 $attached = $file->posts()->sync(
                     array_filter(explode(',', $file->matched_post_ids ?? ''))
                 );
@@ -321,6 +334,7 @@ class FileRepository
 
         File::query()
             ->whereDoesntHave('posts')
+            ->where('shared', false)
             ->where('created_at', '<', $before)
             ->each(function (File $file) use ($manager, &$count, $confirm) {
                 $adapter = $manager->instantiate($file->upload_method);
