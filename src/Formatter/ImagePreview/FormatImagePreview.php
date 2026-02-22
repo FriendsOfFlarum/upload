@@ -51,6 +51,13 @@ class FormatImagePreview
                 }
 
                 $attributes['title'] = $file->base_name;
+
+                // Set alt to the filename unless the user provided a custom value.
+                // Also handles legacy posts where alt="{TEXT?}" was stored literally.
+                $alt = Arr::get($attributes, 'alt', '');
+                if (empty($alt) || $alt === '{TEXT?}') {
+                    $attributes['alt'] = $file->base_name;
+                }
             }
 
             return $attributes;

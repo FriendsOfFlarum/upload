@@ -66,13 +66,13 @@ class TemplatesTest extends TestCase
     /** Build a File model stub populated with predictable test data. */
     private function makeFile(): File
     {
-        $file            = new File();
-        $file->uuid      = 'test-uuid-1234';
+        $file = new File();
+        $file->uuid = 'test-uuid-1234';
         $file->base_name = 'photo.jpg';
-        $file->url       = 'https://example.com/files/photo.jpg';
-        $file->path      = 'uploads/photo.jpg';
-        $file->size      = 2048;
-        $file->type      = 'image/jpeg';
+        $file->url = 'https://example.com/files/photo.jpg';
+        $file->path = 'uploads/photo.jpg';
+        $file->size = 2048;
+        $file->type = 'image/jpeg';
 
         return $file;
     }
@@ -92,7 +92,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function just_url_template_preview_returns_file_url(): void
     {
-        $t    = new JustUrlTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new JustUrlTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertSame($file->url, $t->preview($file));
@@ -121,7 +121,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function markdown_image_template_preview_produces_markdown_syntax(): void
     {
-        $t    = new MarkdownImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new MarkdownImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $preview = $t->preview($file);
@@ -132,7 +132,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function markdown_image_template_preview_embeds_url(): void
     {
-        $t    = new MarkdownImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new MarkdownImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->url, $t->preview($file));
@@ -153,10 +153,10 @@ class TemplatesTest extends TestCase
     #[Test]
     public function bbcode_image_template_preview_produces_bbcode_syntax(): void
     {
-        $t    = new BbcodeImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new BbcodeImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
-        $url     = $file->url;
+        $url = $file->url;
         $preview = $t->preview($file);
 
         $this->assertSame("[URL=$url][IMG]{$url}[/IMG][/URL]", $preview);
@@ -165,7 +165,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function bbcode_image_template_preview_contains_url_twice(): void
     {
-        $t    = new BbcodeImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new BbcodeImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         // URL appears in both the [URL=…] wrapper and the [IMG]…[/IMG] inner tag
@@ -195,7 +195,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function file_template_bbcode_contains_uuid_and_size_placeholders(): void
     {
-        $t      = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
         $bbcode = $t->bbcode();
 
         $this->assertStringContainsString('uuid={IDENTIFIER}', $bbcode);
@@ -216,7 +216,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function file_template_preview_substitutes_uuid(): void
     {
-        $t    = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->uuid, $t->preview($file));
@@ -225,7 +225,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function file_template_preview_substitutes_human_size(): void
     {
-        $t    = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->humanSize, $t->preview($file));
@@ -234,7 +234,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function file_template_preview_substitutes_base_name(): void
     {
-        $t    = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->base_name, $t->preview($file));
@@ -243,7 +243,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function file_template_preview_contains_no_remaining_placeholders(): void
     {
-        $t    = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $preview = $t->preview($file);
@@ -257,7 +257,7 @@ class TemplatesTest extends TestCase
     public function file_template_returns_a_view(): void
     {
         $view = $this->makeView();
-        $t    = new FileTemplate($this->makeViewFactory($view), $this->makeTranslator());
+        $t = new FileTemplate($this->makeViewFactory($view), $this->makeTranslator());
 
         $this->assertSame($view, $t->template());
     }
@@ -285,7 +285,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_bbcode_contains_uuid_size_and_url_placeholders(): void
     {
-        $t      = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $bbcode = $t->bbcode();
 
         $this->assertStringContainsString('uuid={IDENTIFIER}', $bbcode);
@@ -298,7 +298,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_preview_substitutes_uuid(): void
     {
-        $t    = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->uuid, $t->preview($file));
@@ -307,7 +307,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_preview_substitutes_url(): void
     {
-        $t    = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->url, $t->preview($file));
@@ -316,7 +316,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_preview_substitutes_human_size(): void
     {
-        $t    = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->humanSize, $t->preview($file));
@@ -325,7 +325,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_preview_substitutes_base_name(): void
     {
-        $t    = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->base_name, $t->preview($file));
@@ -334,7 +334,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_template_preview_contains_no_remaining_placeholders(): void
     {
-        $t    = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $preview = $t->preview($file);
@@ -349,7 +349,7 @@ class TemplatesTest extends TestCase
     public function image_template_returns_a_view(): void
     {
         $view = $this->makeView();
-        $t    = new ImageTemplate($this->makeViewFactory($view), $this->makeTranslator());
+        $t = new ImageTemplate($this->makeViewFactory($view), $this->makeTranslator());
 
         $this->assertSame($view, $t->template());
     }
@@ -377,7 +377,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_preview_template_bbcode_contains_uuid_and_url_placeholders(): void
     {
-        $t      = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $bbcode = $t->bbcode();
 
         $this->assertStringContainsString('uuid={IDENTIFIER}', $bbcode);
@@ -388,7 +388,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_preview_template_preview_substitutes_uuid(): void
     {
-        $t    = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->uuid, $t->preview($file));
@@ -397,7 +397,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_preview_template_preview_substitutes_url(): void
     {
-        $t    = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->url, $t->preview($file));
@@ -406,7 +406,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function image_preview_template_preview_substitutes_all_placeholders(): void
     {
-        $t    = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $preview = $t->preview($file);
@@ -422,7 +422,7 @@ class TemplatesTest extends TestCase
         // Default alt text is the filename. Users who manually edit the BBCode
         // in their post can override alt= and the formatter will preserve it,
         // since alt={TEXT?} in bbcode() marks it as an accepted optional attribute.
-        $t    = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString("alt={$file->base_name}", $t->preview($file));
@@ -432,7 +432,7 @@ class TemplatesTest extends TestCase
     public function image_preview_template_returns_a_view(): void
     {
         $view = $this->makeView();
-        $t    = new ImagePreviewTemplate($this->makeViewFactory($view), $this->makeTranslator());
+        $t = new ImagePreviewTemplate($this->makeViewFactory($view), $this->makeTranslator());
 
         $this->assertSame($view, $t->template());
     }
@@ -460,7 +460,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function text_preview_template_bbcode_contains_uuid_url_and_snippet_placeholders(): void
     {
-        $t      = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $bbcode = $t->bbcode();
 
         $this->assertStringContainsString('uuid={IDENTIFIER}', $bbcode);
@@ -474,7 +474,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function text_preview_template_preview_uses_uuid(): void
     {
-        $t    = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->uuid, $t->preview($file));
@@ -483,7 +483,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function text_preview_template_preview_uses_url(): void
     {
-        $t    = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->url, $t->preview($file));
@@ -492,7 +492,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function text_preview_template_preview_uses_base_name_as_inner_text(): void
     {
-        $t    = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString($file->base_name, $t->preview($file));
@@ -501,7 +501,7 @@ class TemplatesTest extends TestCase
     #[Test]
     public function text_preview_template_preview_sets_has_snippet_false(): void
     {
-        $t    = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $this->assertStringContainsString('has_snippet=false', $t->preview($file));
@@ -511,7 +511,7 @@ class TemplatesTest extends TestCase
     public function text_preview_template_returns_a_view(): void
     {
         $view = $this->makeView();
-        $t    = new TextPreviewTemplate($this->makeViewFactory($view), $this->makeTranslator());
+        $t = new TextPreviewTemplate($this->makeViewFactory($view), $this->makeTranslator());
 
         $this->assertSame($view, $t->template());
     }
@@ -524,13 +524,13 @@ class TemplatesTest extends TestCase
     public static function allTemplateTags(): array
     {
         return [
-            'just-url'      => ['just-url'],
+            'just-url'       => ['just-url'],
             'markdown-image' => ['markdown-image'],
-            'bbcode-image'  => ['bbcode-image'],
-            'file'          => ['file'],
-            'image'         => ['image'],
-            'image-preview' => ['image-preview'],
-            'text-preview'  => ['text-preview'],
+            'bbcode-image'   => ['bbcode-image'],
+            'file'           => ['file'],
+            'image'          => ['image'],
+            'image-preview'  => ['image-preview'],
+            'text-preview'   => ['text-preview'],
         ];
     }
 
@@ -563,7 +563,7 @@ class TemplatesTest extends TestCase
     #[DataProvider('allTextFormatterTemplates')]
     public function text_formatter_template_preview_substitutes_all_required_placeholders(string $class): void
     {
-        $t    = new $class($this->makeViewFactory(), $this->makeTranslator());
+        $t = new $class($this->makeViewFactory(), $this->makeTranslator());
         $file = $this->makeFile();
 
         $preview = $t->preview($file);
