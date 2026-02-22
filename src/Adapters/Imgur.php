@@ -21,6 +21,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Imgur implements UploadAdapter
 {
+    /**
+     * The canonical key under which this adapter is registered in Manager.
+     * Set by Manager::instantiate() after construction.
+     *
+     * @see Flysystem::$adapterKey
+     */
+    public string $adapterKey = '';
+
     public function __construct(
         protected Guzzle $api
     ) {
