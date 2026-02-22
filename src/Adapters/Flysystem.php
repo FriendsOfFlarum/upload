@@ -120,18 +120,24 @@ abstract class Flysystem implements UploadAdapter
     /**
      * Generate and store the thumbnail URL by temporarily swapping the file path.
      * Reuses the subclass generateUrl() logic without duplication.
+     *
+     * Also swaps $this->meta['path'] because some adapters (e.g. AwsS3) prefer
+     * meta over $file->path when building URLs.
      */
     protected function generateThumbnailUrl(File $file): void
     {
         $savedPath = $file->path;
         $savedUrl = $file->url;
+        $savedMetaPath = $this->meta['path'] ?? null;
 
         $file->path = $file->thumbnail_path;
+        $this->meta['path'] = $file->thumbnail_path;
         $this->generateUrl($file);
         $file->thumbnail_url = $file->url;
 
         $file->path = $savedPath;
         $file->url = $savedUrl;
+        $this->meta['path'] = $savedMetaPath;
     }
 
     /**
