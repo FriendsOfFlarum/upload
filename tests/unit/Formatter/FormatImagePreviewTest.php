@@ -161,4 +161,29 @@ class FormatImagePreviewTest extends TestCase
         $this->assertStringNotContainsString('width="1', $result);
         $this->assertStringNotContainsString('height="1', $result);
     }
+
+    #[Test]
+    public function injects_thumbnail_url_when_file_has_thumbnail(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file->thumbnail_url = 'https://example.com/photo-thumb.webp';
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringContainsString('thumbnail_url="https://example.com/photo-thumb.webp"', $result);
+    }
+
+    #[Test]
+    public function falls_back_to_main_url_as_thumbnail_url_when_no_thumbnail(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        // thumbnail_url is not set (null)
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        // thumbnail_url should be set to the main URL as fallback
+        $this->assertStringContainsString('thumbnail_url="https://example.com/photo.jpg"', $result);
+    }
 }

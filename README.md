@@ -10,6 +10,7 @@ An extension that handles file uploads intelligently for your forum.
   - Auto watermarks with proportional scaling, opacity and padding controls.
   - Auto resizing.
   - Dimension storage (width × height) for JPEG, PNG, and GIF — prevents layout shifts when images lazy-load.
+  - WebP thumbnail generation at upload time — reduces bandwidth; clicking the thumbnail opens the original in a new tab.
   - Animated GIF support for resize operations.
 - Mime type to upload adapter mapping.
 - Whitelisting mime types.
@@ -101,6 +102,33 @@ The stored dimensions are injected as `width` and `height` HTML attributes on th
 **No configuration is required** — this happens automatically for all new JPEG, PNG, and GIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
 
 > **GIF support:** Animated GIF uploads now also benefit from the **Resize images** setting. Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
+
+### Image Thumbnails
+
+FoF Upload can generate a **downscaled thumbnail** at upload time to significantly reduce bandwidth for large-image forums. The original file is always kept intact.
+
+When enabled, the **Image Preview** template displays the thumbnail as the visible image and wraps it in a link to the original — clicking the image opens the full-resolution file in a new tab.
+
+#### How it works
+
+1. After the image is processed (resize, watermark, orientation), a copy is scaled down to a configurable maximum width (default: **1200 px**).
+2. The thumbnail is encoded as **WebP** by default (~30% smaller than JPEG at equivalent quality) or in the original format if WebP is disabled.
+3. The thumbnail is stored alongside the original in the same storage backend (Local, S3, Qiniu). Imgur uploads are excluded — Imgur manages its own thumbnails.
+4. The thumbnail URL is stored in the database and injected at render time; no BBCode changes are required for existing posts.
+
+#### Settings
+
+| Setting | Default | Description |
+|---|---|---|
+| **Generate thumbnails on upload** | On | Master toggle. Disable to revert to full-resolution images in the Image Preview template. |
+| **Encode thumbnails as WebP** | On | Use WebP encoding for the thumbnail. Disable to use the original image format (JPEG/PNG/GIF). |
+| **Thumbnail max width (px)** | `1200` | Thumbnails are scaled down so neither dimension exceeds this value. Images smaller than this are not upscaled. |
+
+#### Backwards compatibility
+
+- **Old posts:** Existing posts have no `thumbnail_url` stored. The formatter falls back to the original full-resolution URL — no change in appearance.
+- **Imgur uploads:** Thumbnails are not generated (Imgur handles image hosting directly).
+- **Private-shared files:** Thumbnails are not generated for private files.
 
 ### Storage Configuration
 
@@ -371,6 +399,43 @@ php flarum fof:upload:backfill-dimensions --chunk=25
 ```
 
 > **Note:** The command is safe to run multiple times — it only processes images where `image_width` is still `NULL`. If a file is unreachable (e.g. deleted from storage) it is skipped with a warning and the command continues.
+
+### BackfillThumbnailsCommand
+
+The `php flarum fof:upload:backfill-thumbnails` command generates thumbnails for existing JPEG, PNG, and GIF uploads that were created before the thumbnail feature was introduced (or while the feature was disabled).
+
+The command downloads each image via the same storage backend used to upload it, scales it to the configured thumbnail width, encodes it as WebP (or the original format if WebP is disabled), and writes the thumbnail file alongside the original. Uploads already having a thumbnail URL are skipped automatically.
+
+> **Note:** Imgur and private-shared uploads are skipped — thumbnails are not supported for those backends.
+
+#### Options
+
+| Option | Description |
+|---|---|
+| `--chunk=N` | Process files in batches of N (default: `50`). Reduce this on very large forums. |
+| `--dry-run` | Print how many images would be processed without making any changes. |
+
+#### Examples
+
+Preview how many images need thumbnails:
+
+```bash
+php flarum fof:upload:backfill-thumbnails --dry-run
+```
+
+Run with the default chunk size:
+
+```bash
+php flarum fof:upload:backfill-thumbnails
+```
+
+Run with a smaller chunk size on a large forum:
+
+```bash
+php flarum fof:upload:backfill-thumbnails --chunk=20
+```
+
+> **Note:** The command is safe to run multiple times. If a file is unreachable it is skipped with a warning and processing continues.
 
 ## Testing and Security Measures
 

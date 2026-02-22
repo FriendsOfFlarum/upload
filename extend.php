@@ -61,7 +61,8 @@ return [
 
     (new Extend\Console())
         ->command(Console\MapFilesCommand::class)
-        ->command(Console\BackfillImageDimensionsCommand::class),
+        ->command(Console\BackfillImageDimensionsCommand::class)
+        ->command(Console\BackfillThumbnailsCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),
@@ -158,7 +159,10 @@ return [
     (new Extend\Settings())
         ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
         ->default('fof-upload.s3CustomUrl', '')  // Default to empty, meaning use AWS default URL
-        ->default('fof-upload.svgAnimateAllowed', false),
+        ->default('fof-upload.svgAnimateAllowed', false)
+        ->default('fof-upload.generateThumbnails', true)
+        ->default('fof-upload.thumbnailWebp', true)
+        ->default('fof-upload.thumbnailMaxWidth', 1200),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

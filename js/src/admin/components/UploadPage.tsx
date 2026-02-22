@@ -90,6 +90,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
     this.fields = [
       'resizeMaxWidth',
+      'thumbnailMaxWidth',
       'cdnUrl',
       'maxFileSize',
       'whitelistedClientExtensions',
@@ -114,6 +115,8 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
     this.checkboxes = [
       'mustResize',
+      'generateThumbnails',
+      'thumbnailWebp',
       'addsWatermarks',
       'disableHotlinkProtection',
       'disableDownloadLogging',
@@ -336,6 +339,33 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                     value={this.values.resizeMaxWidth() ?? 100}
                     oninput={withAttr('value', this.values.resizeMaxWidth)}
                     disabled={!this.values.mustResize()}
+                  />
+                </div>
+              </fieldset>
+
+              <fieldset className="Form-group">
+                <legend>{app.translator.trans('fof-upload.admin.labels.thumbnails.title')}</legend>
+                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnails')}</p>
+                <div className="Form-group">
+                  <Switch state={this.values.generateThumbnails() || false} onchange={this.values.generateThumbnails}>
+                    {app.translator.trans('fof-upload.admin.labels.thumbnails.toggle')}
+                  </Switch>
+                </div>
+                <div className="Form-group">
+                  <Switch state={this.values.thumbnailWebp() || false} onchange={this.values.thumbnailWebp} disabled={!this.values.generateThumbnails()}>
+                    {app.translator.trans('fof-upload.admin.labels.thumbnails.webp_toggle')}
+                  </Switch>
+                </div>
+                <div className="Form-group">
+                  <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.max_width')}</label>
+                  <input
+                    className="FormControl"
+                    type="number"
+                    min="100"
+                    max="4000"
+                    value={this.values.thumbnailMaxWidth() ?? 1200}
+                    oninput={withAttr('value', this.values.thumbnailMaxWidth)}
+                    disabled={!this.values.generateThumbnails()}
                   />
                 </div>
               </fieldset>

@@ -48,7 +48,7 @@ class ImagePreviewTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[upl-image-preview uuid={IDENTIFIER} url={URL?} alt={TEXT?}]';
+        return '[upl-image-preview uuid={IDENTIFIER} url={URL?} alt={TEXT?} thumbnail_url={URL?}]';
     }
 
     public function preview(File $file): string

@@ -73,6 +73,20 @@ abstract class Flysystem implements UploadAdapter
 
         $this->generateUrl($file);
 
+        // Write thumbnail if ImageProcessor generated one.
+        if ($file->thumbnailContent !== null) {
+            $thumbPath = $this->thumbnailPath($file);
+            try {
+                $this->adapter->write($thumbPath, $file->thumbnailContent, $this->getConfig());
+                $file->thumbnail_path = $thumbPath;
+                $this->generateThumbnailUrl($file);
+            } catch (FilesystemException) {
+                // Non-fatal — thumbnail is optional; continue without it.
+            } finally {
+                $file->thumbnailContent = null; // free memory
+            }
+        }
+
         return $file;
     }
 
@@ -89,6 +103,55 @@ abstract class Flysystem implements UploadAdapter
     }
 
     abstract protected function generateUrl(File $file): void;
+
+    /**
+     * Derive the thumbnail storage path from the main file path.
+     * e.g. 2026-02-22/1234-photo.jpg → 2026-02-22/1234-photo-thumb.webp
+     */
+    protected function thumbnailPath(File $file): string
+    {
+        $ext = $file->thumbnailExtension ?? 'webp';
+
+        return preg_replace('/\.[^.\/]+$/', "-thumb.{$ext}", $file->path)
+            ?? $file->path."-thumb.{$ext}";
+    }
+
+    /**
+     * Generate and store the thumbnail URL by temporarily swapping the file path.
+     * Reuses the subclass generateUrl() logic without duplication.
+     */
+    protected function generateThumbnailUrl(File $file): void
+    {
+        $savedPath = $file->path;
+        $savedUrl  = $file->url;
+
+        $file->path = $file->thumbnail_path;
+        $this->generateUrl($file);
+        $file->thumbnail_url = $file->url;
+
+        $file->path = $savedPath;
+        $file->url  = $savedUrl;
+    }
+
+    /**
+     * Write a thumbnail for an existing file (used by the backfill console command).
+     * Sets $file->thumbnail_path and $file->thumbnail_url; caller must call $file->save().
+     */
+    public function storeThumbnail(File $file, string $content, string $ext): bool
+    {
+        $file->thumbnailExtension = $ext;
+        $thumbPath = $this->thumbnailPath($file);
+
+        try {
+            $this->adapter->write($thumbPath, $content, $this->getConfig());
+            $file->thumbnail_path = $thumbPath;
+            $this->generateThumbnailUrl($file);
+
+            return true;
+        } catch (FilesystemException) {
+            return false;
+        }
+    }
 
     /**
      * In case deletion is not possible, return false.
