@@ -52,6 +52,25 @@ The regex for these types is `^image\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\+xml)
 
 Make sure you configure the upload permission on the permissions page as well.
 
+### Per-Mime-Type Permission Scoping
+
+Each mime type row can be given an optional **Permission label** (e.g. `Images`, `Videos`, `Documents`). When a label is set, FoF Upload automatically:
+
+1. Creates a dedicated permission in the Flarum permission grid — e.g. `Upload Images` — scoped to the **Start** section.
+2. Defaults that permission to the **Member** group on first use, preserving existing access.
+3. Enforces **AND logic**: a user must hold *both* the base `Upload files` permission *and* the mime-specific permission to upload that file type.
+
+**Use cases:**
+- Allow Members to upload images but restrict video uploads to Staff.
+- Require a "Trusted" group role to upload ZIP archives or executable files.
+- Mix restricted and unrestricted types freely — mime types without a permission label require only the base upload permission (fully backwards-compatible).
+
+**How to configure:**
+1. Go to **Admin → Extensions → FoF Upload**.
+2. In the Mime Types section, enter a label in the **Permission label** field for any type you want to restrict (e.g. `Images`).
+3. Save settings — the permission appears immediately in **Admin → Permissions** under the Start section.
+4. Adjust which groups have that permission as needed.
+
 ### Storage Configuration
 
 FoF Upload supports configuration via both the admin panel (database settings) and environment variables. **Environment variables take precedence** over database settings when configured.

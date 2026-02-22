@@ -31,6 +31,8 @@ fof-upload:
         Download templates are how uploads are shown on your forum, eg like previews, buttons. Currently available:
       mime_types: |
         Please configure your mapping here. Each mime type regular expression will be handled by a specific upload adapter and download template.
+        Optionally, give each entry a permission label (e.g. "Images", "Videos") to create a dedicated permission in the permission grid.
+        This lets you restrict which groups may upload specific file types — in addition to the base "Upload files" permission which is always required.
       resize: |
         Choose whether you want to resize your images before they get uploaded. You can choose a maximum width and height, in pixels. The resizing process keeps the aspect ratio of the images.
       client_extension: |
@@ -85,6 +87,7 @@ fof-upload:
         mime_types: "Configure your mime type, upload adapter mapping"
         mime_type_regex_placeholder: "e.g. ^image/(jpeg|png|gif)$"
         mime_type_regex_invalid: "Invalid regex (e.g. empty alternatives like ||)"
+        mime_type_permission_placeholder: "Permission label (optional, e.g. Images)"
         title: General preferences
         php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
@@ -113,7 +116,8 @@ fof-upload:
 
     permissions:
       download_label: Download files
-      upload_label: Upload files
+      upload_label: Upload files (base permission, required for all uploads)
+      upload_mime_label: "Upload {label}"
       view_user_uploads_label: View user uploads
       delete_uploads_of_others_label: Delete user uploads
       upload_shared_label: Upload shared files
@@ -190,6 +194,7 @@ fof-upload:
   api:
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.
+      mime_permission_denied: You don't have permission to upload this file type.
       unsupported_type: "Upload adapter does not support the provided mime type: {mime}."
       could_not_detect_mime: Could not detect the MIME type of this file, please try again.
       max_upload_file_size_ini: Upload max filesize limit reached from php.ini.

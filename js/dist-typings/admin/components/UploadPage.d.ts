@@ -7,6 +7,8 @@ import type Mithril from 'mithril';
 type MimeConfig = {
     adapter: string;
     template: string;
+    permission_label?: string;
+    permission_slug?: string;
 };
 type Values = Record<string, Stream<any>>;
 export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
@@ -31,6 +33,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
         regex: Stream<string>;
         adapter: Stream<string>;
         template: Stream<string>;
+        permission_label: Stream<string>;
     };
     oninit(vnode: Mithril.Vnode<ExtensionPageAttrs, this>): void;
     content(vnode: Mithril.VnodeDOM<ExtensionPageAttrs, this>): JSX.Element;
@@ -39,6 +42,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     updateMimeTypeKey(mime: string, value: string): void;
     updateMimeTypeAdapter(mime: string, config: MimeConfig, value: string): void;
     updateMimeTypeTemplate(mime: string, config: MimeConfig, value: string): void;
+    updateMimeTypePermissionLabel(mime: string, config: MimeConfig, value: string): void;
     deleteMimeType(mime: string): void;
     templateOptionsDescriptions(): JSX.Element;
     addMimeType(): void;

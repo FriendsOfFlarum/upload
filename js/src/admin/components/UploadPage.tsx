@@ -14,11 +14,45 @@ import Icon from 'flarum/common/components/Icon';
 import Link from 'flarum/common/components/Link';
 import type { ExtensionPageAttrs } from 'flarum/admin/components/ExtensionPage';
 import type Mithril from 'mithril';
+import { registerMimePermissions } from '../index';
 
 type MimeConfig = {
   adapter: string;
   template: string;
+  permission_label?: string;
+  permission_slug?: string;
 };
+
+/**
+ * Convert a human-readable permission label into a URL-safe slug.
+ *
+ * Steps:
+ *  1. NFD-normalize so accented chars (ä, ö, ü, ñ, …) decompose into
+ *     base letter + combining mark.
+ *  2. Strip the combining marks (Unicode category Mn).
+ *  3. Lowercase the result.
+ *  4. Replace any run of non-alphanumeric characters with a single dash.
+ *  5. Trim leading/trailing dashes.
+ *
+ * Examples:
+ *   "Images"          → "images"
+ *   "Bilder (Größen)" → "bilder-grossen"   (ö→o, ß→ss via NFD doesn't work for ß,
+ *                                            see note below)
+ *   "Vidéos & More"   → "videos-more"
+ *
+ * Note: ß does not decompose under NFD; it becomes "ss" only under NFKD-like
+ * mappings that browsers don't expose. We handle it with an explicit replacement
+ * before normalizing.
+ */
+function slugify(value: string): string {
+  return value
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/\p{Mn}/gu, '') // strip combining marks (diacritics)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 type Values = Record<string, Stream<any>>;
 
@@ -44,6 +78,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     regex: Stream<string>;
     adapter: Stream<string>;
     template: Stream<string>;
+    permission_label: Stream<string>;
   };
 
   oninit(vnode: Mithril.Vnode<ExtensionPageAttrs, this>) {
@@ -131,6 +166,8 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
         '^image\\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\\+xml)$': {
           adapter: this.defaultAdap,
           template: 'image-preview',
+          permission_label: 'Images',
+          permission_slug: 'images',
         },
       });
     }
@@ -139,6 +176,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       regex: Stream(''),
       adapter: Stream(this.defaultAdap),
       template: Stream('file'),
+      permission_label: Stream(''),
     };
   }
 
@@ -210,6 +248,12 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                             onchange={(v: string) => this.updateMimeTypeTemplate(mime, config as MimeConfig, v)}
                             value={config.template || 'file'}
                           />
+                          <input
+                            className="FormControl UploadPage-mimeTypePermission"
+                            placeholder={app.translator.trans('fof-upload.admin.labels.preferences.mime_type_permission_placeholder') as string}
+                            value={(config as MimeConfig).permission_label ?? ''}
+                            oninput={withAttr('value', (v: string) => this.updateMimeTypePermissionLabel(mime, config as MimeConfig, v))}
+                          />
                           <Button type="button" className="Button Button--warning" onclick={() => this.deleteMimeType(mime)}>
                             ×
                           </Button>
@@ -242,6 +286,12 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                         className="UploadPage-mimeTypeSelect"
                         onchange={this.newMimeType.template}
                         value={this.newMimeType.template()}
+                      />
+                      <input
+                        className="FormControl UploadPage-mimeTypePermission"
+                        placeholder={app.translator.trans('fof-upload.admin.labels.preferences.mime_type_permission_placeholder') as string}
+                        value={this.newMimeType.permission_label()}
+                        oninput={withAttr('value', this.newMimeType.permission_label)}
                       />
                       <Button type="button" className="Button Button--warning" onclick={() => this.addMimeType()}>
                         +
@@ -512,6 +562,15 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     m.redraw();
   }
 
+  updateMimeTypePermissionLabel(mime: string, config: MimeConfig, value: string) {
+    config.permission_label = value || undefined;
+    config.permission_slug = value ? slugify(value) : undefined;
+    const mimeTypes = this.values.mimeTypes();
+    mimeTypes[mime] = config;
+    this.values.mimeTypes({ ...mimeTypes });
+    m.redraw();
+  }
+
   deleteMimeType(mime: string) {
     const mimeTypes = this.values.mimeTypes();
     delete mimeTypes[mime];
@@ -535,16 +594,24 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     const regex = this.newMimeType.regex();
     if (!regex) return;
 
+    const label = this.newMimeType.permission_label();
     const mimeTypes = this.values.mimeTypes();
     mimeTypes[regex] = {
       adapter: this.newMimeType.adapter(),
       template: this.newMimeType.template(),
+      ...(label
+        ? {
+            permission_label: label,
+            permission_slug: slugify(label),
+          }
+        : {}),
     };
     this.values.mimeTypes({ ...mimeTypes });
 
     this.newMimeType.regex('');
     this.newMimeType.adapter(this.defaultAdap);
     this.newMimeType.template('file');
+    this.newMimeType.permission_label('');
     m.redraw();
   }
 
@@ -567,9 +634,16 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     this.checkboxes.forEach((key) => (settings[this.addPrefix(key)] = this.values[key]()));
     this.objects.forEach((key) => (settings[this.addPrefix(key)] = JSON.stringify(this.values[key]())));
 
+    // Snapshot current mime permissions before the async save so the grid
+    // can be updated immediately on success without waiting for a page reload.
+    const mimePermsSnapshot = Object.values(this.values.mimeTypes() as Record<string, MimeConfig>)
+      .filter((c) => c.permission_label && c.permission_slug)
+      .map((c) => ({ label: c.permission_label!, slug: c.permission_slug! }));
+
     saveSettings(settings)
       .then(() => {
         this.successAlert = app.alerts.show(Alert, { type: 'success' }, app.translator.trans('core.admin.settings.saved_message'));
+        registerMimePermissions(mimePermsSnapshot);
       })
       .catch(() => {})
       .then(() => {

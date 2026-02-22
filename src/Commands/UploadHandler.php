@@ -15,6 +15,7 @@ namespace FoF\Upload\Commands;
 use Flarum\Foundation\Application;
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\UrlGenerator;
+use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\Events;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
@@ -72,6 +73,18 @@ class UploadHandler
                 $this->files->sanitizeSvg($upload, $mime);
 
                 $mimeConfiguration = $this->util->getMimeConfiguration($mime);
+
+                $mimePermSlug = Arr::get($mimeConfiguration, 'permission_slug');
+                if ($mimePermSlug) {
+                    try {
+                        $command->actor->assertCan('fof-upload.upload-mime.'.$mimePermSlug);
+                    } catch (PermissionDeniedException) {
+                        throw new ValidationException([
+                            'upload' => $this->translator->trans('fof-upload.api.upload_errors.mime_permission_denied'),
+                        ]);
+                    }
+                }
+
                 $adapter = $this->util->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->util->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 
