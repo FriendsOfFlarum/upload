@@ -60,7 +60,7 @@ class FormatImagePreview
                 }
 
                 if ($file->image_width && $file->image_height) {
-                    $attributes['width']  = $file->image_width;
+                    $attributes['width'] = $file->image_width;
                     $attributes['height'] = $file->image_height;
                 }
             }

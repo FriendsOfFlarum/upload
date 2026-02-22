@@ -67,7 +67,7 @@ class ImageProcessor implements Processable
         @file_put_contents($upload->getRealPath(), $encoded->toString());
 
         // Store dimensions so the browser can reserve layout space before the image loads.
-        $file->image_width  = $image->width();
+        $file->image_width = $image->width();
         $file->image_height = $image->height();
     }
 

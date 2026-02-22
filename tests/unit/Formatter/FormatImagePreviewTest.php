@@ -139,7 +139,7 @@ class FormatImagePreviewTest extends TestCase
     public function injects_width_and_height_when_file_has_dimensions(): void
     {
         $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
-        $file->image_width  = 1920;
+        $file->image_width = 1920;
         $file->image_height = 1080;
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
