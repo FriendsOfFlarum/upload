@@ -37,32 +37,38 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
-        if ($mimeType === 'image/jpeg' || $mimeType === 'image/png') {
-            try {
-                $image = $this->imageManager->read($upload->getRealPath());
-            } catch (RuntimeException $e) {
-                throw new ValidationException(['upload' => 'Corrupted image']);
-            }
-
-            if ($this->settings->get('fof-upload.mustResize')) {
-                $this->resize($image);
-            }
-
-            if ($this->settings->get('fof-upload.addsWatermarks')) {
-                $this->watermark($image);
-            }
-
-            $image->orient();
-
-            $encoded = $mimeType === 'image/jpeg'
-                ? $image->toJpeg(quality: 90)
-                : $image->toPng();
-
-            @file_put_contents(
-                $upload->getRealPath(),
-                $encoded->toString()
-            );
+        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'], true)) {
+            return;
         }
+
+        try {
+            $image = $this->imageManager->read($upload->getRealPath());
+        } catch (RuntimeException $e) {
+            throw new ValidationException(['upload' => 'Corrupted image']);
+        }
+
+        if ($this->settings->get('fof-upload.mustResize')) {
+            $this->resize($image);
+        }
+
+        // Watermarks are not applied to GIFs — palette reduction causes quality degradation.
+        if ($this->settings->get('fof-upload.addsWatermarks') && $mimeType !== 'image/gif') {
+            $this->watermark($image);
+        }
+
+        $image->orient();
+
+        $encoded = match ($mimeType) {
+            'image/jpeg' => $image->toJpeg(quality: 90),
+            'image/gif'  => $image->toGif(),
+            default      => $image->toPng(),
+        };
+
+        @file_put_contents($upload->getRealPath(), $encoded->toString());
+
+        // Store dimensions so the browser can reserve layout space before the image loads.
+        $file->image_width = $image->width();
+        $file->image_height = $image->height();
     }
 
     protected function resize(ImageInterface $image): void

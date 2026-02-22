@@ -1,3 +1,10 @@
+// Ensure width/height HTML attributes used for aspect-ratio hinting don't
+// override CSS scaling. height: auto lets max-width control the display size.
+.FoFUpload--Upl-Image-Preview {
+    height: auto;
+    max-width: 100%;
+}
+
 .fof-download.row {
     margin: 10px auto 0;
     min-height: 280px;
