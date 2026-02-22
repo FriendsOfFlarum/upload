@@ -34,24 +34,24 @@ class FileRepositoryTest extends EnhancedTestCase
 {
     use RetrievesAuthorizedUsers;
 
-    private const OLD_DATE    = '2020-01-01 00:00:00';
+    private const OLD_DATE = '2020-01-01 00:00:00';
     private const FUTURE_DATE = '2099-01-01 00:00:00';
 
     // Seeded file UUIDs
-    private const UUID_URL_IN_CONTENT     = 'uuid-url-in-content';
-    private const UUID_UUID_IN_CONTENT    = 'uuid-uuid-in-content';
+    private const UUID_URL_IN_CONTENT = 'uuid-url-in-content';
+    private const UUID_UUID_IN_CONTENT = 'uuid-uuid-in-content';
     private const UUID_NEITHER_IN_CONTENT = 'uuid-neither-in-content';
-    private const UUID_SHARED             = 'uuid-shared-file';
-    private const UUID_RECENT             = 'uuid-recent-orphan';
+    private const UUID_SHARED = 'uuid-shared-file';
+    private const UUID_RECENT = 'uuid-recent-orphan';
 
     // UUIDs for per-template tests (seeded in setUp)
-    private const UUID_TMPL_JUST_URL      = 'uuid-tmpl-just-url';
-    private const UUID_TMPL_MARKDOWN      = 'uuid-tmpl-markdown';
-    private const UUID_TMPL_BBCODE        = 'uuid-tmpl-bbcode';
+    private const UUID_TMPL_JUST_URL = 'uuid-tmpl-just-url';
+    private const UUID_TMPL_MARKDOWN = 'uuid-tmpl-markdown';
+    private const UUID_TMPL_BBCODE = 'uuid-tmpl-bbcode';
     private const UUID_TMPL_IMAGE_PREVIEW = 'uuid-tmpl-image-preview';
-    private const UUID_TMPL_IMAGE         = 'uuid-tmpl-image';
-    private const UUID_TMPL_TEXT_PREVIEW  = 'uuid-tmpl-text-preview';
-    private const UUID_TMPL_FILE          = 'uuid-tmpl-file';
+    private const UUID_TMPL_IMAGE = 'uuid-tmpl-image';
+    private const UUID_TMPL_TEXT_PREVIEW = 'uuid-tmpl-text-preview';
+    private const UUID_TMPL_FILE = 'uuid-tmpl-file';
 
     public function setUp(): void
     {
@@ -65,58 +65,58 @@ class FileRepositoryTest extends EnhancedTestCase
             ],
             'discussions' => [
                 [
-                    'id' => 1, 'title' => 'Test', 'slug' => 'test',
+                    'id'            => 1, 'title' => 'Test', 'slug' => 'test',
                     'comment_count' => 2, 'participant_count' => 1,
-                    'created_at' => self::OLD_DATE, 'user_id' => 2,
+                    'created_at'    => self::OLD_DATE, 'user_id' => 2,
                     'first_post_id' => 1, 'last_post_id' => 2,
                 ],
             ],
             'posts' => [
                 // Post 1: references the URL-in-content file by URL
                 [
-                    'id' => 1, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 1, 'created_at' => self::OLD_DATE,
+                    'id'      => 1, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 1, 'created_at' => self::OLD_DATE,
                     'content' => 'See http://localhost/files/file-url.jpg here',
                 ],
                 // Post 2: references the UUID-in-content file by UUID only (FileTemplate BBCode)
                 [
-                    'id' => 2, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 2, 'created_at' => self::OLD_DATE,
+                    'id'      => 2, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 2, 'created_at' => self::OLD_DATE,
                     'content' => '[upl-file uuid='.self::UUID_UUID_IN_CONTENT.' size=5kB]archive.zip[/upl-file]',
                 ],
                 // Posts 10-16: one per template format (for matchFilesForPost per-template tests)
                 [
-                    'id' => 10, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 10, 'created_at' => self::OLD_DATE,
+                    'id'      => 10, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 10, 'created_at' => self::OLD_DATE,
                     'content' => 'http://localhost/files/tmpl.jpg',
                 ],
                 [
-                    'id' => 11, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 11, 'created_at' => self::OLD_DATE,
+                    'id'      => 11, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 11, 'created_at' => self::OLD_DATE,
                     'content' => '![alt](http://localhost/files/tmpl.jpg)',
                 ],
                 [
-                    'id' => 12, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 12, 'created_at' => self::OLD_DATE,
+                    'id'      => 12, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 12, 'created_at' => self::OLD_DATE,
                     'content' => '[URL=http://localhost/files/tmpl.jpg][IMG]http://localhost/files/tmpl.jpg[/IMG][/URL]',
                 ],
                 [
-                    'id' => 13, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 13, 'created_at' => self::OLD_DATE,
+                    'id'      => 13, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 13, 'created_at' => self::OLD_DATE,
                     'content' => '[upl-image-preview uuid='.self::UUID_TMPL_IMAGE_PREVIEW.' url=http://localhost/files/tmpl.jpg alt=img]',
                 ],
                 [
-                    'id' => 14, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 14, 'created_at' => self::OLD_DATE,
+                    'id'      => 14, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 14, 'created_at' => self::OLD_DATE,
                     'content' => '[upl-image uuid='.self::UUID_TMPL_IMAGE.' size=1kB url=http://localhost/files/tmpl.jpg]img[/upl-image]',
                 ],
                 [
-                    'id' => 15, 'discussion_id' => 1, 'user_id' => 2,
-                    'type' => 'comment', 'number' => 15, 'created_at' => self::OLD_DATE,
+                    'id'      => 15, 'discussion_id' => 1, 'user_id' => 2,
+                    'type'    => 'comment', 'number' => 15, 'created_at' => self::OLD_DATE,
                     'content' => '[upl-text-preview uuid='.self::UUID_TMPL_TEXT_PREVIEW.' url=http://localhost/files/tmpl.jpg]name[/upl-text-preview]',
                 ],
                 [
-                    'id' => 16, 'discussion_id' => 1, 'user_id' => 2,
+                    'id'   => 16, 'discussion_id' => 1, 'user_id' => 2,
                     'type' => 'comment', 'number' => 16, 'created_at' => self::OLD_DATE,
                     // FileTemplate: UUID in BBCode, URL never appears in content
                     'content' => '[upl-file uuid='.self::UUID_TMPL_FILE.' size=1kB]file.zip[/upl-file]',
@@ -125,106 +125,106 @@ class FileRepositoryTest extends EnhancedTestCase
             'fof_upload_files' => [
                 // File whose URL appears in post content
                 [
-                    'id' => 1, 'uuid' => self::UUID_URL_IN_CONTENT,
-                    'base_name' => 'file-url.jpg', 'path' => 'files/file-url.jpg',
-                    'url' => 'http://localhost/files/file-url.jpg',
-                    'type' => 'image/jpeg', 'size' => 1000,
+                    'id'            => 1, 'uuid' => self::UUID_URL_IN_CONTENT,
+                    'base_name'     => 'file-url.jpg', 'path' => 'files/file-url.jpg',
+                    'url'           => 'http://localhost/files/file-url.jpg',
+                    'type'          => 'image/jpeg', 'size' => 1000,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::OLD_DATE,
+                    'shared'        => false, 'created_at' => self::OLD_DATE,
                 ],
                 // File whose UUID appears in post content (FileTemplate), URL does NOT appear
                 [
-                    'id' => 2, 'uuid' => self::UUID_UUID_IN_CONTENT,
-                    'base_name' => 'archive.zip', 'path' => 'files/archive.zip',
-                    'url' => 'http://localhost/files/archive.zip',
-                    'type' => 'application/zip', 'size' => 5000,
+                    'id'            => 2, 'uuid' => self::UUID_UUID_IN_CONTENT,
+                    'base_name'     => 'archive.zip', 'path' => 'files/archive.zip',
+                    'url'           => 'http://localhost/files/archive.zip',
+                    'type'          => 'application/zip', 'size' => 5000,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::OLD_DATE,
+                    'shared'        => false, 'created_at' => self::OLD_DATE,
                 ],
                 // Truly orphaned file — neither URL nor UUID in any post
                 [
-                    'id' => 3, 'uuid' => self::UUID_NEITHER_IN_CONTENT,
-                    'base_name' => 'orphan.jpg', 'path' => 'files/orphan.jpg',
-                    'url' => 'http://localhost/files/orphan.jpg',
-                    'type' => 'image/jpeg', 'size' => 500,
+                    'id'            => 3, 'uuid' => self::UUID_NEITHER_IN_CONTENT,
+                    'base_name'     => 'orphan.jpg', 'path' => 'files/orphan.jpg',
+                    'url'           => 'http://localhost/files/orphan.jpg',
+                    'type'          => 'image/jpeg', 'size' => 500,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::OLD_DATE,
+                    'shared'        => false, 'created_at' => self::OLD_DATE,
                 ],
                 // Shared file — no actor_id, no post association by design
                 [
-                    'id' => 4, 'uuid' => self::UUID_SHARED,
-                    'base_name' => 'shared.jpg', 'path' => 'files/shared.jpg',
-                    'url' => 'http://localhost/files/shared.jpg',
-                    'type' => 'image/jpeg', 'size' => 800,
+                    'id'            => 4, 'uuid' => self::UUID_SHARED,
+                    'base_name'     => 'shared.jpg', 'path' => 'files/shared.jpg',
+                    'url'           => 'http://localhost/files/shared.jpg',
+                    'type'          => 'image/jpeg', 'size' => 800,
                     'upload_method' => 'local', 'actor_id' => null,
-                    'shared' => true, 'created_at' => self::OLD_DATE,
+                    'shared'        => true, 'created_at' => self::OLD_DATE,
                 ],
                 // Recent orphan — within grace period, should not be cleaned up
                 [
-                    'id' => 5, 'uuid' => self::UUID_RECENT,
-                    'base_name' => 'recent.jpg', 'path' => 'files/recent.jpg',
-                    'url' => 'http://localhost/files/recent.jpg',
-                    'type' => 'image/jpeg', 'size' => 300,
+                    'id'            => 5, 'uuid' => self::UUID_RECENT,
+                    'base_name'     => 'recent.jpg', 'path' => 'files/recent.jpg',
+                    'url'           => 'http://localhost/files/recent.jpg',
+                    'type'          => 'image/jpeg', 'size' => 300,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 // Per-template files (matching posts 10-16).
                 // Use FUTURE_DATE so these don't interfere with cleanup-cutoff tests.
                 [
-                    'id' => 10, 'uuid' => self::UUID_TMPL_JUST_URL,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 10, 'uuid' => self::UUID_TMPL_JUST_URL,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 11, 'uuid' => self::UUID_TMPL_MARKDOWN,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 11, 'uuid' => self::UUID_TMPL_MARKDOWN,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 12, 'uuid' => self::UUID_TMPL_BBCODE,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 12, 'uuid' => self::UUID_TMPL_BBCODE,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 13, 'uuid' => self::UUID_TMPL_IMAGE_PREVIEW,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 13, 'uuid' => self::UUID_TMPL_IMAGE_PREVIEW,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 14, 'uuid' => self::UUID_TMPL_IMAGE,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 14, 'uuid' => self::UUID_TMPL_IMAGE,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 15, 'uuid' => self::UUID_TMPL_TEXT_PREVIEW,
-                    'base_name' => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
-                    'url' => 'http://localhost/files/tmpl.jpg',
-                    'type' => 'image/jpeg', 'size' => 100,
+                    'id'            => 15, 'uuid' => self::UUID_TMPL_TEXT_PREVIEW,
+                    'base_name'     => 'tmpl.jpg', 'path' => 'files/tmpl.jpg',
+                    'url'           => 'http://localhost/files/tmpl.jpg',
+                    'type'          => 'image/jpeg', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
                 [
-                    'id' => 16, 'uuid' => self::UUID_TMPL_FILE,
-                    'base_name' => 'file.zip', 'path' => 'files/file.zip',
-                    'url' => 'http://localhost/files/file.zip',
-                    'type' => 'application/zip', 'size' => 100,
+                    'id'            => 16, 'uuid' => self::UUID_TMPL_FILE,
+                    'base_name'     => 'file.zip', 'path' => 'files/file.zip',
+                    'url'           => 'http://localhost/files/file.zip',
+                    'type'          => 'application/zip', 'size' => 100,
                     'upload_method' => 'local', 'actor_id' => 2,
-                    'shared' => false, 'created_at' => self::FUTURE_DATE,
+                    'shared'        => false, 'created_at' => self::FUTURE_DATE,
                 ],
             ],
         ]);
@@ -238,6 +238,7 @@ class FileRepositoryTest extends EnhancedTestCase
     private function fileByUuid(string $uuid): File
     {
         $this->app(); // ensure app is booted before Eloquent queries
+
         return File::byUuid($uuid)->firstOrFail();
     }
 
