@@ -287,12 +287,18 @@ class FileRepository
 
         $changes = 0;
 
+        // GROUP_CONCAT is MySQL/SQLite only; PostgreSQL uses STRING_AGG.
+        $isPostgres = $db->getDriverName() === 'pgsql';
+        $aggregateExpr = $isPostgres
+            ? "string_agg(distinct cast({$prefix}posts.id as text), ',')"
+            : "group_concat(distinct {$prefix}posts.id)";
+
         // Finds files and the posts they have been published in.
         File::query()
             // Sorting is required when using each, for bulk querying.
             ->orderBy("$table.id")
             // Load everything for files, and any matched post ids concatenated.
-            ->select("$table.*", $db->raw("group_concat(distinct {$prefix}posts.id) as matched_post_ids"))
+            ->select("$table.*", $db->raw("$aggregateExpr as matched_post_ids"))
             // Join on the posts table so that we can find posts that contain the file url or uuid.
             // Some templates (e.g. FileTemplate) only embed the uuid in post content, not the url.
             ->leftJoin('posts', function (JoinClause $join) use ($table, $db, $prefix) {
@@ -308,7 +314,7 @@ class FileRepository
             // Now loop over all discovered files.
             ->each(function (File $file) use (&$changes) {
                 // Sync attaches and detaches in one swoop. This updates the intermediate table.
-                // $file->matched_post_ids contains all posts by author that contain the file url.
+                // $file->matched_post_ids contains all posts by author that contain the file url or uuid.
                 $attached = $file->posts()->sync(
                     array_filter(explode(',', $file->matched_post_ids ?? ''))
                 );
