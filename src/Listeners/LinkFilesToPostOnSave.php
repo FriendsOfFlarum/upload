@@ -16,7 +16,7 @@ use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
 use FoF\Upload\Repositories\FileRepository;
 
-class LinkImageToPostOnSave
+class LinkFilesToPostOnSave
 {
     public function __construct(
         private FileRepository $files

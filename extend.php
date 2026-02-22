@@ -56,9 +56,8 @@ return [
         ->get('/fof/upload/shared-files', 'fof-upload.shared-files.index', Api\Controllers\ListSharedUploadsController::class)
         ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
-    // Disabled pending https://github.com/FriendsOfFlarum/upload/issues/374
-    // (new Extend\Console())
-    //     ->command(Console\MapFilesCommand::class),
+    (new Extend\Console())
+        ->command(Console\MapFilesCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),
@@ -85,8 +84,8 @@ return [
 
     (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
-        ->listen(Posted::class, Listeners\LinkImageToPostOnSave::class)
-        ->listen(Revised::class, Listeners\LinkImageToPostOnSave::class)
+        ->listen(Posted::class, Listeners\LinkFilesToPostOnSave::class)
+        ->listen(Revised::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
 
     (new Extend\Filesystem())
