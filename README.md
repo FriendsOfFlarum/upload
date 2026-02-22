@@ -215,39 +215,77 @@ Adapter names currently available:
 
 ### MapFilesCommand
 
-Using `php flarum fof:upload` you have a powerful tool in your hands to map uploads to posts and
-clean up unused files. To do so there are two steps to take into consideration:
+The `php flarum fof:upload` command helps you keep file storage clean by mapping uploaded files to
+the posts they appear in, and removing files that were never used in any post (e.g. uploaded by a
+user who never submitted their draft, or by spammers abusing the upload endpoint).
 
-- Mapping (`--map`) allows you to look through posts to identify whether which uploaded files have been used inside any posts, and store this information
-- Clean up (`--cleanup`, `--cleanup-before=yyyy-mm-dd`) grants you to ability to remove files that have been uploaded before the given time and haven't been mapped to any (existing) posts.
+#### How matching works
 
-The intent of this command stems from the original concept of understand what uploads are used where and to allow removal
-of unused, stale files. You can run this command manually or as a cronjob.
+When a post is saved or edited, files are automatically linked to it based on what appears in the
+post content. The command's `--map` flag lets you rebuild these associations in bulk — useful after
+an import, a migration, or if associations were lost.
 
-Example 1; only mapping files:
+Matching looks for the file's **URL or UUID** in post content, so all built-in templates are
+covered:
+
+| Template | What appears in post content |
+|---|---|
+| Default File Download | `[upl-file uuid=… size=…]name[/upl-file]` — UUID only |
+| Image Preview | `[upl-image-preview uuid=… url=…]` — both |
+| Image | `[upl-image uuid=… url=…]` — both |
+| Text Preview | `[upl-text-preview uuid=… url=…]` — both |
+| Just URL | raw URL |
+| Markdown Image | `![alt](url)` |
+| BBCode Image | `[URL=…][IMG]…[/IMG][/URL]` |
+
+> **Note:** Shared files (uploaded via the shared file manager) are intentionally not associated
+> with individual posts and are **never** removed by cleanup.
+
+#### Options
+
+| Option | Description |
+|---|---|
+| `--map` | Scan all posts and link files to the posts where they appear. Safe to run at any time. |
+| `--cleanup` | Delete files that have no post associations and were uploaded before the cutoff date. Always run `--map` first. |
+| `--cleanup-before=DATE` | Set the cutoff date for cleanup. Any date string accepted by PHP's `strtotime` works: `"yesterday"`, `"1 week ago"`, `"2024-01-01"`, `"now"`. Defaults to 24 hours ago. |
+| `--force` | Skip per-file confirmation prompts. **Use with caution.** |
+
+#### Examples
+
+Map files only (no deletions):
 
 ```bash
 php flarum fof:upload --map
 ```
 
-Example 2; map and clean up
+Map and clean up files uploaded more than a month ago that have no post association — with
+per-file confirmation:
 
 ```bash
-php flarum fof:upload --map --cleanup --cleanup-before="a month ago"
+php flarum fof:upload --map --cleanup --cleanup-before="1 month ago"
 ```
 
-Once you're happy with how the command operates, you can append the flag `--force`, which removes the need to confirm
-the action:
+Same, but skip confirmation prompts (suitable for a cronjob):
 
 ```bash
-php flarum fof:upload --map --cleanup --cleanup-before="last year" --force
+php flarum fof:upload --map --cleanup --cleanup-before="1 month ago" --force
 ```
 
-The following (to resume) will happen when this command is put into a recurring cronjob:
+#### Recommended workflow
 
-- based on the interval of the cronjob (daily, weekly or however)
-- the command will go over all uploads to discover in which posts they have been used
-- delete those files that have been uploaded "last year" that have not been found in posts
+> **Always run `--map` before `--cleanup`.** Without mapping first, files that are genuinely in
+> use may appear orphaned and be deleted.
+
+1. Run `--map` first to rebuild file-to-post associations.
+2. Review what would be deleted by running `--cleanup` without `--force` (you will be prompted per file).
+3. Once satisfied, add `--force` for unattended runs.
+
+For ongoing maintenance, a daily cronjob is a sensible setup:
+
+```bash
+# Remove files older than 24 hours (the default) that are not in any post
+php flarum fof:upload --map --cleanup --force
+```
 
 ## Testing and Security Measures
 
