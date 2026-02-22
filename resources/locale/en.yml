@@ -98,7 +98,10 @@ fof-upload:
         title: User-provided file extensions
       watermark:
         file: Upload your watermark image
+        opacity: "Watermark opacity (0–100)"
+        padding: "Padding from edge (px)"
         position: Watermark position
+        size_percent: "Watermark size (% of image width)"
         title: Watermark images
         toggle: Watermark images
       svg-sanitizer:

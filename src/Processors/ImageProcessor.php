@@ -77,7 +77,15 @@ class ImageProcessor implements Processable
         if ($watermarkPath && $this->assetsDir->exists($watermarkPath)) {
             $fullPath = $this->assetsDir->path($watermarkPath);
             $position = $this->settings->get('fof-upload.watermarkPosition', 'bottom-right');
-            $image->place($fullPath, $position);
+            $opacity = max(0, min(100, (int) $this->settings->get('fof-upload.watermarkOpacity', 100)));
+            $sizePercent = max(1, min(100, (int) $this->settings->get('fof-upload.watermarkSizePercent', 25)));
+            $padding = max(0, (int) $this->settings->get('fof-upload.watermarkPadding', 10));
+
+            $targetWidth = (int) round($image->width() * $sizePercent / 100);
+            $watermark = $this->imageManager->read($fullPath);
+            $watermark->scale(width: $targetWidth);
+
+            $image->place($watermark, $position, $padding, $padding, $opacity);
         }
     }
 }
