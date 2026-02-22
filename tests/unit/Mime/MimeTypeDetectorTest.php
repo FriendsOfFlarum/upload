@@ -70,7 +70,7 @@ class MimeTypeDetectorTest extends TestCase
         }
 
         // A real JPEG magic-bytes header — both detectors agree on image/jpeg.
-        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0" . str_repeat("\x00", 100));
+        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0".str_repeat("\x00", 100));
 
         $mime = (new MimeTypeDetector())->forFile($path)->getMimeType();
 
@@ -81,11 +81,14 @@ class MimeTypeDetectorTest extends TestCase
     public function getMimeType_succeeds_without_fileinfo(): void
     {
         // Subclass forces fileinfoAvailable() = false regardless of server environment.
-        $detector = new class extends MimeTypeDetector {
-            public static function fileinfoAvailable(): bool { return false; }
+        $detector = new class() extends MimeTypeDetector {
+            public static function fileinfoAvailable(): bool
+            {
+                return false;
+            }
         };
 
-        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0" . str_repeat("\x00", 100));
+        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0".str_repeat("\x00", 100));
         $mime = $detector->forFile($path)->getMimeType();
 
         // Should not throw; MimeDetector library alone resolves the type.
@@ -100,17 +103,23 @@ class MimeTypeDetectorTest extends TestCase
         // the two detectors would have disagreed, no mismatch exception is raised.
         // We verify this by crafting a detector that lies about the internal MIME
         // (returns a different value than fileinfo would) while disabling fileinfo.
-        $detector = new class extends MimeTypeDetector {
-            public static function fileinfoAvailable(): bool { return false; }
+        $detector = new class() extends MimeTypeDetector {
+            public static function fileinfoAvailable(): bool
+            {
+                return false;
+            }
 
             // Force getMimeInternally() to return a fake MIME so that if the
             // cross-validation code ran it would always detect a mismatch.
             // Achieved by proxying to a known-good file but returning wrong MIME.
-            protected function getMappings(): array { return []; } // unused here
+            protected function getMappings(): array
+            {
+                return [];
+            } // unused here
         };
 
         // Any file will do — without fileinfo the result comes from MimeDetector alone.
-        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0" . str_repeat("\x00", 100));
+        $path = $this->makeTempFile("\xFF\xD8\xFF\xE0".str_repeat("\x00", 100));
 
         // Must not throw ValidationException.
         $mime = $detector->forFile($path)->getMimeType();
