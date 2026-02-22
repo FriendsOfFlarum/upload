@@ -23,10 +23,10 @@ class FormatImagePreviewTest extends TestCase
 {
     private function makeFile(string $uuid, string $baseName, string $url): File
     {
-        $file            = new File();
-        $file->uuid      = $uuid;
+        $file = new File();
+        $file->uuid = $uuid;
         $file->base_name = $baseName;
-        $file->url       = $url;
+        $file->url = $url;
 
         return $file;
     }
@@ -64,7 +64,7 @@ class FormatImagePreviewTest extends TestCase
     #[Test]
     public function sets_alt_to_base_name_when_alt_is_absent(): void
     {
-        $file      = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
@@ -75,7 +75,7 @@ class FormatImagePreviewTest extends TestCase
     #[Test]
     public function sets_alt_to_base_name_when_alt_is_empty(): void
     {
-        $file      = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg', ''));
@@ -87,7 +87,7 @@ class FormatImagePreviewTest extends TestCase
     public function sets_alt_to_base_name_when_legacy_placeholder_stored(): void
     {
         // Legacy posts (saved before the fix) have the literal string {TEXT?} stored as the alt value.
-        $file      = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg', '{TEXT?}'));
@@ -99,7 +99,7 @@ class FormatImagePreviewTest extends TestCase
     #[Test]
     public function preserves_user_supplied_alt_text(): void
     {
-        $file      = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg', 'My cat on the windowsill'));
@@ -111,7 +111,7 @@ class FormatImagePreviewTest extends TestCase
     #[Test]
     public function sets_title_to_base_name(): void
     {
-        $file      = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
         $formatter = new FormatImagePreview($this->makeRepository($file));
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
