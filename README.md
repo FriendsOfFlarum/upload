@@ -7,7 +7,7 @@ An extension that handles file uploads intelligently for your forum.
 ## Features
 
 - For images:
-  - Auto watermarks.
+  - Auto watermarks with proportional scaling, opacity and padding controls.
   - Auto resizing.
 - Mime type to upload adapter mapping.
 - Whitelisting mime types.
@@ -70,6 +70,25 @@ Each mime type row can be given an optional **Permission label** (e.g. `Images`,
 2. In the Mime Types section, enter a label in the **Permission label** field for any type you want to restrict (e.g. `Images`).
 3. Save settings — the permission appears immediately in **Admin → Permissions** under the Start section.
 4. Adjust which groups have that permission as needed.
+
+### Watermark Configuration
+
+When **Watermark images** is enabled, FoF Upload stamps every uploaded JPEG or PNG with a watermark image. Three settings let you control how the watermark looks:
+
+| Setting | Default | Description |
+|---|---|---|
+| **Watermark size (% of image width)** | `25` | The watermark is scaled so its width equals this percentage of the uploaded image's width. A value of `25` means the watermark will always be one-quarter the width of the image, regardless of upload dimensions. |
+| **Watermark opacity (0–100)** | `100` | Opacity of the placed watermark. `100` is fully opaque; `0` is invisible. |
+| **Padding from edge (px)** | `10` | Inward pixel offset from the corner or edge set by the **Position** field. Set to `0` to place the watermark flush against the edge. |
+
+**How to configure:**
+1. Go to **Admin → Extensions → FoF Upload**.
+2. Enable **Watermark images** and upload your watermark file.
+3. Choose a **Position** (e.g. `bottom-right`).
+4. Adjust size %, opacity, and padding to taste.
+5. Save — the settings are applied to every new image upload.
+
+> **Backwards compatibility:** Existing installs that used watermarks before these settings were introduced will use the defaults on next upload: 25% width, 100% opacity, 10 px padding. Set padding to `0` to restore the previous flush-edge behaviour.
 
 ### Storage Configuration
 
