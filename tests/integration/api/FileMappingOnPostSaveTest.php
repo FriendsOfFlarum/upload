@@ -162,6 +162,7 @@ class FileMappingOnPostSaveTest extends EnhancedTestCase
         $this->assertEquals(201, $response->getStatusCode(), 'Reply should succeed');
 
         $json = json_decode($response->getBody()->getContents(), true);
+
         return (int) $json['data']['id'];
     }
 
