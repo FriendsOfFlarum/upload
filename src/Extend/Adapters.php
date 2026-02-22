@@ -20,24 +20,25 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 class Adapters implements ExtenderInterface
 {
-    protected $disabling = [];
-    protected $force;
+    /** @var string[] */
+    protected array $disabling = [];
+    protected ?string $force = null;
 
-    public function disable(string $adapter)
+    public function disable(string $adapter): static
     {
         $this->disabling[] = $adapter;
 
         return $this;
     }
 
-    public function force(string $adapter)
+    public function force(string $adapter): static
     {
         $this->force = $adapter;
 
         return $this;
     }
 
-    public function extend(Container $container, ?Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null): void
     {
         /** @var Dispatcher $events */
         $events = $container->make(Dispatcher::class);

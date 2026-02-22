@@ -27,8 +27,9 @@ export default class FileManagerButton extends Component<FileManagerButtonAttrs>
   fileManagerButtonClicked(e: PointerEvent) {
     e.preventDefault();
 
-    // Open dialog
-    app.modal.show(FileManagerModal, {
+    // Note: FileManagerModal is imported synchronously to avoid chunk ID collision
+    // with Flarum core's ReplyComposer (both would get webpack chunk ID 378).
+    app.modal.show(FileManagerModal as any, {
       uploader: this.attrs.uploader,
     });
   }

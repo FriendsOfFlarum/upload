@@ -18,43 +18,47 @@ use Illuminate\Contracts\Container\Container;
 
 class SvgSanitizer implements ExtenderInterface
 {
-    protected $allowedAttrs = [];
+    /** @var string[] */
+    protected array $allowedAttrs = [];
 
-    protected $allowedTags = [];
+    /** @var string[] */
+    protected array $allowedTags = [];
 
-    protected $removeAttrs = [];
+    /** @var string[] */
+    protected array $removeAttrs = [];
 
-    protected $removeTags = [];
+    /** @var string[] */
+    protected array $removeTags = [];
 
-    public function allowAttr(string $attr): self
+    public function allowAttr(string $attr): static
     {
         $this->allowedAttrs[] = $attr;
 
         return $this;
     }
 
-    public function allowTag(string $tag): self
+    public function allowTag(string $tag): static
     {
         $this->allowedTags[] = $tag;
 
         return $this;
     }
 
-    public function removeAttr($attr): self
+    public function removeAttr(string $attr): static
     {
         $this->removeAttrs[] = $attr;
 
         return $this;
     }
 
-    public function removeTag($tag): self
+    public function removeTag(string $tag): static
     {
         $this->removeTags[] = $tag;
 
         return $this;
     }
 
-    public function extend(Container $container, ?Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null): void
     {
         $container->extend('fof.upload.sanitizer.svg_allowed_attrs', function ($items): array {
             return array_merge($items, $this->allowedAttrs);

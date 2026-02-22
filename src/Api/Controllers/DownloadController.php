@@ -15,7 +15,6 @@ namespace FoF\Upload\Api\Controllers;
 use Flarum\Http\RequestUtil;
 use Flarum\Post\PostRepository;
 use Flarum\Settings\SettingsRepositoryInterface;
-use FoF\Upload\Api\Serializers\FileSerializer;
 use FoF\Upload\Commands\Download;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Session\Session;
@@ -27,8 +26,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DownloadController implements RequestHandlerInterface
 {
-    public string $serializer = FileSerializer::class;
-
     public function __construct(
         protected Dispatcher $bus,
         protected PostRepository $posts,

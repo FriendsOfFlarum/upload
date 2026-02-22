@@ -13,8 +13,10 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\User\User;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class FileUploadTest extends EnhancedTestCase
 {
@@ -28,10 +30,12 @@ class FileUploadTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 $this->normalUser(),
             ],
         ]);
+
+        // Use default mime types (image/* with local adapter) - no need to set explicitly
     }
 
     protected function setMaxUploadSize(int $max)
@@ -39,9 +43,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->setting('fof-upload.maxFileSize', $max);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permission_can_upload_a_file()
     {
         $this->giveNormalUserUploadPermission();
@@ -55,9 +57,10 @@ class FileUploadTest extends EnhancedTestCase
             ])
         );
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody()->getContents();
+        $this->assertEquals(200, $response->getStatusCode(), 'Upload failed: '.$body);
 
-        $json = json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($body, true);
 
         $this->assertCount(1, $json['data']);
 
@@ -79,9 +82,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertFalse($file->shared);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_without_permission_cannot_upload_a_file()
     {
         $response = $this->send(
@@ -96,9 +97,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals(403, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permission_cannot_upload_an_unconfigured_file_type()
     {
         $this->giveNormalUserUploadPermission();
@@ -121,9 +120,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals('/data/attributes/upload', $json['errors'][0]['source']['pointer']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permission_can_upload_a_configured_type()
     {
         $this->addType('text\/plain', 'local', 'text-preview');
@@ -141,9 +138,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permission_cannot_upload_a_file_that_is_too_large()
     {
         $this->setMaxUploadSize(10);
@@ -153,7 +148,7 @@ class FileUploadTest extends EnhancedTestCase
             $this->request('POST', '/api/fof/upload', [
                 'authenticatedAs' => 2,
                 'multipart'       => [
-                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                    $this->uploadFile($this->fixtures('LargeFile.jpg')),
                 ],
             ])
         );
@@ -167,9 +162,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals('/data/attributes/file', $json['errors'][0]['source']['pointer']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function admin_can_upload_a_file_and_then_delete_it()
     {
         $response = $this->send(
@@ -202,9 +195,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertNull($file);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_can_upload_zip_file_when_configured()
     {
         $this->addType('application\/zip');
@@ -222,9 +213,7 @@ class FileUploadTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_can_upload_apk_file_when_configured()
     {
         $this->addType('application\/vnd.android.package-archive');

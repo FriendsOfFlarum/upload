@@ -83,6 +83,8 @@ fof-upload:
       preferences:
         max_file_size: Maximum file size (in kilobytes)
         mime_types: "Configure your mime type, upload adapter mapping"
+        mime_type_regex_placeholder: "e.g. ^image/(jpeg|png|gif)$"
+        mime_type_regex_invalid: "Invalid regex (e.g. empty alternatives like ||)"
         title: General preferences
         php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
@@ -140,8 +142,6 @@ fof-upload:
         Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
     upload_methods:
       aws-s3: S3 or Compatible
-      # TODO: Flarum 2.0 - Remove 'awss3' backward compatibility translation
-      awss3: AWS S3
       imgur: Imgur
       local: Local
       ovh-svfs: OVH SVFS

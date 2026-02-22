@@ -22,7 +22,7 @@ class AdminPayload
     ) {
     }
 
-    public function __invoke(Document $document)
+    public function __invoke(Document $document): void
     {
         $document->payload['uploadS3SetByEnv'] = $this->config->shouldUseEnv();
         $document->payload['uploadLocalCdnSetByEnv'] = $this->config->shouldUseLocalCdnEnv();

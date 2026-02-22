@@ -14,7 +14,10 @@ namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\User\User;
 use FoF\Upload\Tests\EnhancedTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class FileUploadSecurityTest extends EnhancedTestCase
 {
@@ -28,17 +31,16 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 $this->normalUser(),
             ],
         ]);
     }
 
     /**
-     * @test
-     *
      * We allow SVG due to the built in santization. Here we test that <script> tags any any external content is removed.
      */
+    #[Test]
     public function user_with_permission_can_upload_svg_containing_malicious_content_and_is_sanitized()
     {
         $this->giveNormalUserUploadPermission();
@@ -83,9 +85,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->assertStringNotContainsString('@import', $file_contents, 'SVG still contains @import in a <style> block.');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permission_can_upload_an_svg_if_safe()
     {
         $this->giveNormalUserUploadPermission();
@@ -102,7 +102,7 @@ class FileUploadSecurityTest extends EnhancedTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function MaliciousFiles(): array
+    public static function MaliciousFiles(): array
     {
         return [
             ['Polyglot.jpg'],
@@ -113,11 +113,8 @@ class FileUploadSecurityTest extends EnhancedTestCase
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider MaliciousFiles
-     */
+    #[Test]
+    #[DataProvider('MaliciousFiles')]
     public function user_with_permission_cannot_upload_malicious_files(string $fixture, ?string $allowMime = null)
     {
         $this->giveNormalUserUploadPermission();

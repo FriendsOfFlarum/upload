@@ -36,7 +36,7 @@ class Download extends AbstractModel
 
     public $timestamps = false;
 
-    protected $dates = ['downloaded_at'];
+    protected $casts = ['downloaded_at' => 'datetime'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

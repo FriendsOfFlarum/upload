@@ -1,20 +1,28 @@
 import app from 'flarum/common/app';
-import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import { IFormModalAttrs } from 'flarum/common/components/FormModal';
+import FormModal from 'flarum/common/components/FormModal';
 import Switch from 'flarum/common/components/Switch';
 import mimeToIcon from '../mimeToIcon';
 import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
-import { ApiResponsePlural } from 'flarum/common/Store';
-import File from '../models/File';
+import type { ApiPayloadPlural } from 'flarum/common/Store';
+import type File from '../models/File';
 
-interface CustomAttrs extends IInternalModalAttrs {
+type NativeFile = globalThis.File;
+
+interface CustomAttrs extends IFormModalAttrs {
   onUploadComplete: (files: File | File[]) => void;
 }
 
-export default class UploadSharedFileModal extends Modal<CustomAttrs> {
-  files = [];
-  fileInput = null;
-  options = {
+interface UploadOptions {
+  shared: boolean;
+  hidden: boolean;
+}
+
+export default class UploadSharedFileModal extends FormModal<CustomAttrs> {
+  files: NativeFile[] = [];
+  fileInput: HTMLInputElement | null = null;
+  options: UploadOptions = {
     shared: true,
     hidden: false,
   };
@@ -32,21 +40,24 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
     return app.translator.trans('fof-upload.lib.upload-shared-file-modal.title');
   }
 
-  onFileChange(e) {
-    this.addFiles(Array.from(e.target.files));
+  onFileChange(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (target.files) {
+      this.addFiles(Array.from(target.files));
+    }
   }
 
-  addFiles(newFiles: File[]) {
-    (this.files as File[]).push(...newFiles);
+  addFiles(newFiles: NativeFile[]) {
+    this.files.push(...newFiles);
     m.redraw();
   }
 
-  onDragOver(e) {
+  onDragOver(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
   }
 
-  onDrop(e) {
+  onDrop(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer && e.dataTransfer.files) {
@@ -75,24 +86,24 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
             multiple
             onchange={this.onFileChange.bind(this)}
             style={{ opacity: 0, position: 'absolute', left: '-9999px' }}
-            oncreate={(vnode) => {
-              this.fileInput = vnode.dom;
+            oncreate={(vnode: Mithril.VnodeDOM) => {
+              this.fileInput = vnode.dom as HTMLInputElement;
             }}
           />
         </div>
         <div className="UploadSharedFileModal-files">
-          {this.files.map((file: File) => {
+          {this.files.map((file: NativeFile) => {
             const isImage = file.type.startsWith('image/');
             return (
               <div className="UploadedFile">
-                {isImage ? <img src={URL.createObjectURL(file)} alt={file.name} /> : <i className={mimeToIcon(file.type)}></i>}
+                {isImage ? <img src={URL.createObjectURL(file as Blob)} alt={file.name} /> : <i className={mimeToIcon(file.type)}></i>}
                 <div className="UploadedFile-name">{file.name}</div>
                 {/* Remove button */}
                 <Button
                   className="Button Button--icon Button--link UploadedFile-remove"
                   icon="fas fa-times"
                   onclick={() => {
-                    this.files = this.files.filter((f) => f !== file);
+                    this.files = this.files.filter((f: NativeFile) => f !== file);
                   }}
                 />
               </div>
@@ -129,18 +140,18 @@ export default class UploadSharedFileModal extends Modal<CustomAttrs> {
       formData.append('files[]', file);
     });
 
-    Object.keys(this.options).forEach((key) => {
-      formData.append(`options[${key}]`, this.options[key]);
+    (Object.keys(this.options) as (keyof UploadOptions)[]).forEach((key) => {
+      formData.append(`options[${key}]`, String(this.options[key]));
     });
 
-    const results = await app.request<ApiResponsePlural<File>>({
+    const results = await app.request<ApiPayloadPlural>({
       method: 'POST',
       url: app.forum.attribute('apiUrl') + '/fof/upload',
       serialize: (raw: FormData) => raw, // Prevent mithril from trying to serialize FormData
       body: formData,
     });
 
-    const uploadedFiles = app.store.pushPayload(results);
+    const uploadedFiles = app.store.pushPayload(results) as unknown as File | File[];
 
     this.attrs.onUploadComplete(uploadedFiles);
     this.files = [];

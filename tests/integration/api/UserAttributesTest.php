@@ -14,8 +14,10 @@ namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
+use Flarum\User\User;
+use PHPUnit\Framework\Attributes\Test;
 
-class UserAttributes extends TestCase
+class UserAttributesTest extends TestCase
 {
     use RetrievesAuthorizedUsers;
 
@@ -26,18 +28,16 @@ class UserAttributes extends TestCase
         $this->extension('fof-upload');
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 $this->normalUser(),
             ],
             'fof_upload_files' => [
-                ['id' => 1, 'base_name' => 'test_file.abc', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false],
+                ['id' => 1, 'base_name' => 'test_file.abc', 'path' => 'path/test_file.abc', 'url' => 'http://localhost/test_file.abc', 'type' => 'test/file', 'size' => 123, 'upload_method' => 'local', 'actor_id' => 2, 'shared' => false, 'created_at' => '2024-01-01 00:00:00'],
             ],
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function upload_counts_are_included_when_logged_in()
     {
         $response = $this->send(
@@ -58,9 +58,7 @@ class UserAttributes extends TestCase
         $this->assertEquals(1, $json['data']['attributes']['fof-upload-uploadCountAll']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function upload_counts_are_included_when_logged_out()
     {
         $response = $this->send(
@@ -78,9 +76,7 @@ class UserAttributes extends TestCase
         $this->assertEquals(1, $json['data']['attributes']['fof-upload-uploadCountAll']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_with_permissions_have_extra_attributes()
     {
         $response = $this->send(
@@ -101,9 +97,7 @@ class UserAttributes extends TestCase
         $this->assertArrayHasKey('fof-upload-deleteOthersMediaLibrary', $json['data']['attributes']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_without_permissions_dont_have_extra_attributes()
     {
         $response = $this->send(
@@ -124,9 +118,7 @@ class UserAttributes extends TestCase
         $this->assertArrayNotHasKey('fof-upload-deleteOthersMediaLibrary', $json['data']['attributes']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function current_user_does_not_have_upload_shared_file_permission_attribute_when_no_permission()
     {
         $response = $this->send(
@@ -146,9 +138,7 @@ class UserAttributes extends TestCase
         $this->assertArrayNotHasKey('fof-upload-uploadSharedFiles', $json['data']['attributes']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function current_user_has_upload_shared_file_permission_attribute_when_has_permission()
     {
         $response = $this->send(

@@ -12,44 +12,41 @@
 
 namespace FoF\Upload\Adapters;
 
+use Flarum\Http\UrlGenerator;
+use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Driver\Config as UploadConfig;
 use FoF\Upload\File;
 use Illuminate\Support\Arr;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Config;
+use League\Flysystem\FilesystemAdapter;
 
 /**
  * @method hostName() This is only available on the AWS S3 adapter at present.
  */
 class AwsS3 extends Flysystem implements UploadAdapter
 {
-    protected AdapterInterface $adapter;
+    protected FilesystemAdapter $adapter;
 
     public function __construct(
-        AdapterInterface $adapter,
-        $settings,
-        $url,
-        protected ?UploadConfig $uploadConfig = null
+        FilesystemAdapter $adapter,
+        SettingsRepositoryInterface $settings,
+        UrlGenerator $url,
+        protected ?UploadConfig $uploadConfig = null,
+        protected ?string $bucket = null,
+        protected ?string $region = null
     ) {
         parent::__construct($adapter, $settings, $url);
     }
 
     /**
      * Get the configuration settings for the S3 adapter.
-     *
-     * @return Config
      */
     protected function getConfig(): Config
     {
-        $config = new Config();
         $acl = $this->uploadConfig ? $this->uploadConfig->getS3Acl() : $this->settings->get('fof-upload.awsS3ACL');
-        if ($acl) {
-            $config->set('ACL', $acl);
-        }
 
-        return $config;
+        return $acl ? (new Config())->extend(['ACL' => $acl]) : new Config();
     }
 
     /**
@@ -87,14 +84,11 @@ class AwsS3 extends Flysystem implements UploadAdapter
             return (string) $cdnUrl;
         }
 
-        // Ensure that $this->adapter is an instance of AwsS3Adapter
-        if ($this->adapter instanceof AwsS3Adapter) {
-            $region = $this->adapter->getClient()->getRegion();
-            $bucket = $this->adapter->getBucket();
-
-            return sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
+        // Use bucket and region passed from Manager
+        if ($this->bucket !== null && $this->region !== null) {
+            return sprintf('https://%s.s3.%s.amazonaws.com', $this->bucket, $this->region ?: 'us-east-1');
         }
 
-        throw new \RuntimeException('Expected adapter to be an instance of AwsS3Adapter, got '.get_class($this->adapter));
+        throw new \RuntimeException('AwsS3 adapter requires bucket and region for URL generation');
     }
 }

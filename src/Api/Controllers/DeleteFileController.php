@@ -20,6 +20,13 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * @TODO: Remove this in favor of one of the API resource classes that were added.
+ *      Or extend an existing API Resource to add this to.
+ *      Or use a vanilla RequestHandlerInterface controller.
+ *
+ *      @link https://docs.flarum.org/2.x/extend/api#endpoints
+ */
 class DeleteFileController extends AbstractDeleteController
 {
     public function __construct(
@@ -27,12 +34,13 @@ class DeleteFileController extends AbstractDeleteController
     ) {
     }
 
-    public function delete(ServerRequestInterface $request): void
+    protected function delete(ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
 
         $uuid = Arr::get($request->getQueryParams(), 'uuid');
 
+        /** @var File $file */
         $file = File::byUuid($uuid)->firstOrFail();
 
         $this->bus->dispatch(

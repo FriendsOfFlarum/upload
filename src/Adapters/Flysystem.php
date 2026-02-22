@@ -17,19 +17,20 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
-use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Flysystem implements UploadAdapter
 {
     /**
-     * @var array|false
+     * @var array
      */
     protected $meta;
 
     public function __construct(
-        protected AdapterInterface $adapter,
+        protected FilesystemAdapter $adapter,
         protected SettingsRepositoryInterface $settings,
         protected UrlGenerator $url
     ) {
@@ -62,13 +63,13 @@ abstract class Flysystem implements UploadAdapter
             $method = 'writeStream';
         }
 
-        $meta = $this->adapter->{$method}($file->path, $contents, $this->getConfig());
-
-        if (!$meta) {
+        try {
+            $this->adapter->{$method}($file->path, $contents, $this->getConfig());
+        } catch (FilesystemException $e) {
             return false;
         }
 
-        $this->meta = $meta;
+        $this->meta = ['path' => $file->path];
 
         $this->generateUrl($file);
 
@@ -98,11 +99,13 @@ abstract class Flysystem implements UploadAdapter
      */
     public function delete(File $file)
     {
-        if ($this->adapter->delete($file->path)) {
-            return $file;
-        }
+        try {
+            $this->adapter->delete($file->path);
 
-        return false;
+            return $file;
+        } catch (FilesystemException $e) {
+            return false;
+        }
     }
 
     /**

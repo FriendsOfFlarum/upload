@@ -1,35 +1,52 @@
 import app from 'flarum/admin/app';
-import Modal from 'flarum/common/components/Modal';
+import FormModal from 'flarum/common/components/FormModal';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import Link from 'flarum/common/components/Link';
+import type Mithril from 'mithril';
 
-export default class InspectMimeModal extends Modal {
-  oninit(vnode) {
+interface InspectionResult {
+  laravel_validation?: boolean;
+  laravel_validation_error?: string;
+  mime_detector?: string;
+  php_mime?: string;
+  guessed_extension?: string;
+}
+
+export default class InspectMimeModal extends FormModal {
+  uploading = false;
+  inspection: InspectionResult = {};
+
+  oninit(vnode: Mithril.Vnode<Record<string, never>, this>) {
     super.oninit(vnode);
 
     this.uploading = false;
     this.inspection = {};
   }
 
-  className() {
+  className(): string {
     return 'Modal--small fof-upload-inspect-mime-modal';
   }
 
-  title() {
-    return app.translator.trans('fof-upload.admin.inspect-mime.title');
+  title(): string {
+    return app.translator.trans('fof-upload.admin.inspect-mime.title') as string;
   }
 
-  content() {
+  content(): Mithril.Children {
     return (
       <div className="Modal-body">
         <p>
           {app.translator.trans('fof-upload.admin.inspect-mime.description', {
-            a: <a href="https://github.com/SoftCreatR/php-mime-detector"></a>,
+            a: (
+              <Link href="https://github.com/SoftCreatR/php-mime-detector" external={true} target="_blank">
+                PHP Mime Detector
+              </Link>
+            ),
           })}
         </p>
         <p>{app.translator.trans('fof-upload.admin.inspect-mime.select')}</p>
         <div>
-          <input type="file" onchange={this.onupload.bind(this)} disabled={this.uploading} />
-          {this.uploading ? LoadingIndicator.component() : null}
+          <input type="file" onchange={(e: Event) => this.onupload(e)} disabled={this.uploading} />
+          {this.uploading ? <LoadingIndicator /> : null}
         </div>
         <dl>
           <dt>{app.translator.trans('fof-upload.admin.inspect-mime.laravel-validation')}</dt>
@@ -79,28 +96,30 @@ export default class InspectMimeModal extends Modal {
     );
   }
 
-  onupload(event) {
+  onupload(event: Event): void {
+    const target = event.target as HTMLInputElement;
     const body = new FormData();
 
-    for (let i = 0; i < event.target.files.length; i++) {
-      body.append('files[]', event.target.files[i]);
+    for (let i = 0; i < target.files!.length; i++) {
+      body.append('files[]', target.files![i]);
     }
 
     this.uploading = true;
 
-    return app
+    app
       .request({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/fof/upload/inspect-mime',
-        serialize: (raw) => raw,
+        serialize: (raw: FormData) => raw,
         body,
       })
-      .then((result) => {
+      .then((result: unknown) => {
+        const inspection = result as InspectionResult;
         this.uploading = false;
-        this.inspection = result;
+        this.inspection = inspection;
         m.redraw();
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         this.uploading = false;
         this.inspection = {};
         m.redraw();

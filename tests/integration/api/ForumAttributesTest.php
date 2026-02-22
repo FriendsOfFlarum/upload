@@ -13,6 +13,7 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Testing\integration\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ForumAttributesTest extends TestCase
 {
@@ -23,9 +24,7 @@ class ForumAttributesTest extends TestCase
         $this->extension('fof-upload');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function upload_attributes_are_added_to_forum()
     {
         $response = $this->send(
@@ -44,9 +43,7 @@ class ForumAttributesTest extends TestCase
         $this->assertArrayHasKey('fof-upload.composerButtonVisiblity', $json['data']['attributes']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function forum_frontend_is_alive()
     {
         $response = $this->send(

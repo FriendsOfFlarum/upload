@@ -52,7 +52,7 @@ class File extends AbstractModel
     protected $casts = [
         'hidden'                  => 'boolean',
         'shared'                  => 'boolean',
-        'created_at'              => 'datetime',
+        'created_at'              => \FoF\Upload\Casts\FlexibleDateTime::class,
     ];
 
     protected $fillable = [
@@ -92,22 +92,22 @@ class File extends AbstractModel
             ->where('url', $url);
     }
 
-    public function actor()
+    public function actor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');
     }
 
-    public function posts()
+    public function posts(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'fof_upload_file_posts');
     }
 
-    public function downloads()
+    public function downloads(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Download::class);
     }
 
-    public function setUploadMethodAttribute(string|UploadAdapter $value)
+    public function setUploadMethodAttribute(string|UploadAdapter $value): void
     {
         if (is_object($value) && in_array(UploadAdapter::class, class_implements($value))) {
             $value = Str::snake(last(explode('\\', get_class($value))));
@@ -116,7 +116,7 @@ class File extends AbstractModel
         $this->attributes['upload_method'] = $value;
     }
 
-    public function setTagAttribute(Template $template)
+    public function setTagAttribute(Template $template): void
     {
         $this->attributes['tag'] = $template->tag();
     }
@@ -129,8 +129,9 @@ class File extends AbstractModel
     public function human_filesize(string $bytes, int $decimals = 0): string
     {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
+        $factor = (int) floor((strlen($bytes) - 1) / 3);
+        $factor = max(0, min($factor, count($size) - 1));
 
-        return sprintf("%.{$decimals}f", (int) $bytes / pow(1024, $factor)).@$size[$factor];
+        return sprintf("%.{$decimals}f", (int) $bytes / pow(1024, $factor)).$size[$factor];
     }
 }

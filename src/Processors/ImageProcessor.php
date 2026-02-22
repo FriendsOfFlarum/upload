@@ -17,22 +17,19 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Contracts\Processable;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
-use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Filesystem\Factory;
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageProcessor implements Processable
 {
-    /**
-     * @var Cloud
-     */
-    protected $assetsDir;
+    protected \Illuminate\Contracts\Filesystem\Filesystem $assetsDir;
 
     public function __construct(
         protected SettingsRepositoryInterface $settings,
+        protected ImageManager $imageManager,
         Factory $factory
     ) {
         $this->assetsDir = $factory->disk('flarum-assets');
@@ -40,10 +37,10 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
-        if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
+        if ($mimeType === 'image/jpeg' || $mimeType === 'image/png') {
             try {
-                $image = (new ImageManager())->make($upload->getRealPath());
-            } catch (NotReadableException $e) {
+                $image = $this->imageManager->read($upload->getRealPath());
+            } catch (RuntimeException $e) {
                 throw new ValidationException(['upload' => 'Corrupted image']);
             }
 
@@ -55,41 +52,32 @@ class ImageProcessor implements Processable
                 $this->watermark($image);
             }
 
-            $image->orientate();
+            $image->orient();
+
+            $encoded = $mimeType === 'image/jpeg'
+                ? $image->toJpeg(quality: 90)
+                : $image->toPng();
 
             @file_put_contents(
                 $upload->getRealPath(),
-                $image->encode($mimeType)
+                $encoded->toString()
             );
         }
     }
 
-    /**
-     * @param Image $manager
-     */
-    protected function resize(Image $manager)
+    protected function resize(ImageInterface $image): void
     {
         $maxSize = $this->settings->get('fof-upload.resizeMaxWidth', Util::DEFAULT_MAX_IMAGE_WIDTH);
-        $manager->resize(
-            $maxSize,
-            $maxSize,
-            function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            }
-        );
+        $image->scaleDown(width: $maxSize, height: $maxSize);
     }
 
-    /**
-     * @param Image $image
-     */
-    protected function watermark(Image $image)
+    protected function watermark(ImageInterface $image): void
     {
-        if ($this->settings->get('fof-watermark_path')) {
-            $image->insert(
-                $this->assetsDir->get($this->settings->get('fof-watermark_path')),
-                $this->settings->get('fof-upload.watermarkPosition', 'bottom-right')
-            );
+        $watermarkPath = $this->settings->get('fof-watermark_path');
+        if ($watermarkPath && $this->assetsDir->exists($watermarkPath)) {
+            $fullPath = $this->assetsDir->path($watermarkPath);
+            $position = $this->settings->get('fof-upload.watermarkPosition', 'bottom-right');
+            $image->place($fullPath, $position);
         }
     }
 }

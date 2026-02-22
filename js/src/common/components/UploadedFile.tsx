@@ -4,7 +4,7 @@ import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
 import mimeToIcon from '../mimeToIcon';
 import File from '../models/File';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import app from 'flarum/common/app';
 import classList from 'flarum/common/utils/classList';
 
@@ -37,7 +37,7 @@ export default class UploadedFile extends Component<CustomAttrs> {
       <div className="UploadedFile" key={this.file.uuid()}>
         <div className="UploadedFile--sharestatus">
           <span>
-            {icon(statusIcon)}
+            <Icon name={statusIcon} />
             {this.file.baseName()}
           </span>
         </div>
@@ -53,10 +53,10 @@ export default class UploadedFile extends Component<CustomAttrs> {
                 alt={this.file.baseName()}
               />
             ) : (
-              icon(errorIcon, { className: 'icon-fallback' }) // Error icon for failed image load
+              <Icon name={errorIcon} className="icon-fallback" />
             )
           ) : (
-            icon(fileIcon, { className: 'icon-fallback' }) // Icon representing the file type
+            <Icon name={fileIcon} className="icon-fallback" />
           )}
         </div>
         <div className="UploadedFile--actions">{this.actionItems().toArray()}</div>

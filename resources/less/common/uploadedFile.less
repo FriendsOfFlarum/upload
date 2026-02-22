@@ -2,9 +2,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: @body-bg; // Using Flarum's body background color
-    border-radius: @border-radius; // Using Flarum's border radius
-    box-shadow: 0 2px 4px @shadow-color; // Using Flarum's shadow color
+    background: var(--body-bg); // Using Flarum's body background color
+    border-radius: var(--border-radius); // Using Flarum's border radius
+    box-shadow: 0 2px 4px var(--shadow-color); // Using Flarum's shadow color
     padding: 15px;
     margin-bottom: 16px; // Consistent with the grid gap
 }
@@ -14,7 +14,7 @@
     width: 100%;
     height: 150px;
     object-fit: cover;
-    border-radius: @border-radius;
+    border-radius: var(--border-radius);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,13 +25,21 @@
     margin-top: 10px;
     .Button {
         margin: 0 4px;
-        background-color: @control-bg; // Control background for buttons
-        color: @control-color; // Control text color for buttons
+        background-color: var(--control-bg); // Control background for buttons
+        color: var(--control-color); // Control text color for buttons
         border: none;
 
         &:hover,
         &:focus {
-            background-color: darken(@control-bg, 10%); // Darken on hover/focus
+            background-color: var(--control-bg-darken-10); // Darken on hover/focus
         }
     }
+}
+
+
+[data-theme^=light] {
+  --control-bg-darken-10: darken(@control-bg-light, 10%);
+}
+[data-theme^=dark] {
+  --control-bg-darken-10: darken(@control-bg-dark, 10%);
 }

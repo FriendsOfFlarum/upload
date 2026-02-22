@@ -25,17 +25,17 @@ class CreateStorageFolder implements ExtenderInterface, LifecycleInterface
     ) {
     }
 
-    public function onEnable(Container $container, Extension $extension)
+    public function onEnable(Container $container, Extension $extension): void
     {
         @mkdir($container->make(Paths::class)->storage.DIRECTORY_SEPARATOR.$this->path);
     }
 
-    public function onDisable(Container $container, Extension $extension)
+    public function onDisable(Container $container, Extension $extension): void
     {
         // Nee, no, nein, nada, pas de rein.
     }
 
-    public function extend(Container $container, ?Extension $extension = null)
+    public function extend(Container $container, ?Extension $extension = null): void
     {
         // TODO: Clark thinks that this line should be removed.
         // Debating with him is tiring, because he's right.

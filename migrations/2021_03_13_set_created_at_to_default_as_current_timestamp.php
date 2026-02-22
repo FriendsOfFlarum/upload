@@ -16,7 +16,7 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         $schema->table('fof_upload_files', function (Blueprint $table) {
-            $table->dateTime('created_at')->default('CURRENT_TIMESTAMP')->change();
+            $table->dateTime('created_at')->useCurrent()->change();
         });
     },
     'down' => function (Builder $schema) {

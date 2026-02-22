@@ -3,20 +3,30 @@ import Component from 'flarum/common/Component';
 import TextEditorButton from 'flarum/common/components/TextEditorButton';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
+import type Uploader from '../handler/Uploader';
+import type Mithril from 'mithril';
 
-export default class UploadButton extends Component {
-  oninit(vnode) {
+interface UploadButtonAttrs {
+  uploader: Uploader;
+  disabled?: boolean;
+  isMediaUploadButton?: boolean;
+}
+
+export default class UploadButton extends Component<UploadButtonAttrs> {
+  isMediaUploadButton = false;
+
+  oninit(vnode: Mithril.Vnode<UploadButtonAttrs, this>) {
     super.oninit(vnode);
 
     this.attrs.uploader.on('uploaded', () => {
-      // reset the button for a new upload
-      this.$('form')[0].reset();
-
-      // redraw to reflect uploader.loading in the DOM
+      const form = this.$('form')[0] as HTMLFormElement | undefined;
+      if (form) {
+        form.reset();
+      }
       m.redraw();
     });
 
-    this.isMediaUploadButton = vnode.attrs.isMediaUploadButton || false;
+    this.isMediaUploadButton = vnode.attrs.isMediaUploadButton ?? false;
   }
 
   view() {
@@ -48,33 +58,15 @@ export default class UploadButton extends Component {
     );
   }
 
-  /**
-   * Process the upload event.
-   *
-   * @param e
-   */
-  process(e) {
-    // get the file from the input field
-    const files = this.$('input').prop('files');
-
-    if (files.length === 0) {
-      // We've got no files to upload, so trying
-      // to begin an upload will show an error
-      // to the user.
+  process(_e: Event): void {
+    const files = this.$('input').prop('files') as FileList | undefined;
+    if (!files || files.length === 0) {
       return;
     }
-
     this.attrs.uploader.upload(files, !this.isMediaUploadButton);
   }
 
-  /**
-   * Event handler for upload button being clicked
-   *
-   * @param {PointerEvent} e
-   */
-  uploadButtonClicked(e) {
-    // Trigger click on hidden input element
-    // (Opens file dialog)
+  uploadButtonClicked(_e: PointerEvent): void {
     this.$('input').click();
   }
 }

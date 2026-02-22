@@ -27,7 +27,7 @@ class UploadValidator extends AbstractValidator
         ];
     }
 
-    public function getMessages()
+    public function getMessages(): array
     {
         return [
             'max' => $this->translator->trans('fof-upload.forum.validation.max_size', [

@@ -52,7 +52,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: fade(@control-bg, 90%);
+        background: var(--control-bg-fade-90);
         z-index: 5;
         transition: opacity 150ms ease-in-out;
         pointer-events: none;
@@ -110,4 +110,12 @@
     margin-left: -25px;
     margin-right: -25px;
     padding-top: 25px;
+}
+
+
+[data-theme^=light] {
+  --control-bg-fade-90: fade(@control-bg-light, 90%);
+}
+[data-theme^=dark] {
+  --control-bg-fade-90: fade(@control-bg-dark, 90%);
 }

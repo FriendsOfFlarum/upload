@@ -35,8 +35,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
@@ -68,23 +68,22 @@ class FileRepository
         return File::query();
     }
 
-    /**
-     * @param $uuid
-     *
-     * @return File|null
-     */
-    public function findByUuid($uuid)
+    public function findByUuid(string $uuid): ?File
     {
-        return File::byUuid($uuid)
+        $file = File::byUuid($uuid)
             ->with('downloads')
             ->first();
+
+        return $file instanceof File ? $file : null;
     }
 
-    public function findByUrl($url)
+    public function findByUrl(string $url): ?File
     {
-        return File::byUrl($url)
+        $file = File::byUrl($url)
             ->with('downloads')
             ->first();
+
+        return $file instanceof File ? $file : null;
     }
 
     public function createFileFromUpload(
@@ -149,7 +148,7 @@ class FileRepository
         return $file;
     }
 
-    protected function handleUploadError($code): void
+    protected function handleUploadError(int $code): void
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
@@ -174,8 +173,10 @@ class FileRepository
     public function removeFromTemp(Upload $file): bool
     {
         $filesystem = $this->getTempFilesystem($file->getPath());
-        if ($filesystem->has($file->getBasename())) {
-            return $filesystem->delete($file->getBasename());
+        if ($filesystem->fileExists($file->getBasename())) {
+            $filesystem->delete($file->getBasename());
+
+            return true;
         }
 
         return true;
@@ -183,7 +184,7 @@ class FileRepository
 
     protected function getTempFilesystem(string $path): Filesystem
     {
-        return new Filesystem(new Local($path));
+        return new Filesystem(new LocalFilesystemAdapter($path));
     }
 
     public function determineExtension(Upload $upload): string
@@ -215,6 +216,9 @@ class FileRepository
         );
     }
 
+    /**
+     * @return resource|string
+     */
     public function readUpload(Upload $upload, ?UploadAdapter $adapter = null)
     {
         $filesystem = $this->getTempFilesystem($upload->getPath());
