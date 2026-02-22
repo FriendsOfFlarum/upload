@@ -54,6 +54,9 @@
         "flarum/testing": "^2.0.0"
     },
     "extra": {
+        "branch-alias": {
+            "dev-2.x": "2.x-dev"
+        },
         "flarum-extension": {
             "title": "FoF Upload",
             "category": "feature",
