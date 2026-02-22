@@ -34,7 +34,7 @@
     "require": {
         "ext-json": "*",
         "enshrined/svg-sanitize": "^0",
-        "flarum/core": ">=2.0.0 <2.1",
+        "flarum/core": "^2.0.0",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
         "softcreatr/php-mime-detector": "^4.0"
