@@ -49,7 +49,7 @@ class AddAvailableOptionsInAdmin
             if (in_array($slug, $seeded, true)) {
                 continue;
             }
-            Permission::insert(['permission' => 'fof-upload.upload-mime.' . $slug, 'group_id' => Group::MEMBER_ID]);
+            Permission::insert(['permission' => 'fof-upload.upload-mime.'.$slug, 'group_id' => Group::MEMBER_ID]);
             $seeded[] = $slug;
             $newlySeeded = true;
         }
