@@ -73,7 +73,7 @@ class BackfillImageDimensionsCommand extends Command
                     $imageData = $response->getBody()->getContents();
                     $image = $imageManager->read($imageData);
 
-                    $file->image_width  = $image->width();
+                    $file->image_width = $image->width();
                     $file->image_height = $image->height();
                     $file->save();
 
