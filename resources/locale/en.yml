@@ -194,6 +194,7 @@ fof-upload:
   api:
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.
+      mime_permission_denied: You don't have permission to upload this file type.
       unsupported_type: "Upload adapter does not support the provided mime type: {mime}."
       could_not_detect_mime: Could not detect the MIME type of this file, please try again.
       max_upload_file_size_ini: Upload max filesize limit reached from php.ini.

@@ -174,7 +174,7 @@ class MimePermissionTest extends EnhancedTestCase
         $this->grantPermission('fof-upload.upload');
         // mime-specific permission NOT granted
 
-        $this->assertEquals(403, $this->uploadImage()->getStatusCode());
+        $this->assertEquals(422, $this->uploadImage()->getStatusCode());
     }
 
     #[Test]
@@ -255,7 +255,7 @@ class MimePermissionTest extends EnhancedTestCase
 
         // Text upload should be denied
         $this->assertEquals(
-            403,
+            422,
             $this->uploadText()->getStatusCode(),
             'Text upload should fail without document permission'
         );
@@ -278,7 +278,7 @@ class MimePermissionTest extends EnhancedTestCase
 
         // Image upload should be denied
         $this->assertEquals(
-            403,
+            422,
             $this->uploadImage()->getStatusCode(),
             'Image upload should fail without image permission'
         );
@@ -345,7 +345,7 @@ class MimePermissionTest extends EnhancedTestCase
 
         // Image (restricted) should still be denied
         $this->assertEquals(
-            403,
+            422,
             $this->uploadImage()->getStatusCode(),
             'Image upload should still require mime permission'
         );
