@@ -13,6 +13,7 @@
 namespace FoF\Upload\Tests\integration\api;
 
 use Carbon\Carbon;
+use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
@@ -240,6 +241,20 @@ class FileRepositoryTest extends EnhancedTestCase
         return File::byUuid($uuid)->with('posts')->firstOrFail();
     }
 
+    /**
+     * Create a real (empty) file on disk so the local adapter's delete() succeeds.
+     * The local adapter root is {public}/assets/files, and File::path is relative to that.
+     */
+    private function createPhysicalFile(string $relativePath): void
+    {
+        $root = $this->app()->getContainer()->make(Paths::class)->public.'/assets/files';
+        $full = $root.'/'.$relativePath;
+        if (!is_dir(dirname($full))) {
+            mkdir(dirname($full), 0755, true);
+        }
+        file_put_contents($full, '');
+    }
+
     // -------------------------------------------------------------------------
     // matchPosts() — bulk CLI remapping
     // -------------------------------------------------------------------------
@@ -448,6 +463,9 @@ class FileRepositoryTest extends EnhancedTestCase
      */
     public function cleanup_deletes_old_orphaned_file(): void
     {
+        // The local adapter calls Flysystem delete() which requires the file to exist on disk.
+        $this->createPhysicalFile('files/orphan.jpg');
+
         // Map first so that files 1 and 2 get linked to their posts.
         // Only file 3 (UUID_NEITHER_IN_CONTENT) remains unlinked.
         $repo = $this->repo();
@@ -524,6 +542,8 @@ class FileRepositoryTest extends EnhancedTestCase
      */
     public function cleanup_with_null_confirm_deletes_silently(): void
     {
+        $this->createPhysicalFile('files/orphan.jpg');
+
         $repo = $this->repo();
         $repo->matchPosts();
 
@@ -547,6 +567,10 @@ class FileRepositoryTest extends EnhancedTestCase
     {
         // Before the fix: matchPosts() never matched FileTemplate files (URL not in content),
         // so cleanUp() treated them as orphans and deleted them.
+        // Create physical files so the adapter can actually attempt deletion.
+        $this->createPhysicalFile('files/orphan.jpg');
+        $this->createPhysicalFile('files/archive.zip');
+
         $this->repo()->matchPosts();
 
         $before = Carbon::now()->addYears(200);
@@ -564,6 +588,8 @@ class FileRepositoryTest extends EnhancedTestCase
      */
     public function map_then_cleanup_only_deletes_genuinely_orphaned_files(): void
     {
+        $this->createPhysicalFile('files/orphan.jpg');
+
         $this->repo()->matchPosts();
 
         $before = Carbon::parse(self::FUTURE_DATE)->subYear();
