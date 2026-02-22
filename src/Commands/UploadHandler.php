@@ -72,6 +72,12 @@ class UploadHandler
                 $this->files->sanitizeSvg($upload, $mime);
 
                 $mimeConfiguration = $this->util->getMimeConfiguration($mime);
+
+                $mimePermSlug = Arr::get($mimeConfiguration, 'permission_slug');
+                if ($mimePermSlug) {
+                    $command->actor->assertCan('fof-upload.upload-mime.' . $mimePermSlug);
+                }
+
                 $adapter = $this->util->getAdapter(Arr::get($mimeConfiguration, 'adapter'));
                 $template = $this->util->getTemplate(Arr::get($mimeConfiguration, 'template', 'file'));
 

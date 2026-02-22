@@ -176,6 +176,20 @@ class Util
         return $template ? $template->preview($file) : null;
     }
 
+    /**
+     * @return Collection
+     */
+    public function getMimePermissions(): Collection
+    {
+        return $this->getMimeTypesConfiguration()
+            ->filter(fn ($config) => !empty(Arr::get($config, 'permission_label')))
+            ->map(fn ($config) => [
+                'label' => Arr::get($config, 'permission_label'),
+                'slug'  => Arr::get($config, 'permission_slug'),
+            ])
+            ->values();
+    }
+
     public function isPrivateShared(File $model): bool
     {
         return $model->shared && $model->hidden;
