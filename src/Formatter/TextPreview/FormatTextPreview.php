@@ -43,6 +43,10 @@ class FormatTextPreview
             $snippet = '';
 
             if ($file) {
+                if ($fileUrl = $this->files->getUrlForFile($file)) {
+                    $attributes['url'] = $fileUrl;
+                }
+
                 $response = $this->downloader->download($file);
                 if ($response->getStatusCode() === 200) {
                     $file_contents = $response->getBody()->getContents();
