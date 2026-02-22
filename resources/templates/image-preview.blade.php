@@ -1,1 +1,1 @@
-<img class="FoFUpload--Upl-Image-Preview" src="{@url}" title="{@title}" alt="{@alt}" data-id="{@uuid}" loading="lazy" width="{@width}" height="{@height}"/>
+<a href="{@url}" target="_blank" rel="noopener noreferrer" class="FoFUpload--Upl-Image-Preview-Link"><img class="FoFUpload--Upl-Image-Preview" src="{@thumbnail_url}" title="{@title}" alt="{@alt}" data-id="{@uuid}" loading="lazy" width="{@width}" height="{@height}"/></a>

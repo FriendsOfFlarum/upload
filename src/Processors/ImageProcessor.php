@@ -69,6 +69,30 @@ class ImageProcessor implements Processable
         // Store dimensions so the browser can reserve layout space before the image loads.
         $file->image_width = $image->width();
         $file->image_height = $image->height();
+
+        // Generate a downscaled thumbnail for faster page loads.
+        // Re-read from the already-processed temp file to get a clean copy for scaling.
+        if ($this->settings->get('fof-upload.generateThumbnails', true)) {
+            $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth', 1000));
+            $thumb = $this->imageManager->read($upload->getRealPath());
+            $thumb->scaleDown(width: $maxWidth);
+
+            $useWebp = (bool) $this->settings->get('fof-upload.thumbnailWebp', true);
+            $thumbEncoded = $useWebp
+                ? $thumb->toWebp(quality: 80)
+                : match ($mimeType) {
+                    'image/jpeg' => $thumb->toJpeg(quality: 80),
+                    'image/gif'  => $thumb->toGif(),
+                    default      => $thumb->toPng(),
+                };
+
+            $file->thumbnailContent = $thumbEncoded->toString();
+            $file->thumbnailExtension = $useWebp ? 'webp' : match ($mimeType) {
+                'image/jpeg' => 'jpg',
+                'image/gif'  => 'gif',
+                default      => 'png',
+            };
+        }
     }
 
     protected function resize(ImageInterface $image): void

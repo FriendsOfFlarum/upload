@@ -39,6 +39,10 @@ fof-upload:
         By default Upload will choose a safe file extension based on the MIME type.
         For some file types based around ZIP or binary data this can result in generic extensions being used instead of the expected one.
         Here you can enter a comma-separated list of file extensions that will be kept verbatim.
+      thumbnails: |
+        Generate a downscaled thumbnail for images at upload time. The thumbnail is shown inline;
+        clicking it opens the original full-resolution file in a new tab. Thumbnails significantly
+        reduce bandwidth and page weight for forums with many large images.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
       s3_compatible_storage: |
@@ -96,6 +100,11 @@ fof-upload:
         toggle: Resize images
       client_extension:
         title: User-provided file extensions
+      thumbnails:
+        title: Image thumbnails
+        toggle: Generate thumbnails on upload
+        webp_toggle: "Encode thumbnails as WebP (recommended, ~30% smaller)"
+        max_width: Thumbnail max width (px)
       watermark:
         file: Upload your watermark image
         opacity: "Watermark opacity (0–100)"

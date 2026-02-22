@@ -37,6 +37,13 @@ class FormatImagePreviewTest extends TestCase
         $repo->method('findByUuid')->willReturn($file);
         $repo->method('findByUrl')->willReturn($file);
         $repo->method('getUrlForFile')->willReturn($file->url);
+        // Return the thumbnail URL derived from thumbnail_path, or null when absent —
+        // mirroring FileRepository::getThumbnailUrlForFile() which uses thumbnail_path.
+        $repo->method('getThumbnailUrlForFile')->willReturnCallback(
+            fn (File $f) => $f->thumbnail_path
+                ? 'https://example.com/'.ltrim(str_replace('.jpg', '-thumb.webp', $f->thumbnail_path), '/')
+                : null
+        );
 
         return $repo;
     }
@@ -160,5 +167,32 @@ class FormatImagePreviewTest extends TestCase
 
         $this->assertStringNotContainsString('width="1', $result);
         $this->assertStringNotContainsString('height="1', $result);
+    }
+
+    #[Test]
+    public function injects_thumbnail_url_derived_from_thumbnail_path(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        // thumbnail_path is the persistent field; getThumbnailUrlForFile() derives the URL from it.
+        $file->thumbnail_path = '2026-02-22/1234-photo-thumb.webp';
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringContainsString('thumbnail_url="', $result);
+        $this->assertStringNotContainsString('thumbnail_url="https://example.com/photo.jpg"', $result);
+    }
+
+    #[Test]
+    public function falls_back_to_main_url_as_thumbnail_url_when_no_thumbnail(): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        // thumbnail_path is null — getThumbnailUrlForFile() returns null → formatter falls back to url.
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        // thumbnail_url should be set to the main URL as fallback
+        $this->assertStringContainsString('thumbnail_url="https://example.com/photo.jpg"', $result);
     }
 }
