@@ -58,10 +58,17 @@ export default function addUploadButton(): void {
     if (dragAndDropTarget) {
       this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), dragAndDropTarget);
     }
+  });
+
+  // PasteClipboard must be attached in onbuild, not oncreate.
+  // The .TextEditor-editor element (the textarea) is created by BasicEditorDriver
+  // inside onbuild() — it does not exist yet when oncreate runs.
+  extend(TextEditor.prototype, 'onbuild', function (this: any) {
+    if (!app.forum.attribute('fof-upload.canUpload')) return;
 
     const editorEl = this.$('.TextEditor-editor')[0];
     if (editorEl) {
-      new PasteClipboard((files) => this.uploader.upload(files), editorEl);
+      this.fofPasteClipboard = new PasteClipboard((files) => this.uploader.upload(files), editorEl);
     }
   });
 
