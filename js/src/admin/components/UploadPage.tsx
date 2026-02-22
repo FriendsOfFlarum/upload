@@ -96,6 +96,9 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       'composerButtonVisiblity',
       'watermark',
       'watermarkPosition',
+      'watermarkSizePercent',
+      'watermarkOpacity',
+      'watermarkPadding',
       'imgurClientId',
       'awsS3Key',
       'awsS3Secret',
@@ -361,6 +364,41 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                     options={this.watermarkPositions}
                     onchange={this.values.watermarkPosition}
                     value={this.values.watermarkPosition() || 'bottom-right'}
+                  />
+                </div>
+                <div className="Form-group">
+                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.size_percent')}</label>
+                  <input
+                    className="FormControl"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={this.values.watermarkSizePercent() ?? 25}
+                    oninput={withAttr('value', this.values.watermarkSizePercent)}
+                    disabled={!this.values.addsWatermarks()}
+                  />
+                </div>
+                <div className="Form-group">
+                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.opacity')}</label>
+                  <input
+                    className="FormControl"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={this.values.watermarkOpacity() ?? 100}
+                    oninput={withAttr('value', this.values.watermarkOpacity)}
+                    disabled={!this.values.addsWatermarks()}
+                  />
+                </div>
+                <div className="Form-group">
+                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.padding')}</label>
+                  <input
+                    className="FormControl"
+                    type="number"
+                    min="0"
+                    value={this.values.watermarkPadding() ?? 10}
+                    oninput={withAttr('value', this.values.watermarkPadding)}
+                    disabled={!this.values.addsWatermarks()}
                   />
                 </div>
                 <div className="Form-group">
