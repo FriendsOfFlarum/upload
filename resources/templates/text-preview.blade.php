@@ -40,19 +40,7 @@ $translator = resolve('translator');
             const figure = document.currentScript.parentElement;
 
             const previewEl = figure.querySelector('.FofUpload-TextPreviewFull');
-            const snippetEl = figure.querySelector('.FofUpload-TextPreviewSnippet');
-            const loadingEl = figure.querySelector('.FofUpload-TextPreviewLoading');
             const toggleBtn = figure.querySelector('.FofUpload-TextPreviewToggle');
-
-            const snippetText = '';
-
-            const testUrl = new URL(location.origin);
-            const url = new URL('{@url}');
-
-            if (testUrl.origin !== url.origin) {
-              // Prevent cross-origin requests
-              handleError(new Error('Attempted to fetch a cross-origin file in text preview.'));
-            }
 
             function createCodeHtml(text) {
                 const codeEl = document.createElement('code');
@@ -70,10 +58,27 @@ $translator = resolve('translator');
                 console.groupEnd();
             }
 
+            const forumOrigin = new URL(location.origin);
+            let url;
+            try {
+                url = new URL('{@url}');
+            } catch (e) {
+                handleError(e);
+                url = null;
+            }
+
+            const isCrossOrigin = url && forumOrigin.origin !== url.origin;
+
+            // Cross-origin files (e.g. CDN) cannot be fetched from the browser —
+            // hide the expand toggle but still show the filename and snippet.
+            if (isCrossOrigin) {
+                toggleBtn.style.display = 'none';
+            }
+
             let fileContent = null;
 
-            // Only allow toggling preview if showing a snippet
-            if ({@has_snippet} && testUrl.origin === url.origin) {
+            // Only wire up the expand toggle if we have a snippet and a same-origin URL.
+            if ({@has_snippet} && url && !isCrossOrigin) {
                 toggleBtn.addEventListener('click', () => {
                     if (fileContent !== null) {
                         const expanded = figure.getAttribute('data-expanded') === 'true';
