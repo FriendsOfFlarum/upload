@@ -58,6 +58,10 @@ class DefaultDownloader implements Downloader
     {
         $file_contents = @file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$file->path);
 
+        if ($file_contents === false) {
+            throw new InvalidDownloadException("Local file not found on disk: {$file->path}");
+        }
+
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
     }
 

@@ -31,7 +31,12 @@ class Uploads extends Type
             ->where('actor_id', $this->user->id)
             ->orderBy('id', 'asc')
             ->each(function (File $file) use ($downloader, &$dataExport) {
-                $fileContent = $downloader->download($file)->getBody()->getContents();
+                try {
+                    $fileContent = $downloader->download($file)->getBody()->getContents();
+                } catch (\Exception $e) {
+                    // Skip files that cannot be retrieved (e.g. missing from disk).
+                    return;
+                }
                 $dataExport[] = ["uploads/{$file->path}" => $fileContent];
             });
 
