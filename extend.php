@@ -57,7 +57,8 @@ return [
         ->delete('/fof/upload/delete/{uuid}', 'fof-upload.delete', Api\Controllers\DeleteFileController::class),
 
     (new Extend\Console())
-        ->command(Console\MapFilesCommand::class),
+        ->command(Console\MapFilesCommand::class)
+        ->command(Console\BackfillImageDimensionsCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),

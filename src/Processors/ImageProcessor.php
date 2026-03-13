@@ -40,28 +40,35 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
-        if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
-            try {
-                $image = (new ImageManager())->make($upload->getRealPath());
-            } catch (NotReadableException $e) {
-                throw new ValidationException(['upload' => 'Corrupted image']);
-            }
-
-            if ($this->settings->get('fof-upload.mustResize')) {
-                $this->resize($image);
-            }
-
-            if ($this->settings->get('fof-upload.addsWatermarks')) {
-                $this->watermark($image);
-            }
-
-            $image->orientate();
-
-            @file_put_contents(
-                $upload->getRealPath(),
-                $image->encode($mimeType)
-            );
+        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'], true)) {
+            return;
         }
+
+        try {
+            $image = (new ImageManager())->make($upload->getRealPath());
+        } catch (NotReadableException $e) {
+            throw new ValidationException(['upload' => 'Corrupted image']);
+        }
+
+        if ($this->settings->get('fof-upload.mustResize')) {
+            $this->resize($image);
+        }
+
+        // Watermarks are not applied to GIFs — palette reduction causes quality degradation.
+        if ($this->settings->get('fof-upload.addsWatermarks') && $mimeType !== 'image/gif') {
+            $this->watermark($image);
+        }
+
+        $image->orientate();
+
+        @file_put_contents(
+            $upload->getRealPath(),
+            $image->encode($mimeType)
+        );
+
+        // Store dimensions so the browser can reserve layout space before the image loads.
+        $file->image_width = $image->width();
+        $file->image_height = $image->height();
     }
 
     /**

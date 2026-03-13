@@ -29,12 +29,8 @@ class AddImageProcessor
         }
     }
 
-    protected function validateMime($mime): bool
+    protected function validateMime(string $mime): bool
     {
-        if ($mime == 'image/jpeg' || $mime == 'image/png' || $mime == 'image/gif' || $mime == 'image/svg+xml') {
-            return true;
-        }
-
-        return false;
+        return in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'], true);
     }
 }
