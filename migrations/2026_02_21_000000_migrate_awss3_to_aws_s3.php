@@ -39,4 +39,7 @@ return [
                 ->update(['value' => json_encode($mimeConfiguration)]);
         }
     },
+    'down' => function (Builder $schema) {
+        // Do nothing..
+    },
 ];
