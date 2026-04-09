@@ -85,6 +85,10 @@ class Manager
 
         $instance = $driver ?? $this->{$method}($this->util);
 
+        if ($instance === null) {
+            throw new ValidationException(['upload' => "Cannot instantiate adapter $adapter"]);
+        }
+
         // Stamp the canonical registration key so Util::setMethod() can store it
         // in File::upload_method without deriving it from the class name.
         // This is the only place where the registered key ($adapter) is known.
