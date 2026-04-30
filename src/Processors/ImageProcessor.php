@@ -40,28 +40,48 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
-        if ($mimeType == 'image/jpeg' || $mimeType == 'image/png') {
-            try {
-                $image = (new ImageManager())->make($upload->getRealPath());
-            } catch (NotReadableException $e) {
+        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'], true)) {
+            return;
+        }
+
+        // Keep animated GIFs untouched
+        if ($mimeType === 'image/gif') {
+            $dimensions = @getimagesize($upload->getRealPath());
+
+            if ($dimensions === false) {
                 throw new ValidationException(['upload' => 'Corrupted image']);
             }
 
-            if ($this->settings->get('fof-upload.mustResize')) {
-                $this->resize($image);
-            }
+            $file->image_width = (int) $dimensions[0];
+            $file->image_height = (int) $dimensions[1];
 
-            if ($this->settings->get('fof-upload.addsWatermarks')) {
-                $this->watermark($image);
-            }
-
-            $image->orientate();
-
-            @file_put_contents(
-                $upload->getRealPath(),
-                $image->encode($mimeType)
-            );
+            return;
         }
+
+        try {
+            $image = (new ImageManager())->make($upload->getRealPath());
+        } catch (NotReadableException $e) {
+            throw new ValidationException(['upload' => 'Corrupted image']);
+        }
+
+        if ($this->settings->get('fof-upload.mustResize')) {
+            $this->resize($image);
+        }
+
+        if ($this->settings->get('fof-upload.addsWatermarks')) {
+            $this->watermark($image);
+        }
+
+        $image->orientate();
+
+        @file_put_contents(
+            $upload->getRealPath(),
+            $image->encode($mimeType)
+        );
+
+        // Store dimensions so the browser can reserve layout space before the image loads.
+        $file->image_width = $image->width();
+        $file->image_height = $image->height();
     }
 
     /**

@@ -55,6 +55,11 @@ class FormatImagePreview
                 }
 
                 $attributes['title'] = $file->base_name;
+
+                if ($file->image_width && $file->image_height) {
+                    $attributes['width'] = $file->image_width;
+                    $attributes['height'] = $file->image_height;
+                }
             }
 
             return $attributes;

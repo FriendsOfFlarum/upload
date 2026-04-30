@@ -42,6 +42,8 @@ use Illuminate\Support\Str;
  * @property bool                  $hidden
  * @property array                 $matched_post_ids
  * @property bool                  $shared
+ * @property int|null              $image_width
+ * @property int|null              $image_height
  */
 class File extends AbstractModel
 {
@@ -53,6 +55,8 @@ class File extends AbstractModel
         'hidden'                  => 'boolean',
         'shared'                  => 'boolean',
         'created_at'              => 'datetime',
+        'image_width'             => 'int',
+        'image_height'            => 'int',
     ];
 
     protected $fillable = [
@@ -64,6 +68,8 @@ class File extends AbstractModel
         'uuid',
         'hidden',
         'shared',
+        'image_width',
+        'image_height',
     ];
 
     public static function filesFor(int $userId, User $actor): Builder
