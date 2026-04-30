@@ -29,6 +29,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 use Overtrue\Flysystem\Qiniu\QiniuAdapter;
 use Qiniu\Http\Client as QiniuClient;
 
@@ -165,7 +167,10 @@ class Manager
     protected function local(Util $util)
     {
         return new Adapters\Local(
-            new LocalFilesystemAdapter($this->paths->public.'/assets/files'),
+            new LocalFilesystemAdapter(
+                $this->paths->public.'/assets/files',
+                PortableVisibilityConverter::fromArray([], Visibility::PUBLIC)
+            ),
             $this->settings,
             $this->url,
             $this->config
