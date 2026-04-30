@@ -1,3 +1,5 @@
+.idea
+.vscode
 js/dist
 js/node_modules
 vendor/
