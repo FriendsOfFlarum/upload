@@ -1,2 +1,1 @@
-<img class="FoFUpload--Upl-Image-Preview" src="{@url}" title="{@title}" alt="{@alt}" data-id="{@uuid}" loading="lazy"
-    width="{@width}" height="{@height}" />
+<img class="FoFUpload--Upl-Image-Preview" src="{@url}" title="{@title}" alt="{@alt}" data-id="{@uuid}" loading="lazy" width="{@width}" height="{@height}"/>
