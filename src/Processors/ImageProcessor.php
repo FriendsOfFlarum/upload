@@ -68,8 +68,7 @@ class ImageProcessor implements Processable
             $this->resize($image);
         }
 
-        // Watermarks are not applied to GIFs — palette reduction causes quality degradation.
-        if ($this->settings->get('fof-upload.addsWatermarks') && $mimeType !== 'image/gif') {
+        if ($this->settings->get('fof-upload.addsWatermarks')) {
             $this->watermark($image);
         }
 
