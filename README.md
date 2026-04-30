@@ -60,7 +60,7 @@ The stored dimensions are injected as `width` and `height` HTML attributes on th
 
 **No configuration is required** — this happens automatically for all new JPEG, PNG, and GIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
 
-> **GIF support:** Animated GIF uploads now also benefit from the **Resize images** setting. Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
+> Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
 
 ### Storage Configuration
 
@@ -296,16 +296,6 @@ For ongoing maintenance, a daily cronjob is a sensible setup:
 # Remove files older than 24 hours (the default) that are not in any post
 php flarum fof:upload --map --cleanup --force
 ```
-
-### Image Dimensions & Layout Shift Prevention
-
-FoF Upload automatically stores the width and height (in pixels) of every JPEG, PNG, and GIF processed at upload time. These are recorded after any resizing or EXIF orientation correction is applied, so they always reflect the **final image as stored**.
-
-The stored dimensions are injected as `width` and `height` HTML attributes on the `<img>` tag rendered by the **Image Preview** template. Modern browsers use these attributes to reserve the correct amount of layout space before the image has loaded, eliminating [Cumulative Layout Shift (CLS)](https://web.dev/cls/) in threads that contain lazy-loaded images.
-
-**No configuration is required** — this happens automatically for all new JPEG, PNG, and GIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
-
-> **GIF support:** Animated GIF uploads now also benefit from the **Resize images** setting. Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
 
 ## Testing and Security Measures
 
