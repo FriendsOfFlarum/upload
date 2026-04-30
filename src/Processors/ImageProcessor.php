@@ -44,6 +44,20 @@ class ImageProcessor implements Processable
             return;
         }
 
+        // Keep animated GIFs untouched
+        if ($mimeType === 'image/gif') {
+            $dimensions = @getimagesize($upload->getRealPath());
+
+            if ($dimensions === false) {
+                throw new ValidationException(['upload' => 'Corrupted image']);
+            }
+
+            $file->image_width = (int) $dimensions[0];
+            $file->image_height = (int) $dimensions[1];
+
+            return;
+        }
+
         try {
             $image = (new ImageManager())->make($upload->getRealPath());
         } catch (NotReadableException $e) {
