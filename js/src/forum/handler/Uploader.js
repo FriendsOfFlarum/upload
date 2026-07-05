@@ -35,7 +35,7 @@ export default class Uploader {
       body.append('files[]', files[i]);
     }
 
-    // Use fetch instead of app.request (XHR) to work around a bug introduced in iOS 26.5.2 where WebKit drops the multipart payload over HTTP/3.
+    // Use fetch instead of app.request (XHR) to work around a bug introduced in iOS 26.5.2 where WebKit drops the multipart payload.
     return fetch(app.forum.attribute('apiUrl') + '/fof/upload', {
       method: 'POST',
       body: body,
