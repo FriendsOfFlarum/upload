@@ -27,13 +27,13 @@ export default class Uploader {
     this.uploading = true;
     this.dispatch('uploading', files);
 
-    m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
-
     const body = new FormData();
 
     for (let i = 0; i < files.length; i++) {
       body.append('files[]', files[i]);
     }
+
+    m.redraw(); // Forcing a redraw so that the button also updates if uploadFiles() is called from DragAndDrop or PasteClipboard
 
     // Use fetch instead of app.request (XHR) to work around a bug introduced in iOS 26.5.2 where WebKit drops the multipart payload.
     return fetch(app.forum.attribute('apiUrl') + '/fof/upload', {
