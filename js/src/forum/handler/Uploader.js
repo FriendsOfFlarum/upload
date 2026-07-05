@@ -35,14 +35,21 @@ export default class Uploader {
       body.append('files[]', files[i]);
     }
 
-    // send a POST request to the api
-    return app
-      .request({
-        method: 'POST',
-        url: app.forum.attribute('apiUrl') + '/fof/upload',
-        // prevent JSON.stringify'ing the form data in the XHR call
-        serialize: (raw) => raw,
-        body,
+    // Use fetch instead of app.request (XHR) to work around a bug introduced in iOS 26.5.2 where WebKit drops the multipart payload over HTTP/3.
+    return fetch(app.forum.attribute('apiUrl') + '/fof/upload', {
+      method: 'POST',
+      body: body,
+      headers: {
+        'X-CSRF-Token': app.session.csrfToken,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw { response: err };
+          });
+        }
+        return response.json();
       })
       .then((result) => this.uploaded(result, addBBcode))
       .catch((error) => {
