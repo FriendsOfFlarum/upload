@@ -9,7 +9,7 @@ class VideoTemplate extends AbstractTextFormatterTemplate
     /**
      * @var string
      */
-    protected $tag = 'video-player';
+    protected $tag = 'video';
 
     /**
      * {@inheritdoc}
