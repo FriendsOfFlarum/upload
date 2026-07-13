@@ -42,6 +42,6 @@ class VideoTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[video url={URL}]{}[/video]';
+        return '[video url={URL}]{Video}[/video]';
     }
 }
