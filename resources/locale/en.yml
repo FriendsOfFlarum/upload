@@ -159,6 +159,7 @@ fof-upload:
       text-preview: Text preview
       text-preview_description: |
         Inserts a preview (first 5 lines) of the text file, with an option to expand to reveal the full contents of the file.
+      video-player: Video player template
     upload_methods:
       aws-s3: S3 or Compatible
       imgur: Imgur
