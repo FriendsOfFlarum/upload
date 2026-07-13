@@ -9,7 +9,7 @@ class VideoTemplate extends AbstractTextFormatterTemplate
     /**
      * @var string
      */
-    protected $tag = 'video';
+    protected $tag = 'upl-video'; 
 
     /**
      * {@inheritdoc}
@@ -40,6 +40,6 @@ class VideoTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[video uuid={IDENTIFIER} url={URL}]{SIMPLETEXT}[/video]';
+        return '[upl-video uuid={IDENTIFIER} url={URL}]{TEXT}[/upl-video]';
     }
 }
