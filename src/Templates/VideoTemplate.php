@@ -40,6 +40,6 @@ class VideoTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[upl-video uuid={IDENTIFIER} url={URL}]{VIDEO_TAG}[/upl-video]';
+        return '[upl-video uuid={IDENTIFIER} url={URL}]{SIMPLETEXT_VIDEO}[/upl-video]';
     }
 }
