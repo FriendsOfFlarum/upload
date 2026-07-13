@@ -4,7 +4,7 @@ $translator = resolve('translator');
 
 <figure class="FofUpload-TextPreview" data-loading="false" data-expanded="false" data-hassnippet="{@has_snippet}">
     <figcaption class="FofUpload-TextPreviewTitle">
-        <i aria-hidden="true" class="icon far fa-file"></i> {SIMPLETEXT1}
+        <i aria-hidden="true" class="icon far fa-file"></i> {SIMPLETEXT1} <a href="{@url}" onclick="event.preventDefault();downloadForTextPreview('{@url}','{SIMPLETEXT1}');" download="{SIMPLETEXT1}" target="_blank"><i aria-hidden="true" class="icon far fa-download"></i></a>
     </figcaption>
 
     <div class="FofUpload-TextPreviewSnippet">
