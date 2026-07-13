@@ -16,7 +16,6 @@ class VideoTemplate extends AbstractTextFormatterTemplate
      */
     public function name(): string
     {
-        // 如果你还没加语言包，可以直接写 'Video Player'，或者使用 $this->trans()
         return 'Video Player';
     }
 
@@ -33,7 +32,6 @@ class VideoTemplate extends AbstractTextFormatterTemplate
      */
     public function template(): View
     {
-        // 对应资源目录下的 video.blade.php
         return $this->getView('fof-upload.templates::video');
     }
 
