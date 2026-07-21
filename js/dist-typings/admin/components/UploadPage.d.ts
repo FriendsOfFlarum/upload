@@ -4,6 +4,7 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import ItemList from 'flarum/common/utils/ItemList';
 import type { ExtensionPageAttrs } from 'flarum/admin/components/ExtensionPage';
 import type Mithril from 'mithril';
+import { type SizeUnit } from '../utils/fileSize';
 type MimeConfig = {
     adapter: string;
     template: string;
@@ -29,6 +30,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     defaultAdap: string;
     watermarkPositions: Record<string, string>;
     composerButtonVisiblityOptions: Record<string, string>;
+    maxFileSizeUnit: Stream<SizeUnit>;
     newMimeType: {
         regex: Stream<string>;
         adapter: Stream<string>;
