@@ -46,6 +46,8 @@ use Illuminate\Support\Str;
  * @property int|null              $image_height
  * @property string|null           $thumbnail_url
  * @property string|null           $thumbnail_path
+ * @property int|null              $thumbnail_width
+ * @property int|null              $thumbnail_height
  */
 class File extends AbstractModel
 {
@@ -57,8 +59,10 @@ class File extends AbstractModel
         'hidden'       => 'boolean',
         'shared'       => 'boolean',
         'created_at'   => \FoF\Upload\Casts\FlexibleDateTime::class,
-        'image_width'  => 'int',
-        'image_height' => 'int',
+        'image_width'      => 'int',
+        'image_height'     => 'int',
+        'thumbnail_width'  => 'int',
+        'thumbnail_height' => 'int',
     ];
 
     protected $fillable = [
@@ -74,6 +78,8 @@ class File extends AbstractModel
         'image_height',
         'thumbnail_url',
         'thumbnail_path',
+        'thumbnail_width',
+        'thumbnail_height',
     ];
 
     /**

@@ -28,7 +28,7 @@ class BackfillThumbnailsCommand extends Command
         {--dry-run : Report how many images would be processed without making any changes}
     ';
 
-    protected $description = 'Backfill missing image thumbnails for existing JPEG, PNG, and GIF uploads';
+    protected $description = 'Backfill missing image thumbnails and thumbnail dimensions for existing JPEG, PNG, and GIF uploads';
 
     public function handle(
         DefaultDownloader $downloader,
@@ -43,15 +43,23 @@ class BackfillThumbnailsCommand extends Command
         $useWebp = (bool) $settings->get('fof-upload.thumbnailWebp', true);
         $maxWidth = max(1, (int) $settings->get('fof-upload.thumbnailMaxWidth', 1000));
 
+        // Process any image that is missing its thumbnail, OR that has a thumbnail but is
+        // missing its recorded thumbnail dimensions (thumbnails backfilled before the
+        // thumbnail_width/thumbnail_height columns existed). Without the dimensions the
+        // rendered <img> falls back to the full-image size and upscales the thumbnail.
         $query = File::query()
             ->whereIn('type', $supportedMimes)
-            ->whereNull('thumbnail_url')
-            ->whereNotIn('upload_method', ['imgur', 'private-shared']);
+            ->whereNotIn('upload_method', ['imgur', 'private-shared'])
+            ->where(function ($q) {
+                $q->whereNull('thumbnail_url')
+                    ->orWhereNull('thumbnail_width')
+                    ->orWhereNull('thumbnail_height');
+            });
 
         $total = $query->count();
 
         if ($total === 0) {
-            $this->info('All eligible images already have thumbnails. Nothing to do.');
+            $this->info('All eligible images already have thumbnails and dimensions. Nothing to do.');
 
             return;
         }
@@ -67,12 +75,15 @@ class BackfillThumbnailsCommand extends Command
         $bar = $this->output->createProgressBar($total);
         $bar->start();
 
-        $updated = 0;
+        $generated = 0;
+        $dimensionsOnly = 0;
         $skipped = 0;
 
-        $query->chunkById($chunkSize, function ($files) use ($downloader, $imageManager, $manager, $bar, $useWebp, $maxWidth, &$updated, &$skipped) {
+        $query->chunkById($chunkSize, function ($files) use ($downloader, $imageManager, $manager, $bar, $useWebp, $maxWidth, &$generated, &$dimensionsOnly, &$skipped) {
             foreach ($files as $file) {
                 try {
+                    $needsThumbnail = empty($file->thumbnail_url);
+
                     $response = $downloader->download($file);
 
                     if ($response->getStatusCode() !== 200) {
@@ -84,6 +95,21 @@ class BackfillThumbnailsCommand extends Command
                     $imageData = $response->getBody()->getContents();
                     $thumb = $imageManager->read($imageData);
                     $thumb->scaleDown(width: $maxWidth);
+
+                    // Record the thumbnail's dimensions regardless of whether we (re)generate
+                    // the file — re-scaling the full image with the same settings yields the
+                    // dimensions of the existing thumbnail too.
+                    $file->thumbnail_width = $thumb->width();
+                    $file->thumbnail_height = $thumb->height();
+
+                    // The thumbnail file already exists; just persist the newly-computed
+                    // dimensions without re-encoding or re-uploading it.
+                    if (!$needsThumbnail) {
+                        $file->save();
+                        $dimensionsOnly++;
+                        $bar->advance();
+                        continue;
+                    }
 
                     $mimeType = $file->type;
 
@@ -111,7 +137,7 @@ class BackfillThumbnailsCommand extends Command
 
                     if ($adapter->storeThumbnail($file, $thumbEncoded->toString(), $ext)) {
                         $file->save();
-                        $updated++;
+                        $generated++;
                     } else {
                         $skipped++;
                     }
@@ -131,6 +157,6 @@ class BackfillThumbnailsCommand extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info("Done. Updated: $updated, Skipped: $skipped.");
+        $this->info("Done. Thumbnails generated: $generated, Dimensions backfilled: $dimensionsOnly, Skipped: $skipped.");
     }
 }

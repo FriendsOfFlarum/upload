@@ -77,6 +77,12 @@ class ImageProcessor implements Processable
             $thumb = $this->imageManager->read($upload->getRealPath());
             $thumb->scaleDown(width: $maxWidth);
 
+            // Store the thumbnail's own dimensions so the rendered <img> reserves the
+            // correct layout space for the thumbnail it actually loads, rather than the
+            // (larger) full-image dimensions.
+            $file->thumbnail_width = $thumb->width();
+            $file->thumbnail_height = $thumb->height();
+
             $useWebp = (bool) $this->settings->get('fof-upload.thumbnailWebp', true);
             $thumbEncoded = $useWebp
                 ? $thumb->toWebp(quality: 80)

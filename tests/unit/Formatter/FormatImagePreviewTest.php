@@ -157,6 +157,45 @@ class FormatImagePreviewTest extends TestCase
     }
 
     #[Test]
+    public function uses_thumbnail_dimensions_when_a_thumbnail_is_rendered(): void
+    {
+        // The <img> src is the thumbnail, so width/height must describe the thumbnail —
+        // not the (larger) full image — otherwise the browser upscales it back to full size.
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file->thumbnail_path = '2026-02-22/1234-photo-thumb.webp';
+        $file->image_width = 1920;
+        $file->image_height = 1080;
+        $file->thumbnail_width = 1000;
+        $file->thumbnail_height = 563;
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringContainsString('width="1000"', $result);
+        $this->assertStringContainsString('height="563"', $result);
+        $this->assertStringNotContainsString('width="1920"', $result);
+        $this->assertStringNotContainsString('height="1080"', $result);
+    }
+
+    #[Test]
+    public function falls_back_to_full_image_dimensions_when_thumbnail_has_no_dimensions(): void
+    {
+        // Legacy thumbnails backfilled before thumbnail_width/height existed: the thumbnail
+        // is rendered but we only know the full-image dimensions. Better than nothing.
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file->thumbnail_path = '2026-02-22/1234-photo-thumb.webp';
+        $file->image_width = 1920;
+        $file->image_height = 1080;
+        // thumbnail_width / thumbnail_height are null
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringContainsString('width="1920"', $result);
+        $this->assertStringContainsString('height="1080"', $result);
+    }
+
+    #[Test]
     public function does_not_inject_dimensions_when_file_has_none(): void
     {
         $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
