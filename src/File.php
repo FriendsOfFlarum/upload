@@ -56,9 +56,9 @@ class File extends AbstractModel
     protected $appends = ['humanSize'];
 
     protected $casts = [
-        'hidden'       => 'boolean',
-        'shared'       => 'boolean',
-        'created_at'   => \FoF\Upload\Casts\FlexibleDateTime::class,
+        'hidden'           => 'boolean',
+        'shared'           => 'boolean',
+        'created_at'       => \FoF\Upload\Casts\FlexibleDateTime::class,
         'image_width'      => 'int',
         'image_height'     => 'int',
         'thumbnail_width'  => 'int',
