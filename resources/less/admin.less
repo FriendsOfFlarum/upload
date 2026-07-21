@@ -24,6 +24,26 @@
     margin-bottom: 1rem;
   }
 
+  &-maxFileSize {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 320px;
+
+    &-value {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    &-unit {
+      flex: 0 0 auto;
+
+      select {
+        width: auto;
+      }
+    }
+  }
+
   &-mimeTypeRow {
     display: grid;
     grid-template-columns: minmax(160px, 2fr) minmax(120px, 1fr) minmax(180px, 1.5fr) minmax(120px, 1fr) auto;

@@ -15,6 +15,7 @@ import Link from 'flarum/common/components/Link';
 import type { ExtensionPageAttrs } from 'flarum/admin/components/ExtensionPage';
 import type Mithril from 'mithril';
 import { registerMimePermissions } from '../index';
+import { bestUnitForKb, effectivePhpLimitKb, fromKb, humanizeKb, toKb, UNIT_TO_KB, type SizeUnit } from '../utils/fileSize';
 
 type MimeConfig = {
   adapter: string;
@@ -74,6 +75,9 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
   watermarkPositions: Record<string, string> = {};
   composerButtonVisiblityOptions: Record<string, string> = {};
+  // Display-only unit for the "maximum file size" field. The setting itself
+  // (this.values.maxFileSize) is always stored in kilobytes.
+  maxFileSizeUnit!: Stream<SizeUnit>;
   newMimeType!: {
     regex: Stream<string>;
     adapter: Stream<string>;
@@ -160,6 +164,9 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
     this.fields.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)])));
     this.checkboxes.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)] === '1')));
+
+    // Choose the friendliest unit that represents the stored KB value exactly.
+    this.maxFileSizeUnit = Stream(bestUnitForKb(Number(this.values.maxFileSize()) || 0));
     this.objects.forEach((key) => {
       const val = settings[this.addPrefix(key)];
       this.values[key] = val ? Stream(JSON.parse(val)) : Stream();
@@ -191,6 +198,13 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     const maxUpload = app.data.settings[this.addPrefix('php_ini.upload_max_filesize')];
     const fileinfoAvailable = app.data.settings[this.addPrefix('fileinfo_available')] as unknown as boolean | undefined;
 
+    const maxFileSizeKb = Number(this.values.maxFileSize()) || 0;
+    const maxFileSizeUnit = this.maxFileSizeUnit();
+    // Value shown in the number input, expressed in the currently-selected unit.
+    const maxFileSizeInUnit = maxFileSizeKb ? fromKb(maxFileSizeKb, maxFileSizeUnit) : '';
+    const phpLimitKb = effectivePhpLimitKb(maxPost, maxUpload);
+    const exceedsPhpLimit = phpLimitKb != null && maxFileSizeKb > phpLimitKb;
+
     return (
       <div className="UploadPage">
         <div className="UploadPage-container container">
@@ -211,19 +225,47 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                 <legend>{app.translator.trans('fof-upload.admin.labels.preferences.title')}</legend>
                 <div className="Form-group">
                   <label>{app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="0"
-                    value={this.values.maxFileSize() ?? ''}
-                    oninput={withAttr('value', this.values.maxFileSize)}
-                  />
+                  <div className="UploadPage-maxFileSize">
+                    <input
+                      className="FormControl UploadPage-maxFileSize-value"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={maxFileSizeInUnit}
+                      oninput={withAttr('value', (v: string) => {
+                        const amount = parseFloat(v);
+                        this.values.maxFileSize(Number.isFinite(amount) ? toKb(amount, this.maxFileSizeUnit()) : '');
+                      })}
+                    />
+                    <Select
+                      className="UploadPage-maxFileSize-unit"
+                      options={Object.fromEntries(Object.keys(UNIT_TO_KB).map((u) => [u, u])) as Record<SizeUnit, string>}
+                      value={maxFileSizeUnit}
+                      onchange={(unit: SizeUnit) => this.maxFileSizeUnit(unit)}
+                    />
+                  </div>
                   <p className="helpText">
-                    {app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
-                      post: maxPost,
-                      upload: maxUpload,
+                    {app.translator.trans('fof-upload.admin.labels.preferences.max_file_size_equivalent', {
+                      value: humanizeKb(maxFileSizeKb),
+                      kb: maxFileSizeKb.toLocaleString(),
                     })}
                   </p>
+                  {exceedsPhpLimit ? (
+                    <Alert type="warning" dismissible={false}>
+                      {app.translator.trans('fof-upload.admin.warnings.max_file_size_exceeds_php', {
+                        limit: humanizeKb(phpLimitKb!),
+                        post: maxPost,
+                        upload: maxUpload,
+                      })}
+                    </Alert>
+                  ) : (
+                    <p className="helpText">
+                      {app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
+                        post: maxPost,
+                        upload: maxUpload,
+                      })}
+                    </p>
+                  )}
                 </div>
                 <div className="Form-group">
                   <label>{app.translator.trans('fof-upload.admin.labels.preferences.mime_types')}</label>
