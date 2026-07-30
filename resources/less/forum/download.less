@@ -121,3 +121,14 @@
         }
     }
 }
+
+// Download gated by per-tag permission (flarum/tags). The control stays visible
+// so users can see a download exists, but reads as unavailable.
+.fof-upload-download-denied {
+    cursor: not-allowed;
+    opacity: 0.55;
+
+    .Button {
+        cursor: not-allowed;
+    }
+}

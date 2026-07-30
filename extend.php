@@ -15,6 +15,7 @@ namespace FoF\Upload;
 use Flarum\Api\Context;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
+use Flarum\Discussion\Discussion;
 use Flarum\Extend;
 use Flarum\Gdpr\Extend\UserData;
 use Flarum\Post\Event\Posted;
@@ -177,6 +178,18 @@ return [
         ->whenExtensionEnabled('flarum-gdpr', fn () => [
             (new UserData())
                 ->addType(Data\Uploads::class),
+        ])
+        ->whenExtensionEnabled('flarum-tags', fn () => [
+            // Lets the forum frontend disable the download button for users who
+            // may read a restricted tag but not download files within it.
+            (new Extend\ApiResource(Resource\DiscussionResource::class))
+                ->fields(fn () => [
+                    Schema\Boolean::make('canDownloadFiles')
+                        ->get(function (Discussion $discussion, Context $context) {
+                            return resolve(Access\TagScopedDownloadGate::class)
+                                ->allowsInDiscussion($context->getActor(), $discussion);
+                        }),
+                ]),
         ]),
     new Extend\ApiResource(Api\Resource\FileResource::class),
 
