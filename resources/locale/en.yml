@@ -133,7 +133,6 @@ fof-upload:
       max_file_size_exceeds_php: "This exceeds your server's effective upload limit of <strong>{limit}</strong> (<code>post_max_size={post}</code>, <code>upload_max_filesize={upload}</code>). Uploads larger than that limit will be rejected by PHP regardless of this setting. Lower this value or raise the limits in your <code>php.ini</code> (and <code>client_max_body_size</code> if using Nginx)."
     permissions:
       download_label: Download files
-      download_files_in_tag_label: Download files in this tag
       upload_label: Upload files (base permission, required for all uploads)
       upload_mime_label: "Upload {label}"
       view_user_uploads_label: View user uploads

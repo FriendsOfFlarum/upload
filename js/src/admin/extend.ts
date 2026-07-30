@@ -26,6 +26,9 @@ export default [
         label: app.translator.trans('fof-upload.admin.permissions.download_label'),
         permission: 'fof-upload.download',
         allowGuest: true,
+        // Also offer this permission per-tag when flarum/tags is enabled, so
+        // downloads can optionally be restricted within a tag.
+        tagScoped: true,
       }),
       'view',
       50

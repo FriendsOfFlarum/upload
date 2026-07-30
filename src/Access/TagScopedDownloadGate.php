@@ -18,24 +18,27 @@ use Flarum\User\User;
 use FoF\Upload\File;
 
 /**
- * Decides whether an actor may download a file, taking per-tag permissions
- * into account on top of the base 'fof-upload.download' permission.
+ * Widens the scope of the existing 'fof-upload.download' permission so it can
+ * optionally be restricted per tag.
  *
- * The per-tag ability is checked against the Tag model, so flarum/tags'
- * own TagPolicy resolves it to `tag{id}.fof-upload.download-files` and only
- * enforces it when the tag is flagged `is_restricted`. Unrestricted tags
- * therefore behave exactly as before this feature existed.
+ * There is deliberately only ONE download permission. Checking it against a
+ * Tag model makes flarum/tags' TagPolicy resolve it to
+ * `tag{id}.fof-upload.download`, and it only does so when the tag is flagged
+ * `is_restricted`. So an admin who does nothing keeps the existing global
+ * behaviour; an admin who restricts a tag gets a per-tag dropdown for the same
+ * permission.
  *
- * When flarum/tags is not enabled this gate is inert: only the base
+ * When flarum/tags is not enabled this gate is inert: only the global
  * permission applies.
  */
 class TagScopedDownloadGate
 {
     /**
-     * The per-tag ability name. Combined with a tag id by flarum/tags'
-     * TagPolicy as `tag{id}.fof-upload.download-files`.
+     * The download ability. Combined with a tag id by flarum/tags' TagPolicy
+     * as `tag{id}.fof-upload.download` — the same permission as the global
+     * one, not a second permission.
      */
-    public const ABILITY = 'fof-upload.download-files';
+    public const ABILITY = 'fof-upload.download';
 
     public function __construct(
         protected ExtensionManager $extensions
@@ -103,7 +106,7 @@ class TagScopedDownloadGate
             return true;
         }
 
-        // Mirror the full server-side decision, base permission included, so the
+        // Mirror the full server-side decision, global permission included, so the
         // button state matches what a download attempt would actually do.
         if (!$actor->hasPermission('fof-upload.download')) {
             return false;
@@ -126,11 +129,11 @@ class TagScopedDownloadGate
             return true;
         }
 
-        // Only restricted tags gate the download. An unrestricted tag returns
-        // null from flarum/tags' TagPolicy, which would fall through to a
-        // *global* 'fof-upload.download-files' permission that no group is
-        // expected to hold — denying every download in an open tag. So the
-        // is_restricted check has to happen here rather than being delegated.
+        // Only restricted tags narrow the download. An unrestricted tag returns
+        // null from flarum/tags' TagPolicy, which falls back to the global
+        // permission — already asserted by the caller. Skipping those tags keeps
+        // this a pure *additional* restriction: a discussion whose tags are all
+        // unrestricted behaves exactly as it did before this feature existed.
         foreach ($tags as $tag) {
             if (!$tag->is_restricted) {
                 continue;

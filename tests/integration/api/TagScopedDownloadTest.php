@@ -29,17 +29,19 @@ use PHPUnit\Framework\Attributes\Test;
  * Everyone may *read* the tag and see that a download exists, but only certain
  * groups may actually download the file.
  *
- * The permission model mirrors flarum/tags' own convention: an ability checked
- * against a Tag model resolves via TagPolicy to `tag{id}.{ability}`, and only
- * bites when the tag is flagged `is_restricted`. So:
+ * There is only ONE download permission: 'fof-upload.download'. Checking it
+ * against a Tag model makes flarum/tags' TagPolicy resolve it to
+ * `tag{id}.fof-upload.download`, and only when the tag is flagged
+ * `is_restricted`. So the same permission is either global or per-tag,
+ * depending on what the admin configures:
  *
- *   allowed = actor.can('fof-upload.download')                       (base, always required)
- *             AND actor.can('fof-upload.download-files', <tag>)      (per-tag, when restricted)
+ *   allowed = actor.can('fof-upload.download')                  (global, always required)
+ *             AND actor.can('fof-upload.download', <tag>)       (per-tag, when restricted)
  *
  * Group map used throughout:
- *   - group 3 = members (base download permission only)
- *   - group 20 = privileged (base + per-tag download on the restricted tag)
- *   - group 21 = no base download permission at all
+ *   - group 20 = privileged (global + per-tag download on the restricted tag)
+ *   - group 21 = no download permission at all
+ *   - group 22 = global download permission but no per-tag grant
  */
 class TagScopedDownloadTest extends EnhancedTestCase
 {
@@ -85,20 +87,21 @@ class TagScopedDownloadTest extends EnhancedTestCase
             ],
             'groups' => [
                 ['id' => 20, 'name_singular' => 'Privileged', 'name_plural' => 'Privileged', 'is_hidden' => 0],
-                // Group 21 deliberately has NO base download permission.
+                // Group 21 deliberately has NO download permission.
                 ['id' => 21, 'name_singular' => 'NoDownload', 'name_plural' => 'NoDownload', 'is_hidden' => 0],
-                // Group 22 has base download permission but no per-tag grant.
+                // Group 22 has the global download permission but no per-tag grant.
                 ['id' => 22, 'name_singular' => 'Members', 'name_plural' => 'Members', 'is_hidden' => 0],
             ],
             'group_permission' => [
-                // Base download permission is granted to the two explicit test groups
-                // only. It is deliberately NOT granted to group 3 (Members), because
-                // every registered user is implicitly a Member — granting it there
-                // would also grant it to the "no download permission" user.
+                // The global download permission is granted to the two explicit test
+                // groups only. It is deliberately NOT granted to group 3 (Members),
+                // because every registered user is implicitly a Member — granting it
+                // there would also grant it to the "no download permission" user.
                 ['group_id' => 22, 'permission' => 'fof-upload.download'],
                 ['group_id' => 20, 'permission' => 'fof-upload.download'],
-                // ...but only the privileged group may download within the restricted tag.
-                ['group_id' => 20, 'permission' => 'tag'.self::RESTRICTED_TAG_ID.'.fof-upload.download-files'],
+                // ...but only the privileged group may download within the restricted
+                // tag. Note this is the SAME permission name, tag-prefixed.
+                ['group_id' => 20, 'permission' => 'tag'.self::RESTRICTED_TAG_ID.'.fof-upload.download'],
                 // All groups may view the restricted tag's discussions — the client
                 // requirement is that non-permitted users still SEE the download.
                 ['group_id' => 3, 'permission' => 'tag'.self::RESTRICTED_TAG_ID.'.viewForum'],
@@ -214,11 +217,11 @@ class TagScopedDownloadTest extends EnhancedTestCase
 
     /**
      * User 6 is in group 21, which has viewForum on the restricted tag but no
-     * base 'fof-upload.download' permission at all. The base check must still
-     * apply independently of any tag scoping, even in an open tag.
+     * 'fof-upload.download' permission at all. The global check must still apply
+     * independently of any tag scoping, even in an open tag.
      */
     #[Test]
-    public function base_download_permission_is_still_required()
+    public function global_download_permission_is_still_required()
     {
         $this->setting('fof-upload.disableHotlinkProtection', true);
 
@@ -226,7 +229,7 @@ class TagScopedDownloadTest extends EnhancedTestCase
 
         $response = $this->download($file, 6, self::OPEN_POST_ID);
 
-        $this->assertEquals(403, $response->getStatusCode(), 'Base download permission must still be required');
+        $this->assertEquals(403, $response->getStatusCode(), 'Global download permission must still be required');
     }
 
     #[Test]
@@ -259,7 +262,7 @@ class TagScopedDownloadTest extends EnhancedTestCase
 
     /**
      * A file that exists only in the media library, never posted, has no tag
-     * context and must remain downloadable with just the base permission.
+     * context and must remain downloadable with just the global permission.
      */
     #[Test]
     public function unposted_file_is_not_tag_scoped()
@@ -300,7 +303,7 @@ class TagScopedDownloadTest extends EnhancedTestCase
 
         $this->assertFalse(
             $json['data']['attributes']['canDownloadFiles'],
-            'User without per-tag permission should see canDownloadFiles=false'
+            'User without per-tag download permission should see canDownloadFiles=false'
         );
     }
 

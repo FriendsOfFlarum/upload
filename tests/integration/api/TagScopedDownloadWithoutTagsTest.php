@@ -118,17 +118,17 @@ class TagScopedDownloadWithoutTagsTest extends EnhancedTestCase
     }
 
     #[Test]
-    public function base_download_permission_still_applies_when_tags_is_disabled()
+    public function global_download_permission_still_applies_when_tags_is_disabled()
     {
         $file = $this->uploadPdf();
 
-        // User 2 (normalUser) has no base download permission.
+        // User 2 (normalUser) has no download permission.
         $response = $this->send(
             $this->request('GET', '/api/fof/download/'.$file->uuid, [
                 'authenticatedAs' => 2,
             ])
         );
 
-        $this->assertEquals(403, $response->getStatusCode(), 'Base permission must still be enforced');
+        $this->assertEquals(403, $response->getStatusCode(), 'Global permission must still be enforced');
     }
 }
