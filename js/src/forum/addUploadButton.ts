@@ -5,6 +5,8 @@ import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
 import FileManagerButton from './components/FileManagerButton';
+import { insertWithDisplayName } from './utils/applyDisplayName';
+import type File from '../common/models/File';
 
 import TextEditor from 'flarum/common/components/TextEditor';
 
@@ -41,17 +43,21 @@ export default function addUploadButton(): void {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
     this.uploader.on('success', (response: unknown) => {
-      const { file, addBBcode } = response as { file: { bbcode: () => string }; addBBcode: boolean };
+      const { file, addBBcode } = response as { file: File; addBBcode: boolean };
       if (!addBBcode) return;
 
-      this.attrs.composer.editor!.insertAtCursor(file.bbcode() + '\n', false);
+      const insert = (bbcode: string) => {
+        this.attrs.composer.editor!.insertAtCursor(bbcode + '\n', false);
 
-      if (typeof this.attrs.preview === 'function') {
-        const originalIsFullScreen = app.composer.isFullScreen;
-        app.composer.isFullScreen = () => false;
-        this.attrs.preview!();
-        app.composer.isFullScreen = originalIsFullScreen;
-      }
+        if (typeof this.attrs.preview === 'function') {
+          const originalIsFullScreen = app.composer.isFullScreen;
+          app.composer.isFullScreen = () => false;
+          this.attrs.preview!();
+          app.composer.isFullScreen = originalIsFullScreen;
+        }
+      };
+
+      insertWithDisplayName(file, insert);
     });
 
     const dragAndDropTarget = (this as any).fofUploadDragAndDropTarget?.();

@@ -43,9 +43,15 @@ interface Template
     /**
      * Generates a preview bbcode string.
      *
-     * @param File $file
+     * $displayName optionally overrides the label shown to readers. Templates
+     * that render a label should use it in place of the file name; the rest
+     * may ignore it. Implementations added before this parameter existed remain
+     * signature-compatible, since it is optional.
+     *
+     * @param File        $file
+     * @param string|null $displayName
      *
      * @return string
      */
-    public function preview(File $file): string;
+    public function preview(File $file, ?string $displayName = null): string;
 }

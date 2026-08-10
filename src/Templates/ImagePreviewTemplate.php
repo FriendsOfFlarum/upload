@@ -51,7 +51,12 @@ class ImagePreviewTemplate extends AbstractTextFormatterTemplate
         return '[upl-image-preview uuid={IDENTIFIER} url={URL?} alt={TEXT?} thumbnail_url={URL?}]';
     }
 
-    public function preview(File $file): string
+    /**
+     * This template renders the image inline and has no label body, so
+     * $displayName does not apply. The alt attribute stays derived from the
+     * file name.
+     */
+    public function preview(File $file, ?string $displayName = null): string
     {
         $thumbnailUrl = $file->thumbnail_url ?: $file->url;
 

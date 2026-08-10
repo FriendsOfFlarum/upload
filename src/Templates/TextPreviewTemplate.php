@@ -48,11 +48,13 @@ class TextPreviewTemplate extends AbstractTextFormatterTemplate
      */
     public function bbcode(): string
     {
-        return '[upl-text-preview uuid={IDENTIFIER} url={URL} has_snippet={SIMPLETEXT?} snippet={SIMPLETEXT?}]{SIMPLETEXT1}[/upl-text-preview]';
+        return '[upl-text-preview uuid={IDENTIFIER} url={URL} has_snippet={SIMPLETEXT?} snippet={SIMPLETEXT?}]{TEXT1}[/upl-text-preview]';
     }
 
-    public function preview(File $file): string
+    public function preview(File $file, ?string $displayName = null): string
     {
-        return "[upl-text-preview uuid={$file->uuid} url={$file->url} has_snippet=false]{$file->base_name}[/upl-text-preview]";
+        $label = $this->label($file, $displayName);
+
+        return "[upl-text-preview uuid={$file->uuid} url={$file->url} has_snippet=false]{$label}[/upl-text-preview]";
     }
 }

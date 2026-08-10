@@ -184,6 +184,13 @@ fof-upload:
   forum:
     media_manager: Media manager
 
+    display_name:
+      title: Name this download
+      label: Display name
+      help: Shown on the download instead of the file name. Leave as-is to use the file name.
+      insert: Insert
+      use_file_name: Use file name
+
     buttons:
       attach: Attach
       upload: Upload
