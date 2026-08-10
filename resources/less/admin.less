@@ -17,11 +17,50 @@
     }
   }
 
+  // One grid for the whole table.
+  //
+  // Each row was previously its own grid. `fr` and `minmax()` resolve per grid
+  // container against that container's own content, so the header row (short
+  // text) and the data rows (wide chips and selects) resolved to different track
+  // widths and could never line up. Declaring the columns once here, with rows
+  // spanning them via subgrid, makes every row share one set of tracks.
+  // A plain table. Columns align by definition, in every browser, with no
+  // per-row grid to keep in sync — an earlier grid version had each row sizing
+  // its own tracks, so the headings never lined up with the controls.
   &-mimeTypes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    width: 100%;
+    border-collapse: collapse;
     margin-bottom: 1rem;
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 0.5rem 0.5rem 0.5rem 0;
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    // Proportional widths so the table adapts to the panel, with the pattern
+    // column taking the space it needs for wrapped chips.
+    th:nth-child(1) {
+      width: 38%;
+    }
+    th:nth-child(2) {
+      width: 14%;
+    }
+    th:nth-child(3) {
+      width: 22%;
+    }
+    th:nth-child(4) {
+      width: 18%;
+    }
+    th:nth-child(5) {
+      width: 1%;
+      white-space: nowrap;
+    }
   }
 
   &-maxFileSize {
@@ -44,11 +83,11 @@
     }
   }
 
+  // Rows span all five columns of the parent grid and inherit its tracks, so
+  // headings and controls always sit on the same boundaries.
+  // Rows are multi-line once chips wrap, so a divider keeps them distinct.
   &-mimeTypeRow {
-    display: grid;
-    grid-template-columns: minmax(160px, 2fr) minmax(120px, 1fr) minmax(180px, 1.5fr) minmax(120px, 1fr) auto;
-    align-items: center;
-    gap: 0.5rem;
+    border-top: 1px solid var(--control-bg);
   }
 
   &-mimeTypeRow .Select {
@@ -104,6 +143,282 @@
 
     fieldset {
       margin-bottom: 1.5rem;
+    }
+  }
+
+  // Column headings for the file-type grid. Same track sizing as the rows, so
+  // the labels stay aligned with the controls they describe.
+  &-mimeTypeHeader {
+    font-weight: bold;
+    color: var(--muted-color);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding-bottom: 0.25rem;
+
+    @media @phone {
+      display: none;
+    }
+  }
+
+  &-columnHeader {
+    // Sized on the span rather than the row: setting it on the row shrinks the
+    // grid tracks relative to the data rows, so the headings drift out of
+    // alignment with the controls they label.
+    font-size: 0.85em;
+    // Signals the tooltip without stealing attention from the values below.
+    border-bottom: 1px dotted var(--muted-color);
+    cursor: help;
+    // Long headings would otherwise spill into the next column.
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  &-mimeTypeTools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  &-presetSelect select {
+    width: auto;
+  }
+
+  // Friendly view of a pattern: the media type followed by one chip per subtype.
+  &-patternChips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  &-mimeTypeName {
+    color: var(--muted-color);
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+
+  &-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.45rem;
+    background: var(--control-bg);
+    border-radius: var(--border-radius);
+    font-size: 0.85em;
+    // Long vendor subtypes would otherwise stretch the column well past its share.
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  &-chipRemove {
+    border: 0;
+    background: none;
+    color: var(--muted-color);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+
+    &:hover:not(:disabled) {
+      color: var(--text-color);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  &-chipAddButton {
+    border: 1px dashed var(--muted-color);
+    background: none;
+    color: var(--muted-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    padding: 0 0.4rem;
+    line-height: 1.5;
+
+    &:hover {
+      color: var(--text-color);
+      border-color: var(--text-color);
+    }
+  }
+
+  &-chipInput {
+    width: 10rem;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.85em;
+  }
+
+  &-patternToggle {
+    padding: 0 0.3rem;
+    font-size: 0.8em;
+    color: var(--muted-color);
+  }
+
+  &-patternRaw {
+    .UploadPage-mimeTypeInput {
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  }
+
+  &-patternMeta {
+    margin-top: 0.2rem;
+  }
+
+  &-patternAdvanced {
+    color: var(--muted-color);
+    font-size: 0.8em;
+  }
+
+  // Each button is Tooltip-wrapped, so the cell holds three inline wrappers
+  // rather than the buttons directly — nowrap keeps them on one line.
+  &-mimeTypeActions {
+    white-space: nowrap;
+
+    .Button {
+      padding: 0.2rem 0.3rem;
+    }
+  }
+
+  &-orderNote {
+    margin-top: 0.75rem;
+  }
+
+  &-templateHelp {
+    margin-top: 1rem;
+
+    summary {
+      cursor: pointer;
+      color: var(--muted-color);
+    }
+  }
+
+  &-storageIntro {
+    margin-bottom: 1.5rem;
+  }
+
+  &-addStorage {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--control-bg);
+
+    .helpText {
+      margin-top: 0.5rem;
+    }
+  }
+
+  &-hideUnused {
+    margin-top: 1rem;
+  }
+
+  // Pointer to the docs when a storage service is available but not installed.
+  &-uninstalled {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--control-bg);
+  }
+
+  &-s3Advanced {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--control-bg);
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+  }
+
+  &-actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background: var(--body-bg);
+    // Keeps the save button reachable without scrolling to the end of a tab.
+    z-index: 1;
+  }
+
+  &-unsavedHint {
+    color: var(--muted-color);
+    font-size: 0.9em;
+  }
+}
+
+.SettingsTabs {
+  margin-bottom: 1rem;
+
+  &-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--control-bg);
+  }
+
+  // Tabs are LinkButtons so each carries a real href — the active tab lives in
+  // the route, not component state. The Button chrome is stripped back to a
+  // tab strip.
+  &-tab.Button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    margin-bottom: -2px;
+    background: none;
+    box-shadow: none;
+    color: var(--muted-color);
+    font-weight: bold;
+
+    &:hover,
+    &:focus {
+      background: none;
+      color: var(--text-color);
+    }
+
+    &.SettingsTabs-tab--active {
+      color: var(--link-color);
+      border-bottom-color: var(--link-color);
+    }
+
+    .Button-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  &-tabIcon {
+    font-size: 0.9em;
+  }
+
+  // Marks a tab holding edits that the single save button has not yet written.
+  &-tabDirty {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--link-color);
+  }
+
+  @media @phone {
+    &-tabLabel {
+      display: none;
+    }
+
+    &-tab {
+      flex: 1 1 auto;
+      justify-content: center;
     }
   }
 }

@@ -6,6 +6,9 @@ import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import Placeholder from 'flarum/common/components/Placeholder';
 import UploadImageButton from './UploadImageButton';
+import SettingsTabs, { type SettingsTab } from './SettingsTabs';
+import MimeTypeRow from './MimeTypeRow';
+import Tooltip from 'flarum/common/components/Tooltip';
 import withAttr from 'flarum/common/utils/withAttr';
 import Stream from 'flarum/common/utils/Stream';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
@@ -16,6 +19,8 @@ import type { ExtensionPageAttrs } from 'flarum/admin/components/ExtensionPage';
 import type Mithril from 'mithril';
 import { registerMimePermissions } from '../index';
 import { bestUnitForKb, effectivePhpLimitKb, fromKb, humanizeKb, toKb, UNIT_TO_KB, type SizeUnit } from '../utils/fileSize';
+import { detectProvider, findProvider, providerOptions } from '../utils/storageProviders';
+import { buildPattern, MIME_PRESETS } from '../utils/mimePatterns';
 
 type MimeConfig = {
   adapter: string;
@@ -37,13 +42,9 @@ type MimeConfig = {
  *
  * Examples:
  *   "Images"          → "images"
- *   "Bilder (Größen)" → "bilder-grossen"   (ö→o, ß→ss via NFD doesn't work for ß,
- *                                            see note below)
  *   "Vidéos & More"   → "videos-more"
  *
- * Note: ß does not decompose under NFD; it becomes "ss" only under NFKD-like
- * mappings that browsers don't expose. We handle it with an explicit replacement
- * before normalizing.
+ * Note: ß does not decompose under NFD, so it is replaced explicitly first.
  */
 function slugify(value: string): string {
   return value
@@ -56,6 +57,41 @@ function slugify(value: string): string {
 }
 
 type Values = Record<string, Stream<any>>;
+
+/** Which tab each setting belongs to, for the per-tab unsaved-changes markers. */
+const TAB_FIELDS: Record<string, string[]> = {
+  files: ['maxFileSize', 'whitelistedClientExtensions', 'mimeTypes'],
+  storage: [
+    'cdnUrl',
+    'imgurClientId',
+    'awsS3Key',
+    'awsS3Secret',
+    'awsS3Bucket',
+    'awsS3Region',
+    'awsS3Endpoint',
+    'awsS3ACL',
+    'awsS3CustomUrl',
+    'awsS3UsePathStyleEndpoint',
+    'qiniuKey',
+    'qiniuSecret',
+    'qiniuBucket',
+  ],
+  images: [
+    'mustResize',
+    'resizeMaxWidth',
+    'generateThumbnails',
+    'thumbnailWebp',
+    'thumbnailMaxWidth',
+    'thumbnailQuality',
+    'addsWatermarks',
+    'watermarkPosition',
+    'watermarkSizePercent',
+    'watermarkOpacity',
+    'watermarkPadding',
+    'svgAnimateAllowed',
+  ],
+  advanced: ['composerButtonVisiblity', 'disableHotlinkProtection', 'disableDownloadLogging'],
+};
 
 export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
   loading = false;
@@ -78,13 +114,19 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
   // Display-only unit for the "maximum file size" field. The setting itself
   // (this.values.maxFileSize) is always stored in kilobytes.
   maxFileSizeUnit!: Stream<SizeUnit>;
-  newMimeType!: {
-    regex: Stream<string>;
-    adapter: Stream<string>;
-    template: Stream<string>;
-    permission_label: Stream<string>;
-  };
-
+  /**
+   * Selected S3 provider preset. Display-only: it drives placeholders and which
+   * fields are relevant, and is derived from the saved endpoint on load rather
+   * than being persisted as its own setting.
+   */
+  s3Provider!: Stream<string>;
+  /**
+   * Reveal storage services that are installed but neither configured nor used
+   * by any file type, so a new one can be set up. They are hidden by default
+   * because an installed adapter package is not the same thing as an adapter
+   * the forum has anything to do with.
+   */
+  showAllAdapters = false;
   oninit(vnode: Mithril.Vnode<ExtensionPageAttrs, this>) {
     super.oninit(vnode);
 
@@ -173,6 +215,8 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       this.values[key] = val ? Stream(JSON.parse(val)) : Stream();
     });
 
+    this.s3Provider = Stream(detectProvider(this.values.awsS3Endpoint()));
+
     this.defaultAdap = Object.keys(this.uploadMethodOptions)[Object.keys(this.uploadMethodOptions).length - 1] || 'local';
 
     if (!this.values.mimeTypes() || Object.keys(this.values.mimeTypes()).length === 0) {
@@ -185,26 +229,10 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
         },
       });
     }
-
-    this.newMimeType = {
-      regex: Stream(''),
-      adapter: Stream(this.defaultAdap),
-      template: Stream('file'),
-      permission_label: Stream(''),
-    };
   }
 
   content(vnode: Mithril.VnodeDOM<ExtensionPageAttrs, this>) {
-    const maxPost = app.data.settings[this.addPrefix('php_ini.post_max_size')];
-    const maxUpload = app.data.settings[this.addPrefix('php_ini.upload_max_filesize')];
     const fileinfoAvailable = app.data.settings[this.addPrefix('fileinfo_available')] as unknown as boolean | undefined;
-
-    const maxFileSizeKb = Number(this.values.maxFileSize()) || 0;
-    const maxFileSizeUnit = this.maxFileSizeUnit();
-    // Value shown in the number input, expressed in the currently-selected unit.
-    const maxFileSizeInUnit = maxFileSizeKb ? fromKb(maxFileSizeKb, maxFileSizeUnit) : '';
-    const phpLimitKb = effectivePhpLimitKb(maxPost, maxUpload);
-    const exceedsPhpLimit = phpLimitKb != null && maxFileSizeKb > phpLimitKb;
 
     return (
       <div className="UploadPage">
@@ -214,351 +242,15 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
               {app.translator.trans('fof-upload.admin.warnings.fileinfo_missing')}
             </Alert>
           )}
-          <form
-            className="Form"
-            onsubmit={(e: Event) => {
-              e.preventDefault();
-              this.onsubmit(e);
-            }}
-          >
-            <div className="Form-body">
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.preferences.title')}</legend>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')}</label>
-                  <div className="UploadPage-maxFileSize">
-                    <input
-                      className="FormControl UploadPage-maxFileSize-value"
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={maxFileSizeInUnit}
-                      oninput={withAttr('value', (v: string) => {
-                        const amount = parseFloat(v);
-                        this.values.maxFileSize(Number.isFinite(amount) ? toKb(amount, this.maxFileSizeUnit()) : '');
-                      })}
-                    />
-                    <Select
-                      className="UploadPage-maxFileSize-unit"
-                      options={Object.fromEntries(Object.keys(UNIT_TO_KB).map((u) => [u, u])) as Record<SizeUnit, string>}
-                      value={maxFileSizeUnit}
-                      onchange={(unit: SizeUnit) => this.maxFileSizeUnit(unit)}
-                    />
-                  </div>
-                  <p className="helpText">
-                    {app.translator.trans('fof-upload.admin.labels.preferences.max_file_size_equivalent', {
-                      value: humanizeKb(maxFileSizeKb),
-                      kb: maxFileSizeKb.toLocaleString(),
-                    })}
-                  </p>
-                  {exceedsPhpLimit ? (
-                    <Alert type="warning" dismissible={false}>
-                      {app.translator.trans('fof-upload.admin.warnings.max_file_size_exceeds_php', {
-                        limit: humanizeKb(phpLimitKb!),
-                        post: maxPost,
-                        upload: maxUpload,
-                      })}
-                    </Alert>
-                  ) : (
-                    <p className="helpText">
-                      {app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
-                        post: maxPost,
-                        upload: maxUpload,
-                      })}
-                    </p>
-                  )}
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.preferences.mime_types')}</label>
-                  <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.mime_types')}</p>
-                  <div className="UploadPage-mimeTypes">
-                    {Object.keys(this.values.mimeTypes()).map((mime) => {
-                      let config = this.values.mimeTypes()[mime] as MimeConfig | string;
-                      if (typeof config !== 'object') {
-                        config = { adapter: config, template: 'file' };
-                      }
-                      const isInvalidRegex = !this.isValidRegex(mime);
-                      return (
-                        <div key={mime} className={`UploadPage-mimeTypeRow ${isInvalidRegex ? 'UploadPage-mimeTypeRow--invalid' : ''}`}>
-                          <input
-                            className="FormControl UploadPage-mimeTypeInput"
-                            value={mime}
-                            oninput={withAttr('value', (v: string) => this.updateMimeTypeKey(mime, v))}
-                            onblur={(e: FocusEvent) => {
-                              const value = (e.target as HTMLInputElement).value;
-                              const sanitized = this.sanitizeMimeRegex(value);
-                              if (sanitized !== value) {
-                                this.updateMimeTypeKey(value, sanitized);
-                              }
-                            }}
-                            title={isInvalidRegex ? app.translator.trans('fof-upload.admin.labels.preferences.mime_type_regex_invalid') : undefined}
-                          />
-                          <Select
-                            options={this.uploadMethodOptions}
-                            onchange={(v: string) => this.updateMimeTypeAdapter(mime, config as MimeConfig, v)}
-                            value={config.adapter || 'local'}
-                          />
-                          <Select
-                            options={this.getTemplateOptionsForInput()}
-                            onchange={(v: string) => this.updateMimeTypeTemplate(mime, config as MimeConfig, v)}
-                            value={config.template || 'file'}
-                          />
-                          <input
-                            className="FormControl UploadPage-mimeTypePermission"
-                            placeholder={app.translator.trans('fof-upload.admin.labels.preferences.mime_type_permission_placeholder') as string}
-                            value={(config as MimeConfig).permission_label ?? ''}
-                            oninput={withAttr('value', (v: string) => this.updateMimeTypePermissionLabel(mime, config as MimeConfig, v))}
-                          />
-                          <Button type="button" className="Button Button--warning" onclick={() => this.deleteMimeType(mime)}>
-                            ×
-                          </Button>
-                        </div>
-                      );
-                    })}
-                    <div className="UploadPage-mimeTypeRow UploadPage-mimeTypeAdd">
-                      <input
-                        className="FormControl UploadPage-mimeTypeInput"
-                        placeholder={app.translator.trans('fof-upload.admin.labels.preferences.mime_type_regex_placeholder')}
-                        value={this.newMimeType.regex()}
-                        oninput={withAttr('value', this.newMimeType.regex)}
-                        onblur={() => {
-                          const value = this.newMimeType.regex();
-                          const sanitized = this.sanitizeMimeRegex(value);
-                          if (sanitized !== value) {
-                            this.newMimeType.regex(sanitized);
-                            m.redraw();
-                          }
-                        }}
-                      />
-                      <Select
-                        options={this.uploadMethodOptions}
-                        className="UploadPage-mimeTypeSelect"
-                        onchange={this.newMimeType.adapter}
-                        value={this.newMimeType.adapter()}
-                      />
-                      <Select
-                        options={this.getTemplateOptionsForInput()}
-                        className="UploadPage-mimeTypeSelect"
-                        onchange={this.newMimeType.template}
-                        value={this.newMimeType.template()}
-                      />
-                      <input
-                        className="FormControl UploadPage-mimeTypePermission"
-                        placeholder={app.translator.trans('fof-upload.admin.labels.preferences.mime_type_permission_placeholder') as string}
-                        value={this.newMimeType.permission_label()}
-                        oninput={withAttr('value', this.newMimeType.permission_label)}
-                      />
-                      <Button type="button" className="Button Button--warning" onclick={() => this.addMimeType()}>
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                  <Button className="Button" onclick={() => app.modal.show(() => import('./InspectMimeModal'))}>
-                    {app.translator.trans('fof-upload.admin.labels.inspect-mime')}
-                  </Button>
-                  <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.download_templates')}</p>
-                  {this.templateOptionsDescriptions()}
-                </div>
-              </fieldset>
 
-              <fieldset className="Form-group UploadPage-composerButtons">
-                <legend>{app.translator.trans('fof-upload.admin.labels.composer_buttons.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.composer_buttons')}</p>
-                <Select
-                  options={this.composerButtonVisiblityOptions}
-                  onchange={this.values.composerButtonVisiblity}
-                  value={this.values.composerButtonVisiblity() || 'both'}
-                />
-              </fieldset>
+          <form onsubmit={this.onsubmit.bind(this)}>
+            <SettingsTabs tabs={this.tabs()} extensionId="fof-upload" />
 
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.resize.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.resize')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.mustResize() || false} onchange={this.values.mustResize}>
-                    {app.translator.trans('fof-upload.admin.labels.resize.toggle')}
-                  </Switch>
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.resize.max_width')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="0"
-                    value={this.values.resizeMaxWidth() ?? 100}
-                    oninput={withAttr('value', this.values.resizeMaxWidth)}
-                    disabled={!this.values.mustResize()}
-                  />
-                </div>
-              </fieldset>
-
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.thumbnails.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnails')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.generateThumbnails() || false} onchange={this.values.generateThumbnails}>
-                    {app.translator.trans('fof-upload.admin.labels.thumbnails.toggle')}
-                  </Switch>
-                </div>
-                <div className="Form-group">
-                  <Switch
-                    state={this.values.thumbnailWebp() || false}
-                    onchange={this.values.thumbnailWebp}
-                    disabled={!this.values.generateThumbnails()}
-                  >
-                    {app.translator.trans('fof-upload.admin.labels.thumbnails.webp_toggle')}
-                  </Switch>
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.max_width')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="100"
-                    max="4000"
-                    value={this.values.thumbnailMaxWidth()}
-                    oninput={withAttr('value', this.values.thumbnailMaxWidth)}
-                    disabled={!this.values.generateThumbnails()}
-                  />
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.quality')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={this.values.thumbnailQuality()}
-                    oninput={withAttr('value', this.values.thumbnailQuality)}
-                    disabled={!this.values.generateThumbnails()}
-                  />
-                  <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnail_quality')}</p>
-                </div>
-              </fieldset>
-
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.client_extension.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.client_extension')}</p>
-                <input
-                  className="FormControl"
-                  value={this.values.whitelistedClientExtensions() ?? ''}
-                  oninput={withAttr('value', this.values.whitelistedClientExtensions)}
-                />
-              </fieldset>
-
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.watermark.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.watermark')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.addsWatermarks() || false} onchange={this.values.addsWatermarks}>
-                    {app.translator.trans('fof-upload.admin.labels.watermark.toggle')}
-                  </Switch>
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.position')}</label>
-                  <Select
-                    options={this.watermarkPositions}
-                    onchange={this.values.watermarkPosition}
-                    value={this.values.watermarkPosition() || 'bottom-right'}
-                  />
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.size_percent')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={this.values.watermarkSizePercent() ?? 25}
-                    oninput={withAttr('value', this.values.watermarkSizePercent)}
-                    disabled={!this.values.addsWatermarks()}
-                  />
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.opacity')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={this.values.watermarkOpacity() ?? 100}
-                    oninput={withAttr('value', this.values.watermarkOpacity)}
-                    disabled={!this.values.addsWatermarks()}
-                  />
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.padding')}</label>
-                  <input
-                    className="FormControl"
-                    type="number"
-                    min="0"
-                    value={this.values.watermarkPadding() ?? 10}
-                    oninput={withAttr('value', this.values.watermarkPadding)}
-                    disabled={!this.values.addsWatermarks()}
-                  />
-                </div>
-                <div className="Form-group">
-                  <label>{app.translator.trans('fof-upload.admin.labels.watermark.file')}</label>
-                  <UploadImageButton
-                    name="fof-watermark"
-                    path="fof/watermark"
-                    routePath="fof-watermark"
-                    value={app.data.settings['fof-watermark_path']}
-                    url={app.forum.attribute('fof-watermarkUrl')}
-                  />
-                </div>
-              </fieldset>
-
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.help')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.svgAnimateAllowed() || false} onchange={this.values.svgAnimateAllowed}>
-                    {app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate')}
-                  </Switch>
-                  <p className="helpText">{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate_help')}</p>
-                </div>
-              </fieldset>
-
-              <fieldset className="Form-group">
-                <legend>{app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.disable-hotlink-protection')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.disableHotlinkProtection() || false} onchange={this.values.disableHotlinkProtection}>
-                    {app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.toggle')}
-                  </Switch>
-                </div>
-                <legend>{app.translator.trans('fof-upload.admin.labels.disable-download-logging.title')}</legend>
-                <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.disable-download-logging')}</p>
-                <div className="Form-group">
-                  <Switch state={this.values.disableDownloadLogging() || false} onchange={this.values.disableDownloadLogging}>
-                    {app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')}
-                  </Switch>
-                </div>
-              </fieldset>
-
-              {!this.uploadLocalCdnSetByEnv && (
-                <fieldset className="Form-group">
-                  <legend>{app.translator.trans('fof-upload.admin.labels.local.title')}</legend>
-                  <label>{app.translator.trans('fof-upload.admin.labels.local.cdn_url')}</label>
-                  <input className="FormControl" value={this.values.cdnUrl() ?? ''} oninput={withAttr('value', this.values.cdnUrl)} />
-                </fieldset>
-              )}
-
-              {this.uploadLocalCdnSetByEnv && (
-                <fieldset className="Form-group">
-                  <legend>{app.translator.trans('fof-upload.admin.labels.local.title')}</legend>
-                  <Placeholder text={app.translator.trans('fof-upload.admin.labels.configured_by_environment')} />
-                </fieldset>
-              )}
-
-              {this.adaptorItems().toArray()}
-
-              <div className="Form-group Form-controls">
-                <Button type="submit" className="Button Button--primary" loading={this.loading} disabled={!this.changed()}>
-                  {app.translator.trans('core.admin.settings.submit_button')}
-                </Button>
-              </div>
+            <div className="UploadPage-actions Form-group Form-controls">
+              <Button type="submit" className="Button Button--primary" loading={this.loading} disabled={!this.changed()}>
+                {app.translator.trans('core.admin.settings.submit_button')}
+              </Button>
+              {this.changed() && <span className="UploadPage-unsavedHint">{app.translator.trans('fof-upload.admin.tabs.unsaved_hint')}</span>}
             </div>
           </form>
         </div>
@@ -566,17 +258,339 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     );
   }
 
-  adaptorItems() {
-    const items = new ItemList<Mithril.Children>();
+  tabs(): SettingsTab[] {
+    return [
+      {
+        key: 'files',
+        icon: 'fas fa-file-arrow-up',
+        label: app.translator.trans('fof-upload.admin.tabs.files'),
+        dirty: this.tabChanged('files'),
+        content: () => this.filesTab(),
+      },
+      {
+        key: 'storage',
+        icon: 'fas fa-database',
+        label: app.translator.trans('fof-upload.admin.tabs.storage'),
+        dirty: this.tabChanged('storage'),
+        content: () => this.storageTab(),
+      },
+      {
+        key: 'images',
+        icon: 'fas fa-image',
+        label: app.translator.trans('fof-upload.admin.tabs.images'),
+        dirty: this.tabChanged('images'),
+        content: () => this.imagesTab(),
+      },
+      {
+        key: 'advanced',
+        icon: 'fas fa-sliders',
+        label: app.translator.trans('fof-upload.admin.tabs.advanced'),
+        dirty: this.tabChanged('advanced'),
+        content: () => this.advancedTab(),
+      },
+    ];
+  }
 
-    if (this.uploadMethodOptions['imgur'] !== undefined) {
+  // ---------------------------------------------------------------------------
+  // Tab: files & permissions
+  // ---------------------------------------------------------------------------
+
+  filesTab() {
+    const maxPost = app.data.settings[this.addPrefix('php_ini.post_max_size')];
+    const maxUpload = app.data.settings[this.addPrefix('php_ini.upload_max_filesize')];
+
+    const maxFileSizeKb = Number(this.values.maxFileSize()) || 0;
+    const maxFileSizeUnit = this.maxFileSizeUnit();
+    const maxFileSizeInUnit = maxFileSizeKb ? fromKb(maxFileSizeKb, maxFileSizeUnit) : '';
+    const phpLimitKb = effectivePhpLimitKb(maxPost, maxUpload);
+    const exceedsPhpLimit = phpLimitKb != null && maxFileSizeKb > phpLimitKb;
+
+    return (
+      <div className="UploadPage-tabContent">
+        {/*
+          The mime mapping decides which adapter stores each file type and how it
+          is rendered, so it leads the page. It used to sit below the file size
+          field inside a fieldset labelled "General preferences", which buried the
+          one section an admin actually has to understand.
+        */}
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.preferences.mime_types')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.mime_types')}</p>
+
+          {/* A real table: columns line up by definition, in every browser, with
+              no per-row grid to keep in sync. */}
+          <table className="UploadPage-mimeTypes">
+            <thead>
+              <tr className="UploadPage-mimeTypeHeader">
+                <th>{this.columnHeader('pattern')}</th>
+                <th>{this.columnHeader('storage')}</th>
+                <th>{this.columnHeader('display')}</th>
+                <th>{this.columnHeader('permission')}</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(this.values.mimeTypes()).map((mime, index, all) => {
+                let config = this.values.mimeTypes()[mime] as MimeConfig | string;
+                if (typeof config !== 'object') {
+                  config = { adapter: config, template: 'file' };
+                }
+                const cfg = config as MimeConfig;
+
+                return (
+                  <MimeTypeRow
+                    key={mime}
+                    pattern={mime}
+                    adapter={cfg.adapter}
+                    template={cfg.template}
+                    permissionLabel={cfg.permission_label ?? ''}
+                    adapterOptions={this.uploadMethodOptions}
+                    templateOptions={this.getTemplateOptionsForInput()}
+                    index={index}
+                    total={all.length}
+                    onPatternChange={(next: string) => this.updateMimeTypeKey(mime, next)}
+                    onAdapterChange={(next: string) => this.updateMimeTypeAdapter(mime, cfg, next)}
+                    onTemplateChange={(next: string) => this.updateMimeTypeTemplate(mime, cfg, next)}
+                    onPermissionLabelChange={(next: string) => this.updateMimeTypePermissionLabel(mime, cfg, next)}
+                    onMove={(direction: -1 | 1) => this.moveMimeType(mime, direction)}
+                    onRemove={() => this.deleteMimeType(mime)}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+
+          <p className="helpText UploadPage-orderNote">
+            <Icon name="fas fa-circle-info" /> {app.translator.trans('fof-upload.admin.help_texts.mime_order')}
+          </p>
+
+          <div className="UploadPage-mimeTypeTools">
+            <Select className="UploadPage-presetSelect" options={this.presetOptions()} value="" onchange={(key: string) => this.addPreset(key)} />
+            <Button className="Button" icon="fas fa-magnifying-glass" onclick={() => app.modal.show(() => import('./InspectMimeModal'))}>
+              {app.translator.trans('fof-upload.admin.labels.inspect-mime')}
+            </Button>
+          </div>
+
+          <details className="UploadPage-templateHelp">
+            <summary>{app.translator.trans('fof-upload.admin.help_texts.download_templates')}</summary>
+            {this.templateOptionsDescriptions()}
+          </details>
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.preferences.max_file_size')}</legend>
+          <div className="UploadPage-maxFileSize">
+            <input
+              className="FormControl UploadPage-maxFileSize-value"
+              type="number"
+              min="0"
+              step="any"
+              value={maxFileSizeInUnit}
+              oninput={withAttr('value', (v: string) => {
+                const amount = parseFloat(v);
+                this.values.maxFileSize(Number.isFinite(amount) ? toKb(amount, this.maxFileSizeUnit()) : '');
+              })}
+            />
+            <Select
+              className="UploadPage-maxFileSize-unit"
+              options={Object.fromEntries(Object.keys(UNIT_TO_KB).map((u) => [u, u])) as Record<SizeUnit, string>}
+              value={maxFileSizeUnit}
+              onchange={(unit: SizeUnit) => this.maxFileSizeUnit(unit)}
+            />
+          </div>
+          <p className="helpText">
+            {app.translator.trans('fof-upload.admin.labels.preferences.max_file_size_equivalent', {
+              value: humanizeKb(maxFileSizeKb),
+              kb: maxFileSizeKb.toLocaleString(),
+            })}
+          </p>
+          {exceedsPhpLimit ? (
+            <Alert type="warning" dismissible={false}>
+              {app.translator.trans('fof-upload.admin.warnings.max_file_size_exceeds_php', {
+                limit: humanizeKb(phpLimitKb!),
+                post: maxPost,
+                upload: maxUpload,
+              })}
+            </Alert>
+          ) : (
+            <p className="helpText">
+              {app.translator.trans('fof-upload.admin.labels.preferences.php_ini_values', {
+                post: maxPost,
+                upload: maxUpload,
+              })}
+            </p>
+          )}
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.client_extension.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.client_extension')}</p>
+          <input
+            className="FormControl"
+            placeholder={app.translator.trans('fof-upload.admin.labels.client_extension.placeholder') as string}
+            value={this.values.whitelistedClientExtensions() ?? ''}
+            oninput={withAttr('value', this.values.whitelistedClientExtensions)}
+          />
+        </fieldset>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tab: storage
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Adapters whose section should be shown by default.
+   *
+   * Two reasons qualify an adapter: a file type routes to it, or it already has
+   * credentials saved. The second matters because configuring storage before
+   * pointing a file type at it is a perfectly normal order to work in — an admin
+   * part-way through setting up S3 must not have the section disappear on them.
+   */
+  adaptersInUse(): Set<string> {
+    const used = new Set<string>();
+
+    Object.values((this.values.mimeTypes() ?? {}) as Record<string, MimeConfig | string>).forEach((config) => {
+      const adapter = typeof config === 'object' ? config.adapter : config;
+      if (adapter) used.add(adapter);
+    });
+
+    if (this.hasAnyValue(['awsS3Key', 'awsS3Secret', 'awsS3Bucket', 'awsS3Endpoint']) || this.uploadS3SetByEnv) {
+      used.add('aws-s3');
+    }
+
+    if (this.hasAnyValue(['imgurClientId'])) {
+      used.add('imgur');
+    }
+
+    if (this.hasAnyValue(['qiniuKey', 'qiniuSecret', 'qiniuBucket'])) {
+      used.add('qiniu');
+    }
+
+    return used;
+  }
+
+  private hasAnyValue(keys: string[]): boolean {
+    return keys.some((key) => {
+      const value = this.values[key]?.();
+      return typeof value === 'string' ? value.trim() !== '' : !!value;
+    });
+  }
+
+  storageTab() {
+    const inUse = this.adaptersInUse();
+    const adapters = this.adaptorItems(inUse);
+    const hidden = this.hiddenAdapterCount(inUse);
+
+    return (
+      <div className="UploadPage-tabContent">
+        <p className="helpText UploadPage-storageIntro">{app.translator.trans('fof-upload.admin.help_texts.storage_intro')}</p>
+
+        {this.uploadLocalCdnSetByEnv ? (
+          <fieldset className="Form-group">
+            <legend>{app.translator.trans('fof-upload.admin.labels.local.title')}</legend>
+            <Placeholder text={app.translator.trans('fof-upload.admin.labels.configured_by_environment')} />
+          </fieldset>
+        ) : (
+          <fieldset className="Form-group">
+            <legend>{app.translator.trans('fof-upload.admin.labels.local.title')}</legend>
+            <label>{app.translator.trans('fof-upload.admin.labels.local.cdn_url')}</label>
+            <input
+              className="FormControl"
+              placeholder="https://cdn.example.com"
+              value={this.values.cdnUrl() ?? ''}
+              oninput={withAttr('value', this.values.cdnUrl)}
+            />
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.local_cdn')}</p>
+          </fieldset>
+        )}
+
+        {adapters.toArray()}
+
+        {this.uninstalledAdapters()}
+
+        {hidden > 0 && (
+          <div className="UploadPage-addStorage">
+            <Button
+              className="Button"
+              icon="fas fa-plus"
+              onclick={() => {
+                this.showAllAdapters = true;
+                m.redraw();
+              }}
+            >
+              {app.translator.trans('fof-upload.admin.labels.storage.configure_another', { count: hidden })}
+            </Button>
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.storage_configure_another')}</p>
+          </div>
+        )}
+
+        {this.showAllAdapters && (
+          <Button
+            className="Button Button--text UploadPage-hideUnused"
+            icon="fas fa-eye-slash"
+            onclick={() => {
+              this.showAllAdapters = false;
+              m.redraw();
+            }}
+          >
+            {app.translator.trans('fof-upload.admin.labels.storage.hide_unused')}
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  /**
+   * Pointer to the docs when a storage service is available but not installed.
+   *
+   * The adapters list is built from `class_exists()` checks on the backend, so a
+   * service whose composer package is absent never appears anywhere on this page
+   * — an admin had no way to discover S3 or Qiniu were even options. A single
+   * link is enough to make that discoverable; the install commands belong in the
+   * docs rather than permanently on screen.
+   */
+  uninstalledAdapters() {
+    const anyMissing = ['aws-s3', 'qiniu'].some((key) => this.uploadMethodOptions[key] === undefined);
+
+    if (!anyMissing) return null;
+
+    return (
+      <p className="helpText UploadPage-uninstalled">
+        {app.translator.trans('fof-upload.admin.help_texts.storage_not_installed', {
+          a: <Link href="https://github.com/FriendsOfFlarum/upload/blob/2.x/README.md#installing-storage-adapters" external={true} target="_blank" />,
+        })}
+      </p>
+    );
+  }
+
+  /** How many installed adapters are currently hidden because nothing uses them. */
+  hiddenAdapterCount(inUse: Set<string>): number {
+    if (this.showAllAdapters) return 0;
+
+    return ['imgur', 'qiniu', 'aws-s3'].filter((key) => this.uploadMethodOptions[key] !== undefined && !inUse.has(key)).length;
+  }
+
+  /**
+   * Storage adapter credential sections.
+   *
+   * Only adapters a mime type actually routes to are shown. Previously every
+   * installed adapter package rendered its credentials permanently, so a forum
+   * with the S3 package installed but unused still had eight S3 fields on screen.
+   */
+  adaptorItems(inUse: Set<string>) {
+    const items = new ItemList<Mithril.Children>();
+    const visible = (key: string) => this.uploadMethodOptions[key] !== undefined && (this.showAllAdapters || inUse.has(key));
+
+    if (visible('imgur')) {
       items.add(
         'imgur',
         <div className="UploadPage-adapter UploadPage-adapter--imgur">
           <fieldset className="Form-group">
             <legend>{app.translator.trans('fof-upload.admin.labels.imgur.title')}</legend>
-            <p>
-              <Icon name="fas fa-exclamation-circle" />
+            <p className="helpText">
+              <Icon name="fas fa-exclamation-circle" />{' '}
               {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
                 a: <Link href="https://imgur.com/tos" external={true} target="_blank" />,
               })}
@@ -589,7 +603,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       );
     }
 
-    if (this.uploadMethodOptions['qiniu'] !== undefined) {
+    if (visible('qiniu')) {
       items.add(
         'qiniu',
         <div className="UploadPage-adapter UploadPage-adapter--qiniu">
@@ -598,7 +612,12 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
             <label>{app.translator.trans('fof-upload.admin.labels.qiniu.key')}</label>
             <input className="FormControl" value={this.values.qiniuKey() ?? ''} oninput={withAttr('value', this.values.qiniuKey)} />
             <label>{app.translator.trans('fof-upload.admin.labels.qiniu.secret')}</label>
-            <input className="FormControl" value={this.values.qiniuSecret() ?? ''} oninput={withAttr('value', this.values.qiniuSecret)} />
+            <input
+              className="FormControl"
+              type="password"
+              value={this.values.qiniuSecret() ?? ''}
+              oninput={withAttr('value', this.values.qiniuSecret)}
+            />
             <label>{app.translator.trans('fof-upload.admin.labels.qiniu.bucket')}</label>
             <input className="FormControl" value={this.values.qiniuBucket() ?? ''} oninput={withAttr('value', this.values.qiniuBucket)} />
           </fieldset>
@@ -607,58 +626,443 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       );
     }
 
-    if (this.uploadMethodOptions['aws-s3'] !== undefined) {
-      if (!this.uploadS3SetByEnv) {
-        items.add(
-          'aws-s3',
-          <div className="UploadPage-adapter UploadPage-adapter--aws">
-            <fieldset className="Form-group">
-              <legend>{app.translator.trans('fof-upload.admin.labels.aws-s3.title')}</legend>
-              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_instance_profile')}</p>
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.key')}</label>
-              <input className="FormControl" value={this.values.awsS3Key() ?? ''} oninput={withAttr('value', this.values.awsS3Key)} />
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.secret')}</label>
-              <input className="FormControl" value={this.values.awsS3Secret() ?? ''} oninput={withAttr('value', this.values.awsS3Secret)} />
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')}</label>
-              <input className="FormControl" value={this.values.awsS3Bucket() ?? ''} oninput={withAttr('value', this.values.awsS3Bucket)} />
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.region')}</label>
-              <input className="FormControl" value={this.values.awsS3Region() ?? ''} oninput={withAttr('value', this.values.awsS3Region)} />
-            </fieldset>
-            <fieldset className="Form-group">
-              <legend>{app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')}</legend>
-              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_compatible_storage')}</p>
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')}</label>
-              <input className="FormControl" value={this.values.awsS3Endpoint() ?? ''} oninput={withAttr('value', this.values.awsS3Endpoint)} />
-              <div className="Form-group">
-                <Switch state={this.values.awsS3UsePathStyleEndpoint() || false} onchange={this.values.awsS3UsePathStyleEndpoint}>
-                  {app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')}
-                </Switch>
-              </div>
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.acl')}</label>
-              <input className="FormControl" value={this.values.awsS3ACL() ?? ''} oninput={withAttr('value', this.values.awsS3ACL)} />
-              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_acl')}</p>
-              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.custom_url')}</label>
-              <input className="FormControl" value={this.values.awsS3CustomUrl() ?? ''} oninput={withAttr('value', this.values.awsS3CustomUrl)} />
-              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.custom_s3_url')}</p>
-            </fieldset>
-          </div>,
-          60
-        );
-      } else {
-        items.add(
-          'aws-s3',
-          <div className="UploadPage-adapter UploadPage-adapter--aws">
-            <fieldset className="Form-group">
-              <legend>{app.translator.trans('fof-upload.admin.labels.aws-s3.title')}</legend>
-              <Placeholder text={app.translator.trans('fof-upload.admin.labels.configured_by_environment')} />
-            </fieldset>
-          </div>,
-          60
-        );
-      }
+    if (visible('aws-s3')) {
+      items.add('aws-s3', this.s3Section(), 60);
     }
 
     return items;
+  }
+
+  /**
+   * S3 and S3-compatible storage.
+   *
+   * Previously split across "AWS S3 storage settings" and "Advanced S3 storage
+   * settings", with nothing indicating that a non-AWS provider needs fields from
+   * both. Now a single section led by a provider preset, which supplies the
+   * endpoint format, path-style requirement and ACL support that an admin
+   * otherwise had to know from the provider's own documentation.
+   */
+  s3Section() {
+    if (this.uploadS3SetByEnv) {
+      return (
+        <div className="UploadPage-adapter UploadPage-adapter--aws">
+          <fieldset className="Form-group">
+            <legend>{app.translator.trans('fof-upload.admin.labels.aws-s3.title')}</legend>
+            <Placeholder text={app.translator.trans('fof-upload.admin.labels.configured_by_environment')} />
+          </fieldset>
+        </div>
+      );
+    }
+
+    const provider = findProvider(this.s3Provider());
+
+    return (
+      <div className="UploadPage-adapter UploadPage-adapter--aws">
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.aws-s3.title')}</legend>
+
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.provider')}</label>
+            <Select options={providerOptions()} value={this.s3Provider()} onchange={(key: string) => this.selectS3Provider(key)} />
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_provider')}</p>
+          </div>
+
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.key')}</label>
+            <input className="FormControl" value={this.values.awsS3Key() ?? ''} oninput={withAttr('value', this.values.awsS3Key)} />
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.secret')}</label>
+            <input
+              className="FormControl"
+              type="password"
+              value={this.values.awsS3Secret() ?? ''}
+              oninput={withAttr('value', this.values.awsS3Secret)}
+            />
+            {provider.key === 'aws' && <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_instance_profile')}</p>}
+          </div>
+
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')}</label>
+            <input className="FormControl" value={this.values.awsS3Bucket() ?? ''} oninput={withAttr('value', this.values.awsS3Bucket)} />
+          </div>
+
+          {provider.needsRegion && (
+            <div className="Form-group">
+              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.region')}</label>
+              <input
+                className="FormControl"
+                placeholder={provider.key === 'aws' ? 'eu-west-2' : ''}
+                value={this.values.awsS3Region() ?? ''}
+                oninput={withAttr('value', this.values.awsS3Region)}
+              />
+            </div>
+          )}
+
+          {provider.key !== 'aws' && (
+            <div className="Form-group">
+              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.endpoint')}</label>
+              <input
+                className="FormControl"
+                placeholder={provider.endpointHint}
+                value={this.values.awsS3Endpoint() ?? ''}
+                oninput={withAttr('value', this.values.awsS3Endpoint)}
+              />
+              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_endpoint')}</p>
+            </div>
+          )}
+
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.custom_url')}</label>
+            <input
+              className="FormControl"
+              placeholder={provider.customUrlHint}
+              value={this.values.awsS3CustomUrl() ?? ''}
+              oninput={withAttr('value', this.values.awsS3CustomUrl)}
+            />
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.custom_s3_url')}</p>
+          </div>
+
+          <details className="UploadPage-s3Advanced">
+            <summary>{app.translator.trans('fof-upload.admin.labels.aws-s3.advanced_title')}</summary>
+
+            <div className="Form-group">
+              <Switch state={this.values.awsS3UsePathStyleEndpoint() || false} onchange={this.values.awsS3UsePathStyleEndpoint}>
+                {app.translator.trans('fof-upload.admin.labels.aws-s3.use_path_style_endpoint')}
+              </Switch>
+              <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_path_style')}</p>
+            </div>
+
+            <div className="Form-group">
+              <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.acl')}</label>
+              <input
+                className="FormControl"
+                value={this.values.awsS3ACL() ?? ''}
+                oninput={withAttr('value', this.values.awsS3ACL)}
+                disabled={!provider.supportsAcl}
+              />
+              <p className="helpText">
+                {provider.supportsAcl
+                  ? app.translator.trans('fof-upload.admin.help_texts.s3_acl')
+                  : app.translator.trans('fof-upload.admin.help_texts.s3_acl_unsupported', { provider: provider.name })}
+              </p>
+            </div>
+          </details>
+        </fieldset>
+      </div>
+    );
+  }
+
+  /**
+   * Apply a provider preset.
+   *
+   * Only fields the preset can meaningfully determine are touched — path-style
+   * addressing, and clearing an ACL the provider would reject. Credentials,
+   * bucket and endpoint stay as the admin entered them.
+   */
+  selectS3Provider(key: string) {
+    this.s3Provider(key);
+
+    const provider = findProvider(key);
+
+    this.values.awsS3UsePathStyleEndpoint(provider.pathStyle);
+
+    if (!provider.supportsAcl) {
+      this.values.awsS3ACL('');
+    }
+
+    if (key === 'aws') {
+      // AWS derives its endpoint from bucket + region; a stale custom endpoint
+      // from another provider would override that and break URL generation.
+      this.values.awsS3Endpoint('');
+    }
+
+    m.redraw();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tab: images
+  // ---------------------------------------------------------------------------
+
+  imagesTab() {
+    return (
+      <div className="UploadPage-tabContent">
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.resize.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.resize')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.mustResize() || false} onchange={this.values.mustResize}>
+              {app.translator.trans('fof-upload.admin.labels.resize.toggle')}
+            </Switch>
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.resize.max_width')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="1"
+              value={this.values.resizeMaxWidth()}
+              oninput={withAttr('value', this.values.resizeMaxWidth)}
+              disabled={!this.values.mustResize()}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.thumbnails.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnails')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.generateThumbnails() || false} onchange={this.values.generateThumbnails}>
+              {app.translator.trans('fof-upload.admin.labels.thumbnails.toggle')}
+            </Switch>
+          </div>
+          <div className="Form-group">
+            <Switch state={this.values.thumbnailWebp() || false} onchange={this.values.thumbnailWebp} disabled={!this.values.generateThumbnails()}>
+              {app.translator.trans('fof-upload.admin.labels.thumbnails.webp_toggle')}
+            </Switch>
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.max_width')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="100"
+              max="4000"
+              value={this.values.thumbnailMaxWidth()}
+              oninput={withAttr('value', this.values.thumbnailMaxWidth)}
+              disabled={!this.values.generateThumbnails()}
+            />
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.quality')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="1"
+              max="100"
+              value={this.values.thumbnailQuality()}
+              oninput={withAttr('value', this.values.thumbnailQuality)}
+              disabled={!this.values.generateThumbnails()}
+            />
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnail_quality')}</p>
+          </div>
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.watermark.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.watermark')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.addsWatermarks() || false} onchange={this.values.addsWatermarks}>
+              {app.translator.trans('fof-upload.admin.labels.watermark.toggle')}
+            </Switch>
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.watermark.file')}</label>
+            <UploadImageButton
+              name="fof-watermark"
+              path="fof/watermark"
+              routePath="fof-watermark"
+              value={app.data.settings['fof-watermark_path']}
+              url={app.forum.attribute('fof-watermarkUrl')}
+            />
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.watermark.position')}</label>
+            <Select
+              options={this.watermarkPositions}
+              onchange={this.values.watermarkPosition}
+              value={this.values.watermarkPosition() || 'bottom-right'}
+              disabled={!this.values.addsWatermarks()}
+            />
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.watermark.size_percent')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="1"
+              max="100"
+              value={this.values.watermarkSizePercent()}
+              oninput={withAttr('value', this.values.watermarkSizePercent)}
+              disabled={!this.values.addsWatermarks()}
+            />
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.watermark.opacity')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="0"
+              max="100"
+              value={this.values.watermarkOpacity()}
+              oninput={withAttr('value', this.values.watermarkOpacity)}
+              disabled={!this.values.addsWatermarks()}
+            />
+          </div>
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.watermark.padding')}</label>
+            <input
+              className="FormControl"
+              type="number"
+              min="0"
+              value={this.values.watermarkPadding()}
+              oninput={withAttr('value', this.values.watermarkPadding)}
+              disabled={!this.values.addsWatermarks()}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.help')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.svgAnimateAllowed() || false} onchange={this.values.svgAnimateAllowed}>
+              {app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate')}
+            </Switch>
+            <p className="helpText">{app.translator.trans('fof-upload.admin.labels.svg-sanitizer.allow_animate_help')}</p>
+          </div>
+        </fieldset>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tab: advanced
+  // ---------------------------------------------------------------------------
+
+  advancedTab() {
+    return (
+      <div className="UploadPage-tabContent">
+        <fieldset className="Form-group UploadPage-composerButtons">
+          <legend>{app.translator.trans('fof-upload.admin.labels.composer_buttons.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.composer_buttons')}</p>
+          <Select
+            options={this.composerButtonVisiblityOptions}
+            onchange={this.values.composerButtonVisiblity}
+            value={this.values.composerButtonVisiblity() || 'both'}
+          />
+        </fieldset>
+
+        {/* Previously these two shared a single fieldset with two legends, which
+            is invalid markup and read as one setting. */}
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.disable-hotlink-protection')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.disableHotlinkProtection() || false} onchange={this.values.disableHotlinkProtection}>
+              {app.translator.trans('fof-upload.admin.labels.disable-hotlink-protection.toggle')}
+            </Switch>
+          </div>
+        </fieldset>
+
+        <fieldset className="Form-group">
+          <legend>{app.translator.trans('fof-upload.admin.labels.disable-download-logging.title')}</legend>
+          <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.disable-download-logging')}</p>
+          <div className="Form-group">
+            <Switch state={this.values.disableDownloadLogging() || false} onchange={this.values.disableDownloadLogging}>
+              {app.translator.trans('fof-upload.admin.labels.disable-download-logging.toggle')}
+            </Switch>
+          </div>
+        </fieldset>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shared helpers
+  // ---------------------------------------------------------------------------
+
+  /** Column heading with a tooltip explaining what the column controls. */
+  columnHeader(column: string) {
+    return (
+      <Tooltip text={app.translator.trans(`fof-upload.admin.labels.preferences.mime_column_${column}_help`, {}, true)}>
+        <span className="UploadPage-columnHeader">{app.translator.trans(`fof-upload.admin.labels.preferences.mime_column_${column}`)}</span>
+      </Tooltip>
+    );
+  }
+
+  /** Options for the "add file types" picker: a prompt, the presets, then custom. */
+  presetOptions(): Record<string, string> {
+    const options: Record<string, string> = {
+      '': app.translator.trans('fof-upload.admin.labels.preferences.mime_add_prompt', {}, true),
+    };
+
+    MIME_PRESETS.forEach((preset) => {
+      options[preset.key] = app.translator.trans(`fof-upload.admin.labels.mime_presets.${preset.labelKey}`, {}, true);
+    });
+
+    options.custom = app.translator.trans('fof-upload.admin.labels.preferences.mime_add_custom', {}, true);
+
+    return options;
+  }
+
+  /**
+   * Add a row from a named preset.
+   *
+   * Authoring a regex from nothing is where a non-technical admin gets stuck, so
+   * the presets cover the groupings forums actually ask for. "Custom" inserts an
+   * empty row that opens straight into raw editing.
+   */
+  addPreset(key: string) {
+    if (!key) return;
+
+    const mimeTypes = this.values.mimeTypes();
+
+    if (key === 'custom') {
+      // A placeholder the admin then edits. Keyed uniquely so it cannot collide
+      // with an existing row.
+      let pattern = '^application\\/octet-stream$';
+      let n = 2;
+      while (mimeTypes[pattern] !== undefined) {
+        pattern = `^application\\/octet-stream-${n++}$`;
+      }
+
+      mimeTypes[pattern] = { adapter: this.defaultAdap, template: 'file' };
+      this.values.mimeTypes({ ...mimeTypes });
+      m.redraw();
+
+      return;
+    }
+
+    const preset = MIME_PRESETS.find((p) => p.key === key);
+    if (!preset) return;
+
+    const pattern = buildPattern(preset.type, preset.subtypes);
+
+    // Adding a preset that is already present would silently replace its
+    // adapter and template, so leave the existing row alone.
+    if (mimeTypes[pattern] !== undefined) {
+      m.redraw();
+
+      return;
+    }
+
+    mimeTypes[pattern] = { adapter: this.defaultAdap, template: preset.template };
+    this.values.mimeTypes({ ...mimeTypes });
+    m.redraw();
+  }
+
+  /**
+   * Move a row up or down.
+   *
+   * Order is significant: the backend matches with `->first()`, so the first
+   * pattern that matches a file's mime type wins. Object key order survives the
+   * JSON round trip on both sides, so rebuilding the object in a new order is
+   * enough to change precedence.
+   */
+  moveMimeType(mime: string, direction: -1 | 1) {
+    const mimeTypes = this.values.mimeTypes();
+    const keys = Object.keys(mimeTypes);
+    const from = keys.indexOf(mime);
+    const to = from + direction;
+
+    if (from === -1 || to < 0 || to >= keys.length) return;
+
+    keys.splice(to, 0, ...keys.splice(from, 1));
+
+    const reordered: Record<string, unknown> = {};
+    keys.forEach((key) => (reordered[key] = mimeTypes[key]));
+
+    this.values.mimeTypes(reordered);
+    m.redraw();
   }
 
   getTemplateOptionsForInput(): Record<string, string> {
@@ -669,6 +1073,22 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       }
     }
     return options;
+  }
+
+  templateOptionsDescriptions() {
+    return (
+      <ul className="UploadPage-templateList">
+        {Object.keys(this.templateOptions).map((template) => (
+          <li key={template}>
+            <strong>{this.templateOptions[template].name}</strong>
+            {/* m.trust, not dangerouslySetInnerHTML — the latter is React's API
+                and silently rendered nothing here, so every description in this
+                list showed up blank. */}
+            {this.templateOptions[template].description ? <span> — {m.trust(this.templateOptions[template].description)}</span> : null}
+          </li>
+        ))}
+      </ul>
+    );
   }
 
   updateMimeTypeKey(mime: string, value: string) {
@@ -712,41 +1132,21 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     m.redraw();
   }
 
-  templateOptionsDescriptions() {
-    return (
-      <ul className="UploadPage-templateList">
-        {Object.keys(this.templateOptions).map((template) => (
-          <li key={template}>
-            {this.templateOptions[template].name}: <span dangerouslySetInnerHTML={{ __html: this.templateOptions[template].description }} />
-          </li>
-        ))}
-      </ul>
-    );
+  /** Whether any setting belonging to the given tab differs from what is saved. */
+  tabChanged(tab: string): boolean {
+    return (TAB_FIELDS[tab] ?? []).some((key) => this.fieldChanged(key));
   }
 
-  addMimeType() {
-    const regex = this.newMimeType.regex();
-    if (!regex) return;
+  fieldChanged(key: string): boolean {
+    if (this.objects.includes(key)) {
+      return JSON.stringify(this.values[key]()) !== app.data.settings[this.addPrefix(key)];
+    }
 
-    const label = this.newMimeType.permission_label();
-    const mimeTypes = this.values.mimeTypes();
-    mimeTypes[regex] = {
-      adapter: this.newMimeType.adapter(),
-      template: this.newMimeType.template(),
-      ...(label
-        ? {
-            permission_label: label,
-            permission_slug: slugify(label),
-          }
-        : {}),
-    };
-    this.values.mimeTypes({ ...mimeTypes });
+    if (this.checkboxes.includes(key)) {
+      return this.values[key]() !== (app.data.settings[this.addPrefix(key)] === '1');
+    }
 
-    this.newMimeType.regex('');
-    this.newMimeType.adapter(this.defaultAdap);
-    this.newMimeType.template('file');
-    this.newMimeType.permission_label('');
-    m.redraw();
+    return this.values[key]?.() !== app.data.settings[this.addPrefix(key)];
   }
 
   changed(): boolean {

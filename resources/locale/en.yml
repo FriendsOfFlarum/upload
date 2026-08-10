@@ -30,9 +30,9 @@ fof-upload:
       download_templates: |
         Download templates are how uploads are shown on your forum, eg like previews, buttons. Currently available:
       mime_types: |
-        Please configure your mapping here. Each mime type regular expression will be handled by a specific upload adapter and download template.
-        Optionally, give each entry a permission label (e.g. "Images", "Videos") to create a dedicated permission in the permission grid.
-        This lets you restrict which groups may upload specific file types — in addition to the base "Upload files" permission which is always required.
+        Decide which files members may upload, where each kind is stored, and how it appears in a post.
+      mime_order: |
+        Rules are matched from the top down and the first match wins, so put more specific rules above general ones.
       resize: |
         Choose whether you want to resize your images before they get uploaded. You can choose a maximum width and height, in pixels. The resizing process keeps the aspect ratio of the images.
       client_extension: |
@@ -49,28 +49,59 @@ fof-upload:
         Existing thumbnails keep their current quality until regenerated with the backfill command.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
-      s3_compatible_storage: |
-        The following settings are only required when using S3 compatible storage. If you use AWS, you can leave them blank.
+      storage_intro: |
+        Services you have configured, or that a file type is using, are shown here. You can set up a service
+        before pointing any file type at it — assign it on the Files tab when you are ready.
+      storage_configure_another: |
+        Other storage services are installed but not yet set up. Configuring one does not change where files go
+        until you assign it to a file type.
+      storage_not_installed: "Looking for Amazon S3, Cloudflare R2 or Qiniu? Those need an extra package — see <a>installing storage adapters</a>."
+      local_cdn: |
+        Optional. If you serve <code>assets/files</code> through a CDN, enter its base URL and uploaded file links will use it.
+        Leave blank to serve files directly from your forum.
+      s3_provider: |
+        Choosing your provider sets the endpoint format, addressing style and ACL support below. Pick "Other S3-compatible"
+        if yours is not listed.
+      s3_endpoint: |
+        The provider's S3 API URL — not your bucket's public URL. Amazon S3 does not need one.
       s3_acl: |
-        The ACL that should be applied to the uploaded object (default: private). For possible values, see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+        Applied to each uploaded object. Leave blank for the provider default (usually private).
+        Use <code>public-read</code> if files must be readable directly from the bucket.
+      s3_acl_unsupported: |
+        {provider} does not support ACLs. Control public access in the provider's own dashboard instead.
+      s3_path_style: |
+        Puts the bucket in the URL path rather than the hostname. Required by MinIO and Cloudflare R2;
+        set automatically when you choose a provider.
       custom_s3_url: |
-        Use this setting if you are using an S3-compatible service that requires a specific URL format (e.g., Backblaze B2) or if you are experiencing issues with the default URL format. This setting is generally not necessary for most services. Ensure the URL includes the protocol (https://) and is correctly formatted. Example: https://your-bucket.s3.your-region.backblazeb2.com
+        The public base URL your files are served from — a CDN or custom domain in front of the bucket.
+        Leave blank to use the provider's default URL. Must include <code>https://</code>.
       s3_instance_profile: |
-        Leave key and secret empty to use credentials in instance profile.
+        Leave both blank to use an IAM role instead — only works on EC2, ECS or EKS.
       composer_buttons: |
         By default both the media manager button and upload button are visible. You can also choose to display only one button.
+    tabs:
+      files: Files
+      storage: Storage
+      images: Images
+      advanced: Advanced
+      unsaved_changes: This tab has unsaved changes
+      unsaved_hint: You have unsaved changes.
     labels:
+      storage:
+        configure_another: "Configure another storage service ({count} available)"
+        hide_unused: Hide services that are not in use
       aws-s3:
         bucket: Bucket
-        key: Key
+        key: Access key ID
         region: Region
-        secret: Secret
-        title: AWS S3 storage settings
-        advanced_title: Advanced S3 storage settings
+        secret: Secret access key
+        title: S3 storage
+        provider: Provider
+        advanced_title: Advanced options
         endpoint: Endpoint
-        use_path_style_endpoint: Use path style endpoint
+        use_path_style_endpoint: Use path-style addressing
         acl: Access Control List (ACL)
-        custom_url: Custom S3 URL
+        custom_url: Public URL
       disable-download-logging:
         title: Disable logging downloads
         toggle: Disable
@@ -93,10 +124,38 @@ fof-upload:
       preferences:
         max_file_size: Maximum file size
         max_file_size_equivalent: "Stored as <code>{kb}</code> KB ({value})."
-        mime_types: "Configure your mime type, upload adapter mapping"
+        mime_types: "File types"
         mime_type_regex_placeholder: "e.g. ^image/(jpeg|png|gif)$"
         mime_type_regex_invalid: "Invalid regex (e.g. empty alternatives like ||)"
-        mime_type_permission_placeholder: "Permission label (optional, e.g. Images)"
+        mime_type_permission_placeholder: "Optional, e.g. Images"
+        mime_type_remove: Remove this file type
+        mime_type_add: Add this file type
+        mime_column_pattern: File type
+        mime_column_pattern_help: The kinds of file this rule applies to, matched against the file's MIME type.
+        mime_column_storage: Stored in
+        mime_column_storage_help: Which storage service files of this type are uploaded to.
+        mime_column_display: Shown as
+        mime_column_display_help: How the file appears in a post — an inline preview, a download button, and so on.
+        mime_column_permission: Permission label
+        mime_column_permission_help: Optional. Naming a group here creates a permission so you can control who may upload these files.
+        mime_move_up: Move up (matched earlier)
+        mime_move_down: Move down (matched later)
+        mime_edit_pattern: Edit pattern
+        mime_use_simple: Use simple editor
+        mime_advanced_pattern: Advanced pattern
+        mime_add_subtype: Add a file format
+        mime_add_subtype_placeholder: "e.g. webp"
+        mime_remove_subtype: "Remove {subtype}"
+        mime_add_prompt: Add file types…
+        mime_add_custom: Custom pattern…
+      mime_presets:
+        images: Images
+        pdf: PDF documents
+        documents: Word documents
+        spreadsheets: Spreadsheets
+        archives: Archives (zip, tar, 7z)
+        audio: Audio
+        video: Video
         title: General preferences
         php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
@@ -105,6 +164,7 @@ fof-upload:
         toggle: Resize images
       client_extension:
         title: User-provided file extensions
+        placeholder: "e.g. docx, xlsx, epub"
       thumbnails:
         title: Image thumbnails
         toggle: Generate thumbnails on upload

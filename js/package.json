@@ -3,9 +3,14 @@
   "name": "@fof/upload",
   "prettier": "@flarum/prettier-config",
   "devDependencies": {
+    "@babel/runtime": "^7",
+    "@flarum/jest-config": "^2.0.0",
     "@flarum/prettier-config": "^1.0.0",
+    "dayjs": "^1.11.21",
     "flarum-tsconfig": "^2.0.0",
     "flarum-webpack-config": "^3.0.0",
+    "jquery": "^4.0.0",
+    "mithril": "^2.3.8",
     "prettier": "^3.3.2",
     "typescript": "^4.5.4",
     "typescript-coverage-report": "^0.6.1",
@@ -21,6 +26,8 @@
     "build-typings": "npm run clean-typings && ([ -e src/@types ] && cp -r src/@types dist-typings/@types || true) && tsc && npm run post-build-typings",
     "post-build-typings": "find dist-typings -type f -name '*.d.ts' -print0 | xargs -0 sed -i 's,../src/@types,@types,g'",
     "check-typings": "tsc --noEmit --emitDeclarationOnly false",
-    "check-typings-coverage": "typescript-coverage-report"
-  }
+    "check-typings-coverage": "typescript-coverage-report",
+    "test": "yarn node --experimental-vm-modules $(yarn bin jest)"
+  },
+  "type": "module"
 }
