@@ -75,7 +75,18 @@ class DeleteFileHandler
 
     protected function deleteFileViaAdaptor(File $file): File|bool
     {
-        $adapter = $this->util->getAdapterForFile($file);
+        // Resolved from where the file was actually stored, not from what its
+        // mime type maps to today — those diverge as soon as an admin edits the
+        // file-type list, and deleting against the wrong adapter silently leaves
+        // the stored object behind.
+        $adapter = $this->util->getStorageAdapterForFile($file);
+
+        if ($adapter === null) {
+            // No adapter could be resolved at all, so there is nothing that can
+            // remove the object. Reported rather than allowed to fatal on a null
+            // call, which previously left both the file and its database row.
+            return false;
+        }
 
         return $adapter->delete($file);
     }
