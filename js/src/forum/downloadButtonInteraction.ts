@@ -18,6 +18,21 @@ function showDenialAlert(message: string): void {
 }
 
 /**
+ * TODO: replace FA_STYLE_CLASSES, FA_UTILITY_CLASSES and swapToLockIcon() with
+ * core's `flarum/common/utils/applyIconStyle`, reading the forced style from
+ * `app.forum.attribute('fontAwesomeForcedStyle')`.
+ *
+ * Neither exists in flarum/core v2.0.0-rc.5, which this builds against — they
+ * are only on the framework's main branch — so importing them now would break
+ * against the released dependency. The local implementation below mirrors
+ * applyIconStyle's behaviour, minus the brand-icon special case (irrelevant for
+ * a padlock). Once core ships them, this whole block collapses to:
+ *
+ *   const style = app.forum.attribute<string | null>('fontAwesomeForcedStyle');
+ *   icon.className = `icon ${applyIconStyle('fa-solid fa-lock', style ?? '')}`;
+ */
+
+/**
  * FontAwesome style classes, in both FA7 long form and the legacy short form.
  * Icon names and utility classes (fa-fw, fa-spin) also begin with `fa-`, so the
  * list is explicit rather than pattern-based.
