@@ -40,7 +40,7 @@ class JustUrlTemplate extends AbstractTemplate
     /**
      * {@inheritdoc}
      */
-    public function preview(File $file): string
+    public function preview(File $file, ?string $displayName = null): string
     {
         return $file->url;
     }

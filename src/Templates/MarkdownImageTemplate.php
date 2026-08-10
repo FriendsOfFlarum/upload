@@ -40,7 +40,7 @@ class MarkdownImageTemplate extends AbstractTemplate
     /**
      * {@inheritdoc}
      */
-    public function preview(File $file): string
+    public function preview(File $file, ?string $displayName = null): string
     {
         return '![Image description]('.$file->url.')';
     }

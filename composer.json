@@ -51,7 +51,8 @@
         "overtrue/flysystem-qiniu": "^3.2",
         "flarum/gdpr": "^2.0.0",
         "flarum/phpstan": "^2.0.0",
-        "flarum/testing": "^2.0.0"
+        "flarum/testing": "^2.0.0",
+        "flarum/tags": "^2.0.0"
     },
     "extra": {
         "branch-alias": {

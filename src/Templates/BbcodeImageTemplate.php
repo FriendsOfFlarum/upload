@@ -40,7 +40,7 @@ class BbcodeImageTemplate extends AbstractTemplate
     /**
      * {@inheritdoc}
      */
-    public function preview(File $file): string
+    public function preview(File $file, ?string $displayName = null): string
     {
         return '[URL='.$file->url.'][IMG]'.$file->url.'[/IMG][/URL]';
     }

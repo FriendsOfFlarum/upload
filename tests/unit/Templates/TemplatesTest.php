@@ -202,6 +202,9 @@ class TemplatesTest extends TestCase
         $this->assertStringContainsString('size={SIMPLETEXT2}', $bbcode);
         $this->assertStringContainsString('[upl-file', $bbcode);
         $this->assertStringContainsString('[/upl-file]', $bbcode);
+        // The label body uses TEXT, not SIMPLETEXT, so display names may contain
+        // punctuation. See DisplayNameTest for the full rationale.
+        $this->assertStringContainsString('{TEXT1}', $bbcode);
     }
 
     #[Test]
@@ -249,7 +252,7 @@ class TemplatesTest extends TestCase
         $preview = $t->preview($file);
 
         $this->assertStringNotContainsString('{IDENTIFIER}', $preview);
-        $this->assertStringNotContainsString('{SIMPLETEXT1}', $preview);
+        $this->assertStringNotContainsString('{TEXT1}', $preview);
         $this->assertStringNotContainsString('{SIMPLETEXT2}', $preview);
     }
 
@@ -340,7 +343,7 @@ class TemplatesTest extends TestCase
         $preview = $t->preview($file);
 
         $this->assertStringNotContainsString('{IDENTIFIER}', $preview);
-        $this->assertStringNotContainsString('{SIMPLETEXT1}', $preview);
+        $this->assertStringNotContainsString('{TEXT1}', $preview);
         $this->assertStringNotContainsString('{SIMPLETEXT2}', $preview);
         $this->assertStringNotContainsString('{URL}', $preview);
     }
@@ -573,7 +576,7 @@ class TemplatesTest extends TestCase
         // has_snippet/snippet in text-preview) are left as-is by design.
         $requiredPlaceholders = [
             '{IDENTIFIER}',
-            '{SIMPLETEXT1}',
+            '{TEXT1}',
             '{SIMPLETEXT2}',
             '{URL}',
         ];

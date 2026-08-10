@@ -9,7 +9,7 @@
             <div class="data">
                 <div class="content">
                     <h4 class="title">
-                        {SIMPLETEXT1}
+                        {TEXT1}
                     </h4>
                     <div class="Button Button--primary Button-icon Button--block"><i class="fas fa-download"></i></div>
                 </div>
