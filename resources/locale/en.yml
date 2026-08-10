@@ -43,6 +43,10 @@ fof-upload:
         Generate a downscaled thumbnail for images at upload time. The thumbnail is shown inline;
         clicking it opens the original full-resolution file in a new tab. Thumbnails significantly
         reduce bandwidth and page weight for forums with many large images.
+      thumbnail_quality: |
+        Encode quality from 1 to 100, applied to WebP and JPEG thumbnails. Higher values look sharper
+        but produce larger files. GIF and PNG thumbnails are lossless and ignore this setting.
+        Existing thumbnails keep their current quality until regenerated with the backfill command.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
       s3_compatible_storage: |
@@ -106,6 +110,7 @@ fof-upload:
         toggle: Generate thumbnails on upload
         webp_toggle: "Encode thumbnails as WebP (recommended, ~30% smaller)"
         max_width: Thumbnail max width (px)
+        quality: Thumbnail quality
       watermark:
         file: Upload your watermark image
         opacity: "Watermark opacity (0–100)"

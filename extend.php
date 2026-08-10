@@ -163,7 +163,8 @@ return [
         ->default('fof-upload.svgAnimateAllowed', false)
         ->default('fof-upload.generateThumbnails', true)
         ->default('fof-upload.thumbnailWebp', true)
-        ->default('fof-upload.thumbnailMaxWidth', 1000),
+        ->default('fof-upload.thumbnailMaxWidth', 1000)
+        ->default('fof-upload.thumbnailQuality', 80),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

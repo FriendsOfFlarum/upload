@@ -40,8 +40,11 @@ class BackfillThumbnailsCommand extends Command
         $chunkSize = max(1, (int) $this->option('chunk'));
         $dryRun = (bool) $this->option('dry-run');
 
-        $useWebp = (bool) $settings->get('fof-upload.thumbnailWebp', true);
-        $maxWidth = max(1, (int) $settings->get('fof-upload.thumbnailMaxWidth', 1000));
+        // Defaults for these live in the Settings extender in extend.php, so they
+        // are not repeated here — a second default would silently diverge.
+        $useWebp = (bool) $settings->get('fof-upload.thumbnailWebp');
+        $maxWidth = max(1, (int) $settings->get('fof-upload.thumbnailMaxWidth'));
+        $quality = max(1, min(100, (int) $settings->get('fof-upload.thumbnailQuality')));
 
         // Process any image that is missing its thumbnail, OR that has a thumbnail but is
         // missing its recorded thumbnail dimensions (thumbnails backfilled before the
@@ -79,7 +82,7 @@ class BackfillThumbnailsCommand extends Command
         $dimensionsOnly = 0;
         $skipped = 0;
 
-        $query->chunkById($chunkSize, function ($files) use ($downloader, $imageManager, $manager, $bar, $useWebp, $maxWidth, &$generated, &$dimensionsOnly, &$skipped) {
+        $query->chunkById($chunkSize, function ($files) use ($downloader, $imageManager, $manager, $bar, $useWebp, $maxWidth, $quality, &$generated, &$dimensionsOnly, &$skipped) {
             foreach ($files as $file) {
                 try {
                     $needsThumbnail = empty($file->thumbnail_url);
@@ -114,9 +117,9 @@ class BackfillThumbnailsCommand extends Command
                     $mimeType = $file->type;
 
                     $thumbEncoded = $useWebp
-                        ? $thumb->toWebp(quality: 80)
+                        ? $thumb->toWebp(quality: $quality)
                         : match ($mimeType) {
-                            'image/jpeg' => $thumb->toJpeg(quality: 80),
+                            'image/jpeg' => $thumb->toJpeg(quality: $quality),
                             'image/gif'  => $thumb->toGif(),
                             default      => $thumb->toPng(),
                         };
