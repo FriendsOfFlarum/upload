@@ -134,6 +134,27 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 
 FoF Upload supports configuration via both the admin panel (database settings) and environment variables. **Environment variables take precedence** over database settings when configured.
 
+#### Installing storage adapters
+
+Local storage and Imgur work out of the box. S3 and Qiniu each need an extra package — until it is installed, the adapter does not appear in the admin panel at all.
+
+```bash
+# Amazon S3, and S3-compatible services (Cloudflare R2, Backblaze B2,
+# DigitalOcean Spaces, MinIO, …)
+composer require league/flysystem-aws-s3-v3:"^3.0"
+
+# Qiniu
+composer require overtrue/flysystem-qiniu:"^3.0"
+```
+
+Run these from your Flarum directory, then clear the cache:
+
+```bash
+php flarum cache:clear
+```
+
+The new service then appears under **Admin → Upload → Storage**, where you pick your provider and enter its credentials.
+
 #### Environment Variable Configuration
 
 You can configure storage adapters using environment variables, which is particularly useful for:

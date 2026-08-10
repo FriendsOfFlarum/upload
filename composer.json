@@ -43,8 +43,7 @@
         "flagrow/upload": "*"
     },
     "suggest": {
-        "league/flysystem-aws-s3-v3": "Uploads to AWS S3 using API version 3.",
-        "overtrue/flysystem-qiniu": "Uploads to QiNiu using API."
+        "league/flysystem-aws-s3-v3": "Uploads to AWS S3 and compatible buckets using API version 3."
     },
     "require-dev": {
         "league/flysystem-aws-s3-v3": "^3.31",
