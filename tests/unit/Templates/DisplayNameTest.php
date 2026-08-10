@@ -171,7 +171,7 @@ class DisplayNameTest extends TestCase
     {
         $bbcode = $this->bbcodeFor('quarterly-report.pdf');
 
-        ['parser' => $oldParser, 'renderer' => $oldRenderer] = $this->formatter('SIMPLETEXT1');
+        ['parser'   => $oldParser, 'renderer' => $oldRenderer] = $this->formatter('SIMPLETEXT1');
         ['renderer' => $newRenderer] = $this->formatter('TEXT1');
 
         $storedXml = $oldParser->parse($bbcode);
