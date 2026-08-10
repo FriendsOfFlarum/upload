@@ -95,6 +95,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     this.fields = [
       'resizeMaxWidth',
       'thumbnailMaxWidth',
+      'thumbnailQuality',
       'cdnUrl',
       'maxFileSize',
       'whitelistedClientExtensions',
@@ -415,10 +416,23 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
                     type="number"
                     min="100"
                     max="4000"
-                    value={this.values.thumbnailMaxWidth() ?? 1000}
+                    value={this.values.thumbnailMaxWidth()}
                     oninput={withAttr('value', this.values.thumbnailMaxWidth)}
                     disabled={!this.values.generateThumbnails()}
                   />
+                </div>
+                <div className="Form-group">
+                  <label>{app.translator.trans('fof-upload.admin.labels.thumbnails.quality')}</label>
+                  <input
+                    className="FormControl"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={this.values.thumbnailQuality()}
+                    oninput={withAttr('value', this.values.thumbnailQuality)}
+                    disabled={!this.values.generateThumbnails()}
+                  />
+                  <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.thumbnail_quality')}</p>
                 </div>
               </fieldset>
 

@@ -64,17 +64,21 @@ class ImageProcessor implements Processable
             default      => $image->toPng(),
         };
 
-        @file_put_contents($upload->getRealPath(), $encoded->toString());
-
         // Store dimensions so the browser can reserve layout space before the image loads.
         $file->image_width = $image->width();
         $file->image_height = $image->height();
 
         // Generate a downscaled thumbnail for faster page loads.
-        // Re-read from the already-processed temp file to get a clean copy for scaling.
-        if ($this->settings->get('fof-upload.generateThumbnails', true)) {
-            $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth', 1000));
-            $thumb = $this->imageManager->read($upload->getRealPath());
+        //
+        // Scaled from the in-memory image, before the full-size encode is written
+        // back below. Re-reading the encoded file instead would put the thumbnail
+        // through two lossy passes — the full-size quality, then the thumbnail's —
+        // which visibly softens detailed images. The in-memory copy has already
+        // been resized, watermarked and oriented, so the thumbnail still reflects
+        // everything the full-size image shows.
+        if ($this->settings->get('fof-upload.generateThumbnails')) {
+            $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth'));
+            $thumb = clone $image;
             $thumb->scaleDown(width: $maxWidth);
 
             // Store the thumbnail's own dimensions so the rendered <img> reserves the
@@ -83,11 +87,15 @@ class ImageProcessor implements Processable
             $file->thumbnail_width = $thumb->width();
             $file->thumbnail_height = $thumb->height();
 
-            $useWebp = (bool) $this->settings->get('fof-upload.thumbnailWebp', true);
+            $useWebp = (bool) $this->settings->get('fof-upload.thumbnailWebp');
+            $quality = max(1, min(100, (int) $this->settings->get('fof-upload.thumbnailQuality')));
+
             $thumbEncoded = $useWebp
-                ? $thumb->toWebp(quality: 80)
+                ? $thumb->toWebp(quality: $quality)
                 : match ($mimeType) {
-                    'image/jpeg' => $thumb->toJpeg(quality: 80),
+                    'image/jpeg' => $thumb->toJpeg(quality: $quality),
+                    // GIF and PNG are lossless formats; the quality setting does
+                    // not apply to them.
                     'image/gif'  => $thumb->toGif(),
                     default      => $thumb->toPng(),
                 };
@@ -99,6 +107,10 @@ class ImageProcessor implements Processable
                 default      => 'png',
             };
         }
+
+        // Written after the thumbnail is taken, so the thumbnail is scaled from
+        // the decoded image rather than from this re-encoded file.
+        @file_put_contents($upload->getRealPath(), $encoded->toString());
     }
 
     protected function resize(ImageInterface $image): void
