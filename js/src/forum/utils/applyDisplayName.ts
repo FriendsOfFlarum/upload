@@ -63,16 +63,40 @@ export function applyDisplayName(bbcode: string, displayName: string): string {
  * inserted straight away, so the prompt only appears where it means something.
  */
 export function insertWithDisplayName(file: File, insert: (bbcode: string) => void): void {
-  const bbcode = file.bbcode();
+  insertWithDisplayNames([file], insert);
+}
 
-  if (!supportsDisplayName(file)) {
-    insert(bbcode);
+/**
+ * Insert one or more files into the composer, prompting for display names for
+ * those whose template renders a label.
+ *
+ * A modal cannot be shown per file — core's ModalManager closes any open modal
+ * when a new one is shown, so a chain of show() calls would leave only the last
+ * one alive and silently drop the rest. A single modal therefore collects a name
+ * for every labelled file in the batch.
+ *
+ * Files whose template has no label (images rendered inline, plain URLs) are
+ * inserted straight away, so the prompt only covers what it can actually change.
+ */
+export function insertWithDisplayNames(files: File[], insert: (bbcode: string) => void): void {
+  const labelled = files.filter(supportsDisplayName);
+
+  if (!labelled.length) {
+    files.forEach((file) => insert(file.bbcode()));
 
     return;
   }
 
   app.modal.show(() => import('../components/DisplayNameModal'), {
-    file,
-    onsubmit: (displayName: string) => insert(applyDisplayName(bbcode, displayName)),
+    files: labelled,
+    onsubmit: (displayNames: Record<string, string>) => {
+      // Preserve the original upload order rather than grouping labelled files
+      // together, so the composer reflects what the author selected.
+      files.forEach((file) => {
+        const bbcode = file.bbcode();
+
+        insert(supportsDisplayName(file) ? applyDisplayName(bbcode, displayNames[file.id()!] ?? '') : bbcode);
+      });
+    },
   });
 }

@@ -5,7 +5,7 @@ import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
 import FileManagerButton from './components/FileManagerButton';
-import { insertWithDisplayName } from './utils/applyDisplayName';
+import { insertWithDisplayNames } from './utils/applyDisplayName';
 import type File from '../common/models/File';
 
 import TextEditor from 'flarum/common/components/TextEditor';
@@ -42,9 +42,24 @@ export default function addUploadButton(): void {
   extend(TextEditor.prototype, 'oncreate', function (this: any) {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
+    // 'success' fires once per file, but a modal cannot be shown per file: core's
+    // ModalManager closes any open modal when a new one is shown, so prompting in
+    // this handler would leave only the last file's modal alive and silently drop
+    // the rest. Files are collected here and inserted together on 'uploaded',
+    // which fires once after the whole batch.
+    const pending: File[] = [];
+
     this.uploader.on('success', (response: unknown) => {
       const { file, addBBcode } = response as { file: File; addBBcode: boolean };
       if (!addBBcode) return;
+
+      pending.push(file);
+    });
+
+    this.uploader.on('uploaded', () => {
+      if (!pending.length) return;
+
+      const files = pending.splice(0, pending.length);
 
       const insert = (bbcode: string) => {
         this.attrs.composer.editor!.insertAtCursor(bbcode + '\n', false);
@@ -57,7 +72,7 @@ export default function addUploadButton(): void {
         }
       };
 
-      insertWithDisplayName(file, insert);
+      insertWithDisplayNames(files, insert);
     });
 
     const dragAndDropTarget = (this as any).fofUploadDragAndDropTarget?.();

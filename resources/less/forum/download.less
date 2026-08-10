@@ -122,14 +122,26 @@
     }
 }
 
-// Download gated by per-tag permission (flarum/tags). The control stays visible
-// so users can see a download exists, but reads as unavailable.
+// A download the viewer has no permission to use. The control keeps its normal
+// colours — greying it out reads as "broken" rather than "locked" — and states
+// the reason instead. The padlock alone carries the locked meaning.
+//
+// The icon element is swapped to a padlock in JS rather than by overriding the
+// glyph here: a forum can force a FontAwesome style globally, which rewrites
+// every icon's classes, so a rule keyed to `.fas.fa-download` would silently
+// stop matching.
 .fof-upload-download-denied {
     cursor: not-allowed;
-    opacity: 0.55;
 
     .Button {
         cursor: not-allowed;
+    }
+
+    // Appended as its own element so the file name and size keep rendering —
+    // a locked download still needs to say what it is.
+    .fof-upload-download-reason {
+        color: var(--muted-color);
+        font-style: italic;
     }
 }
 

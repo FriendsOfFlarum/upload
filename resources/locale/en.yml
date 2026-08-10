@@ -186,10 +186,10 @@ fof-upload:
 
     display_name:
       title: Name this download
-      label: Display name
+      title_plural: "Name these downloads"
       help: Shown on the download instead of the file name. Leave as-is to use the file name.
       insert: Insert
-      use_file_name: Use file name
+      use_file_name: Use file names
 
     buttons:
       attach: Attach
@@ -203,8 +203,8 @@ fof-upload:
     states:
       error: Error
       loading: Uploading
-      unauthorized: You are not allowed to download files
-      unauthorized_in_tag: You do not have permission to download files in this tag
+      unauthorized: You are not allowed to download this file
+      permission_required: Permission required
 
     validation:
       max_size: "Uploads over {max} kb are not accepted."
