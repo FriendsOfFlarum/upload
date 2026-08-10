@@ -204,6 +204,41 @@ class Util
         return $this->getAdapterForMime($file->type);
     }
 
+    /**
+     * Resolve the adapter a file is actually stored on.
+     *
+     * Not the same thing as getAdapterForFile(), which maps the file's mime type
+     * through the *current* configuration. That only agrees with reality while
+     * the mapping is unchanged: remap a mime type, or delete the rule that
+     * covered it, and existing files still live wherever they were originally
+     * uploaded. Acting on the wrong adapter leaves the stored object behind —
+     * and for a mime type no longer covered by any rule there is no adapter to
+     * resolve at all.
+     *
+     * File::upload_method records where the file went, which is why cleanUp()
+     * and getUrlForFile() both use it. Falls back to the mime mapping only for
+     * legacy rows written before that column was populated.
+     */
+    public function getStorageAdapterForFile(File $file): ?UploadAdapter
+    {
+        if ($this->isPrivateShared($file)) {
+            throw new ValidationException(['shared-file' => 'Private shared files are handled differently, not by an adapter.']);
+        }
+
+        if ($file->upload_method) {
+            try {
+                return resolve(Manager::class)->instantiate($file->upload_method);
+            } catch (ValidationException $e) {
+                // The adapter it was uploaded with is no longer available — its
+                // package may have been removed. Fall through to the mime
+                // mapping rather than failing outright, so a delete can still
+                // clean up when the two happen to agree.
+            }
+        }
+
+        return $this->getAdapterForMime($file->type);
+    }
+
     public function getAdapterForMime(?string $mime): ?UploadAdapter
     {
         return $this->getAdapter(
@@ -264,7 +299,9 @@ class Util
         $downloadedFile = resolve(Dispatcher::class)->dispatch(new Download($file->uuid, $actor));
 
         $originalFile = clone $file;
-        $adapter = $this->getAdapterForFile($originalFile);
+        // The original is being deleted, so it must be resolved from where it
+        // was stored rather than from the current mime mapping.
+        $adapter = $this->getStorageAdapterForFile($originalFile);
 
         $success = $this->getPrivateDir()->put(
             $file->path,
@@ -272,7 +309,7 @@ class Util
         );
 
         if ($success) {
-            $adapter->delete($originalFile);
+            $adapter?->delete($originalFile);
             $file->upload_method = $this->setMethod();
             $file->url = $this->getFilePrivateUrl($file);
         }
