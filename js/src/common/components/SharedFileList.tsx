@@ -4,6 +4,8 @@ import AbstractFileList from './AbstractFIleList';
 
 export default class SharedFileList extends AbstractFileList {
   public loadFileList(): void {
+    // The in-flight and already-loaded guards live in FileListState.loadResults,
+    // so every caller gets them — not just this one.
     this.fileState.loadResults();
   }
 

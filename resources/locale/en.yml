@@ -306,6 +306,7 @@ fof-upload:
     file_list:
       loading: Loading files...
       empty: There are no files to show.
+      load_error: Could not load files. Please try again.
       release_to_upload: Release to upload
       modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
       modal_empty_phone: Your file list is empty. Tap the button above to upload a file.

@@ -62,8 +62,15 @@ export default abstract class AbstractFileList extends Component<FileListAttrs> 
             <LoadingIndicator />
           </div>
         )}
+        {/* Failed to load — distinct from an empty library, which otherwise
+            looks identical to the reader. */}
+        {!this.isLoading() && this.fileCollection().length === 0 && this.fileState.hasLoadError() && (
+          <div className="Placeholder">
+            <p className="fof-upload-empty">{app.translator.trans('fof-upload.lib.file_list.load_error')}</p>
+          </div>
+        )}
         {/* Empty file list */}
-        {!this.isLoading() && this.fileCollection().length === 0 && (
+        {!this.isLoading() && this.fileCollection().length === 0 && !this.fileState.hasLoadError() && (
           <div className="Placeholder">
             <p className="fof-upload-empty">{app.translator.trans('fof-upload.lib.file_list.empty')}</p>
           </div>
