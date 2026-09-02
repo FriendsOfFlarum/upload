@@ -48,7 +48,7 @@
     "require-dev": {
         "league/flysystem-aws-s3-v3": "^3.31",
         "flarum/gdpr": "^2.0.0",
-        "flarum/phpstan": "^2.0.0",
+        "flarum/phpstan": "2.x-dev",
         "flarum/testing": "^2.0.0",
         "flarum/tags": "^2.0.0"
     },

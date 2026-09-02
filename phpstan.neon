@@ -9,3 +9,16 @@ parameters:
   excludePaths:
     - *.blade.php
   databaseMigrationsPath: ['migrations']
+  ignoreErrors:
+    # overtrue/flysystem-qiniu is no longer a dev dependency: qiniu/php-sdk
+    # triggers PHP 8.4 deprecations during bootstrap, which fail the whole
+    # integration suite under processIsolation. The adapter code stays, guarded
+    # by class_exists(), so forums that install the package keep Qiniu support —
+    # but PHPStan can no longer resolve the symbol.
+    #
+    # Remove these once qiniu/php-sdk supports PHP 8.4, or if Qiniu support is
+    # dropped outright.
+    - message: '#Instantiated class Overtrue\\Flysystem\\Qiniu\\QiniuAdapter not found\.#'
+      path: src/Adapters/Manager.php
+    - message: '#Parameter \#1 \$adapter of class FoF\\Upload\\Adapters\\Qiniu constructor expects League\\Flysystem\\FilesystemAdapter, Overtrue\\Flysystem\\Qiniu\\QiniuAdapter given\.#'
+      path: src/Adapters/Manager.php
