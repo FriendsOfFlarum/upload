@@ -8,6 +8,7 @@ export default class FileListState {
   public files: File[];
   private moreResults: boolean;
   private loading: boolean;
+  private loadError: boolean;
   private sharedFiles: boolean;
 
   constructor(sharedFiles: boolean = false) {
@@ -15,6 +16,7 @@ export default class FileListState {
     this.files = [];
     this.moreResults = false;
     this.loading = false;
+    this.loadError = false;
     this.sharedFiles = sharedFiles;
   }
 
@@ -32,6 +34,10 @@ export default class FileListState {
 
   public refresh(): void {
     this.files = [];
+    // Clear the in-flight flag so the guard in loadResults() does not turn a
+    // deliberate refresh into a no-op. Any response still in flight lands in
+    // parseResults, but files has just been emptied, so it cannot duplicate.
+    this.loading = false;
     this.loadResults();
     m.redraw();
   }
@@ -44,12 +50,20 @@ export default class FileListState {
   public async loadResults(offset: number = 0): Promise<File[]> {
     if (!this.sharedFiles && !this.user) return Promise.reject('User not set');
 
-    this.loading = true;
+    // A request is already in flight. Without this, switching between the media
+    // tabs remounts the list component and fires a second fetch while the first
+    // is still running — parseResults concats both responses, so the list is
+    // duplicated on every switch. Guarding here rather than in the component
+    // covers loadMore() and refresh() too, which call this directly.
+    if (this.loading) return Promise.resolve(this.files);
 
+    // Shared files are loaded once and kept; only paging asks for more.
     if (this.sharedFiles && this.files.length > 0 && offset === 0) {
-      this.loading = false;
       return Promise.resolve(this.files);
     }
+
+    this.loading = true;
+    this.loadError = false;
 
     let route: string = 'fof/uploads';
     let params: ApiQueryParamsPlural = {};
@@ -70,11 +84,16 @@ export default class FileListState {
       const results = await app.store.find<File[]>(route, params);
       return this.parseResults(results as File[]);
     } catch (error) {
-      // Ensure loading is reset on failure so consumers (e.g. SharedFileList's loadFileList guard)
-      // can detect that the previous attempt finished and a retry is allowed.
+      // Reset loading so the in-flight guard above lets a retry through.
       this.loading = false;
+      this.loadError = true;
       m.redraw();
-      throw error;
+
+      // Deliberately not rethrown: every caller ignores the returned promise,
+      // so a rethrow would only produce an unhandled rejection. The error is
+      // surfaced through loadError instead, which the list renders — otherwise
+      // a failed request is indistinguishable from an empty library.
+      return [];
     }
   }
 
@@ -82,7 +101,6 @@ export default class FileListState {
    * Load the next set of results.
    */
   public async loadMore(): Promise<File[]> {
-    this.loading = true;
     return this.loadResults(this.files.length);
   }
 
@@ -135,6 +153,14 @@ export default class FileListState {
    */
   public isLoading(): boolean {
     return this.loading;
+  }
+
+  /**
+   * Whether the last load failed. Lets the list distinguish a failed request
+   * from a genuinely empty library.
+   */
+  public hasLoadError(): boolean {
+    return this.loadError;
   }
 
   /**
