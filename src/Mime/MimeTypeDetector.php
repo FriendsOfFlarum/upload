@@ -22,6 +22,101 @@ class MimeTypeDetector
     protected ?UploadedFile $upload = null;
 
     /**
+     * Names that denote the same format, mapped onto one representative each.
+     *
+     * getMimeType() cross-checks php-mime-detector against fileinfo and rejects the upload
+     * when the two disagree. They frequently disagree about nothing: a format usually has
+     * more than one registered name, the two libraries picked different ones, and the file
+     * is exactly what it claims to be. A .wav is the common case — php-mime-detector answers
+     * `audio/vnd.wave` (the IANA registration) and libmagic answers `audio/x-wav` (the name
+     * that predates it) — and there is no file either library would accept.
+     *
+     * Merging these affects the cross-check only. getMimeType() still returns the detector's
+     * own spelling, so the admin's MIME whitelist and the extension mapping see exactly what
+     * they saw before.
+     *
+     * Nothing here crosses a format boundary, so the check keeps its purpose: a file whose
+     * magic bytes and libmagic signature describe genuinely different formats is still
+     * rejected. The two deliberate groupings are documented where they appear.
+     */
+    protected const EQUIVALENT_MIME_TYPES = [
+        // Audio.
+        'audio/wav'          => 'audio/vnd.wave',
+        'audio/wave'         => 'audio/vnd.wave',
+        'audio/x-wav'        => 'audio/vnd.wave',
+        'audio/x-pn-wav'     => 'audio/vnd.wave',
+        'audio/x-flac'       => 'audio/flac',
+        'audio/x-aiff'       => 'audio/aiff',
+        'audio/x-aifc'       => 'audio/aiff',
+        'audio/m4a'          => 'audio/mp4',
+        'audio/x-m4a'        => 'audio/mp4',
+        'audio/mp3'          => 'audio/mpeg',
+        'audio/x-mp3'        => 'audio/mpeg',
+        'audio/mpeg3'        => 'audio/mpeg',
+        'audio/x-mpeg3'      => 'audio/mpeg',
+        'audio/x-mpeg'       => 'audio/mpeg',
+        'audio/x-ape'        => 'audio/ape',
+        'audio/x-wavpack'    => 'audio/wavpack',
+
+        // Ogg is a container, and the two libraries answer at different levels: libmagic
+        // names the container, php-mime-detector the codec inside it. Same bytes, and the
+        // container is what an admin whitelisting `audio/ogg` means.
+        'audio/x-ogg'        => 'audio/ogg',
+        'audio/opus'         => 'audio/ogg',
+        'audio/vorbis'       => 'audio/ogg',
+        'audio/x-opus+ogg'   => 'audio/ogg',
+        'audio/x-vorbis+ogg' => 'audio/ogg',
+
+        // Video.
+        'video/avi'          => 'video/vnd.avi',
+        'video/msvideo'      => 'video/vnd.avi',
+        'video/x-msvideo'    => 'video/vnd.avi',
+        'video/x-matroska'   => 'video/matroska',
+        'video/mpeg4'        => 'video/mp4',
+        'video/x-m4v'        => 'video/mp4',
+        'video/x-quicktime'  => 'video/quicktime',
+
+        // Images.
+        'image/ico'          => 'image/vnd.microsoft.icon',
+        'image/x-icon'       => 'image/vnd.microsoft.icon',
+        'image/x-ms-bmp'     => 'image/bmp',
+        'image/x-bmp'        => 'image/bmp',
+        'image/x-tiff'       => 'image/tiff',
+        'image/psd'          => 'image/vnd.adobe.photoshop',
+        'image/photoshop'    => 'image/vnd.adobe.photoshop',
+        'image/x-photoshop'  => 'image/vnd.adobe.photoshop',
+
+        // Fonts. TrueType and OpenType share the SFNT container, and libmagic reports some
+        // builds of either as `font/sfnt` without distinguishing them, so the whole family
+        // resolves to one name. TTF against OTF is not a security boundary.
+        'font/ttf'                      => 'font/sfnt',
+        'font/otf'                      => 'font/sfnt',
+        'application/font-sfnt'         => 'font/sfnt',
+        'application/x-font-ttf'        => 'font/sfnt',
+        'application/x-font-truetype'   => 'font/sfnt',
+        'application/x-font-otf'        => 'font/sfnt',
+        'application/x-font-opentype'   => 'font/sfnt',
+        'application/vnd.ms-opentype'   => 'font/sfnt',
+        'application/font-woff'         => 'font/woff',
+        'application/x-font-woff'       => 'font/woff',
+
+        // Documents, archives, executables.
+        'text/rtf'                                      => 'application/rtf',
+        'text/xml'                                      => 'application/xml',
+        'application/x-rar'                             => 'application/x-rar-compressed',
+        'application/vnd.rar'                           => 'application/x-rar-compressed',
+        'application/x-gzip'                            => 'application/gzip',
+        'application/x-bzip'                            => 'application/x-bzip2',
+        'application/x-debian-package'                  => 'application/x-deb',
+        'application/vnd.debian.binary-package'         => 'application/x-deb',
+        'application/x-dosexec'                         => 'application/x-msdownload',
+        'application/x-ms-dos-executable'               => 'application/x-msdownload',
+        'application/vnd.microsoft.portable-executable' => 'application/x-msdownload',
+        'application/x-nes-rom'                         => 'application/x-nintendo-nes-rom',
+        'application/vnd.sqlite3'                       => 'application/x-sqlite3',
+    ];
+
+    /**
      * Set the file path for MIME type detection.
      *
      * @param string $filePath
@@ -77,8 +172,9 @@ class MimeTypeDetector
                     }
                 }
 
-                // Reject if MIME mismatch occurs (AFTER checking for APKs)
-                if ($detectorMime !== $fileinfoMime) {
+                // Reject if MIME mismatch occurs (AFTER checking for APKs), comparing the
+                // formats rather than the strings — see EQUIVALENT_MIME_TYPES.
+                if ($this->canonicalMimeType($detectorMime) !== $this->canonicalMimeType($fileinfoMime)) {
                     $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
                     resolve('log')->error("[fof/upload] $message");
 
@@ -106,6 +202,24 @@ class MimeTypeDetector
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
+    }
+
+    /**
+     * Reduces a MIME type to the name this class compares on.
+     *
+     * Lower-cases it, drops any parameters (`text/xml; charset=utf-8`), and resolves the
+     * alternative spellings in EQUIVALENT_MIME_TYPES onto one representative. An unknown
+     * type is returned unchanged, so a name nobody has listed still has to match exactly.
+     */
+    protected function canonicalMimeType(?string $mime): ?string
+    {
+        if ($mime === null) {
+            return null;
+        }
+
+        $mime = strtolower(trim(explode(';', $mime, 2)[0]));
+
+        return static::EQUIVALENT_MIME_TYPES[$mime] ?? $mime;
     }
 
     /**
