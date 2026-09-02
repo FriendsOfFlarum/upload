@@ -5,6 +5,7 @@ export default class FileListState {
     files: File[];
     private moreResults;
     private loading;
+    private loadError;
     private sharedFiles;
     constructor(sharedFiles?: boolean);
     /**
@@ -44,6 +45,11 @@ export default class FileListState {
      * @returns True if loading, false otherwise.
      */
     isLoading(): boolean;
+    /**
+     * Whether the last load failed. Lets the list distinguish a failed request
+     * from a genuinely empty library.
+     */
+    hasLoadError(): boolean;
     /**
      * Check if there are more files to load.
      * @returns True if there are more files, false otherwise.
