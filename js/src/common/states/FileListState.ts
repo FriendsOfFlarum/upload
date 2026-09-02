@@ -29,6 +29,10 @@ export default class FileListState {
 
     this.user = user;
     this.files = [];
+    // Same reason as refresh(): a switch to a different user must not be
+    // swallowed by the in-flight guard, or the new user's list never loads and
+    // they are left looking at an empty one.
+    this.loading = false;
     this.loadResults();
   }
 
