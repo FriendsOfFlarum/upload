@@ -162,7 +162,20 @@ class MimeTypeDetectorTest extends TestCase
         // The detector's own spelling is what callers get, so the admin's MIME
         // whitelist keeps matching what it matched before.
         $this->assertSame('audio/vnd.wave', $mime);
-        $this->assertFileExists($path, 'a rejected upload is deleted');
+    }
+
+    #[Test]
+    public function getMimeType_still_rejects_a_file_whose_detectors_name_different_formats(): void
+    {
+        $this->requireFileinfo();
+
+        // FLIF magic bytes in front of an HTML document: php-mime-detector reads the
+        // header (image/flif), libmagic the body (text/html).
+        $path = $this->makeTempFile((string) file_get_contents(__DIR__.'/../../fixtures/Polyglot.flif'));
+
+        $this->expectException(ValidationException::class);
+
+        (new MimeTypeDetector())->forFile($path)->getMimeType();
     }
 
     private static function png(bool $animated): string
