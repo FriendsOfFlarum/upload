@@ -43,7 +43,7 @@ Enable the extension, a new tab will appear on the left hand side. This separate
 On new installations, a pre-defined regex will be inserted for you that enables image uploads, restricted to safe image types. We now include SVG as safe, due to our SVG sanitization method. Default image types allowed are:
 
 - JPEG
-- PNG
+- PNG (including animated PNG)
 - GIF
 - WebP
 - AVIF
@@ -51,7 +51,7 @@ On new installations, a pre-defined regex will be inserted for you that enables 
 - TIFF
 - SVG
 
-The regex for these types is `^image\/(jpeg|png|gif|webp|avif|bmp|tiff|svg\+xml)$`, and can be modified as required. We **STRONGLY** discourage the use of a wildcard such as `^image\/.*`, as this could introduce vulnerabilities in the uploaded files. Versions of `fof/upload` prior to `1.8.0` used this as default, and is considered insecure.
+The regex for these types is `^image\/(jpeg|png|apng|gif|webp|avif|bmp|tiff|svg\+xml)$`, and can be modified as required. We **STRONGLY** discourage the use of a wildcard such as `^image\/.*`, as this could introduce vulnerabilities in the uploaded files. Versions of `fof/upload` prior to `1.8.0` used this as default, and is considered insecure.
 
 Make sure you configure the upload permission on the permissions page as well.
 
@@ -274,11 +274,25 @@ Regular expressions allow you a lot of freedom, but they are also very difficult
 In case you want to allow all regular file types including video, music, compressed files and images, use this:
 
 ```text
-(video\/(3gpp|mp4|mpeg|quicktime|webm))|(audio\/(aiff|midi|mpeg|mp4))|(image\/(gif|jpeg|png))|(application\/(x-(7z|rar|zip)-compressed|zip|arj|x-(bzip2|gzip|lha|stuffit|tar)|pdf))
+(video\/(3gpp|mp4|mpeg|quicktime|webm))|(audio\/(aiff|midi|mpeg|mp4|x-m4a))|(image\/(gif|jpeg|png|apng))|(application\/(x-(7z|rar|zip)-compressed|zip|arj|x-(bzip2|gzip|lha|stuffit|tar)|pdf))
 ```
 
 A mimetype consists of a primary and secondary type. The primary type can be `image`, `video` and `application` for instance.
 The secondary is like a more detailed specification, eg `png`, `pdf` etc. These two are divided by a `/`, in regex you have to escape this character by using: `\/`.
+
+Your patterns are matched against the mimetype FoF Upload detects from the file's contents, not the one the browser sends. For some formats that is not the most familiar name:
+
+| File | Detected as |
+|------|-------------|
+| Animated PNG | `image/apng` |
+| WAV | `audio/vnd.wave` |
+| FLAC | `audio/x-flac` |
+| M4A | `audio/x-m4a` |
+| Opus | `audio/opus` |
+| AVI | `video/vnd.avi` |
+| Camera RAW | `image/x-adobe-dng`, `image/x-sony-arw`, `image/x-nikon-nef` |
+
+The admin's file-type presets already use these names.
 
 
 ### Disable or Force a particular adapter
@@ -473,6 +487,8 @@ We specifically test against:
 - Polygot Files (Files that act as two different formats)
 - SVG Sanitization (`<script>`, `<foreignObject>`, event handlers, external styles, etc)
 - ZIP & APK Handling (Ensuring APKs are valid and ZIPs are not misclassified)
+
+Every upload is identified twice — by [php-mime-detector](https://github.com/SoftCreatR/php-mime-detector) and, when the PHP `fileinfo` extension is loaded, by libmagic — and rejected when the two describe different formats. Different names for the same format (`audio/vnd.wave` and `audio/x-wav`), or a specific format and the container libmagic reports for it (`image/apng` and `image/png`), are not treated as a disagreement.
 
 ### Submitting Additional Test Cases
 We welcome community contributes in all our extensions! Especially where security is concerned. If you find a new edge case or a file format that bypasses validation, please:
