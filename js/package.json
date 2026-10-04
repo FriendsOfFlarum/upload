@@ -4,7 +4,7 @@
   "prettier": "@flarum/prettier-config",
   "devDependencies": {
     "@babel/runtime": "^7",
-    "@flarum/jest-config": "^2.0.0",
+    "@flarum/jest-config": "^2.0.2",
     "@flarum/prettier-config": "^1.0.0",
     "dayjs": "^1.11.21",
     "flarum-tsconfig": "^2.0.0",
@@ -20,8 +20,8 @@
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "format": "prettier --write src",
-    "format-check": "prettier --check src",
+    "format": "prettier --write src tests",
+    "format-check": "prettier --check src tests",
     "clean-typings": "npx rimraf dist-typings && mkdir dist-typings",
     "build-typings": "npm run clean-typings && ([ -e src/@types ] && cp -r src/@types dist-typings/@types || true) && tsc && npm run post-build-typings",
     "post-build-typings": "find dist-typings -type f -name '*.d.ts' -print0 | xargs -0 sed -i 's,../src/@types,@types,g'",
