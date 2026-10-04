@@ -125,4 +125,42 @@ class MimeTypeDetectorTest extends TestCase
         $mime = $detector->forFile($path)->getMimeType();
         $this->assertIsString($mime);
     }
+
+    // ---------------------------------------------------------------------------
+    // Cross-validation compares formats, not spellings.
+
+    private function requireFileinfo(): void
+    {
+        if (!MimeTypeDetector::fileinfoAvailable()) {
+            $this->markTestSkipped('fileinfo extension not loaded on this system');
+        }
+    }
+
+    /**
+     * A complete, playable 8-sample WAV. php-mime-detector names it `audio/vnd.wave`,
+     * libmagic `audio/x-wav`.
+     */
+    private function wavBytes(): string
+    {
+        $pcm = str_repeat(pack('v', 0), 8);
+
+        return 'RIFF'.pack('V', 36 + strlen($pcm)).'WAVEfmt '
+            .pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16)
+            .'data'.pack('V', strlen($pcm)).$pcm;
+    }
+
+    #[Test]
+    public function getMimeType_accepts_a_wav_the_two_detectors_spell_differently(): void
+    {
+        $this->requireFileinfo();
+
+        $path = $this->makeTempFile($this->wavBytes());
+
+        $mime = (new MimeTypeDetector())->forFile($path)->getMimeType();
+
+        // The detector's own spelling is what callers get, so the admin's MIME
+        // whitelist keeps matching what it matched before.
+        $this->assertSame('audio/vnd.wave', $mime);
+        $this->assertFileExists($path, 'a rejected upload is deleted');
+    }
 }

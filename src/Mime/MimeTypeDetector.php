@@ -14,6 +14,7 @@ namespace FoF\Upload\Mime;
 
 use Flarum\Foundation\ValidationException;
 use SoftCreatR\MimeDetector\MimeDetector;
+use SoftCreatR\MimeDetector\MimeTypeAliases;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MimeTypeDetector
@@ -78,7 +79,7 @@ class MimeTypeDetector
                 }
 
                 // Reject if MIME mismatch occurs (AFTER checking for APKs)
-                if ($detectorMime !== $fileinfoMime) {
+                if (!$this->sameFormat($detectorMime, $fileinfoMime)) {
                     $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
                     resolve('log')->error("[fof/upload] $message");
 
@@ -106,6 +107,22 @@ class MimeTypeDetector
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
+    }
+
+    /**
+     * Whether the two detectors' answers name the same format.
+     *
+     * A format often has more than one registered name, and the two libraries do not
+     * always pick the same one: a .wav is `audio/vnd.wave` to php-mime-detector and
+     * `audio/x-wav` to libmagic. Comparing the strings rejected such files outright.
+     */
+    protected function sameFormat(string|false $detectorMime, string|false $fileinfoMime): bool
+    {
+        if ($detectorMime === false || $fileinfoMime === false) {
+            return $detectorMime === $fileinfoMime;
+        }
+
+        return MimeTypeAliases::equivalent($detectorMime, $fileinfoMime);
     }
 
     /**
