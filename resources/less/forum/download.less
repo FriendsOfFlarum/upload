@@ -122,6 +122,15 @@
     }
 }
 
+// The label body is a TEXT token, so in a block context TextFormatter wraps it
+// in <p>; the post's paragraph margin then stretches the button and pushes the
+// label to the top. The templates now wrap the label in an inline <span>, which
+// stops the <p> being created, but posts saved on 2.0.0-beta.7 already have it
+// stored in their XML.
+[data-fof-upload-download-uuid] .fof-upload-download-label > p {
+    margin: 0;
+}
+
 // A download the viewer has no permission to use. The control keeps its normal
 // colours — greying it out reads as "broken" rather than "locked" — and states
 // the reason instead. The padlock alone carries the locked meaning.

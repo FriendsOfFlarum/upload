@@ -13,6 +13,12 @@
         border-radius: 0;
     }
 
+    // Posts saved on 2.0.0-beta.7 store the label wrapped in <p> — see download.less.
+    &Label > p {
+        display: inline;
+        margin: 0;
+    }
+
     &Full,
     &Snippet,
     &Loading,
