@@ -14,12 +14,33 @@ namespace FoF\Upload\Mime;
 
 use Flarum\Foundation\ValidationException;
 use SoftCreatR\MimeDetector\MimeDetector;
+use SoftCreatR\MimeDetector\MimeTypeAliases;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MimeTypeDetector
 {
     protected ?string $filePath = null;
     protected ?UploadedFile $upload = null;
+
+    /**
+     * Formats php-mime-detector names specifically, mapped to the container libmagic
+     * reports for them instead.
+     *
+     * One-way on purpose: the detector's specific name may match the container libmagic
+     * reports, but two different specific formats never match each other through the
+     * container they share (Opus is not Vorbis, TrueType is not OpenType).
+     */
+    protected const CONTAINER_MIME_TYPES = [
+        'image/apng' => ['image/png'],
+        'audio/opus' => ['audio/ogg'],
+        'font/ttf'   => ['font/sfnt'],
+        'font/otf'   => ['font/sfnt', 'application/vnd.ms-opentype'],
+
+        // Camera RAW formats built on TIFF.
+        'image/x-adobe-dng' => ['image/tiff'],
+        'image/x-sony-arw'  => ['image/tiff'],
+        'image/x-nikon-nef' => ['image/tiff'],
+    ];
 
     /**
      * Set the file path for MIME type detection.
@@ -78,7 +99,7 @@ class MimeTypeDetector
                 }
 
                 // Reject if MIME mismatch occurs (AFTER checking for APKs)
-                if ($detectorMime !== $fileinfoMime) {
+                if (!$this->sameFormat($detectorMime, $fileinfoMime)) {
                     $message = "MIME type mismatch detected: $detectorMime vs $fileinfoMime";
                     resolve('log')->error("[fof/upload] $message");
 
@@ -106,6 +127,28 @@ class MimeTypeDetector
         } catch (\Exception $e) {
             throw new ValidationException(['upload' => 'Could not detect MIME type.']);
         }
+    }
+
+    /**
+     * Whether the two detectors' answers name the same format.
+     *
+     * A format often has more than one registered name, and the two libraries do not
+     * always pick the same one: a .wav is `audio/vnd.wave` to php-mime-detector and
+     * `audio/x-wav` to libmagic. Comparing the strings rejected such files outright.
+     */
+    protected function sameFormat(string|false $detectorMime, string|false $fileinfoMime): bool
+    {
+        if ($detectorMime === false || $fileinfoMime === false) {
+            return $detectorMime === $fileinfoMime;
+        }
+
+        if (MimeTypeAliases::equivalent($detectorMime, $fileinfoMime)) {
+            return true;
+        }
+
+        $containers = static::CONTAINER_MIME_TYPES[MimeTypeAliases::preferred($detectorMime)] ?? [];
+
+        return in_array(MimeTypeAliases::preferred($fileinfoMime), $containers, true);
     }
 
     /**

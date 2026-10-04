@@ -124,6 +124,22 @@ describe('mimePatterns', () => {
       expect(new Set(keys).size).toBe(keys.length);
     });
 
+    // Patterns are matched against the name php-mime-detector returns, which is not
+    // always the common one: a .wav is audio/vnd.wave, an animated PNG image/apng.
+    const accepts = (key: string, mime: string) => {
+      const preset = MIME_PRESETS.find((p) => p.key === key)!;
+
+      return new RegExp(buildPattern(preset.type, preset.subtypes)).test(mime);
+    };
+
+    it.each(['image/jpeg', 'image/png', 'image/apng', 'image/gif', 'image/webp'])('images accepts %s', (mime) => {
+      expect(accepts('images', mime)).toBe(true);
+    });
+
+    it.each(['audio/mpeg', 'audio/ogg', 'audio/opus', 'audio/vnd.wave', 'audio/x-m4a'])('audio accepts %s', (mime) => {
+      expect(accepts('audio', mime)).toBe(true);
+    });
+
     it('names a template for every preset', () => {
       MIME_PRESETS.forEach((preset) => {
         expect(preset.template).toBeTruthy();
@@ -132,6 +148,24 @@ describe('mimePatterns', () => {
   });
 
   describe('suggestedSubtypes', () => {
+    it.each([
+      ['image', 'apng'],
+      ['audio', 'vnd.wave'],
+      ['audio', 'x-flac'],
+      ['audio', 'x-m4a'],
+      ['video', 'vnd.avi'],
+    ])('suggests %s/%s, the name php-mime-detector returns', (type, subtype) => {
+      expect(suggestedSubtypes(type, [])).toContain(subtype);
+    });
+
+    it.each([
+      ['audio', 'wav'],
+      ['audio', 'flac'],
+      ['video', 'x-msvideo'],
+    ])('does not suggest %s/%s, which php-mime-detector never returns', (type, subtype) => {
+      expect(suggestedSubtypes(type, [])).not.toContain(subtype);
+    });
+
     it('excludes subtypes already on the row', () => {
       const suggestions = suggestedSubtypes('image', ['jpeg', 'png']);
 

@@ -37,7 +37,7 @@
         "flarum/core": "^2.0.0",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ramsey/uuid": "^3.5.2 || ^4",
-        "softcreatr/php-mime-detector": "^4.0"
+        "softcreatr/php-mime-detector": "^5.2"
     },
     "replace": {
         "flagrow/upload": "*"
@@ -82,7 +82,7 @@
         }
     },
     "scripts": {
-        "analyse:phpstan": "phpstan analyse",
+        "analyse:phpstan": "phpstan analyse --memory-limit=1G",
         "clear-cache:phpstan": "phpstan clear-result-cache",
         "test": [
             "@test:unit",

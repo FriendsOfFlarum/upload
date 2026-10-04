@@ -124,7 +124,7 @@ export const MIME_PRESETS: MimePreset[] = [
     key: 'images',
     labelKey: 'images',
     type: 'image',
-    subtypes: ['jpeg', 'png', 'gif', 'webp', 'avif'],
+    subtypes: ['jpeg', 'png', 'apng', 'gif', 'webp', 'avif'],
     template: 'image-preview',
   },
   {
@@ -159,7 +159,7 @@ export const MIME_PRESETS: MimePreset[] = [
     key: 'audio',
     labelKey: 'audio',
     type: 'audio',
-    subtypes: ['mpeg', 'ogg', 'wav', 'webm'],
+    subtypes: ['mpeg', 'ogg', 'opus', 'vnd.wave', 'x-m4a', 'webm'],
     template: 'file',
   },
   {
@@ -174,9 +174,12 @@ export const MIME_PRESETS: MimePreset[] = [
 /**
  * Subtypes offered when adding to an existing row, keyed by top-level type.
  * Suggestions only — the chip editor accepts anything valid.
+ *
+ * Spelled the way php-mime-detector names them, since that is what a pattern is
+ * matched against: `vnd.wave` not `wav`, `x-flac` not `flac`, `vnd.avi` not `x-msvideo`.
  */
 export const KNOWN_SUBTYPES: Record<string, string[]> = {
-  image: ['jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'tiff', 'svg+xml', 'heic'],
+  image: ['jpeg', 'png', 'apng', 'gif', 'webp', 'avif', 'bmp', 'tiff', 'svg+xml', 'heic'],
   application: [
     'pdf',
     'msword',
@@ -193,8 +196,8 @@ export const KNOWN_SUBTYPES: Record<string, string[]> = {
     'vnd.android.package-archive',
     'epub+zip',
   ],
-  audio: ['mpeg', 'ogg', 'wav', 'webm', 'aac', 'flac'],
-  video: ['mp4', 'webm', 'ogg', 'quicktime', 'x-msvideo'],
+  audio: ['mpeg', 'ogg', 'opus', 'vnd.wave', 'x-m4a', 'webm', 'aac', 'x-flac'],
+  video: ['mp4', 'webm', 'ogg', 'quicktime', 'vnd.avi'],
   text: ['plain', 'csv', 'markdown', 'html'],
 };
 

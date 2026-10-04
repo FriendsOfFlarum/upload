@@ -14,6 +14,7 @@ namespace FoF\Upload\Tests\unit\Mime;
 
 use Flarum\Foundation\ValidationException;
 use FoF\Upload\Mime\MimeTypeDetector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -124,5 +125,146 @@ class MimeTypeDetectorTest extends TestCase
         // Must not throw ValidationException.
         $mime = $detector->forFile($path)->getMimeType();
         $this->assertIsString($mime);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Cross-validation compares formats, not spellings.
+
+    private function requireFileinfo(): void
+    {
+        if (!MimeTypeDetector::fileinfoAvailable()) {
+            $this->markTestSkipped('fileinfo extension not loaded on this system');
+        }
+    }
+
+    /**
+     * A complete, playable 8-sample WAV. php-mime-detector names it `audio/vnd.wave`,
+     * libmagic `audio/x-wav`.
+     */
+    private function wavBytes(): string
+    {
+        $pcm = str_repeat(pack('v', 0), 8);
+
+        return 'RIFF'.pack('V', 36 + strlen($pcm)).'WAVEfmt '
+            .pack('VvvVVvv', 16, 1, 1, 8000, 16000, 2, 16)
+            .'data'.pack('V', strlen($pcm)).$pcm;
+    }
+
+    #[Test]
+    public function getMimeType_accepts_a_wav_the_two_detectors_spell_differently(): void
+    {
+        $this->requireFileinfo();
+
+        $path = $this->makeTempFile($this->wavBytes());
+
+        $mime = (new MimeTypeDetector())->forFile($path)->getMimeType();
+
+        // The detector's own spelling is what callers get, so the admin's MIME
+        // whitelist keeps matching what it matched before.
+        $this->assertSame('audio/vnd.wave', $mime);
+    }
+
+    #[Test]
+    public function getMimeType_still_rejects_a_file_whose_detectors_name_different_formats(): void
+    {
+        $this->requireFileinfo();
+
+        // FLIF magic bytes in front of an HTML document: php-mime-detector reads the
+        // header (image/flif), libmagic the body (text/html).
+        $path = $this->makeTempFile((string) file_get_contents(__DIR__.'/../../fixtures/Polyglot.flif'));
+
+        $this->expectException(ValidationException::class);
+
+        (new MimeTypeDetector())->forFile($path)->getMimeType();
+    }
+
+    private static function png(bool $animated): string
+    {
+        $chunk = fn (string $type, string $data) => pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
+
+        return "\x89PNG\r\n\x1a\n".$chunk('IHDR', pack('NNCCCCC', 1, 1, 8, 6, 0, 0, 0))
+            .($animated ? $chunk('acTL', pack('NN', 1, 0)) : '')
+            .$chunk('IDAT', gzcompress("\x00\x00\x00\x00\x00"))
+            .$chunk('IEND', '');
+    }
+
+    private static function oggPage(string $packet): string
+    {
+        return "OggS\x00\x02".str_repeat("\x00", 8)."\x01\x00\x00\x00".str_repeat("\x00", 8)
+            ."\x01".chr(strlen($packet)).$packet;
+    }
+
+    private static function sfnt(string $version): string
+    {
+        return $version.pack('nnnn', 1, 16, 0, 0).'head'.pack('NNN', 0, 28, 54).str_repeat("\x00", 54);
+    }
+
+    /**
+     * A little-endian TIFF with one IFD; camera RAW formats are told apart by its tags.
+     *
+     * @param list<array{int, int, int, int}> $tags tag, type, count, value
+     */
+    private static function tiff(array $tags, string $data = ''): string
+    {
+        $ifd = pack('v', count($tags));
+
+        foreach ($tags as [$tag, $type, $count, $value]) {
+            $ifd .= pack('vvVV', $tag, $type, $count, $value);
+        }
+
+        return "II*\x00".pack('V', 8).$ifd.pack('V', 0).$data;
+    }
+
+    private static function sonyArw(): string
+    {
+        // Make (271) pointing at "SONY" after the IFD, plus the PrintIM tag (50341).
+        return self::tiff([[271, 2, 5, 8 + 2 + 2 * 12 + 4], [50341, 7, 4, 0]], "SONY\x00");
+    }
+
+    private static function nikonNef(): string
+    {
+        // A NEF's IFD0 holds 28 entries and opens with NewSubfileType (254); it also
+        // carries Make "NIKON" and SubIFDs (330).
+        $tags = [[254, 4, 1, 1], [271, 2, 6, 8 + 2 + 28 * 12 + 4], [330, 4, 1, 0]];
+
+        while (count($tags) < 28) {
+            $tags[] = [305 + count($tags), 3, 1, 0];
+        }
+
+        return self::tiff($tags, "NIKON\x00");
+    }
+
+    /**
+     * Files php-mime-detector names more specifically than libmagic, which reports only
+     * the container they share with other formats.
+     *
+     * @return array<string, array{string, string, string}> bytes, detector's name, libmagic's name
+     */
+    public static function specificFormatsInAContainer(): array
+    {
+        return [
+            'animated png' => [self::png(true), 'image/apng', 'image/png'],
+            'opus in ogg'  => [self::oggPage("OpusHead\x01\x01\x38\x01\x80\xbb\x00\x00\x00\x00\x00"), 'audio/opus', 'audio/ogg'],
+            'truetype'     => [self::sfnt("\x00\x01\x00\x00"), 'font/ttf', 'font/sfnt'],
+            'opentype'     => [self::sfnt('OTTO'), 'font/otf', 'application/vnd.ms-opentype'],
+            'adobe dng'    => [self::tiff([[50706, 1, 4, 0x0401]]), 'image/x-adobe-dng', 'image/tiff'],
+            'sony arw'     => [self::sonyArw(), 'image/x-sony-arw', 'image/tiff'],
+            'nikon nef'    => [self::nikonNef(), 'image/x-nikon-nef', 'image/tiff'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('specificFormatsInAContainer')]
+    public function getMimeType_accepts_a_specific_format_libmagic_reports_by_its_container(string $bytes, string $detectorName, string $libmagicName): void
+    {
+        $this->requireFileinfo();
+
+        $path = $this->makeTempFile($bytes);
+
+        if (mime_content_type($path) !== $libmagicName) {
+            $this->markTestSkipped("this libmagic build does not report $libmagicName for the sample");
+        }
+
+        $this->assertSame($detectorName, (new MimeTypeDetector())->forFile($path)->getMimeType());
     }
 }
