@@ -187,6 +187,41 @@ class MimeTypeDetectorTest extends TestCase
     }
 
     /**
+     * A little-endian TIFF with one IFD; camera RAW formats are told apart by its tags.
+     *
+     * @param list<array{int, int, int, int}> $tags tag, type, count, value
+     */
+    private static function tiff(array $tags, string $data = ''): string
+    {
+        $ifd = pack('v', count($tags));
+
+        foreach ($tags as [$tag, $type, $count, $value]) {
+            $ifd .= pack('vvVV', $tag, $type, $count, $value);
+        }
+
+        return "II*\x00".pack('V', 8).$ifd.pack('V', 0).$data;
+    }
+
+    private static function sonyArw(): string
+    {
+        // Make (271) pointing at "SONY" after the IFD, plus the PrintIM tag (50341).
+        return self::tiff([[271, 2, 5, 8 + 2 + 2 * 12 + 4], [50341, 7, 4, 0]], "SONY\x00");
+    }
+
+    private static function nikonNef(): string
+    {
+        // A NEF's IFD0 holds 28 entries and opens with NewSubfileType (254); it also
+        // carries Make "NIKON" and SubIFDs (330).
+        $tags = [[254, 4, 1, 1], [271, 2, 6, 8 + 2 + 28 * 12 + 4], [330, 4, 1, 0]];
+
+        while (count($tags) < 28) {
+            $tags[] = [305 + count($tags), 3, 1, 0];
+        }
+
+        return self::tiff($tags, "NIKON\x00");
+    }
+
+    /**
      * Files php-mime-detector names more specifically than libmagic, which reports only
      * the container they share with other formats.
      *
@@ -199,6 +234,9 @@ class MimeTypeDetectorTest extends TestCase
             'opus in ogg'  => [self::oggPage("OpusHead\x01\x01\x38\x01\x80\xbb\x00\x00\x00\x00\x00"), 'audio/opus', 'audio/ogg'],
             'truetype'     => [self::sfnt("\x00\x01\x00\x00"), 'font/ttf', 'font/sfnt'],
             'opentype'     => [self::sfnt('OTTO'), 'font/otf', 'application/vnd.ms-opentype'],
+            'adobe dng'    => [self::tiff([[50706, 1, 4, 0x0401]]), 'image/x-adobe-dng', 'image/tiff'],
+            'sony arw'     => [self::sonyArw(), 'image/x-sony-arw', 'image/tiff'],
+            'nikon nef'    => [self::nikonNef(), 'image/x-nikon-nef', 'image/tiff'],
         ];
     }
 

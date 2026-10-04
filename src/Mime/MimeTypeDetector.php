@@ -35,6 +35,11 @@ class MimeTypeDetector
         'audio/opus' => ['audio/ogg'],
         'font/ttf'   => ['font/sfnt'],
         'font/otf'   => ['font/sfnt', 'application/vnd.ms-opentype'],
+
+        // Camera RAW formats built on TIFF.
+        'image/x-adobe-dng' => ['image/tiff'],
+        'image/x-sony-arw'  => ['image/tiff'],
+        'image/x-nikon-nef' => ['image/tiff'],
     ];
 
     /**
