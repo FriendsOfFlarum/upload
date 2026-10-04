@@ -4,7 +4,7 @@ $translator = resolve('translator');
 
 <figure class="FofUpload-TextPreview" data-loading="false" data-expanded="false" data-hassnippet="{@has_snippet}">
     <figcaption class="FofUpload-TextPreviewTitle">
-        <i aria-hidden="true" class="icon far fa-file"></i> {TEXT1}
+        <i aria-hidden="true" class="icon far fa-file"></i> <span class="FofUpload-TextPreviewLabel">{TEXT1}</span>
     </figcaption>
 
     <div class="FofUpload-TextPreviewSnippet">
