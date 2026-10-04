@@ -50,7 +50,9 @@ class Manager
     {
         $adapters = Collection::make([
             'aws-s3' => class_exists(S3Client::class),
-            'imgur'  => true,
+            // Deprecated: Imgur no longer issues API client IDs, so only a forum that
+            // already has one can use it. To be removed in the next major version.
+            'imgur'  => (bool) $this->settings->get('fof-upload.imgurClientId'),
             'qiniu'  => class_exists(QiniuClient::class),
             'local'  => true,
         ]);
