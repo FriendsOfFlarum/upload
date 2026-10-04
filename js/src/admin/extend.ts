@@ -151,6 +151,8 @@ export default [
           tree: [t('fof-upload.admin.labels.imgur.title')],
           label: t('fof-upload.admin.labels.imgur.client_id'),
           help: t('fof-upload.admin.labels.imgur.title'),
+          // Deprecated adapter, only offered where a client ID is already configured.
+          visible: () => !!app.data.settings['fof-upload.imgurClientId'],
         },
         {
           id: 'qiniu',

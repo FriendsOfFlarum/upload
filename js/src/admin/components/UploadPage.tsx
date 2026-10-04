@@ -589,6 +589,10 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
         <div className="UploadPage-adapter UploadPage-adapter--imgur">
           <fieldset className="Form-group">
             <legend>{app.translator.trans('fof-upload.admin.labels.imgur.title')}</legend>
+            {/* Only forums that already had a client ID reach this: Imgur no longer issues them. */}
+            <Alert type="warning" dismissible={false} className="UploadPage-deprecated">
+              {app.translator.trans('fof-upload.admin.labels.imgur.deprecated')}
+            </Alert>
             <p className="helpText">
               <Icon name="fas fa-exclamation-circle" />{' '}
               {app.translator.trans('fof-upload.admin.labels.imgur.tos', {
