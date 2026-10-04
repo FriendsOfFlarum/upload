@@ -14,7 +14,7 @@ An extension that handles file uploads intelligently for your forum.
   - Animated GIF support for resize operations.
 - Mime type to upload adapter mapping.
 - Whitelisting mime types.
-- Uploading on different storage services (local, imgur, AWS S3 for instance).
+- Uploading on different storage services (local, AWS S3, Qiniu for instance).
 - Drag and drop uploads.
 - Uploading multiple files at once (button and drag and drop both support this).
 - Easily extendable, the extension heavily relies on Events.
@@ -136,7 +136,9 @@ FoF Upload supports configuration via both the admin panel (database settings) a
 
 #### Installing storage adapters
 
-Local storage and Imgur work out of the box. S3 and Qiniu each need an extra package — until it is installed, the adapter does not appear in the admin panel at all.
+Local storage works out of the box. S3 and Qiniu each need an extra package — until it is installed, the adapter does not appear in the admin panel at all.
+
+The Imgur adapter is **deprecated**. Imgur no longer issues API client IDs, so it is only available on forums that already have one configured, and it will be removed in a future version. Files already uploaded to Imgur keep displaying.
 
 ```bash
 # Amazon S3, and S3-compatible services (Cloudflare R2, Backblaze B2,
@@ -299,28 +301,28 @@ The admin's file-type presets already use these names.
 
 In some circumstances, you may wish to either disable an adapter, or force the use of one. This is set in your root `extend.php` file.
 
-For example, you may disable `imgur`
+For example, you may disable `qiniu`
 ```
 (new FoF\Upload\Extend\Adapters())
-        ->disable('imgur'),
+        ->disable('qiniu'),
 ```
 
 Chaining of multiple commands is also possible:
 ```
 (new FoF\Upload\Extend\Adapters())
-        ->disable('imgur')
+        ->disable('qiniu')
         ->disable('aws-s3'),
 ```
 
 You may also force an adapter:
 ```
 (new FoF\Upload\Extend\Adapters())
-        ->force('imgur'),
+        ->force('aws-s3'),
 ```
 
 Adapter names currently available:
 - `local`
-- `imgur`
+- `imgur` (deprecated — see above)
 - `qiniu`
 - `aws-s3`
 
