@@ -46,6 +46,9 @@ export declare const MIME_PRESETS: MimePreset[];
 /**
  * Subtypes offered when adding to an existing row, keyed by top-level type.
  * Suggestions only — the chip editor accepts anything valid.
+ *
+ * Spelled the way php-mime-detector names them, since that is what a pattern is
+ * matched against: `vnd.wave` not `wav`, `x-flac` not `flac`, `vnd.avi` not `x-msvideo`.
  */
 export declare const KNOWN_SUBTYPES: Record<string, string[]>;
 /** Suggested subtypes for a type, excluding those already present. */
