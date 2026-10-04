@@ -14,6 +14,7 @@ namespace FoF\Upload\Tests\unit\Mime;
 
 use Flarum\Foundation\ValidationException;
 use FoF\Upload\Mime\MimeTypeDetector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -162,5 +163,57 @@ class MimeTypeDetectorTest extends TestCase
         // whitelist keeps matching what it matched before.
         $this->assertSame('audio/vnd.wave', $mime);
         $this->assertFileExists($path, 'a rejected upload is deleted');
+    }
+
+    private static function png(bool $animated): string
+    {
+        $chunk = fn (string $type, string $data) => pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
+
+        return "\x89PNG\r\n\x1a\n".$chunk('IHDR', pack('NNCCCCC', 1, 1, 8, 6, 0, 0, 0))
+            .($animated ? $chunk('acTL', pack('NN', 1, 0)) : '')
+            .$chunk('IDAT', gzcompress("\x00\x00\x00\x00\x00"))
+            .$chunk('IEND', '');
+    }
+
+    private static function oggPage(string $packet): string
+    {
+        return "OggS\x00\x02".str_repeat("\x00", 8)."\x01\x00\x00\x00".str_repeat("\x00", 8)
+            ."\x01".chr(strlen($packet)).$packet;
+    }
+
+    private static function sfnt(string $version): string
+    {
+        return $version.pack('nnnn', 1, 16, 0, 0).'head'.pack('NNN', 0, 28, 54).str_repeat("\x00", 54);
+    }
+
+    /**
+     * Files php-mime-detector names more specifically than libmagic, which reports only
+     * the container they share with other formats.
+     *
+     * @return array<string, array{string, string, string}> bytes, detector's name, libmagic's name
+     */
+    public static function specificFormatsInAContainer(): array
+    {
+        return [
+            'animated png' => [self::png(true), 'image/apng', 'image/png'],
+            'opus in ogg'  => [self::oggPage("OpusHead\x01\x01\x38\x01\x80\xbb\x00\x00\x00\x00\x00"), 'audio/opus', 'audio/ogg'],
+            'truetype'     => [self::sfnt("\x00\x01\x00\x00"), 'font/ttf', 'font/sfnt'],
+            'opentype'     => [self::sfnt('OTTO'), 'font/otf', 'application/vnd.ms-opentype'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('specificFormatsInAContainer')]
+    public function getMimeType_accepts_a_specific_format_libmagic_reports_by_its_container(string $bytes, string $detectorName, string $libmagicName): void
+    {
+        $this->requireFileinfo();
+
+        $path = $this->makeTempFile($bytes);
+
+        if (mime_content_type($path) !== $libmagicName) {
+            $this->markTestSkipped("this libmagic build does not report $libmagicName for the sample");
+        }
+
+        $this->assertSame($detectorName, (new MimeTypeDetector())->forFile($path)->getMimeType());
     }
 }

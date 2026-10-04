@@ -23,6 +23,21 @@ class MimeTypeDetector
     protected ?UploadedFile $upload = null;
 
     /**
+     * Formats php-mime-detector names specifically, mapped to the container libmagic
+     * reports for them instead.
+     *
+     * One-way on purpose: the detector's specific name may match the container libmagic
+     * reports, but two different specific formats never match each other through the
+     * container they share (Opus is not Vorbis, TrueType is not OpenType).
+     */
+    protected const CONTAINER_MIME_TYPES = [
+        'image/apng' => ['image/png'],
+        'audio/opus' => ['audio/ogg'],
+        'font/ttf'   => ['font/sfnt'],
+        'font/otf'   => ['font/sfnt', 'application/vnd.ms-opentype'],
+    ];
+
+    /**
      * Set the file path for MIME type detection.
      *
      * @param string $filePath
@@ -122,7 +137,13 @@ class MimeTypeDetector
             return $detectorMime === $fileinfoMime;
         }
 
-        return MimeTypeAliases::equivalent($detectorMime, $fileinfoMime);
+        if (MimeTypeAliases::equivalent($detectorMime, $fileinfoMime)) {
+            return true;
+        }
+
+        $containers = static::CONTAINER_MIME_TYPES[MimeTypeAliases::preferred($detectorMime)] ?? [];
+
+        return in_array(MimeTypeAliases::preferred($fileinfoMime), $containers, true);
     }
 
     /**
