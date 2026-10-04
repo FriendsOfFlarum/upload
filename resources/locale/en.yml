@@ -110,6 +110,7 @@ fof-upload:
         toggle: Disable
       imgur:
         client_id: Imgur client ID
+        deprecated: Imgur no longer issues API client IDs, so this adapter is deprecated and will be removed in a future version. Move these file types to another storage adapter.
         title: Imgur image storage settings
         tos: It is your responsibility to ensure your forum users adhere to Imgur's <a>Terms of service</a>
       local:

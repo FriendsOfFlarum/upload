@@ -45,6 +45,8 @@ class ManagerTest extends TestCase
         $this->url = m::mock(UrlGenerator::class);
         $this->config = m::mock(Config::class);
 
+        $this->settings->shouldReceive('get')->with('fof-upload.imgurClientId')->andReturn(null)->byDefault();
+
         $this->manager = new Manager(
             $this->events,
             $this->paths,
@@ -72,14 +74,32 @@ class ManagerTest extends TestCase
     }
 
     #[Test]
-    public function adapters_always_includes_local_and_imgur()
+    public function adapters_always_includes_local()
     {
         $this->events->shouldReceive('dispatch')->once();
 
-        $adapters = $this->manager->adapters();
+        $this->assertTrue($this->manager->adapters()->get('local'));
+    }
 
-        $this->assertTrue($adapters->get('local'));
-        $this->assertTrue($adapters->get('imgur'));
+    /**
+     * Imgur no longer issues API client IDs, so a forum without one can never use
+     * the adapter. It stays available only where a client ID is already configured.
+     */
+    #[Test]
+    public function adapters_excludes_imgur_without_a_client_id()
+    {
+        $this->events->shouldReceive('dispatch')->once();
+
+        $this->assertFalse($this->manager->adapters()->get('imgur'));
+    }
+
+    #[Test]
+    public function adapters_includes_imgur_when_a_client_id_is_configured()
+    {
+        $this->settings->shouldReceive('get')->with('fof-upload.imgurClientId')->andReturn('abc123');
+        $this->events->shouldReceive('dispatch')->once();
+
+        $this->assertTrue($this->manager->adapters()->get('imgur'));
     }
 
     #[Test]
