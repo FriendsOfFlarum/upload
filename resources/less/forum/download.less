@@ -131,6 +131,18 @@
     margin: 0;
 }
 
+// The file template reuses core's `.ButtonGroup`, which is `inline-flex`.
+// TextFormatter treats the tag as block-level, so the newlines a writer puts
+// between several attachments are dropped rather than turned into <br>, and
+// the downloads flowed onto one row like words in a sentence. Make each one
+// its own line, still only as wide as its content.
+.ButtonGroup[data-fof-upload-download-uuid] {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 6px;
+}
+
 // A download the viewer has no permission to use. The control keeps its normal
 // colours — greying it out reads as "broken" rather than "locked" — and states
 // the reason instead. The padlock alone carries the locked meaning.
