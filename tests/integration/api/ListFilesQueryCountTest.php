@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\Test;
 class ListFilesQueryCountTest extends EnhancedTestCase
 {
     use RetrievesAuthorizedUsers;
+    use UploadFileTrait;
 
     private const FILES = 8;
 
@@ -72,5 +73,49 @@ class ListFilesQueryCountTest extends EnhancedTestCase
         // One for the viewer's own session, one for the page's uploaders.
         $userLoads = array_filter($sql, fn ($q) => str_contains($q, 'from users where users.id'));
         $this->assertLessThanOrEqual(2, count($userLoads), 'The uploaders load in one query, not one per file');
+    }
+
+    /**
+     * Uploading several files at once answers with the same per-file checks;
+     * the uploader is the actor, so none of them should fetch it again.
+     */
+    #[Test]
+    public function uploading_several_files_does_not_load_the_uploader_per_file()
+    {
+        $this->giveNormalUserUploadPermission();
+
+        $this->app();
+        $db = $this->database();
+        $db->enableQueryLog();
+        $db->flushQueryLog();
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 2,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+            ])
+        );
+
+        $sql = array_map(fn ($q) => str_replace(['`', '"'], '', $q), array_column($db->getQueryLog(), 'query'));
+        $db->flushQueryLog();
+
+        $body = $response->getBody()->getContents();
+        $this->assertEquals(200, $response->getStatusCode(), $body);
+        $json = json_decode($body, true);
+        $this->assertCount(3, $json['data']);
+
+        foreach ($json['data'] as $file) {
+            $this->assertTrue($file['attributes']['canHide'], 'The uploader can hide their own files');
+            $this->assertFalse($file['attributes']['canDelete'], 'Only users who may delete others\' uploads can delete');
+            $this->assertSame('2', $file['relationships']['actor']['data']['id']);
+        }
+
+        // Only the viewer's own session reads the users table.
+        $userLoads = array_filter($sql, fn ($q) => str_contains($q, 'from users where users.id'));
+        $this->assertLessThanOrEqual(1, count($userLoads), 'The uploader is not fetched again for each file');
     }
 }
