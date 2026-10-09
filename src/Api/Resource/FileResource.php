@@ -73,6 +73,9 @@ class FileResource extends Resource\AbstractDatabaseResource
             Endpoint\Index::make()
                 ->authenticated()
                 ->defaultInclude(['actor'])
+                // FilePolicy reads each file's uploader to answer canHide and
+                // canDelete: one query per file otherwise.
+                ->eagerLoad(['actor'])
                 ->defaultSort('-id')
                 ->paginate(20, 50),
             Endpoint\Delete::make()
