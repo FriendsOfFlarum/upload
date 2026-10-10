@@ -8,6 +8,7 @@ import UploadSharedFileModal from '../../common/components/UploadSharedFileModal
 import ItemList from 'flarum/common/utils/ItemList';
 import SharedFileList from '../../common/components/SharedFileList';
 import FileListState from '../../common/states/FileListState';
+import classList from 'flarum/common/utils/classList';
 
 export default class FileManagerModal extends Modal {
   oninit(vnode) {
@@ -76,7 +77,13 @@ export default class FileManagerModal extends Modal {
             )}
             {app.session.user && app.session.user.uploadSharedFiles() && !hideShared && this.selectedFilesLibrary === 'shared' && (
               <Button
-                className="Button"
+                className={classList([
+                          'Button',
+                          'hasIcon',
+                          'fof-upload-button',
+                          'Button--icon',
+                          this.attrs.uploader.uploading && 'uploading',
+                        ])}
                 icon="fas fa-file-upload"
                 onclick={() => {
                   this.showUploadModal();
