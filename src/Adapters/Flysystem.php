@@ -169,6 +169,17 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
+     * The contents of a file this adapter stored, read from the storage itself
+     * rather than fetched from the file's public URL.
+     *
+     * @throws FilesystemException when the storage can't supply it
+     */
+    public function read(File $file): string
+    {
+        return $this->adapter->read($file->path);
+    }
+
+    /**
      * In case deletion is not possible, return false.
      *
      * @param File $file
