@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Formatter\ImagePreview;
 
+use FoF\Upload\Relations\EmbeddedFiles;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Support\Arr;
 use s9e\TextFormatter\Renderer;
@@ -35,15 +36,14 @@ class FormatImagePreview
      */
     public function __invoke(Renderer $renderer, $context, string $xml)
     {
-        return Utils::replaceAttributes($xml, 'UPL-IMAGE-PREVIEW', function ($attributes) {
-            $url = Arr::get($attributes, 'url');
-            $uuid = Arr::get($attributes, 'uuid');
+        if (!str_contains($xml, '<UPL-IMAGE-PREVIEW')) {
+            return $xml;
+        }
 
-            if ($uuid) {
-                $file = $this->files->findByUuid($uuid);
-            } else {
-                $file = $this->files->findByUrl($url);
-            }
+        $files = $this->files->findEmbeddedIn($xml, $context);
+
+        return Utils::replaceAttributes($xml, 'UPL-IMAGE-PREVIEW', function ($attributes) use ($files) {
+            $file = EmbeddedFiles::pick($files, Arr::get($attributes, 'uuid'), Arr::get($attributes, 'url'));
 
             if ($file) {
                 if ($fileUrl = $this->files->getUrlForFile($file)) {
