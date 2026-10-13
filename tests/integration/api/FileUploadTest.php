@@ -124,7 +124,7 @@ class FileUploadTest extends EnhancedTestCase
      * The decoder rejects some images browsers display fine. This GIF's frame
      * uses a disposal method GIF89a reserves (5), which intervention/gif refuses
      * with a ValueError rather than an exception: the upload must report it like
-     * any other image that can't be read, not fail with a server error. (#528)
+     * any other image that can't be read, not fail with a server error. (#528).
      */
     #[Test]
     public function an_image_that_cannot_be_decoded_is_rejected_as_corrupted()
