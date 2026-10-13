@@ -22,6 +22,7 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use ValueError;
 
 class ImageProcessor implements Processable
 {
@@ -43,7 +44,9 @@ class ImageProcessor implements Processable
 
         try {
             $image = $this->imageManager->read($upload->getRealPath());
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException|ValueError $e) {
+            // A ValueError is how intervention/gif rejects values it doesn't
+            // know, such as a frame disposal method GIF89a reserves (#528).
             throw new ValidationException(['upload' => 'Corrupted image']);
         }
 
