@@ -2,6 +2,7 @@ import app from 'flarum/admin/app';
 import UploadPage from './components/UploadPage';
 import extendAdminNav from './extendAdminNav';
 import FileListState from '../common/states/FileListState';
+import customizeGetRequiredPermissions from './extenders/customizeGetRequiredPermissions';
 
 export * from './components';
 
@@ -41,12 +42,57 @@ app.initializers.add('fof-upload', () => {
     )
     .registerPermission(
       {
-        icon: 'fas fa-trash',
-        label: app.translator.trans('fof-upload.admin.permissions.delete_uploads_of_others_label'),
-        permission: 'fof-upload.deleteUserUploads',
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_own_uploads_label'),
+        permission: 'fof-upload.hideUserUploads',
+      },
+      'reply',
+      42
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_uploads_of_others_label'),
+        permission: 'fof-upload.hideOtherUsersUploads',
       },
       'moderate',
-      50
+      41
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-eye-slash',
+        label: app.translator.trans('fof-upload.admin.permissions.hide_shared_uploads_label'),
+        permission: 'fof-upload.hideSharedUploads',
+      },
+      'moderate',
+      40
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_own_uploads_label'),
+        permission: 'fof-upload.deleteUserUploads',
+      },
+      'reply',
+      32
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_uploads_of_others_label'),
+        permission: 'fof-upload.deleteOtherUsersUploads',
+      },
+      'moderate',
+      31
+    )
+    .registerPermission(
+      {
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_shared_uploads_label'),
+        permission: 'fof-upload.deleteSharedUploads',
+      },
+      'moderate',
+      30
     )
     .registerPermission(
       {
@@ -66,6 +112,7 @@ app.initializers.add('fof-upload', () => {
     );
 
   extendAdminNav();
+  customizeGetRequiredPermissions();
 
   //app.fileListState = new FileListState();
 });
