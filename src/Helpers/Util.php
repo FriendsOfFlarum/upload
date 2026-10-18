@@ -16,11 +16,14 @@ use Flarum\Foundation\ValidationException;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use FoF\Upload\Adapters\Flysystem;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download;
 use FoF\Upload\Contracts\Template;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\File;
+use FoF\Upload\Processors\ImageProcessor;
+use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Filesystem\Factory;
@@ -28,6 +31,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laminas\Diactoros\Response\TextResponse;
+use League\Flysystem\FilesystemException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Util
@@ -282,39 +286,111 @@ class Util
 
         $adapter = $this->getAdapterForMime($file->type);
 
+        if ($adapter === null || $contents === null) {
+            throw new ValidationException(['file' => 'Could not move the file to public storage.']);
+        }
+
+        // Cleared first, so a thumbnail left behind by an earlier hide is never
+        // pointed at again; upload() writes a fresh one when it's generated.
+        $this->clearThumbnail($file);
+        resolve(ImageProcessor::class)->generateThumbnailFromContents($file, $contents);
+
         $movedFile = $adapter->upload($file, null, $contents);
 
-        if ($movedFile !== false) {
-            $this->getPrivateDir()->delete($privatePath);
+        if ($movedFile === false) {
+            throw new ValidationException(['file' => 'Could not move the file to public storage.']);
         }
+
+        $this->getPrivateDir()->delete($privatePath);
 
         $movedFile->upload_method = $this->setMethod($adapter);
 
         return $movedFile;
     }
 
+    /**
+     * Nothing of the file may stay publicly reachable, so the public copy and
+     * its thumbnail must both be removed; if they can't be, the move is undone.
+     */
     public function moveFileToPrivate(File $file, User $actor): File
     {
-        /** @var TextResponse $downloadedFile */
-        $downloadedFile = resolve(Dispatcher::class)->dispatch(new Download($file->uuid, $actor));
-
         $originalFile = clone $file;
         // The original is being deleted, so it must be resolved from where it
         // was stored rather than from the current mime mapping.
         $adapter = $this->getStorageAdapterForFile($originalFile);
 
-        $success = $this->getPrivateDir()->put(
-            $file->path,
-            $downloadedFile->getBody()->getContents()
-        );
+        $failed = new ValidationException(['file' => 'Could not move the file to private storage.']);
 
-        if ($success) {
-            $adapter?->delete($originalFile);
-            $file->upload_method = $this->setMethod();
-            $file->url = $this->getFilePrivateUrl($file);
+        if ($adapter === null) {
+            throw $failed;
         }
 
+        if (!$this->getPrivateDir()->put($file->path, $this->readStoredContents($file, $adapter, $actor))) {
+            throw $failed;
+        }
+
+        if (!resolve(FileRepository::class)->deleteFromStorage($originalFile, $adapter)) {
+            $this->getPrivateDir()->delete($file->path);
+            $this->forgetMissingThumbnail($file, $adapter);
+
+            throw $failed;
+        }
+
+        $file->upload_method = $this->setMethod();
+        $file->url = $this->getFilePrivateUrl($file);
+        $this->clearThumbnail($file);
+
         return $file;
+    }
+
+    /**
+     * Read from the storage itself where the adapter can, rather than fetching
+     * the public URL, which a private bucket refuses.
+     */
+    protected function readStoredContents(File $file, UploadAdapter $adapter, User $actor): string
+    {
+        if ($adapter instanceof Flysystem) {
+            try {
+                return $adapter->read($file);
+            } catch (FilesystemException) {
+                throw new ValidationException(['file' => 'Could not read the file from storage.']);
+            }
+        }
+
+        /** @var TextResponse $downloadedFile */
+        $downloadedFile = resolve(Dispatcher::class)->dispatch(new Download($file->uuid, $actor));
+
+        return $downloadedFile->getBody()->getContents();
+    }
+
+    /**
+     * The thumbnail is deleted before the file, so a failed move can leave the
+     * file without it: stop pointing previews at an object that is gone.
+     */
+    protected function forgetMissingThumbnail(File $file, UploadAdapter $adapter): void
+    {
+        if (!$file->thumbnail_path || !$adapter instanceof Flysystem) {
+            return;
+        }
+
+        try {
+            if ($adapter->exists($file->thumbnail_path)) {
+                return;
+            }
+        } catch (FilesystemException) {
+            return;
+        }
+
+        $this->clearThumbnail($file);
+        $file->save();
+    }
+
+    protected function clearThumbnail(File $file): void
+    {
+        $file->thumbnail_path = null;
+        $file->thumbnail_url = null;
+        $file->thumbnail_width = null;
+        $file->thumbnail_height = null;
     }
 
     private function getPrivateDir(): Cloud

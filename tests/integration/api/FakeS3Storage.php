@@ -22,6 +22,8 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FoF\Upload\Adapters\AwsS3;
 use FoF\Upload\Events\Adapter\Instantiate;
 use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use Psr\Http\Message\RequestInterface;
 
@@ -35,7 +37,10 @@ trait FakeS3Storage
     /** @var list<array{command: string, key: ?string}> */
     protected array $s3Commands = [];
 
-    /** @var (callable(string, ?string): bool)|null decides which commands fail */
+    /** @var array<string, string> the bucket's contents, by key */
+    protected array $s3Objects = [];
+
+    /** @var (callable(string, ?string): bool|int)|null decides which commands fail: true, or an HTTP status */
     protected $s3Fails = null;
 
     protected function useFakeS3(): void
@@ -54,8 +59,32 @@ trait FakeS3Storage
                         $key = $command['Key'] ?? null;
                         $this->s3Commands[] = ['command' => $command->getName(), 'key' => $key];
 
-                        if ($this->s3Fails !== null && ($this->s3Fails)($command->getName(), $key)) {
-                            return Create::rejectionFor(new S3Exception('Simulated S3 failure', $command));
+                        $failure = $this->s3Fails !== null ? ($this->s3Fails)($command->getName(), $key) : false;
+
+                        if ($failure !== false) {
+                            // An int answers with that HTTP status (404: no such object).
+                            $context = is_int($failure) ? ['response' => new Response($failure)] : [];
+
+                            return Create::rejectionFor(new S3Exception('Simulated S3 failure', $command, $context));
+                        }
+
+                        // A minimal bucket, so reads see what was written.
+                        switch ($command->getName()) {
+                            case 'PutObject':
+                                $this->s3Objects[$key] = (string) $command['Body'];
+                                break;
+                            case 'DeleteObject':
+                                unset($this->s3Objects[$key]);
+                                break;
+                            case 'GetObject':
+                            case 'HeadObject':
+                                if (!array_key_exists($key, $this->s3Objects)) {
+                                    return Create::rejectionFor(new S3Exception('Not found', $command, ['response' => new Response(404)]));
+                                }
+
+                                return Create::promiseFor(new Result(
+                                    $command->getName() === 'GetObject' ? ['Body' => Utils::streamFor($this->s3Objects[$key])] : []
+                                ));
                         }
 
                         return Create::promiseFor(new Result([]));

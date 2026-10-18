@@ -66,7 +66,8 @@ return [
     (new Extend\Console())
         ->command(Console\MapFilesCommand::class)
         ->command(Console\BackfillImageDimensionsCommand::class)
-        ->command(Console\BackfillThumbnailsCommand::class),
+        ->command(Console\BackfillThumbnailsCommand::class)
+        ->command(Console\PurgePrivateThumbnailsCommand::class),
 
     (new Extend\Csrf())
         ->exemptRoute('fof-upload.download'),

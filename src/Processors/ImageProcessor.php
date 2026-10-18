@@ -26,6 +26,8 @@ use ValueError;
 
 class ImageProcessor implements Processable
 {
+    public const PROCESSED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
     protected \Illuminate\Contracts\Filesystem\Filesystem $assetsDir;
 
     public function __construct(
@@ -38,7 +40,7 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
-        if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'], true)) {
+        if (!in_array($mimeType, self::PROCESSED_TYPES, true)) {
             return;
         }
 
@@ -79,6 +81,39 @@ class ImageProcessor implements Processable
         // which visibly softens detailed images. The in-memory copy has already
         // been resized, watermarked and oriented, so the thumbnail still reflects
         // everything the full-size image shows.
+        $this->generateThumbnail($file, $image, $mimeType);
+
+        // Written after the thumbnail is taken, so the thumbnail is scaled from
+        // the decoded image rather than from this re-encoded file.
+        @file_put_contents($upload->getRealPath(), $encoded->toString());
+    }
+
+    /**
+     * Prepare a thumbnail for a stored image that is about to be written to an
+     * adapter again, such as a shared image made public. Unreadable contents
+     * leave the file without one, as a thumbnail is optional.
+     */
+    public function generateThumbnailFromContents(File $file, string $contents): void
+    {
+        if (!in_array($file->type, self::PROCESSED_TYPES, true) || !$this->settings->get('fof-upload.generateThumbnails')) {
+            return;
+        }
+
+        try {
+            $image = $this->imageManager->read($contents);
+        } catch (RuntimeException|ValueError) {
+            return;
+        }
+
+        $this->generateThumbnail($file, $image, $file->type);
+    }
+
+    /**
+     * Sets the file's thumbnail content, extension and dimensions, which the
+     * adapter's upload() writes alongside the file. A no-op with thumbnails off.
+     */
+    public function generateThumbnail(File $file, ImageInterface $image, string $mimeType): void
+    {
         if ($this->settings->get('fof-upload.generateThumbnails')) {
             $maxWidth = max(1, (int) $this->settings->get('fof-upload.thumbnailMaxWidth'));
             $thumb = clone $image;
@@ -110,10 +145,6 @@ class ImageProcessor implements Processable
                 default      => 'png',
             };
         }
-
-        // Written after the thumbnail is taken, so the thumbnail is scaled from
-        // the decoded image rather than from this re-encoded file.
-        @file_put_contents($upload->getRealPath(), $encoded->toString());
     }
 
     protected function resize(ImageInterface $image): void
