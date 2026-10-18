@@ -57,6 +57,10 @@ class HideUploadFromMediaManagerHandler implements RequestHandlerInterface
         $fileUpload->setAttribute('hidden', !$fileUpload->getAttribute('hidden'));
         $fileUpload->save();
 
+        // This context has no endpoint, which the serializer's deferred
+        // relationship loading needs: load the included uploader up front.
+        $fileUpload->loadMissing('actor');
+
         $collection = $this->api->getCollection(FileResource::class);
         $context = (new Context($this->api, $request))->withCollection($collection);
         $resourceType = $collection->resource($fileUpload, $context);

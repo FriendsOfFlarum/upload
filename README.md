@@ -55,6 +55,18 @@ The regex for these types is `^image\/(jpeg|png|apng|gif|webp|avif|bmp|tiff|svg\
 
 Make sure you configure the upload permission on the permissions page as well.
 
+### Managing uploaded files
+
+Who may hide or delete a file in the Media Manager depends on whose file it is:
+
+| File | Hide | Delete |
+| --- | --- | --- |
+| Your own | Always | **Delete own uploads** |
+| Another user's | **Hide and delete other users' uploads** | **Hide and delete other users' uploads** |
+| Shared | **Upload, hide and delete shared files** | **Upload, hide and delete shared files** |
+
+Admins can always hide and delete any file. Listing the shared library needs **Access shared files in Media Manager** (or the shared-files upload permission). Deleting a file removes it, and its thumbnail, from storage; if the storage can't be reached, the file is kept so the delete can be retried.
+
 ### Per-Mime-Type Permission Scoping
 
 Each mime type row can be given an optional **Permission label** (e.g. `Images`, `Videos`, `Documents`). When a label is set, FoF Upload automatically:

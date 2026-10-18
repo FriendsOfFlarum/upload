@@ -53,6 +53,14 @@ export default [
     )
     .permission(
       () => ({
+        icon: 'fas fa-trash',
+        label: app.translator.trans('fof-upload.admin.permissions.delete_own_uploads_label'),
+        permission: 'fof-upload.deleteOwnUploads',
+      }),
+      'start'
+    )
+    .permission(
+      () => ({
         icon: 'far fa-file-alt',
         label: app.translator.trans('fof-upload.admin.permissions.upload_shared_label'),
         permission: 'fof-upload.upload-shared-files',

@@ -42,14 +42,9 @@ class DeleteFileHandler
 
     public function handle(DeleteFile $command): void
     {
-        $privateShared = $this->util->isPrivateShared($command->file);
+        $command->actor->assertCan('delete', $command->file);
 
-        if ($privateShared || $command->file->shared) {
-            $command->actor->assertCan('fof-upload.upload-shared-files');
-        } else {
-            // We don't currently have a permission for this, so we'll just use admin.
-            $command->actor->assertAdmin();
-        }
+        $privateShared = $this->util->isPrivateShared($command->file);
 
         $success = false;
 
@@ -73,7 +68,7 @@ class DeleteFileHandler
         return $this->sharedPrivateDir->delete($file->path);
     }
 
-    protected function deleteFileViaAdaptor(File $file): File|bool
+    protected function deleteFileViaAdaptor(File $file): bool
     {
         // Resolved from where the file was actually stored, not from what its
         // mime type maps to today — those diverge as soon as an admin edits the
@@ -88,6 +83,6 @@ class DeleteFileHandler
             return false;
         }
 
-        return $adapter->delete($file);
+        return $this->files->deleteFromStorage($file, $adapter);
     }
 }
