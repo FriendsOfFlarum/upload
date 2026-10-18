@@ -46,10 +46,10 @@ class FilePermissionsTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $file = fn (int $id, string $uuid, ?int $actorId, bool $shared = false) => [
-            'id' => $id, 'base_name' => "$uuid.txt", 'uuid' => $uuid, 'path' => "perm-test/$uuid.txt",
-            'url' => "http://localhost/assets/files/perm-test/$uuid.txt", 'type' => 'text/plain', 'size' => 1,
+            'id'            => $id, 'base_name' => "$uuid.txt", 'uuid' => $uuid, 'path' => "perm-test/$uuid.txt",
+            'url'           => "http://localhost/assets/files/perm-test/$uuid.txt", 'type' => 'text/plain', 'size' => 1,
             'upload_method' => 'local', 'actor_id' => $actorId, 'shared' => $shared, 'hidden' => false,
-            'created_at' => '2024-01-01 00:00:00',
+            'created_at'    => '2024-01-01 00:00:00',
         ];
 
         $this->prepareDatabase([
