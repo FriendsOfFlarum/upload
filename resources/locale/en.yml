@@ -202,8 +202,9 @@ fof-upload:
       upload_label: Upload files (base permission, required for all uploads)
       upload_mime_label: "Upload {label}"
       view_user_uploads_label: View user uploads
-      delete_uploads_of_others_label: Delete user uploads
-      upload_shared_label: Upload shared files
+      delete_uploads_of_others_label: Hide and delete other users' uploads
+      delete_own_uploads_label: Delete own uploads
+      upload_shared_label: Upload, hide and delete shared files
       access_shared_label: Access shared files in Media Manager
     templates:
       file: Default file download template

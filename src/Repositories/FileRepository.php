@@ -370,12 +370,33 @@ class FileRepository
                     return;
                 }
 
-                if ($adapter->delete($file)) {
+                if ($this->deleteFromStorage($file, $adapter)) {
                     $file->delete() && $count++;
                 }
             });
 
         return $count;
+    }
+
+    /**
+     * Remove a file's stored objects — its thumbnail, then the file itself.
+     *
+     * The thumbnail goes first, and deleting an object that is already gone
+     * succeeds on every Flysystem adapter, so after a partial failure the caller
+     * keeps the row and a retry finishes the job.
+     */
+    public function deleteFromStorage(File $file, UploadAdapter $adapter): bool
+    {
+        if ($file->thumbnail_path) {
+            $thumbnail = clone $file;
+            $thumbnail->path = $file->thumbnail_path;
+
+            if ($adapter->delete($thumbnail) === false) {
+                return false;
+            }
+        }
+
+        return $adapter->delete($file) !== false;
     }
 
     /**

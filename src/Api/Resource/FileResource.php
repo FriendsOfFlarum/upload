@@ -18,8 +18,11 @@ use Flarum\Api\Resource;
 use Flarum\Api\Schema;
 use Flarum\Api\Sort\SortColumn;
 use Flarum\Http\UrlGenerator;
+use Flarum\User\Exception\PermissionDeniedException;
+use FoF\Upload\Commands\DeleteFile;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context as OriginalContext;
 
@@ -49,9 +52,21 @@ class FileResource extends Resource\AbstractDatabaseResource
         $actor = $context->getActor();
         $actor->assertRegistered();
 
+        // Deleting looks the file up through this scope, and the listing rules
+        // below would 404 everything but the actor's own visible files. The
+        // endpoint's can('delete') decides instead. Narrowed to this resource's
+        // own Delete: the scope also runs for `files` loaded from other resources.
+        if ($context->endpoint instanceof Endpoint\Delete && $context->collection instanceof self) {
+            return;
+        }
+
         $filters = $context->request->getQueryParams()['filter'] ?? [];
 
         if (isset($filters['shared']) && $filters['shared']) {
+            if ($actor->cannot('fof-upload.access-shared-files') && $actor->cannot('fof-upload.upload-shared-files')) {
+                throw new PermissionDeniedException();
+            }
+
             $query->where('shared', true);
             if ($actor->cannot('fof-upload.upload-shared-files')) {
                 $query->where('hidden', false);
@@ -114,6 +129,15 @@ class FileResource extends Resource\AbstractDatabaseResource
                 ->includable()
                 ->type('users'),
         ];
+    }
+
+    /**
+     * Through the same command as /fof/upload/delete, so the stored objects go
+     * too, and a storage failure keeps the row rather than orphaning them.
+     */
+    public function delete(object $model, OriginalContext $context): void
+    {
+        resolve(Dispatcher::class)->dispatch(new DeleteFile($model, $context->getActor()));
     }
 
     public function sorts(): array
