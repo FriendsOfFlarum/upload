@@ -41,12 +41,12 @@ class PurgePrivateThumbnailsCommandTest extends ConsoleTestCase
         $this->useFakeS3();
 
         $row = fn (int $id, string $uuid, bool $hidden, ?string $thumb) => [
-            'id' => $id, 'base_name' => "$uuid.png", 'uuid' => $uuid, 'path' => "leak/$uuid.png",
-            'url' => "http://localhost/api/fof/download/$uuid", 'type' => 'image/png', 'size' => 1,
-            'upload_method' => $hidden ? 'private-shared' : 'local', 'actor_id' => null, 'shared' => true, 'hidden' => $hidden,
-            'thumbnail_path' => $thumb, 'thumbnail_url' => $thumb ? "http://localhost/assets/files/$thumb" : null,
+            'id'              => $id, 'base_name' => "$uuid.png", 'uuid' => $uuid, 'path' => "leak/$uuid.png",
+            'url'             => "http://localhost/api/fof/download/$uuid", 'type' => 'image/png', 'size' => 1,
+            'upload_method'   => $hidden ? 'private-shared' : 'local', 'actor_id' => null, 'shared' => true, 'hidden' => $hidden,
+            'thumbnail_path'  => $thumb, 'thumbnail_url' => $thumb ? "http://localhost/assets/files/$thumb" : null,
             'thumbnail_width' => $thumb ? 100 : null, 'thumbnail_height' => $thumb ? 75 : null,
-            'created_at' => '2024-01-01 00:00:00',
+            'created_at'      => '2024-01-01 00:00:00',
         ];
 
         $this->prepareDatabase([
