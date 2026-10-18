@@ -13,6 +13,7 @@
 namespace FoF\Upload\Formatter\TextPreview;
 
 use FoF\Upload\Downloader\DefaultDownloader;
+use FoF\Upload\Relations\EmbeddedFiles;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
 use s9e\TextFormatter\Utils;
@@ -36,8 +37,14 @@ class FormatTextPreview
      */
     public function __invoke(Renderer $renderer, $context, string $xml)
     {
-        return Utils::replaceAttributes($xml, 'UPL-TEXT-PREVIEW', function ($attributes) {
-            $file = $this->files->findByUuid($attributes['uuid']);
+        if (!str_contains($xml, '<UPL-TEXT-PREVIEW')) {
+            return $xml;
+        }
+
+        $files = $this->files->findEmbeddedIn($xml, $context);
+
+        return Utils::replaceAttributes($xml, 'UPL-TEXT-PREVIEW', function ($attributes) use ($files) {
+            $file = EmbeddedFiles::pick($files, $attributes['uuid'] ?? null, null);
 
             $attributes['has_snippet'] = 'true';
             $snippet = '';

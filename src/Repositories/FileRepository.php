@@ -30,8 +30,10 @@ use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
 use FoF\Upload\Mime\MimeTypeDetector;
+use FoF\Upload\Relations\EmbeddedFiles;
 use FoF\Upload\Validators\UploadValidator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Str;
@@ -84,6 +86,27 @@ class FileRepository
             ->first();
 
         return $file instanceof File ? $file : null;
+    }
+
+    /**
+     * The files content embeds as previews: those loaded with its post, or
+     * else all of them in one query rather than one for each preview.
+     *
+     * @return Collection<int, File>
+     */
+    public function findEmbeddedIn(string $xml, mixed $context = null): Collection
+    {
+        if ($context instanceof Post && $context->relationLoaded(EmbeddedFiles::NAME)) {
+            return $context->getRelation(EmbeddedFiles::NAME);
+        }
+
+        $references = EmbeddedFiles::referencesIn($xml);
+
+        if (!$references['uuids'] && !$references['urls']) {
+            return new Collection();
+        }
+
+        return EmbeddedFiles::constrain(File::query(), $references)->get();
     }
 
     public function createFileFromUpload(

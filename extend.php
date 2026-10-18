@@ -13,6 +13,7 @@
 namespace FoF\Upload;
 
 use Flarum\Api\Context;
+use Flarum\Api\Endpoint;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
 use Flarum\Discussion\Discussion;
@@ -20,6 +21,7 @@ use Flarum\Extend;
 use Flarum\Gdpr\Extend\UserData;
 use Flarum\Post\Event\Posted;
 use Flarum\Post\Event\Revised;
+use Flarum\Post\Post;
 use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Settings\Event\Deserializing;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -29,6 +31,7 @@ use FoF\Upload\Exceptions\ExceptionHandler;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 use FoF\Upload\Helpers\Util;
+use FoF\Upload\Relations\EmbeddedFiles;
 use Illuminate\Contracts\Filesystem\Factory;
 
 return [
@@ -74,6 +77,25 @@ return [
         ->hasMany('foffiles', File::class, 'actor_id')
         ->relationship('foffilesCurrent', function (User $model) {
             return $model->foffiles()->where('hidden', false);
+        }),
+
+    // Rendering a post looks up the files it previews. Loaded with the posts,
+    // every post's files on a page take one query.
+    (new Extend\Model(Post::class))
+        ->relationship(EmbeddedFiles::NAME, fn (Post $post) => new EmbeddedFiles($post)),
+
+    (new Extend\ApiResource(Resource\PostResource::class))
+        ->endpoint([Endpoint\Index::class, Endpoint\Show::class], function (Endpoint\Index|Endpoint\Show $endpoint): Endpoint\Endpoint {
+            return $endpoint->eagerLoad([EmbeddedFiles::NAME]);
+        }),
+
+    (new Extend\ApiResource(Resource\DiscussionResource::class))
+        ->endpoint([Endpoint\Index::class, Endpoint\Show::class], function (Endpoint\Index|Endpoint\Show $endpoint): Endpoint\Endpoint {
+            return $endpoint->eagerLoadWhenIncluded([
+                'firstPost'        => ['firstPost.'.EmbeddedFiles::NAME],
+                'lastPost'         => ['lastPost.'.EmbeddedFiles::NAME],
+                'mostRelevantPost' => ['mostRelevantPost.'.EmbeddedFiles::NAME],
+            ]);
         }),
 
     (new Extend\ApiResource(Resource\ForumResource::class))

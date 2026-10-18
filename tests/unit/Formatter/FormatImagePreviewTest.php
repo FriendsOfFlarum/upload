@@ -15,6 +15,7 @@ namespace FoF\Upload\Tests\unit\Formatter;
 use FoF\Upload\File;
 use FoF\Upload\Formatter\ImagePreview\FormatImagePreview;
 use FoF\Upload\Repositories\FileRepository;
+use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use s9e\TextFormatter\Renderer;
@@ -34,8 +35,7 @@ class FormatImagePreviewTest extends TestCase
     private function makeRepository(File $file): FileRepository
     {
         $repo = $this->createMock(FileRepository::class);
-        $repo->method('findByUuid')->willReturn($file);
-        $repo->method('findByUrl')->willReturn($file);
+        $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
         $repo->method('getUrlForFile')->willReturn($file->url);
         // Return the thumbnail URL derived from thumbnail_path, or null when absent —
         // mirroring FileRepository::getThumbnailUrlForFile() which uses thumbnail_path.
@@ -132,7 +132,7 @@ class FormatImagePreviewTest extends TestCase
         $file = $this->makeFile('abc', 'photo.jpg', 'https://cdn.example.com/photo.jpg');
 
         $repo = $this->createMock(FileRepository::class);
-        $repo->method('findByUuid')->willReturn($file);
+        $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
         $repo->method('getUrlForFile')->willReturn('https://cdn.example.com/photo.jpg');
 
         $formatter = new FormatImagePreview($repo);
