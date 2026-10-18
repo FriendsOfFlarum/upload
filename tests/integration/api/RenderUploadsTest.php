@@ -283,10 +283,7 @@ class RenderUploadsTest extends TestCase
             $database->flushQueryLog();
             $database->enableQueryLog();
             $rendered[$post->id] = $post->formatContent();
-            $queries[$post->id] = count(array_filter(
-                array_column($database->getQueryLog(), 'query'),
-                fn (string $sql) => str_contains($sql, '`fof_upload_')
-            ));
+            $queries[$post->id] = array_sum($this->countUploadQueries($database->getQueryLog()));
             $database->disableQueryLog();
             $database->flushQueryLog();
         }
@@ -345,6 +342,7 @@ class RenderUploadsTest extends TestCase
         $forFew = $this->uploadQueries($few);
         $forMany = $this->uploadQueries($many);
 
+        $this->assertGreaterThan(0, $forMany['files'], 'No file lookups were seen, so nothing was measured.');
         $this->assertSame(
             $forFew['files'],
             $forMany['files'],
@@ -368,7 +366,7 @@ class RenderUploadsTest extends TestCase
 
         try {
             $response = $this->send($request);
-            $queries = array_column($database->getQueryLog(), 'query');
+            $queries = $database->getQueryLog();
         } finally {
             $database->disableQueryLog();
             $database->flushQueryLog();
@@ -376,9 +374,24 @@ class RenderUploadsTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
 
+        return $this->countUploadQueries($queries);
+    }
+
+    /**
+     * Matched by the bare table names, as each database quotes them its own way
+     * and a table prefix goes inside the quotes.
+     *
+     * @param array<array{query: string}> $log
+     *
+     * @return array{files: int, downloads: int}
+     */
+    protected function countUploadQueries(array $log): array
+    {
+        $queries = array_column($log, 'query');
+
         return [
-            'files'     => count(array_filter($queries, fn (string $sql) => str_contains($sql, '`fof_upload_files`'))),
-            'downloads' => count(array_filter($queries, fn (string $sql) => str_contains($sql, '`fof_upload_downloads`'))),
+            'files'     => count(array_filter($queries, fn (string $sql) => str_contains($sql, 'fof_upload_files'))),
+            'downloads' => count(array_filter($queries, fn (string $sql) => str_contains($sql, 'fof_upload_downloads'))),
         ];
     }
 
