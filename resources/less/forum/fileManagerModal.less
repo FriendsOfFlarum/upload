@@ -85,12 +85,6 @@
     .Modal-body {
         max-height: 500px;
         overflow: auto;
-
-        // Full height on mobile devices
-        @media screen and (max-width: 767px) {
-            height: ~"calc(100vh - 122px)";
-            max-height: unset;
-        }
     }
 
     .Modal-footer {
@@ -98,6 +92,36 @@
 
         .Button {
             margin-left: 10px;
+        }
+    }
+
+    // Full screen on mobile devices: the header and footer keep their natural
+    // height and the file list takes whatever is left, so the footer stays on
+    // screen whatever the header holds. dvh follows the browser's toolbars,
+    // where 100vh is the viewport with them hidden (iOS Safari).
+    @media screen and (max-width: 767px) {
+        .Modal-content {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        .Modal-header,
+        .Modal-alert,
+        .Modal-footer {
+            flex-shrink: 0;
+        }
+
+        .Modal-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: none;
+            overscroll-behavior: contain;
+        }
+
+        .Modal-footer {
+            padding-bottom: ~"calc(20px + env(safe-area-inset-bottom, 0px))";
         }
     }
 }
@@ -110,6 +134,13 @@
     margin-left: -25px;
     margin-right: -25px;
     padding-top: 25px;
+
+    // The phone Modal-header has no padding to cancel out
+    @media screen and (max-width: 767px) {
+        gap: 10px;
+        margin: 0;
+        padding: 10px 15px;
+    }
 }
 
 
