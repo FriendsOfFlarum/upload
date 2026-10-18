@@ -74,6 +74,14 @@ class UploadHandler implements RequestHandlerInterface
             ->withCollection($collectionResource)
             ->withEndpoint($endpoint);
 
+        // The uploader is the actor, already loaded: canHide and canDelete read
+        // it, and would otherwise fetch it again for every file.
+        foreach ($collection as $file) {
+            if ($file->actor_id !== null && $file->actor_id === $actor->id) {
+                $file->setRelation('actor', $actor);
+            }
+        }
+
         $serializer = new Serializer($context);
         foreach ($collection as $model) {
             $resourceType = $collectionResource->resource($model, $context);
