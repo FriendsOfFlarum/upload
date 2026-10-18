@@ -22,6 +22,7 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
 use ValueError;
 
 class ImageProcessor implements Processable
@@ -101,7 +102,9 @@ class ImageProcessor implements Processable
 
         try {
             $image = $this->imageManager->read($contents);
-        } catch (RuntimeException|ValueError) {
+        } catch (Throwable) {
+            // Broad on purpose: the decoders also throw ValueError (#528), and
+            // an optional thumbnail must never stop the file being stored.
             return;
         }
 
