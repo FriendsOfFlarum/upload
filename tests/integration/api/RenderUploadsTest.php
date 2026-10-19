@@ -379,7 +379,8 @@ class RenderUploadsTest extends TestCase
 
     /**
      * Matched by the bare table names, as each database quotes them its own way
-     * and a table prefix goes inside the quotes.
+     * and a table prefix goes inside the quotes. Lookups only: a text preview
+     * from before snippets were kept writes its snippet once, on first render.
      *
      * @param array<array{query: string}> $log
      *
@@ -387,7 +388,7 @@ class RenderUploadsTest extends TestCase
      */
     protected function countUploadQueries(array $log): array
     {
-        $queries = array_column($log, 'query');
+        $queries = array_filter(array_column($log, 'query'), fn (string $sql) => stripos(ltrim($sql), 'select') === 0);
 
         return [
             'files'     => count(array_filter($queries, fn (string $sql) => str_contains($sql, 'fof_upload_files'))),

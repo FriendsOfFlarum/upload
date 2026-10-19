@@ -18,8 +18,10 @@ use Flarum\Http\UrlGenerator;
 use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\Events;
 use FoF\Upload\File;
+use FoF\Upload\Formatter\TextPreview\TextSnippets;
 use FoF\Upload\Helpers\Util;
 use FoF\Upload\Repositories\FileRepository;
+use FoF\Upload\Templates\TextPreviewTemplate;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Filesystem\Factory;
@@ -109,6 +111,14 @@ class UploadHandler
                     $command->hideFromMediaManager,
                     $command->shared
                 );
+
+                if ($template instanceof TextPreviewTemplate && ($stream = @fopen($upload->getRealPath(), 'rb'))) {
+                    try {
+                        resolve(TextSnippets::class)->fill($file, $stream);
+                    } finally {
+                        fclose($stream);
+                    }
+                }
 
                 $this->events->dispatch(
                     new Events\File\WillBeUploaded($command->actor, $file, $upload, $mime)

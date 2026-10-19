@@ -12,7 +12,6 @@
 
 namespace FoF\Upload\Formatter\TextPreview;
 
-use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\Relations\EmbeddedFiles;
 use FoF\Upload\Repositories\FileRepository;
 use s9e\TextFormatter\Renderer;
@@ -22,7 +21,7 @@ class FormatTextPreview
 {
     public function __construct(
         private FileRepository $files,
-        protected DefaultDownloader $downloader
+        protected TextSnippets $snippets
     ) {
     }
 
@@ -54,21 +53,10 @@ class FormatTextPreview
                     $attributes['url'] = $fileUrl;
                 }
 
-                $response = $this->downloader->download($file);
-                if ($response->getStatusCode() === 200) {
-                    $file_contents = $response->getBody()->getContents();
+                $kept = $this->snippets->for($file);
 
-                    $lines = preg_split('/\R/', $file_contents);
-                    $lines = array_filter($lines, 'trim');
-
-                    if (count($lines) <= 5) {
-                        $attributes['has_snippet'] = 'false';
-                    }
-
-                    $snippet = implode("\n", array_slice($lines, 0, 5));
-                } else {
-                    $attributes['has_snippet'] = 'false';
-                }
+                $attributes['has_snippet'] = $kept && $kept['hasMore'] ? 'true' : 'false';
+                $snippet = $kept['snippet'] ?? '';
             }
 
             $attributes['snippet'] = $snippet;
