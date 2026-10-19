@@ -73,8 +73,7 @@ class TextSnippets
     }
 
     /**
-     * Set the file's snippet from its contents. Lines are split as \R does and
-     * blank ones are skipped.
+     * Set the file's snippet from its contents, skipping blank lines.
      *
      * @param resource $stream
      */
@@ -92,7 +91,9 @@ class TextSnippets
             }
 
             $read += strlen($chunk);
-            $parts = preg_split('/\R/', $buffer.$chunk);
+            // Not \R, which also breaks on a 0x85 byte: in UTF-8 that's part of
+            // letters such as Å, х and ą. These bytes never occur inside one.
+            $parts = preg_split('/\r\n|\n|\r/', $buffer.$chunk);
             // The last part may be a line that continues in the next chunk.
             $buffer = array_pop($parts);
 
@@ -109,10 +110,11 @@ class TextSnippets
             $lines[] = $buffer;
         }
 
-        $snippet = implode("\n", array_slice($lines, 0, self::LINES));
+        $snippet = mb_scrub(implode("\n", array_slice($lines, 0, self::LINES)), 'UTF-8');
+        $capped = mb_strlen($snippet, 'UTF-8') > self::MAX_LENGTH;
 
-        $file->text_snippet = mb_substr(mb_scrub($snippet, 'UTF-8'), 0, self::MAX_LENGTH, 'UTF-8');
-        $file->text_snippet_has_more = count($lines) > self::LINES || !$complete;
+        $file->text_snippet = $capped ? mb_substr($snippet, 0, self::MAX_LENGTH, 'UTF-8') : $snippet;
+        $file->text_snippet_has_more = $capped || count($lines) > self::LINES || !$complete;
     }
 
     /**
