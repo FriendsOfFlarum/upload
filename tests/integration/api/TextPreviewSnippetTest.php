@@ -255,6 +255,26 @@ class TextPreviewSnippetTest extends EnhancedTestCase
     }
 
     #[Test]
+    public function uploading_text_in_any_language_keeps_its_letters(): void
+    {
+        $this->addType('^text\\/plain$', 'local', 'text-preview');
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [$this->uploadFile($this->fixtures('Languages.txt'))],
+            ])
+        );
+
+        $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+
+        $file = File::byUuid(json_decode((string) $response->getBody(), true)['data'][0]['attributes']['uuid'])->firstOrFail();
+
+        $this->assertSame("Århus og Ålborg\nхорошо, привет\nsą żółć\n七月 日本語\nκαλημέρα", $file->text_snippet);
+        $this->assertFalse((bool) $file->text_snippet_has_more);
+    }
+
+    #[Test]
     public function other_uploads_get_no_snippet(): void
     {
         $this->addType('^text\\/plain$', 'local', 'file');
