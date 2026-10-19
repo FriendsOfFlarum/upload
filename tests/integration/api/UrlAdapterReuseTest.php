@@ -14,7 +14,6 @@ namespace FoF\Upload\Tests\integration\api;
 
 use Flarum\Discussion\Discussion;
 use Flarum\Extend;
-use Flarum\Foundation\Paths;
 use Flarum\Post\Post;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\User\User;
@@ -79,7 +78,11 @@ class UrlAdapterReuseTest extends EnhancedTestCase
                 'id'            => $id, 'uuid' => $uuid, 'base_name' => $name, 'path' => "files/$name",
                 'url'           => "https://old.example.com/$name", 'type' => str_ends_with($name, '.txt') ? 'text/plain' : 'image/png',
                 'size'          => 10, 'upload_method' => $method, 'actor_id' => 2, 'shared' => false, 'created_at' => '2026-01-01 00:00:00',
-            ];
+            ] + (str_ends_with($name, '.txt')
+                // Its snippet already kept, as after its first render: reading
+                // one (#537) uses a fresh adapter, which isn't what's measured.
+                ? ['text_snippet' => 'a note', 'text_snippet_has_more' => false]
+                : []);
             $content .= str_ends_with($name, '.txt')
                 ? "<UPL-TEXT-PREVIEW url=\"https://old.example.com/$name\" uuid=\"$uuid\"><s>[upl-text-preview uuid=$uuid url=https://old.example.com/$name]</s>$name<e>[/upl-text-preview]</e></UPL-TEXT-PREVIEW>"
                 : "<UPL-IMAGE-PREVIEW url=\"https://old.example.com/$name\" uuid=\"$uuid\">[upl-image-preview uuid=$uuid url=https://old.example.com/$name]</UPL-IMAGE-PREVIEW>";
@@ -137,18 +140,9 @@ class UrlAdapterReuseTest extends EnhancedTestCase
     #[Test]
     public function a_post_mixing_storage_links_each_file_to_its_own_storage(): void
     {
-        $this->app();
-        $local = $this->app()->getContainer()->make(Paths::class)->public.'/assets/files/files';
-        @mkdir($local, 0777, true);
-        file_put_contents("$local/notes.txt", "a note\n");
-
-        try {
-            $response = $this->send(
-                $this->request('GET', '/api/posts/100', ['authenticatedAs' => 1])
-            );
-        } finally {
-            @unlink("$local/notes.txt");
-        }
+        $response = $this->send(
+            $this->request('GET', '/api/posts/100', ['authenticatedAs' => 1])
+        );
 
         $html = json_decode((string) $response->getBody(), true)['data']['attributes']['contentHtml'] ?? '';
         preg_match_all('#(?:src|href)="(https?://[^"]+/files/([^"/]+))"#', $html, $matches, PREG_SET_ORDER);
