@@ -180,6 +180,16 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
+     * @throws FilesystemException when the storage can't supply it
+     *
+     * @return resource
+     */
+    public function readStream(File $file)
+    {
+        return $this->adapter->readStream($file->path);
+    }
+
+    /**
      * @throws FilesystemException when the storage can't say
      */
     public function exists(string $path): bool
