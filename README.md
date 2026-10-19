@@ -140,7 +140,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 
 - **Old posts:** Existing posts have no `thumbnail_path` stored. The formatter falls back to the original full-resolution URL — no change in appearance.
 - **Imgur uploads:** Thumbnails are not generated (Imgur handles image hosting directly).
-- **Private-shared files:** Thumbnails are not generated for private files.
+- **Private-shared files:** Private files have no thumbnail. Hiding a shared image removes its public copy and its thumbnail; making it public again generates a fresh thumbnail (when thumbnails are enabled). Images hidden before this was the case may still have a public thumbnail — remove those with `fof:upload:purge-private-thumbnails` (below).
 
 ### Storage Configuration
 
@@ -485,6 +485,21 @@ php flarum fof:upload:backfill-thumbnails --chunk=20
 ```
 
 > **Note:** The command is safe to run multiple times. If a file is unreachable it is skipped with a warning and processing continues.
+
+### PurgePrivateThumbnailsCommand
+
+Earlier versions left a hidden (private) shared image's thumbnail on the public storage, where it stayed reachable by its URL. The `php flarum fof:upload:purge-private-thumbnails` command removes those leftovers. Run it once after updating.
+
+Hiding a file recorded its storage as private, so the command looks for each leftover on the storage its file type maps to. It confirms the thumbnail is there before deleting it, and lists any it can't find or delete instead of guessing — check those by hand.
+
+| Option | Description |
+|---|---|
+| `--dry-run` | List the thumbnails that would be removed without changing anything. |
+
+```bash
+php flarum fof:upload:purge-private-thumbnails --dry-run
+php flarum fof:upload:purge-private-thumbnails
+```
 
 ## Testing and Security Measures
 

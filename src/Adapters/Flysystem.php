@@ -180,6 +180,14 @@ abstract class Flysystem implements UploadAdapter
     }
 
     /**
+     * @throws FilesystemException when the storage can't say
+     */
+    public function exists(string $path): bool
+    {
+        return $this->adapter->fileExists($path);
+    }
+
+    /**
      * In case deletion is not possible, return false.
      *
      * @param File $file
