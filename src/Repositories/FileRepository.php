@@ -336,16 +336,51 @@ class FileRepository
             ->groupBy("$table.id")
             // Now loop over all discovered files.
             ->each(function (File $file) use (&$changes) {
-                // Sync attaches and detaches in one swoop. This updates the intermediate table.
-                // $file->matched_post_ids contains all posts by author that contain the file url or uuid.
-                $attached = $file->posts()->sync(
+                // Only ever adds: links are made when a post is saved — to any
+                // author's post — and those must survive a remap, or --cleanup
+                // deletes files that posts still show.
+                $attached = $file->posts()->syncWithoutDetaching(
                     array_filter(explode(',', $file->matched_post_ids ?? ''))
                 );
 
-                $changes += count($attached);
+                $changes += count($attached['attached']);
+            });
+
+        // The join above only finds posts by the file's uploader — cheap, but it
+        // misses a file used in someone else's post, and every file whose
+        // uploader was deleted (core nulls their posts' user_id). Files still
+        // without a post are looked for in every post.
+        // By id, not offset: linking a file takes it out of this set as we go.
+        File::query()
+            ->whereDoesntHave('posts')
+            ->where('shared', false)
+            ->eachById(function (File $file) use (&$changes) {
+                $changes += count($file->posts()->syncWithoutDetaching($this->postsUsing($file))['attached']);
             });
 
         return $changes;
+    }
+
+    /**
+     * Ids of every post whose content has the file's uuid or URL, whoever
+     * wrote it. A wildcard character in a URL can only widen the match, which
+     * errs towards keeping a file.
+     *
+     * @return list<int>
+     */
+    public function postsUsing(File $file): array
+    {
+        return Post::query()
+            ->where(function (Builder $query) use ($file) {
+                $query->where('content', 'like', '%'.$file->uuid.'%');
+
+                if ($file->url) {
+                    $query->orWhere('content', 'like', '%'.$file->url.'%');
+                }
+            })
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     public function cleanUp(Carbon $before, ?callable $confirm = null): int
@@ -359,10 +394,19 @@ class FileRepository
             ->whereDoesntHave('posts')
             ->where('shared', false)
             ->where('created_at', '<', $before)
-            ->each(function (File $file) use ($manager, &$count, $confirm) {
+            // By id, not offset: deleting or linking a file takes it out of this set.
+            ->eachById(function (File $file) use ($manager, &$count, $confirm) {
                 try {
                     $adapter = $manager->instantiate($file->upload_method);
                 } catch (ValidationException $e) {
+                    return;
+                }
+
+                // Last check, so cleanup is safe without --map first: a file
+                // any post still shows is linked to it and kept.
+                if ($posts = $this->postsUsing($file)) {
+                    $file->posts()->syncWithoutDetaching($posts);
+
                     return;
                 }
 
