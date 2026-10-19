@@ -28,6 +28,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use FoF\Upload\Events\File\WillBeUploaded;
 use FoF\Upload\Exceptions\ExceptionHandler;
+use FoF\Upload\Exceptions\InvalidDownloadException;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\Extend\SvgSanitizer;
 use FoF\Upload\Helpers\Util;
@@ -178,7 +179,8 @@ return [
         ->removeTag('style'),
 
     (new Extend\ErrorHandling())
-        ->handler(InvalidUploadException::class, ExceptionHandler::class),
+        ->handler(InvalidUploadException::class, ExceptionHandler::class)
+        ->status(InvalidDownloadException::TYPE, 502),
 
     (new Extend\Settings())
         ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)

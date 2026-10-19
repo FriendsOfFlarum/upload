@@ -16,10 +16,13 @@ use Flarum\Foundation\Paths;
 use FoF\Upload\Commands\Download;
 use FoF\Upload\Contracts\Downloader;
 use FoF\Upload\Exceptions\InvalidDownloadException;
+use FoF\Upload\Exceptions\MissingFileException;
 use FoF\Upload\File;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Filesystem\Factory;
 use Laminas\Diactoros\Response\TextResponse;
+use League\Flysystem\FilesystemException;
 use Psr\Http\Message\ResponseInterface;
 
 class DefaultDownloader implements Downloader
@@ -59,7 +62,7 @@ class DefaultDownloader implements Downloader
         $file_contents = @file_get_contents(resolve(Paths::class)->public.'/assets/files/'.$file->path);
 
         if ($file_contents === false) {
-            throw new InvalidDownloadException("Local file not found on disk: {$file->path}");
+            throw new MissingFileException("Local file not found on disk: {$file->path}");
         }
 
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
@@ -69,6 +72,13 @@ class DefaultDownloader implements Downloader
     {
         try {
             $response = $this->api->get($file->url);
+        } catch (ClientException $e) {
+            // Storage that won't list a bucket answers a missing key with 403.
+            if (in_array($e->getResponse()->getStatusCode(), [403, 404, 410], true)) {
+                throw new MissingFileException($e->getMessage());
+            }
+
+            throw new InvalidDownloadException($e->getMessage());
         } catch (\Exception $e) {
             throw new InvalidDownloadException($e->getMessage());
         }
@@ -84,7 +94,15 @@ class DefaultDownloader implements Downloader
     {
         $privateSharedDir = resolve(Factory::class)->disk('private-shared');
 
-        $file_contents = $privateSharedDir->get($file->path);
+        try {
+            $file_contents = $privateSharedDir->get($file->path);
+        } catch (FilesystemException) {
+            $file_contents = null;
+        }
+
+        if ($file_contents === null) {
+            throw new MissingFileException("Private file not found on disk: {$file->path}");
+        }
 
         return $this->mutateHeaders(new TextResponse($file_contents), $file);
     }
