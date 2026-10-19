@@ -36,6 +36,11 @@ use Qiniu\Http\Client as QiniuClient;
 
 class Manager
 {
+    /**
+     * @var array<string, UploadAdapter> adapters kept for building URLs
+     */
+    protected array $urlAdapters = [];
+
     public function __construct(
         protected Dispatcher $events,
         protected Paths $paths,
@@ -60,6 +65,18 @@ class Manager
         $this->events->dispatch(new Collecting($adapters));
 
         return $adapters;
+    }
+
+    /**
+     * An adapter to build file URLs with, kept for the request. Building one —
+     * an S3Client, for S3 — for every image on a page is wasted work, and URL
+     * building leaves no state on it. Anything that writes or deletes needs a
+     * fresh one from instantiate(). Queue workers are restarted by core when
+     * settings are saved, so a kept adapter never outlives its configuration.
+     */
+    public function forUrls(string $adapter): UploadAdapter
+    {
+        return $this->urlAdapters[$adapter] ??= $this->instantiate($adapter);
     }
 
     public function instantiate(string $adapter): UploadAdapter
