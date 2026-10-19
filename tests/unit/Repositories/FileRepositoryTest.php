@@ -77,13 +77,14 @@ class FileRepositoryTest extends TestCase
 
     /**
      * Build a partially-mocked FileRepository where:
-     *  - Manager::instantiate() returns $adapter
+     *  - Manager::instantiate() and Manager::forUrls() return $adapter
      *  - getHostnameForFile() returns $hostname
      */
     private function makeRepo(object $adapter, ?string $hostname): FileRepository
     {
         $manager = $this->createMock(Manager::class);
         $manager->method('instantiate')->willReturn($adapter);
+        $manager->method('forUrls')->willReturn($adapter);
 
         $tmp = sys_get_temp_dir();
         $paths = new Paths(['base' => $tmp, 'public' => $tmp, 'storage' => $tmp]);

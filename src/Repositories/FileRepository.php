@@ -489,7 +489,7 @@ class FileRepository
     public function getUrlForFile(File $file): ?string
     {
         try {
-            $adapter = $this->manager->instantiate($file->upload_method);
+            $adapter = $this->manager->forUrls($file->upload_method);
         } catch (ValidationException $e) {
             return null;
         }
@@ -524,7 +524,7 @@ class FileRepository
         }
 
         try {
-            $adapter = $this->manager->instantiate($file->upload_method);
+            $adapter = $this->manager->forUrls($file->upload_method);
         } catch (ValidationException $e) {
             return null;
         }
