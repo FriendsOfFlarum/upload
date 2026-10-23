@@ -22,6 +22,7 @@ use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\Commands\DeleteFile;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
+use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context as OriginalContext;
@@ -33,7 +34,8 @@ class FileResource extends Resource\AbstractDatabaseResource
 {
     public function __construct(
         protected Util $util,
-        protected UrlGenerator $url
+        protected UrlGenerator $url,
+        protected FileRepository $files
     ) {
     }
 
@@ -116,6 +118,21 @@ class FileResource extends Resource\AbstractDatabaseResource
             Schema\Str::make('bbcode')
                 ->get(fn (File $file) => $this->util->getBbcodeForFile($file)),
             Schema\Boolean::make('shared'),
+            Schema\Integer::make('imageWidth')
+                ->property('image_width')
+                ->nullable(),
+            Schema\Integer::make('imageHeight')
+                ->property('image_height')
+                ->nullable(),
+            Schema\Str::make('thumbnailUrl')
+                ->nullable()
+                ->get(fn (File $file) => $this->files->getThumbnailUrlForFile($file)),
+            Schema\Integer::make('thumbnailWidth')
+                ->property('thumbnail_width')
+                ->nullable(),
+            Schema\Integer::make('thumbnailHeight')
+                ->property('thumbnail_height')
+                ->nullable(),
             Schema\Boolean::make('isPrivateShared')
                 ->get(fn (File $file) => $this->util->isPrivateShared($file)),
             Schema\Boolean::make('canViewInfo')

@@ -53,6 +53,26 @@ export default class File extends Model {
     return Model.attribute<boolean>('isPrivateShared').call(this);
   }
 
+  imageWidth() {
+    return Model.attribute<number | null>('imageWidth').call(this);
+  }
+
+  imageHeight() {
+    return Model.attribute<number | null>('imageHeight').call(this);
+  }
+
+  thumbnailUrl() {
+    return Model.attribute<string | null>('thumbnailUrl').call(this);
+  }
+
+  thumbnailWidth() {
+    return Model.attribute<number | null>('thumbnailWidth').call(this);
+  }
+
+  thumbnailHeight() {
+    return Model.attribute<number | null>('thumbnailHeight').call(this);
+  }
+
   canViewInfo() {
     return Model.attribute<boolean>('canViewInfo').call(this);
   }
