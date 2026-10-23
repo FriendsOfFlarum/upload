@@ -28,7 +28,7 @@ class FileThumbnailAttributesTest extends EnhancedTestCase
         $this->extension('fof-upload');
 
         $file = fn (array $attributes) => $attributes + [
-            'type' => 'image/png', 'size' => 1, 'actor_id' => 2, 'upload_method' => 'local',
+            'type'   => 'image/png', 'size' => 1, 'actor_id' => 2, 'upload_method' => 'local',
             'shared' => false, 'hidden' => false, 'created_at' => '2024-01-01 00:00:00',
         ];
 
