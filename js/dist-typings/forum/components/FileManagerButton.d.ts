@@ -1,4 +1,3 @@
-/// <reference types="mithril" />
 import Component, { ComponentAttrs } from 'flarum/common/Component';
 interface FileManagerButtonAttrs extends ComponentAttrs {
     uploader: any;
