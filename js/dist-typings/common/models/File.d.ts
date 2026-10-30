@@ -13,6 +13,11 @@ export default class File extends Model {
     bbcode(): string;
     isShared(): boolean;
     isPrivateShared(): boolean;
+    imageWidth(): number | null;
+    imageHeight(): number | null;
+    thumbnailUrl(): string | null;
+    thumbnailWidth(): number | null;
+    thumbnailHeight(): number | null;
     canViewInfo(): boolean;
     canHide(): boolean;
     canDelete(): boolean;
