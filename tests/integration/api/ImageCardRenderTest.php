@@ -36,8 +36,11 @@ class ImageCardRenderTest extends TestCase
                 ['id' => 1, 'title' => 'Cards', 'user_id' => 1, 'created_at' => '2026-01-01 00:00:00', 'first_post_id' => 1, 'comment_count' => 1],
             ],
             Post::class => [
-                ['id' => 1, 'discussion_id' => 1, 'number' => 1, 'user_id' => 1, 'type' => 'comment', 'created_at' => '2026-01-01 00:00:00',
-                    'content'    => '<r>'.$this->card(1, 'with-thumb.png').$this->card(2, 'no-thumb.png').$this->card(3, 'gone.png', 'https://evil.example/x.png').'</r>'],
+                [
+                    'id'         => 1, 'discussion_id' => 1, 'number' => 1, 'user_id' => 1, 'type' => 'comment',
+                    'created_at' => '2026-01-01 00:00:00',
+                    'content'    => '<r>'.$this->card(1, 'with-thumb.png').$this->card(2, 'no-thumb.png').$this->card(3, 'gone.png', 'https://evil.example/x.png').'</r>',
+                ],
             ],
             'fof_upload_files' => [
                 $this->upload(1, 'with-thumb.png', [
@@ -53,7 +56,7 @@ class ImageCardRenderTest extends TestCase
     public function an_image_card_shows_its_live_thumbnail_at_its_size(): void
     {
         $this->assertSame([
-            'uuid' => $this->uuid(1), 'src' => 'http://localhost/assets/files/files/with-thumb-thumb.webp', 'width' => '800', 'height' => '450',
+            'uuid'  => $this->uuid(1), 'src' => 'http://localhost/assets/files/files/with-thumb-thumb.webp', 'width' => '800', 'height' => '450',
             'label' => 'with-thumb.png', 'size' => '2MB', 'button' => 'button',
         ], $this->cards()[0]);
     }
@@ -62,7 +65,7 @@ class ImageCardRenderTest extends TestCase
     public function an_image_card_without_a_thumbnail_shows_the_file_itself(): void
     {
         $this->assertSame([
-            'uuid' => $this->uuid(2), 'src' => 'http://localhost/assets/files/files/no-thumb.png', 'width' => '30', 'height' => '40',
+            'uuid'  => $this->uuid(2), 'src' => 'http://localhost/assets/files/files/no-thumb.png', 'width' => '30', 'height' => '40',
             'label' => 'no-thumb.png', 'size' => '2MB', 'button' => 'button',
         ], $this->cards()[1]);
     }
@@ -71,7 +74,7 @@ class ImageCardRenderTest extends TestCase
     public function a_thumbnail_typed_into_the_bbcode_is_never_shown(): void
     {
         $this->assertSame([
-            'uuid' => $this->uuid(3), 'src' => 'https://old.example.com/3', 'width' => '', 'height' => '',
+            'uuid'  => $this->uuid(3), 'src' => 'https://old.example.com/3', 'width' => '', 'height' => '',
             'label' => 'gone.png', 'size' => '2MB', 'button' => 'button',
         ], $this->cards()[2]);
     }

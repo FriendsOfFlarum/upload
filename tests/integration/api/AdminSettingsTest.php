@@ -34,20 +34,20 @@ class AdminSettingsTest extends TestCase
     public static function fallbacks(): array
     {
         return [
-            'max file size'       => ['fof-upload.maxFileSize', 2048],
-            'composer buttons'    => ['fof-upload.composerButtonVisiblity', 'both'],
-            'resize width'        => ['fof-upload.resizeMaxWidth', 100],
-            'watermark position'  => ['fof-upload.watermarkPosition', 'bottom-right'],
-            'watermark size'      => ['fof-upload.watermarkSizePercent', 25],
-            'watermark opacity'   => ['fof-upload.watermarkOpacity', 100],
-            'watermark padding'   => ['fof-upload.watermarkPadding', 10],
-            'thumbnail width'     => ['fof-upload.thumbnailMaxWidth', 1000],
-            'thumbnail quality'   => ['fof-upload.thumbnailQuality', 80],
-            'thumbnails'          => ['fof-upload.generateThumbnails', true],
-            'resize'              => ['fof-upload.mustResize', false],
-            'hotlink protection'  => ['fof-upload.disableHotlinkProtection', false],
-            'cdn url'             => ['fof-upload.cdnUrl', ''],
-            'kept extensions'     => ['fof-upload.whitelistedClientExtensions', ''],
+            'max file size'      => ['fof-upload.maxFileSize', 2048],
+            'composer buttons'   => ['fof-upload.composerButtonVisiblity', 'both'],
+            'resize width'       => ['fof-upload.resizeMaxWidth', 100],
+            'watermark position' => ['fof-upload.watermarkPosition', 'bottom-right'],
+            'watermark size'     => ['fof-upload.watermarkSizePercent', 25],
+            'watermark opacity'  => ['fof-upload.watermarkOpacity', 100],
+            'watermark padding'  => ['fof-upload.watermarkPadding', 10],
+            'thumbnail width'    => ['fof-upload.thumbnailMaxWidth', 1000],
+            'thumbnail quality'  => ['fof-upload.thumbnailQuality', 80],
+            'thumbnails'         => ['fof-upload.generateThumbnails', true],
+            'resize'             => ['fof-upload.mustResize', false],
+            'hotlink protection' => ['fof-upload.disableHotlinkProtection', false],
+            'cdn url'            => ['fof-upload.cdnUrl', ''],
+            'kept extensions'    => ['fof-upload.whitelistedClientExtensions', ''],
         ];
     }
 
@@ -76,9 +76,9 @@ class AdminSettingsTest extends TestCase
     public static function brokenPatterns(): array
     {
         return [
-            'unbalanced group'  => ['^image\/(png|jpeg$'],
-            'unescaped slash'   => ['^image/png$'],
-            'empty pattern'     => [''],
+            'unbalanced group' => ['^image\/(png|jpeg$'],
+            'unescaped slash'  => ['^image/png$'],
+            'empty pattern'    => [''],
         ];
     }
 
