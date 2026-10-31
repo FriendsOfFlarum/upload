@@ -1,27 +1,20 @@
 import app from 'flarum/admin/app';
-import AdminPage, { AdminHeaderAttrs } from 'flarum/admin/components/AdminPage';
+import AdminPage, { type AdminHeaderAttrs } from 'flarum/admin/components/AdminPage';
 import Button from 'flarum/common/components/Button';
-import { IPageAttrs } from 'flarum/common/components/Page';
+import Placeholder from 'flarum/common/components/Placeholder';
+import type { IPageAttrs } from 'flarum/common/components/Page';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
-import File from 'src/common/models/File';
-import SharedFileList from '../../common/components/SharedFileList';
+import type File from '../../common/models/File';
+import FileLibrary from '../../common/components/FileLibrary';
 import FileListState from '../../common/states/FileListState';
 
 export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttrs> extends AdminPage<CustomAttrs> {
-  sharedUploads: File[] = [];
-  currentPage: number = 1;
-  fileState!: FileListState;
-
-  oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
-    super.oninit(vnode);
-
-    this.fileState = new FileListState(true);
-  }
+  fileState = new FileListState(true);
 
   headerInfo(): AdminHeaderAttrs {
     return {
-      className: 'SharedUploadPage--header',
+      className: 'SharedUploadPage',
       icon: 'fas fa-file-upload',
       title: app.translator.trans('fof-upload.admin.shared-uploads.title'),
       description: app.translator.trans('fof-upload.admin.shared-uploads.description'),
@@ -30,34 +23,31 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
 
   content(): Mithril.Children {
     return (
-      <div className="SharedUploadPage--content">
+      <div className="SharedUploadPage-content">
         <p className="helpText">{app.translator.trans('fof-upload.admin.shared-uploads.introduction')}</p>
-        <hr />
-        <div className="SharedUploadPage--main-actions">{this.mainActionItems().toArray()}</div>
-        <hr />
-        <div className="SharedUploadPage--uploads">
-          <SharedFileList user={app.session.user} selectable={false} fileState={this.fileState} onDelete={this.onDelete.bind(this)} />
-        </div>
+        <FileLibrary
+          state={this.fileState.library!}
+          mode="browse"
+          actions={this.mainActionItems()}
+          empty={() => <Placeholder text={app.translator.trans('fof-upload.admin.shared-uploads.no-files')} />}
+        />
       </div>
     );
-  }
-
-  showUploadModal() {
-    app.modal.show(() => import('../../common/components/UploadSharedFileModal'), {
-      onUploadComplete: (files: File | File[]) => {
-        this.uploadComplete(files);
-      },
-    });
   }
 
   mainActionItems(): ItemList<Mithril.Children> {
     const items = new ItemList<Mithril.Children>();
 
-    items.add('refresh', <Button className="Button Button--icon" icon="fas fa-sync" onclick={() => this.refresh()} />);
+    items.add(
+      'refresh',
+      <Button className="Button" icon="fas fa-sync" onclick={() => this.refresh()}>
+        {app.translator.trans('fof-upload.admin.shared-uploads.refresh-button')}
+      </Button>
+    );
 
     items.add(
       'upload-new',
-      <Button className="Button" icon="fas fa-upload" onclick={() => this.showUploadModal()}>
+      <Button className="Button Button--primary" icon="fas fa-upload" onclick={() => this.showUploadModal()}>
         {app.translator.trans('fof-upload.admin.shared-uploads.upload-new-button')}
       </Button>
     );
@@ -66,21 +56,25 @@ export default class SharedUploadPage<CustomAttrs extends IPageAttrs = IPageAttr
   }
 
   fileActionItems(file: File): ItemList<Mithril.Children> {
-    const items = new ItemList<Mithril.Children>();
-
-    return items;
+    return new ItemList<Mithril.Children>();
   }
 
-  uploadComplete(files: File | File[]) {
-    console.log('upload complete', files);
+  showUploadModal(): void {
+    app.modal.show(() => import('../../common/components/UploadSharedFileModal'), {
+      onUploadComplete: (files: File | File[]) => this.uploadComplete(files),
+    });
+  }
+
+  uploadComplete(files: File | File[]): void {
     this.fileState.addToList(files);
   }
 
-  refresh() {
-    this.fileState.refresh();
+  // Keeps what is on screen while it reloads.
+  refresh(): void {
+    this.fileState.library?.revalidate();
   }
 
-  onDelete(file: File) {
+  onDelete(file: File): void {
     this.fileState.removeFromList(file);
   }
 }

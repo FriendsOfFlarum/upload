@@ -1,82 +1,78 @@
-export default class DragAndDrop {
+export interface FileDropTargetOptions {
+  // A refused drop is still kept from the browser, so it never opens the file.
+  accepts?: () => boolean;
+}
+
+export default class FileDropTarget {
   private upload: (files: FileList) => void;
-  private composerElement: Element;
-  private over = false;
-  private handlers: {
-    in?: (event: DragEvent) => void;
-    out?: (event: DragEvent) => void;
-    dropping?: (event: DragEvent) => void;
-  } = {};
+  private element: Element;
+  private accepts: () => boolean;
+  private depth = 0;
 
-  constructor(upload: (files: FileList) => void, composerElement: Element) {
+  private readonly onEnter = (event: Event) => this.enter(event as DragEvent);
+  private readonly onOver = (event: Event) => this.over(event as DragEvent);
+  private readonly onLeave = (event: Event) => this.leave(event as DragEvent);
+  private readonly onDrop = (event: Event) => this.drop(event as DragEvent);
+
+  constructor(upload: (files: FileList) => void, element: Element, options: FileDropTargetOptions = {}) {
     this.upload = upload;
-    this.composerElement = composerElement;
+    this.element = element;
+    this.accepts = options.accepts ?? (() => true);
 
-    if (!this.supportsFileDragging()) {
-      return;
-    }
-
-    this.composerElement.addEventListener('dragover', (this.handlers.in = this.in.bind(this)) as EventListener);
-    this.composerElement.addEventListener('dragleave', (this.handlers.out = this.out.bind(this)) as EventListener);
-    this.composerElement.addEventListener('dragend', this.handlers.out as EventListener);
-    this.composerElement.addEventListener('drop', (this.handlers.dropping = this.dropping.bind(this)) as EventListener);
-  }
-
-  supportsFileDragging(): boolean {
-    const div = document.createElement('div');
-    return ('draggable' in div || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    element.addEventListener('dragenter', this.onEnter);
+    element.addEventListener('dragover', this.onOver);
+    element.addEventListener('dragleave', this.onLeave);
+    element.addEventListener('drop', this.onDrop);
   }
 
   unload(): void {
-    if (!this.handlers.in) {
-      return;
-    }
-
-    this.composerElement.removeEventListener('dragover', this.handlers.in as EventListener);
-    this.composerElement.removeEventListener('dragleave', this.handlers.out! as EventListener);
-    this.composerElement.removeEventListener('dragend', this.handlers.out! as EventListener);
-    this.composerElement.removeEventListener('drop', this.handlers.dropping! as EventListener);
+    this.element.removeEventListener('dragenter', this.onEnter);
+    this.element.removeEventListener('dragover', this.onOver);
+    this.element.removeEventListener('dragleave', this.onLeave);
+    this.element.removeEventListener('drop', this.onDrop);
+    this.reset();
   }
 
-  isNotFile(event: DragEvent): boolean {
-    if (event.dataTransfer?.items) {
-      for (let i = 0; i < event.dataTransfer.items.length; i++) {
-        if (event.dataTransfer.items[i].kind !== 'file') {
-          return true;
-        }
-      }
-    }
-    return false;
+  isFileDrag(event: DragEvent): boolean {
+    return Array.from(event.dataTransfer?.types ?? []).includes('Files');
   }
 
-  in(event: DragEvent): void {
-    if (this.isNotFile(event)) {
-      return;
-    }
+  // dragenter and dragleave fire for every child crossed, so only the outermost pair counts.
+  private enter(event: DragEvent): void {
+    if (!this.isFileDrag(event)) return;
+
     event.preventDefault();
-    if (!this.over) {
-      this.composerElement.classList.add('fof-upload-dragging');
-      this.over = true;
-    }
+
+    if (this.depth++ === 0 && this.accepts()) this.element.classList.add('fof-upload-dragging');
   }
 
-  out(event: DragEvent): void {
-    if (this.isNotFile(event)) {
-      return;
-    }
+  private over(event: DragEvent): void {
+    if (!this.isFileDrag(event)) return;
+
     event.preventDefault();
-    if (this.over) {
-      this.composerElement.classList.remove('fof-upload-dragging');
-      this.over = false;
-    }
+
+    if (event.dataTransfer) event.dataTransfer.dropEffect = this.accepts() ? 'copy' : 'none';
   }
 
-  dropping(event: DragEvent): void {
-    if (this.isNotFile(event) || !event.dataTransfer?.files) {
-      return;
-    }
+  private leave(event: DragEvent): void {
+    if (!this.isFileDrag(event)) return;
+
+    if (--this.depth <= 0) this.reset();
+  }
+
+  private drop(event: DragEvent): void {
+    if (!this.isFileDrag(event)) return;
+
     event.preventDefault();
-    this.upload(event.dataTransfer.files);
-    this.composerElement.classList.remove('fof-upload-dragging');
+    this.reset();
+
+    const files = event.dataTransfer?.files;
+
+    if (files?.length && this.accepts()) this.upload(files);
+  }
+
+  private reset(): void {
+    this.depth = 0;
+    this.element.classList.remove('fof-upload-dragging');
   }
 }

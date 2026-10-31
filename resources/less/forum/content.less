@@ -1,0 +1,157 @@
+// Downloads in a post. TextFormatter drops the newlines between block tags, so each is put on its own line.
+.ButtonGroup[data-fof-upload-download-uuid] {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 6px;
+}
+
+.fof-upload-download-button {
+  max-width: 100%;
+  min-height: 36px;
+  padding-block: 6px;
+  text-align: start;
+
+  .Button-label {
+    align-items: flex-start;
+  }
+}
+
+.fof-upload-download-reason:empty {
+  display: none;
+}
+
+// Posts saved on 2.0.0-beta.7 store the label wrapped in a paragraph.
+[data-fof-upload-download-uuid] .fof-upload-download-label > p,
+.FofUpload-TextPreviewLabel > p {
+  display: inline;
+  margin: 0;
+}
+
+.fof-download.row {
+  display: block;
+  margin: 10px 0;
+}
+
+.fof-upload-image {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: ~"min(100%, 480px)";
+  margin: 0;
+  overflow: hidden;
+  background: var(--control-bg);
+  border-radius: var(--border-radius);
+}
+
+.fof-upload-image-media {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+}
+
+.fof-upload-image-caption {
+  padding: 8px;
+
+  .fof-upload-download-button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+// Frozen markup: lightbox and SEO extensions read it.
+.FoFUpload--Upl-Image-Preview-Link {
+  display: inline-block;
+
+  .Post-body &,
+  .Post-preview & {
+    border-bottom: 0;
+  }
+}
+
+.FoFUpload--Upl-Image-Preview {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.FofUpload-TextPreview {
+  margin: 8px 0;
+  overflow: hidden;
+  background: var(--control-bg);
+  border-radius: var(--border-radius);
+
+  pre {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+.FofUpload-TextPreviewTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.FofUpload-TextPreviewEmpty {
+  margin: 0;
+  padding: 0 12px 10px;
+}
+
+.FofUpload-TextPreviewError {
+  margin: 0;
+  padding: 0 12px;
+  color: var(--validation-error-color);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.FofUpload-TextPreviewFull {
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.FofUpload-TextPreviewControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.FofUpload-TextPreviewToggle {
+  .LoadingIndicator-container {
+    display: none;
+  }
+
+  .FofUpload-TextPreview[data-loading='true'] & {
+    .LoadingIndicator-container {
+      display: inline-flex;
+    }
+
+    .Button-icon {
+      display: none;
+    }
+  }
+}
+
+.FofUpload-TextPreview[data-expanded='true'] {
+  > .FofUpload-TextPreviewSnippet,
+  .FofUpload-TextPreviewExpand,
+  .FofUpload-TextPreviewExpandIcon {
+    display: none;
+  }
+}
+
+.FofUpload-TextPreview[data-expanded='false'] {
+  > .FofUpload-TextPreviewFull,
+  .FofUpload-TextPreviewCollapse,
+  .FofUpload-TextPreviewCollapseIcon {
+    display: none;
+  }
+}

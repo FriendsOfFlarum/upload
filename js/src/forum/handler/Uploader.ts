@@ -1,88 +1,107 @@
 import app from 'flarum/forum/app';
 import type File from '../../common/models/File';
 import type FileListState from '../../common/states/FileListState';
+import { adjustUploadCount } from '../../common/utils/uploadCount';
+import uploadFile from '../../common/utils/uploadFile';
 
 type NativeFile = globalThis.File;
 
-interface UploadResponse {
-  file: File;
-  addBBcode: boolean;
+export type UploaderEvent = 'success' | 'failure' | 'uploading' | 'uploaded';
+
+export interface UploadJob {
+  file: NativeFile;
+  status: 'queued' | 'uploading' | 'done' | 'failed';
+  result?: File;
+  error?: unknown;
 }
 
-interface ApiUploadResponse {
-  data: Array<{ type: string; id: string; attributes: Record<string, unknown> }>;
+export interface UploadOptions {
+  shared?: boolean;
+  hidden?: boolean;
 }
 
 export default class Uploader {
-  private callbacks: {
-    success: Array<(response: UploadResponse) => void>;
-    failure: Array<(response: unknown) => void>;
-    uploading: Array<(files: FileList | NativeFile[]) => void>;
-    uploaded: Array<() => void>;
-  } = {
+  jobs: UploadJob[] = [];
+  fileState?: FileListState;
+
+  private callbacks: Record<UploaderEvent, Array<(payload?: any) => void>> = {
     success: [],
     failure: [],
     uploading: [],
     uploaded: [],
   };
 
-  uploading = false;
-  fileState?: FileListState;
+  get uploading(): boolean {
+    return this.jobs.some((job) => job.status === 'queued' || job.status === 'uploading');
+  }
+
+  // Derived from the jobs now; older code that assigned it must not throw.
+  set uploading(_value: boolean) {}
 
   setState(fileState: FileListState): void {
     this.fileState = fileState;
   }
 
-  on(type: 'success' | 'failure' | 'uploading' | 'uploaded', callback: (response?: unknown) => void): void {
-    this.callbacks[type].push(callback as () => void);
+  on(type: UploaderEvent, callback: (payload?: any) => void): void {
+    this.callbacks[type].push(callback);
   }
 
-  private dispatch(type: keyof typeof this.callbacks, response?: unknown): void {
-    this.callbacks[type].forEach((callback) => callback(response as never));
+  off(type: UploaderEvent, callback: (payload?: any) => void): void {
+    this.callbacks[type] = this.callbacks[type].filter((registered) => registered !== callback);
   }
 
-  upload(files: FileList | NativeFile[], addBBcode = true): Promise<void> {
-    this.uploading = true;
+  // Uploads already under way still finish and stay in the library; nobody is told.
+  dispose(): void {
+    (Object.keys(this.callbacks) as UploaderEvent[]).forEach((type) => (this.callbacks[type] = []));
+    this.fileState = undefined;
+  }
+
+  // One request per file, so each failure can name its file and earlier files are never lost.
+  async upload(files: FileList | NativeFile[], addBBcode = true, options: UploadOptions = {}): Promise<void> {
+    const batch: UploadJob[] = Array.from(files as ArrayLike<NativeFile>).map((file) => ({ file, status: 'queued' }));
+
+    if (!batch.length) return;
+
+    this.jobs.push(...batch);
     this.dispatch('uploading', files);
     m.redraw();
 
-    const body = new FormData();
-    const fileArray = Array.from(files as Iterable<NativeFile>);
-    for (let i = 0; i < fileArray.length; i++) {
-      body.append('files[]', fileArray[i] as Blob);
+    const uploaded: File[] = [];
+
+    for (const job of batch) {
+      job.status = 'uploading';
+      m.redraw();
+
+      try {
+        const file = await this.send(job.file, options);
+
+        job.status = 'done';
+        job.result = file;
+        uploaded.push(file);
+
+        this.fileState?.addToList(file);
+
+        if (!file.isShared() && app.session.user) adjustUploadCount(app.session.user, 1, 1);
+
+        this.dispatch('success', { file, addBBcode });
+      } catch (error) {
+        job.status = 'failed';
+        job.error = error;
+
+        this.dispatch('failure', { file: job.file, error });
+      }
     }
 
-    return app
-      .request({
-        method: 'POST',
-        url: app.forum.attribute('apiUrl') + '/fof/upload',
-        serialize: (raw: FormData) => raw,
-        body,
-      })
-      .then((result: unknown) => this.uploaded(result as ApiUploadResponse, addBBcode))
-      .catch((error: { response?: { errors?: Array<{ code?: string; detail?: string }> } }) => {
-        this.uploading = false;
-        m.redraw();
-
-        const e = error.response?.errors?.[0];
-        if (!e?.code?.includes('fof-upload')) {
-          throw error;
-        }
-
-        app.alerts.clear();
-        app.alerts.show({ type: 'error' }, e.detail);
-      });
+    this.jobs = this.jobs.filter((job) => !batch.includes(job));
+    this.dispatch('uploaded', { files: uploaded });
+    m.redraw();
   }
 
-  private uploaded(result: ApiUploadResponse, addBBcode = false): void {
-    this.uploading = false;
+  protected send(file: NativeFile, options: UploadOptions): Promise<File> {
+    return uploadFile(file, options);
+  }
 
-    result.data.forEach((file) => {
-      const fileObj = app.store.pushObject(file) as File;
-      this.fileState?.addToList(fileObj);
-      this.dispatch('success', { file: fileObj, addBBcode });
-    });
-
-    this.dispatch('uploaded');
+  private dispatch(type: UploaderEvent, payload?: unknown): void {
+    this.callbacks[type].forEach((callback) => callback(payload));
   }
 }

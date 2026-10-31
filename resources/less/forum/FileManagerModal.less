@@ -1,0 +1,54 @@
+.FileManagerModal {
+  .Tabs-nav {
+    padding: 0 25px;
+  }
+
+  // The grid scrolls inside the modal, so the footer and Insert stay in view.
+  .FileManagerModal-body {
+    position: relative;
+    max-height: ~"min(60vh, 640px)";
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    @media @phone {
+      max-height: none;
+    }
+  }
+}
+
+.FileManagerModal-drop {
+  position: absolute;
+  inset: 8px;
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 18px;
+  color: var(--heading-color);
+  background: var(--body-bg-faded);
+  border: 2px dashed var(--primary-color);
+  border-radius: var(--border-radius);
+  pointer-events: none;
+
+  .icon {
+    font-size: 40px;
+  }
+
+  .fof-upload-dragging & {
+    display: flex;
+  }
+}
+
+.FileManagerModal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.FileManagerModal-count {
+  margin-inline-end: auto;
+  color: var(--muted-color);
+}

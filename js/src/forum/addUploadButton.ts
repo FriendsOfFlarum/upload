@@ -1,14 +1,13 @@
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
+import TextEditor from 'flarum/common/components/TextEditor';
 import UploadButton from './components/UploadButton';
-import DragAndDrop from './components/DragAndDrop';
+import FileDropTarget from '../common/utils/FileDropTarget';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
 import FileManagerButton from './components/FileManagerButton';
-import { insertWithDisplayNames } from './utils/applyDisplayName';
+import { bbcodesWithDisplayNames } from './utils/applyDisplayName';
 import type File from '../common/models/File';
-
-import TextEditor from 'flarum/common/components/TextEditor';
 
 export default function addUploadButton(): void {
   extend(TextEditor.prototype, 'oninit', function (this: any) {
@@ -18,86 +17,67 @@ export default function addUploadButton(): void {
   extend(TextEditor.prototype, 'controlItems', function (this: any, items) {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-    const composerButtonVisiblity = app.forum.attribute('fof-upload.composerButtonVisiblity');
+    const visibility = app.forum.attribute<string>('fof-upload.composerButtonVisiblity');
+    const showMedia = visibility !== 'upload-btn';
+    const showUpload = visibility !== 'media-btn';
 
-    if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'media-btn') {
+    if (showMedia) {
       items.add(
         'fof-upload-media',
         FileManagerButton.component({
-          uploader: this.uploader,
+          composer: this.attrs.composer,
+          disabled: this.disabled,
+          loading: !showUpload && this.uploader.uploading,
         })
       );
     }
 
-    if (composerButtonVisiblity === 'both' || composerButtonVisiblity === 'upload-btn') {
-      items.add(
-        'fof-upload',
-        UploadButton.component({
-          uploader: this.uploader,
-        })
-      );
+    if (showUpload) {
+      items.add('fof-upload', UploadButton.component({ uploader: this.uploader, disabled: this.disabled }));
     }
   });
 
   extend(TextEditor.prototype, 'oncreate', function (this: any) {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
-    // 'success' fires once per file, but a modal cannot be shown per file: core's
-    // ModalManager closes any open modal when a new one is shown, so prompting in
-    // this handler would leave only the last file's modal alive and silently drop
-    // the rest. Files are collected here and inserted together on 'uploaded',
-    // which fires once after the whole batch.
+    // A batch is inserted once it has finished, into this editor only, and only while it is still open.
     const pending: File[] = [];
 
-    this.uploader.on('success', (response: unknown) => {
-      const { file, addBBcode } = response as { file: File; addBBcode: boolean };
-      if (!addBBcode) return;
-
-      pending.push(file);
+    this.uploader.on('success', ({ file, addBBcode }: { file: File; addBBcode: boolean }) => {
+      if (addBBcode) pending.push(file);
     });
 
     this.uploader.on('uploaded', () => {
-      if (!pending.length) return;
-
       const files = pending.splice(0, pending.length);
 
-      const insert = (bbcode: string) => {
-        this.attrs.composer.editor!.insertAtCursor(bbcode + '\n', false);
+      if (!files.length || !this.element?.isConnected) return;
 
-        if (typeof this.attrs.preview === 'function') {
-          const originalIsFullScreen = app.composer.isFullScreen;
-          app.composer.isFullScreen = () => false;
-          this.attrs.preview!();
-          app.composer.isFullScreen = originalIsFullScreen;
-        }
-      };
-
-      insertWithDisplayNames(files, insert);
+      bbcodesWithDisplayNames(files).then((bbcodes) => {
+        if (this.element?.isConnected) this.attrs.composer.editor?.insertAtCursor(bbcodes.join('\n') + '\n', false);
+      });
     });
 
-    const dragAndDropTarget = (this as any).fofUploadDragAndDropTarget?.();
-    if (dragAndDropTarget) {
-      this.dragAndDrop = new DragAndDrop((files) => this.uploader.upload(files), dragAndDropTarget);
+    const target = this.fofUploadDragAndDropTarget?.();
+
+    if (target) {
+      this.dragAndDrop = new FileDropTarget((files) => this.uploader.upload(files), target, { accepts: () => !this.disabled });
     }
   });
 
-  // PasteClipboard must be attached in onbuild, not oncreate.
-  // The .TextEditor-editor element (the textarea) is created by BasicEditorDriver
-  // inside onbuild() — it does not exist yet when oncreate runs.
+  // The textarea is created by the editor driver in onbuild, after oncreate.
   extend(TextEditor.prototype, 'onbuild', function (this: any) {
     if (!app.forum.attribute('fof-upload.canUpload')) return;
 
     const editorEl = this.$('.TextEditor-editor')[0];
+
     if (editorEl) {
       this.fofPasteClipboard = new PasteClipboard((files) => this.uploader.upload(files), editorEl);
     }
   });
 
   extend(TextEditor.prototype, 'onremove', function (this: any) {
-    if (!app.forum.attribute('fof-upload.canUpload')) return;
-    if (this.dragAndDrop) {
-      this.dragAndDrop.unload();
-    }
+    this.dragAndDrop?.unload();
+    this.uploader?.dispose();
   });
 
   (TextEditor.prototype as any).fofUploadDragAndDropTarget = function (this: any) {

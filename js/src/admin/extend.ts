@@ -77,10 +77,24 @@ export default [
     )
     .generalIndexItems('settings', () => {
       const t = (key: string, attrs?: Record<string, string>) => app.translator.trans(key, attrs ?? {}, true) as string;
+      const tab = (key: string) => t(`fof-upload.admin.tabs.${key}`);
+      const installed = (adapter: string) => {
+        const raw = app.data.settings?.['fof-upload.availableUploadMethods'];
+        const methods = typeof raw === 'string' ? JSON.parse(raw || '{}') : (raw ?? {});
+
+        return adapter in methods;
+      };
+
       return [
         {
+          id: 'mime-types',
+          tree: [tab('files')],
+          label: t('fof-upload.admin.labels.preferences.mime_types'),
+          help: t('fof-upload.admin.help_texts.mime_types'),
+        },
+        {
           id: 'preferences',
-          tree: [t('fof-upload.admin.labels.preferences.title')],
+          tree: [tab('files'), t('fof-upload.admin.labels.preferences.limits')],
           label: t('fof-upload.admin.labels.preferences.max_file_size'),
           help: t('fof-upload.admin.labels.preferences.php_ini_values', {
             post: app.data.settings?.['fof-upload.php_ini.post_max_size'] || '',
@@ -88,91 +102,90 @@ export default [
           }),
         },
         {
-          id: 'mime-types',
-          tree: [t('fof-upload.admin.labels.preferences.title')],
-          label: t('fof-upload.admin.labels.preferences.mime_types'),
-          help: t('fof-upload.admin.help_texts.mime_types'),
+          id: 'client-extension',
+          tree: [tab('files'), t('fof-upload.admin.labels.preferences.limits')],
+          label: t('fof-upload.admin.labels.client_extension.title'),
+          help: t('fof-upload.admin.help_texts.client_extension'),
         },
         {
-          id: 'composer-buttons',
-          tree: [t('fof-upload.admin.labels.composer_buttons.title')],
-          label: t('fof-upload.admin.labels.composer_buttons.title'),
-          help: t('fof-upload.admin.help_texts.composer_buttons'),
+          id: 'local-cdn',
+          tree: [tab('storage'), t('fof-upload.admin.labels.local.title')],
+          label: t('fof-upload.admin.labels.local.cdn_url'),
+          help: t('fof-upload.admin.help_texts.local_cdn'),
+          visible: () => !app.data.uploadLocalCdnSetByEnv,
+        },
+        {
+          id: 'imgur',
+          tree: [tab('storage'), t('fof-upload.admin.labels.imgur.title')],
+          label: t('fof-upload.admin.labels.imgur.client_id'),
+          help: t('fof-upload.admin.labels.imgur.deprecated'),
+          // Deprecated, so only offered where a client ID is already configured.
+          visible: () => !!app.data.settings['fof-upload.imgurClientId'],
+        },
+        {
+          id: 'qiniu',
+          tree: [tab('storage')],
+          label: t('fof-upload.admin.labels.qiniu.title'),
+          visible: () => installed('qiniu'),
+        },
+        {
+          id: 'aws-s3',
+          tree: [tab('storage')],
+          label: t('fof-upload.admin.labels.aws-s3.title'),
+          help: t('fof-upload.admin.help_texts.s3_provider'),
+          visible: () => installed('aws-s3'),
         },
         {
           id: 'resize',
-          tree: [t('fof-upload.admin.labels.resize.title')],
+          tree: [tab('images'), t('fof-upload.admin.labels.resize.title')],
           label: t('fof-upload.admin.labels.resize.toggle'),
           help: t('fof-upload.admin.help_texts.resize'),
         },
         {
           id: 'resize-max-width',
-          tree: [t('fof-upload.admin.labels.resize.title')],
+          tree: [tab('images'), t('fof-upload.admin.labels.resize.title')],
           label: t('fof-upload.admin.labels.resize.max_width'),
-          help: t('fof-upload.admin.help_texts.resize'),
         },
         {
-          id: 'client-extension',
-          tree: [t('fof-upload.admin.labels.client_extension.title')],
-          label: t('fof-upload.admin.labels.client_extension.title'),
-          help: t('fof-upload.admin.help_texts.client_extension'),
+          id: 'thumbnails',
+          tree: [tab('images'), t('fof-upload.admin.labels.thumbnails.title')],
+          label: t('fof-upload.admin.labels.thumbnails.toggle'),
+          help: t('fof-upload.admin.help_texts.thumbnails'),
         },
         {
           id: 'watermark',
-          tree: [t('fof-upload.admin.labels.watermark.title')],
+          tree: [tab('images'), t('fof-upload.admin.labels.watermark.title')],
           label: t('fof-upload.admin.labels.watermark.toggle'),
           help: t('fof-upload.admin.help_texts.watermark'),
         },
         {
           id: 'watermark-position',
-          tree: [t('fof-upload.admin.labels.watermark.title')],
+          tree: [tab('images'), t('fof-upload.admin.labels.watermark.title')],
           label: t('fof-upload.admin.labels.watermark.position'),
-          help: t('fof-upload.admin.help_texts.watermark'),
         },
         {
           id: 'svg-sanitizer',
-          tree: [t('fof-upload.admin.labels.svg-sanitizer.title')],
+          tree: [tab('images')],
           label: t('fof-upload.admin.labels.svg-sanitizer.title'),
           help: t('fof-upload.admin.labels.svg-sanitizer.help'),
         },
         {
+          id: 'composer-buttons',
+          tree: [tab('advanced')],
+          label: t('fof-upload.admin.labels.composer_buttons.title'),
+          help: t('fof-upload.admin.help_texts.composer_buttons'),
+        },
+        {
           id: 'hotlink-protection',
-          tree: [t('fof-upload.admin.labels.disable-hotlink-protection.title')],
-          label: t('fof-upload.admin.labels.disable-hotlink-protection.toggle'),
+          tree: [tab('advanced'), t('fof-upload.admin.labels.downloads.title')],
+          label: t('fof-upload.admin.labels.disable-hotlink-protection.title'),
           help: t('fof-upload.admin.help_texts.disable-hotlink-protection'),
         },
         {
           id: 'download-logging',
-          tree: [t('fof-upload.admin.labels.disable-download-logging.title')],
-          label: t('fof-upload.admin.labels.disable-download-logging.toggle'),
+          tree: [tab('advanced'), t('fof-upload.admin.labels.downloads.title')],
+          label: t('fof-upload.admin.labels.disable-download-logging.title'),
           help: t('fof-upload.admin.help_texts.disable-download-logging'),
-        },
-        {
-          id: 'local-cdn',
-          tree: [t('fof-upload.admin.labels.local.title')],
-          label: t('fof-upload.admin.labels.local.cdn_url'),
-          help: t('fof-upload.admin.labels.local.title'),
-          visible: () => !app.data.uploadLocalCdnSetByEnv,
-        },
-        {
-          id: 'imgur',
-          tree: [t('fof-upload.admin.labels.imgur.title')],
-          label: t('fof-upload.admin.labels.imgur.client_id'),
-          help: t('fof-upload.admin.labels.imgur.title'),
-          // Deprecated adapter, only offered where a client ID is already configured.
-          visible: () => !!app.data.settings['fof-upload.imgurClientId'],
-        },
-        {
-          id: 'qiniu',
-          tree: [t('fof-upload.admin.labels.qiniu.title')],
-          label: t('fof-upload.admin.labels.qiniu.title'),
-          help: t('fof-upload.admin.labels.qiniu.title'),
-        },
-        {
-          id: 'aws-s3',
-          tree: [t('fof-upload.admin.labels.aws-s3.title')],
-          label: t('fof-upload.admin.labels.aws-s3.title'),
-          help: t('fof-upload.admin.help_texts.s3_instance_profile'),
         },
       ];
     })

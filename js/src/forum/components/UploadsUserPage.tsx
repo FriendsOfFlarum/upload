@@ -1,50 +1,47 @@
 import app from 'flarum/forum/app';
-import UserPage from 'flarum/forum/components/UserPage';
-import UserFileList from '../../common/components/UserFileList';
+import UserPage, { type IUserPageAttrs } from 'flarum/forum/components/UserPage';
+import Placeholder from 'flarum/common/components/Placeholder';
+import type User from 'flarum/common/models/User';
 import type Mithril from 'mithril';
-import User from 'flarum/common/models/User';
-import FileListState from '../../common/states/FileListState';
+import FileLibrary from '../../common/components/FileLibrary';
+import FileLibraryState from '../../common/states/FileLibraryState';
 
-import type File from '../../common/models/File';
+interface SessionUser extends User {
+  viewOthersMediaLibrary(): boolean;
+}
 
-export default class UploadsUserPage extends UserPage {
-  fileState!: FileListState;
+export default class UploadsUserPage<CustomAttrs extends IUserPageAttrs = IUserPageAttrs> extends UserPage<CustomAttrs> {
+  library: FileLibraryState | null = null;
 
-  oninit(vnode: Mithril.Vnode<this>) {
+  oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
     super.oninit(vnode);
-
-    this.user = null;
-    this.fileState = new FileListState();
 
     this.loadUser(m.route.param('username'));
   }
 
-  content() {
-    if (
-      app.session.user &&
-      ((app.session.user as unknown as { viewOthersMediaLibrary(): boolean }).viewOthersMediaLibrary() || this.user === app.session.user)
-    ) {
-      return (
-        this.user &&
-        UserFileList.component({
-          user: this.user,
-          selectable: false,
-          downloadOnClick: true,
-          fileState: this.fileState,
-          onDelete: this.onDelete.bind(this),
-        })
-      );
-    } else {
-      return null;
+  show(user: User): void {
+    super.show(user);
+
+    if (this.library?.user !== user) this.library = new FileLibraryState('user', user);
+  }
+
+  content(): Mithril.Children {
+    if (!this.user || !this.library) return null;
+
+    if (!this.canView(this.user)) {
+      return <Placeholder text={app.translator.trans('fof-upload.forum.user_uploads.no_permission')} />;
     }
+
+    return (
+      <div className="UploadsUserPage">
+        <FileLibrary state={this.library} mode="browse" />
+      </div>
+    );
   }
 
-  onDelete(file: File) {
-    this.fileState.removeFromList(file);
-  }
+  canView(user: User): boolean {
+    const viewer = app.session.user as SessionUser | null;
 
-  show(user: User) {
-    (super.show as (u: unknown) => void)(user);
-    this.user = user;
+    return !!viewer && (viewer === user || viewer.viewOthersMediaLibrary());
   }
 }
