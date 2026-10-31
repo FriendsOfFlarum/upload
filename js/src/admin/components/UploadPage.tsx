@@ -206,7 +206,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     ) as Record<string, { name: string; description: string }>;
 
     this.fields.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)])));
-    this.checkboxes.forEach((key) => (this.values[key] = Stream(settings[this.addPrefix(key)] === '1')));
+    this.checkboxes.forEach((key) => (this.values[key] = Stream(this.storedCheckbox(key))));
 
     // Choose the friendliest unit that represents the stored KB value exactly.
     this.maxFileSizeUnit = Stream(bestUnitForKb(Number(this.values.maxFileSize()) || 0));
@@ -1147,17 +1147,25 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
     }
 
     if (this.checkboxes.includes(key)) {
-      return this.values[key]() !== (app.data.settings[this.addPrefix(key)] === '1');
+      return this.values[key]() !== this.storedCheckbox(key);
     }
 
     return this.values[key]?.() !== app.data.settings[this.addPrefix(key)];
   }
 
   changed(): boolean {
-    const fieldsCheck = this.fields.some((key) => this.values[key]() !== app.data.settings[this.addPrefix(key)]);
-    const checkboxesCheck = this.checkboxes.some((key) => this.values[key]() !== (app.data.settings[this.addPrefix(key)] === '1'));
-    const objectsCheck = this.objects.some((key) => JSON.stringify(this.values[key]()) !== app.data.settings[this.addPrefix(key)]);
-    return fieldsCheck || checkboxesCheck || objectsCheck;
+    return [...this.fields, ...this.checkboxes, ...this.objects].some((key) => this.fieldChanged(key));
+  }
+
+  /**
+   * A saved toggle arrives as '1' or '', but one that has only an
+   * Extend\Settings default (generateThumbnails and thumbnailWebp default to
+   * true) arrives as its raw value, a boolean or a number. Reading only '1'
+   * showed those as off, and the next save of any setting wrote them off.
+   */
+  storedCheckbox(key: string): boolean {
+    const value = app.data.settings[this.addPrefix(key)] as unknown;
+    return value === true || value === 1 || value === '1';
   }
 
   onsubmit(e: Event) {
