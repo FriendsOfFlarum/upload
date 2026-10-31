@@ -132,7 +132,7 @@ class TextPreviewSnippetTest extends EnhancedTestCase
         return [
             'status'     => $response->getStatusCode(),
             'hasSnippet' => $figure?->getAttribute('data-hassnippet'),
-            'snippet'    => $figure ? (new DOMXPath($dom))->query('.//code', $figure)->item(0)?->textContent : null,
+            'snippet'    => $figure ? ((new DOMXPath($dom))->query('.//code', $figure)->item(0)?->textContent ?? '') : null,
         ];
     }
 
@@ -146,6 +146,25 @@ class TextPreviewSnippetTest extends EnhancedTestCase
     {
         // No file on disk at all: only the stored snippet can produce this.
         $this->assertSame(['status' => 200, 'hasSnippet' => 'true', 'snippet' => "kept\nsnippet"], $this->render(1), $this->lastBody);
+    }
+
+    #[Test]
+    public function only_a_same_origin_file_with_more_to_show_offers_expand(): void
+    {
+        $toggle = function (int $postId): ?string {
+            $this->render($postId);
+            $html = json_decode($this->lastBody, true)['data']['attributes']['contentHtml'] ?? '';
+
+            $dom = new DOMDocument();
+            @$dom->loadHTML('<?xml encoding="utf-8"?><body>'.$html.'</body>');
+            $toggle = (new DOMXPath($dom))->query('//*[contains(@class, "FofUpload-TextPreviewToggle")]')->item(0);
+
+            return $toggle instanceof \DOMElement ? $toggle->getAttribute('data-url') : null;
+        };
+
+        $this->assertSame('http://localhost/assets/files/text/stored.txt', $toggle(1), 'Local and longer than its snippet');
+        $this->assertNull($toggle(2), 'On S3, which the browser cannot fetch from the forum');
+        $this->assertNull($toggle(5), 'Missing, so there is nothing to fetch');
     }
 
     #[Test]

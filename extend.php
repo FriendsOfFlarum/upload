@@ -24,6 +24,7 @@ use Flarum\Post\Event\Revised;
 use Flarum\Post\Post;
 use Flarum\Search\Database\DatabaseSearchDriver;
 use Flarum\Settings\Event\Deserializing;
+use Flarum\Settings\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use FoF\Upload\Events\File\WillBeUploaded;
@@ -153,6 +154,7 @@ return [
 
     (new Extend\Event())
         ->listen(Deserializing::class, Listeners\AddAvailableOptionsInAdmin::class)
+        ->listen(Saving::class, Listeners\ValidateMimeTypes::class)
         ->listen(Posted::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(Revised::class, Listeners\LinkFilesToPostOnSave::class)
         ->listen(WillBeUploaded::class, Listeners\AddImageProcessor::class),
@@ -172,6 +174,7 @@ return [
 
     (new Extend\Formatter())
         ->render(Formatter\ImagePreview\FormatImagePreview::class)
+        ->render(Formatter\Image\FormatImage::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
     (new SvgSanitizer())
@@ -182,14 +185,47 @@ return [
         ->handler(InvalidUploadException::class, ExceptionHandler::class)
         ->status(InvalidDownloadException::TYPE, 502),
 
+    // Each default equals the fallback its reader used before, so a forum that never
+    // saved a key behaves the same, and the admin page no longer loads as changed.
     (new Extend\Settings())
         ->default('fof-upload.maxFileSize', Util::DEFAULT_MAX_FILE_SIZE)
-        ->default('fof-upload.s3CustomUrl', '')  // Default to empty, meaning use AWS default URL
-        ->default('fof-upload.svgAnimateAllowed', false)
+        ->default('fof-upload.whitelistedClientExtensions', '')
+        ->default('fof-upload.composerButtonVisiblity', 'both')
+        ->default('fof-upload.cdnUrl', '')
+        ->default('fof-upload.s3CustomUrl', '')
+        ->default('fof-upload.imgurClientId', '')
+        ->default('fof-upload.awsS3Key', '')
+        ->default('fof-upload.awsS3Secret', '')
+        ->default('fof-upload.awsS3Bucket', '')
+        ->default('fof-upload.awsS3Region', '')
+        ->default('fof-upload.awsS3Endpoint', '')
+        ->default('fof-upload.awsS3ACL', '')
+        ->default('fof-upload.awsS3CustomUrl', '')
+        ->default('fof-upload.awsS3UsePathStyleEndpoint', false)
+        ->default('fof-upload.qiniuKey', '')
+        ->default('fof-upload.qiniuSecret', '')
+        ->default('fof-upload.qiniuBucket', '')
+        ->default('fof-upload.mustResize', false)
+        ->default('fof-upload.resizeMaxWidth', Util::DEFAULT_MAX_IMAGE_WIDTH)
         ->default('fof-upload.generateThumbnails', true)
         ->default('fof-upload.thumbnailWebp', true)
         ->default('fof-upload.thumbnailMaxWidth', 1000)
-        ->default('fof-upload.thumbnailQuality', 80),
+        ->default('fof-upload.thumbnailQuality', 80)
+        ->default('fof-upload.addsWatermarks', false)
+        ->default('fof-upload.watermarkPosition', 'bottom-right')
+        ->default('fof-upload.watermarkSizePercent', 25)
+        ->default('fof-upload.watermarkOpacity', 100)
+        ->default('fof-upload.watermarkPadding', 10)
+        ->default('fof-upload.svgAnimateAllowed', false)
+        ->default('fof-upload.disableHotlinkProtection', false)
+        ->default('fof-upload.disableDownloadLogging', false)
+        ->resetWhen('fof-upload.maxFileSize', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.resizeMaxWidth', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.thumbnailMaxWidth', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.thumbnailQuality', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.watermarkSizePercent', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.watermarkOpacity', [Util::class, 'isBlankSetting'])
+        ->resetWhen('fof-upload.watermarkPadding', [Util::class, 'isBlankSetting']),
 
     new Extenders\AddPostDownloadTags(),
     new Extenders\CreateStorageFolder('tmp'),

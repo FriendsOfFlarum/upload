@@ -17,6 +17,7 @@ fof-upload:
 
         <strong>Warning:</strong> Shared uploads are not protected by any permissions. Anyone with the URL can view them.
       no-files: No shared files have been uploaded yet.
+      refresh-button: Refresh
       title: Shared uploads
       upload-new-button: Upload new file
     pane:
@@ -49,13 +50,14 @@ fof-upload:
         Existing thumbnails keep their current quality until regenerated with the backfill command.
       watermark: |
         Choose whether images will have a watermark added during upload. Watermarks are added to non-gifs based on your preferences below.
+      watermark_save_first: Save your changes first. Uploading a watermark reloads the page.
       storage_intro: |
         Services you have configured, or that a file type is using, are shown here. You can set up a service
-        before pointing any file type at it — assign it on the Files tab when you are ready.
+        before pointing any file type at it, then assign it on the Files tab when you are ready.
       storage_configure_another: |
         Other storage services are installed but not yet set up. Configuring one does not change where files go
         until you assign it to a file type.
-      storage_not_installed: "Looking for Amazon S3, Cloudflare R2 or Qiniu? Those need an extra package — see <a>installing storage adapters</a>."
+      storage_not_installed: "Looking for Amazon S3, Cloudflare R2 or Qiniu? Those need an extra package, see <a>installing storage adapters</a>."
       local_cdn: |
         Optional. If you serve <code>assets/files</code> through a CDN, enter its base URL and uploaded file links will use it.
         Leave blank to serve files directly from your forum.
@@ -63,7 +65,7 @@ fof-upload:
         Choosing your provider sets the endpoint format, addressing style and ACL support below. Pick "Other S3-compatible"
         if yours is not listed.
       s3_endpoint: |
-        The provider's S3 API URL — not your bucket's public URL. Amazon S3 does not need one.
+        The provider's S3 API URL, not your bucket's public URL. Amazon S3 does not need one.
       s3_acl: |
         Applied to each uploaded object. Leave blank for the provider default (usually private).
         Use <code>public-read</code> if files must be readable directly from the bucket.
@@ -73,10 +75,10 @@ fof-upload:
         Puts the bucket in the URL path rather than the hostname. Required by MinIO and Cloudflare R2;
         set automatically when you choose a provider.
       custom_s3_url: |
-        The public base URL your files are served from — a CDN or custom domain in front of the bucket.
+        The public base URL your files are served from, such as a CDN or custom domain in front of the bucket.
         Leave blank to use the provider's default URL. Must include <code>https://</code>.
       s3_instance_profile: |
-        Leave both blank to use an IAM role instead — only works on EC2, ECS or EKS.
+        Leave both blank to use an IAM role instead. This only works on EC2, ECS or EKS.
       composer_buttons: |
         By default both the media manager button and upload button are visible. You can also choose to display only one button.
     tabs:
@@ -84,8 +86,7 @@ fof-upload:
       storage: Storage
       images: Images
       advanced: Advanced
-      unsaved_changes: This tab has unsaved changes
-      unsaved_hint: You have unsaved changes.
+      unsaved_changes: unsaved changes
     labels:
       storage:
         configure_another: "Configure another storage service ({count} available)"
@@ -97,17 +98,17 @@ fof-upload:
         secret: Secret access key
         title: S3 storage
         provider: Provider
-        advanced_title: Advanced options
+        advanced_title: Advanced S3 options
         endpoint: Endpoint
         use_path_style_endpoint: Use path-style addressing
         acl: Access Control List (ACL)
         custom_url: Public URL
+      downloads:
+        title: Downloads
       disable-download-logging:
         title: Disable logging downloads
-        toggle: Disable
       disable-hotlink-protection:
         title: Disable hotlink protection
-        toggle: Disable
       imgur:
         client_id: Imgur client ID
         deprecated: Imgur no longer issues API client IDs, so this adapter is deprecated and will be removed in a future version. Move these file types to another storage adapter.
@@ -123,22 +124,29 @@ fof-upload:
         secret: Secret
         bucket: Bucket
       preferences:
+        title: General preferences
+        limits: Limits
         max_file_size: Maximum file size
+        max_file_size_unit: Unit
         max_file_size_equivalent: "Stored as <code>{kb}</code> KB ({value})."
-        mime_types: "File types"
-        mime_type_regex_placeholder: "e.g. ^image/(jpeg|png|gif)$"
-        mime_type_regex_invalid: "Invalid regex (e.g. empty alternatives like ||)"
+        php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
+        mime_types: File types
+        mime_type_regex_placeholder: "e.g. ^image\\/(jpeg|png|gif)$"
+        mime_type_regex_invalid: This pattern is not a valid regular expression.
+        mime_pattern_empty: Enter a pattern for this rule.
+        mime_pattern_duplicate: A rule above already uses this pattern, so this one would never match.
+        mime_pattern_slash: "Write every slash as \\/, as in image\\/png."
         mime_type_permission_placeholder: "Optional, e.g. Images"
         mime_type_remove: Remove this file type
-        mime_type_add: Add this file type
         mime_column_pattern: File type
-        mime_column_pattern_help: The kinds of file this rule applies to, matched against the file's MIME type.
+        mime_column_pattern_help: Matched against the file's MIME type.
         mime_column_storage: Stored in
-        mime_column_storage_help: Which storage service files of this type are uploaded to.
+        mime_column_storage_help: Where files of this type are uploaded to.
         mime_column_display: Shown as
-        mime_column_display_help: How the file appears in a post — an inline preview, a download button, and so on.
+        mime_column_display_help: How the file appears in a post.
         mime_column_permission: Permission label
-        mime_column_permission_help: Optional. Naming a group here creates a permission so you can control who may upload these files.
+        mime_column_permission_help: Optional. Creates a permission for uploading these files.
+        mime_column_actions: Actions
         mime_move_up: Move up (matched earlier)
         mime_move_down: Move down (matched later)
         mime_edit_pattern: Edit pattern
@@ -146,9 +154,14 @@ fof-upload:
         mime_advanced_pattern: Advanced pattern
         mime_add_subtype: Add a file format
         mime_add_subtype_placeholder: "e.g. webp"
+        mime_add_subtype_confirm: Add
+        mime_cancel: Cancel
+        mime_subtype_invalid: "\"{subtype}\" can't be used as a file format."
+        mime_subtype_duplicate: "\"{subtype}\" is already in this rule."
         mime_remove_subtype: "Remove {subtype}"
-        mime_add_prompt: Add file types…
-        mime_add_custom: Custom pattern…
+        mime_add_prompt: Add file types
+        mime_add_custom: Custom pattern
+        not_available: "{name} (not available)"
       mime_presets:
         images: Images
         pdf: PDF documents
@@ -157,8 +170,6 @@ fof-upload:
         archives: Archives (zip, tar, 7z)
         audio: Audio
         video: Video
-        title: General preferences
-        php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
         max_width: Maximum image width/height
         title: Image resize
@@ -173,10 +184,20 @@ fof-upload:
         max_width: Thumbnail max width (px)
         quality: Thumbnail quality
       watermark:
-        file: Upload your watermark image
-        opacity: "Watermark opacity (0–100)"
+        file: Watermark image
+        opacity: "Watermark opacity (0 to 100)"
         padding: "Padding from edge (px)"
         position: Watermark position
+        positions:
+          top-left: Top left
+          top: Top
+          top-right: Top right
+          left: Left
+          center: Center
+          right: Right
+          bottom-left: Bottom left
+          bottom: Bottom
+          bottom-right: Bottom right
         size_percent: "Watermark size (% of image width)"
         title: Watermark images
         toggle: Watermark images
@@ -239,9 +260,9 @@ fof-upload:
       description: |
         FoF Upload uses the <a>PHP Mime Detector</a> library for common MIME types and PHP Fileinfo as a fallback.
         The MIME value returned by Fileinfo can be different from server to server!
-      select: Select a file below to inspect the values that will be used. The file will not be saved.
+      select: Choose a file to see the values that will be used. The file will not be saved.
+      choose: Choose a file
       laravel-validation: Laravel File Validation
-      no-file-selected: No file
       validation-passed: Passed
       validation-failed: "Failed: {error}"
       mime-detector: Mime Detector (primary)
@@ -259,19 +280,17 @@ fof-upload:
       use_file_name: Use file names
 
     buttons:
-      attach: Attach
       upload: Upload
-      upload_shared: Shared
       user_uploads: User uploads
-      cancel: Cancel
       media: My media
       shared_media: Shared media
 
+    user_uploads:
+      no_permission: You can't view this member's media.
+
     states:
-      error: Error
-      loading: Uploading
-      unauthorized: You are not allowed to download this file
       permission_required: Permission required
+      login_to_download: Log in to download
 
     validation:
       max_size: "Uploads over {max} kb are not accepted."
@@ -282,9 +301,11 @@ fof-upload:
       download: Download file
       error: |
         Error previewing file. It may have been deleted, or the provided file ID is invalid.
-      no_snippet_preview: "<preview will appear here after posting>"
-      no_snippet: "<no preview snippet available>"
+      no_snippet_preview: The preview will appear here after posting.
+      no_snippet: No preview is available for this file.
   api:
+    mime_types_invalid: The file type rules could not be read. Reload the page and try again.
+    mime_pattern_invalid: "\"{pattern}\" is not a valid file type pattern."
     upload_errors:
       forbidden_type: Uploading files of this type is not allowed.
       mime_permission_denied: You don't have permission to upload this file type.
@@ -298,43 +319,48 @@ fof-upload:
       cannot_write_to_disk: Cannot write to disk.
       upload_blocked_by_php_extension: A php extension blocked the upload.
       no_files_made_it_to_upload: Please upload files no larger than {max} kb.
+      svg_failure: This SVG file could not be made safe, so it was not uploaded.
   lib:
+    upload_failed: "{fileName} could not be uploaded. {error}"
+
     upload-shared-file-modal:
       title: New shared file
       dropzone: Drag and drop files here or click to browse
-      hide-from-media-gallery: Hide from user's media gallery
+      hide-from-media-gallery: Private (hide from the media manager and remove the public URL)
+      remove: "Remove \"{fileName}\""
       upload: Upload
 
     file_list:
-      loading: Loading files...
       empty: There are no files to show.
-      load_error: Could not load files. Please try again.
+      load_error: Could not load files.
+      retry: Try again
       release_to_upload: Release to upload
-      modal_empty_desktop: Your file list is empty. Click the button or drag a file here to upload.
-      modal_empty_phone: Your file list is empty. Tap the button above to upload a file.
-      select_file_a11y_label: Select file "{fileName}"
+      modal_empty_desktop: Your file list is empty. Click Upload or drag a file here to upload.
+      modal_empty_phone: Your file list is empty. Tap Upload to upload a file.
+      unavailable_type: Can't be used here
+      private_badge: Private
+      hidden_badge: Hidden
+      actions_label: "Actions for \"{fileName}\""
+      actions:
+        hide: Hide from my media
+        show: Show in my media
+        make_private: Make private
+        make_public: Make public
+        delete: Delete
+      selected_count: "{count, plural, one {# file selected} other {# files selected}}"
+      clear_selection: Clear
       confirm_selection_btn: "{fileCount, plural, =0 {None selected} one {Select file} other {Select files}}"
+      insert_btn: "{count, plural, =0 {Insert} one {Insert file} other {Insert # files}}"
       load_more_files_btn: Load more files
-      delete_file_a11y_label: Delete file "{fileName}"
-      delete_confirmation: Are you sure you want to delete "{fileName}"?
+      delete_confirmation: "Delete \"{fileName}\"? Posts that use it will show a missing file."
 
       hide_file:
-        btn_a11y_label_hide: Hide "{fileName}" from media manager
-        btn_a11y_label_show: Show "{fileName}" in media manager
-        hide_confirmation: Are you sure you want to hide "{fileName}"? Hiding a file will only remove it from your media manager and will not affect existing posts.
+        hide_confirmation: "Hide \"{fileName}\" from your media? Posts that use it are not affected. You can't show it again from here yet."
         hide_success: File hidden
-        show_confirmation: Are you sure you want to show "{fileName}"? Showing a file will make it visible in your media manager.
+        show_confirmation: "Show \"{fileName}\" in your media again?"
         show_success: File shown
-        hide_fail: Couldn't hide file "{fileName}"
-        show_fail: Couldn't show file "{fileName}"
-        loading: Hiding file...
       hide_shared_file:
-        btn_a11y_label_hide: Make "{fileName}" private (no public URL)
-        btn_a11y_label_show: Make "{fileName}" public (with public URL)
-        hide_confirmation: Are you sure you want to make "{fileName}" private? Making a file private will remove its public URL, but it will not affect existing posts. It will also no longer be visible in the media manager to unauthorized users.
+        hide_confirmation: "Make \"{fileName}\" private? Its public URL stops working, though posts that use it are not affected, and only shared file managers will see it in the media manager."
         hide_success: File made private
-        show_confirmation: Are you sure you want to make "{fileName}" public? Making a file public will make it accessible to anyone with a public URL and anyone can share it using the media manager.
+        show_confirmation: "Make \"{fileName}\" public? Anyone with its URL can open it, and everyone with access to shared files can insert it."
         show_success: File made public
-        hide_fail: Couldn't make file "{fileName}" private
-        show_fail: Couldn't make file "{fileName}" public
-        loading: Making file private...

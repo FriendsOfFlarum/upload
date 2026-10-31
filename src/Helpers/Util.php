@@ -39,6 +39,11 @@ class Util
     const DEFAULT_MAX_FILE_SIZE = 2048;
     const DEFAULT_MAX_IMAGE_WIDTH = 100;
 
+    public static function isBlankSetting(mixed $value): bool
+    {
+        return $value === null || (is_string($value) && trim($value) === '');
+    }
+
     /**
      * The templates used to render files.
      *
