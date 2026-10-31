@@ -104,10 +104,7 @@ export default class MimeTypesField extends Component<MimeTypesFieldAttrs> {
             <thead>
               <tr>
                 {['pattern', 'storage', 'display', 'permission'].map((column) => (
-                  <th scope="col">
-                    {t(`mime_column_${column}`)}
-                    <span className="helpText">{t(`mime_column_${column}_help`)}</span>
-                  </th>
+                  <th scope="col">{t(`mime_column_${column}`)}</th>
                 ))}
                 <th scope="col">
                   <span className="visually-hidden">{t('mime_column_actions')}</span>

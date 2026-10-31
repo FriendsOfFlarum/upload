@@ -27,13 +27,7 @@
 
   thead th {
     text-align: start;
-    vertical-align: bottom;
     padding: 12px 15px;
-
-    .helpText {
-      display: block;
-      font-weight: normal;
-    }
   }
 
   // Controls sit on the table's own surface, so they take the page's.
@@ -57,6 +51,11 @@
   gap: 6px;
 }
 
+.MimeTypeRow-chips,
+.MimeTypeRow-raw {
+  min-width: 15em;
+}
+
 .MimeTypeRow-type {
   font-weight: 600;
 }
@@ -67,6 +66,10 @@
 
 .MimeTypeRow-addSubtype .FormControl {
   width: 12em;
+}
+
+.MimeTypeRow-permission .FormControl {
+  min-width: 11em;
 }
 
 .MimeTypeRow-actions {
@@ -108,8 +111,8 @@
   }
 }
 
-.InspectMimeModal-results {
+.SharedUploadPage-content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
 }

@@ -51,13 +51,6 @@ export const TAB_SETTINGS: Record<string, string[]> = {
   advanced: ['composerButtonVisiblity', 'disableHotlinkProtection', 'disableDownloadLogging'],
 };
 
-const TAB_ICONS: Record<string, string> = {
-  files: 'fas fa-file-arrow-up',
-  storage: 'fas fa-database',
-  images: 'fas fa-image',
-  advanced: 'fas fa-sliders',
-};
-
 function parseJsonSetting<T>(value: unknown, fallback: T): T {
   if (value && typeof value === 'object') return value as T;
 
@@ -137,7 +130,6 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
     return Object.keys(TAB_SETTINGS).map((key) => ({
       key,
-      icon: TAB_ICONS[key],
       label: app.translator.trans(`fof-upload.admin.tabs.${key}`),
       dirty: TAB_SETTINGS[key].filter((setting) => dirty.includes(PREFIX + setting)).length,
       content: content[key],
@@ -510,11 +502,12 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
 
   advancedTab(): Mithril.Children {
     return [
-      this.fieldSet('fof-upload.admin.labels.composer_buttons.title', 'fof-upload.admin.help_texts.composer_buttons', [
+      this.fieldSet('fof-upload.admin.labels.composer.title', null, [
         this.buildSettingComponent({
           type: 'select',
           setting: PREFIX + 'composerButtonVisiblity',
           label: app.translator.trans('fof-upload.admin.labels.composer_buttons.title'),
+          help: app.translator.trans('fof-upload.admin.help_texts.composer_buttons'),
           options: {
             both: extractText(app.translator.trans('fof-upload.admin.labels.composer_buttons.options.both')),
             'upload-btn': extractText(app.translator.trans('fof-upload.admin.labels.composer_buttons.options.upload-btn')),

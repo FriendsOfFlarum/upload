@@ -28,10 +28,10 @@ fof-upload:
         Disable logging every download made by users of your forum. Keeping it enabled allows you to view the number of downloads and other metrics in the nearby future.
       disable-hotlink-protection: |
         Hotlink protection prevents opening downloads from other sites. Current method requires a csrf token and post id.
-      download_templates: |
-        Download templates are how uploads are shown on your forum, eg like previews, buttons. Currently available:
+      download_templates: What each template shows
       mime_types: |
         Decide which files members may upload, where each kind is stored, and how it appears in a post.
+        A permission label adds a permission for uploading that file type.
       mime_order: |
         Rules are matched from the top down and the first match wins, so put more specific rules above general ones.
       resize: |
@@ -136,16 +136,12 @@ fof-upload:
         mime_pattern_empty: Enter a pattern for this rule.
         mime_pattern_duplicate: A rule above already uses this pattern, so this one would never match.
         mime_pattern_slash: "Write every slash as \\/, as in image\\/png."
-        mime_type_permission_placeholder: "Optional, e.g. Images"
+        mime_type_permission_placeholder: "e.g. Images"
         mime_type_remove: Remove this file type
         mime_column_pattern: File type
-        mime_column_pattern_help: Matched against the file's MIME type.
         mime_column_storage: Stored in
-        mime_column_storage_help: Where files of this type are uploaded to.
         mime_column_display: Shown as
-        mime_column_display_help: How the file appears in a post.
         mime_column_permission: Permission label
-        mime_column_permission_help: Optional. Creates a permission for uploading these files.
         mime_column_actions: Actions
         mime_move_up: Move up (matched earlier)
         mime_move_down: Move down (matched later)
@@ -206,6 +202,8 @@ fof-upload:
         allow_animate: Allow SVG animations
         help: Configure how SVG files are processed and sanitized when uploaded. SVG files can contain potentially harmful scripts and should be handled carefully. Uploaded SVGs are sanitized on upload and harmful scripts and tags are removed.
         allow_animate_help: Enabling SVG animations may introduce security vulnerabilities as animated SVGs can contain malicious code. Enable this setting at your own risk and only if you trust your users.
+      composer:
+        title: Composer
       composer_buttons:
         title: Composer buttons
         options:
@@ -267,7 +265,7 @@ fof-upload:
       validation-failed: "Failed: {error}"
       mime-detector: Mime Detector (primary)
       mime-fileinfo: PHP Fileinfo (fallback)
-      guessed-extension: Default file extension (if original is not whitelisted)
+      guessed-extension: Assigned extension
       not-available: No result
   forum:
     media_manager: Media manager

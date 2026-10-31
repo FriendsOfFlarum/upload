@@ -6,7 +6,7 @@ import type Mithril from 'mithril';
 export interface SettingsTab {
   key: string;
   label: Mithril.Children;
-  icon: string;
+  icon?: string;
   content: () => Mithril.Children;
   // How many of this tab's settings are changed but not saved.
   dirty?: number;

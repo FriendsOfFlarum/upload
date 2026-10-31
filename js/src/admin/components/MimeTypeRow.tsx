@@ -62,7 +62,7 @@ export default class MimeTypeRow extends Component<MimeTypeRowAttrs> {
             aria-label={t('mime_column_display')}
           />
         </td>
-        <td>
+        <td className="MimeTypeRow-permission">
           <input
             className="FormControl"
             placeholder={t('mime_type_permission_placeholder')}
@@ -149,16 +149,20 @@ export default class MimeTypeRow extends Component<MimeTypeRowAttrs> {
           ))}
         </span>
         {this.addingSubtype ? this.subtypeInput(type, subtypes) : null}
-        {this.addingSubtype ? null : (
-          <Button className="Button Button--link" icon="fas fa-plus" onclick={() => (this.addingSubtype = true)}>
-            {app.translator.trans('fof-upload.admin.labels.preferences.mime_add_subtype')}
-          </Button>
-        )}
-        <Button className="Button Button--link" icon="fas fa-code" onclick={() => (this.editingRaw = true)}>
-          {app.translator.trans('fof-upload.admin.labels.preferences.mime_edit_pattern')}
-        </Button>
+        {this.addingSubtype ? null : this.iconButton('fas fa-plus', 'mime_add_subtype', () => (this.addingSubtype = true))}
+        {this.iconButton('fas fa-code', 'mime_edit_pattern', () => (this.editingRaw = true))}
         {this.subtypeError ? <p className="ValidationError">{this.subtypeError}</p> : null}
       </div>
+    );
+  }
+
+  iconButton(icon: string, key: string, onclick: () => void): Mithril.Children {
+    const label = extractText(app.translator.trans(`fof-upload.admin.labels.preferences.${key}`));
+
+    return (
+      <Tooltip text={label}>
+        <Button className="Button Button--icon Button--flat" icon={icon} aria-label={label} onclick={onclick} />
+      </Tooltip>
     );
   }
 

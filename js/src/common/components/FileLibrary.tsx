@@ -81,7 +81,7 @@ export default class FileLibrary<CustomAttrs extends FileLibraryAttrs = FileLibr
       if (state.hasError()) {
         return (
           <InfoTile icon="fas fa-exclamation-circle" className="FileLibrary-error">
-            {app.translator.trans('fof-upload.lib.file_list.load_error')}
+            <p>{app.translator.trans('fof-upload.lib.file_list.load_error')}</p>
             <Button className="Button" onclick={() => state.load()}>
               {app.translator.trans('fof-upload.lib.file_list.retry')}
             </Button>

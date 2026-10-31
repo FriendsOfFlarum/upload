@@ -81,7 +81,7 @@ export default class FileManagerModal<CustomAttrs extends FileManagerModalAttrs 
   }
 
   className(): string {
-    return 'FileManagerModal fof-file-manager-modal Modal--large';
+    return 'FileManagerModal fof-file-manager-modal Modal--large Modal--flat';
   }
 
   title(): Mithril.Children {

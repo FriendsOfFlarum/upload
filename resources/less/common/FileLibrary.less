@@ -23,11 +23,15 @@
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-}
 
-.FileLibrary-toolbar-actions {
-  margin-inline-start: auto;
+    &:empty {
+      display: none;
+    }
+  }
+
+  > .FileLibrary-toolbar-actions {
+    margin-inline-start: auto;
+  }
 }
 
 .FileLibrary-grid {
@@ -43,8 +47,8 @@
   padding: 40px 0;
 }
 
-.FileLibrary-error .Button {
-  margin-top: 10px;
+.FileLibrary-error p {
+  margin: 0 0 12px;
 }
 
 .FileLibrary-more {
@@ -121,7 +125,6 @@
   justify-content: center;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--body-bg-shaded);
   border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
