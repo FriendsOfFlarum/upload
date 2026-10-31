@@ -1,72 +1,72 @@
 import app from 'flarum/forum/app';
-import Component from 'flarum/common/Component';
+import Component, { type ComponentAttrs } from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
 import TextEditorButton from 'flarum/common/components/TextEditorButton';
-import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
-import classList from 'flarum/common/utils/classList';
-import type Uploader from '../handler/Uploader';
+import extractText from 'flarum/common/utils/extractText';
 import type Mithril from 'mithril';
+import type Uploader from '../handler/Uploader';
 
-interface UploadButtonAttrs {
+export interface UploadButtonAttrs extends ComponentAttrs {
   uploader: Uploader;
   disabled?: boolean;
+  // A labelled toolbar button rather than the composer's icon button; its uploads are not inserted.
   isMediaUploadButton?: boolean;
 }
 
 export default class UploadButton extends Component<UploadButtonAttrs> {
-  isMediaUploadButton = false;
+  input: HTMLInputElement | null = null;
 
-  oninit(vnode: Mithril.Vnode<UploadButtonAttrs, this>) {
-    super.oninit(vnode);
+  view(): Mithril.Children {
+    const { uploader, disabled, isMediaUploadButton } = this.attrs;
+    const label = app.translator.trans('fof-upload.forum.buttons.upload');
 
-    this.attrs.uploader.on('uploaded', () => {
-      const form = this.$('form')[0] as HTMLFormElement | undefined;
-      if (form) {
-        form.reset();
-      }
-      m.redraw();
-    });
-
-    this.isMediaUploadButton = vnode.attrs.isMediaUploadButton ?? false;
-  }
-
-  view() {
-    const buttonText = this.attrs.uploader.uploading
-      ? app.translator.trans('fof-upload.forum.states.loading')
-      : app.translator.trans('fof-upload.forum.buttons.upload');
-
-    return (
-      <TextEditorButton
-        className={classList([
-          'Button',
-          'hasIcon',
-          'fof-upload-button',
-          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
-          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
-          this.attrs.uploader.uploading && 'uploading',
-        ])}
-        icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
-        onclick={this.uploadButtonClicked.bind(this)}
-        disabled={this.attrs.disabled}
-        title={buttonText}
+    const button = isMediaUploadButton ? (
+      <Button
+        className="Button fof-upload-button"
+        icon="fas fa-file-upload"
+        loading={uploader.uploading}
+        disabled={disabled}
+        onclick={() => this.choose()}
       >
-        {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
-        {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
-        <form>
-          <input type="file" multiple={true} onchange={this.process.bind(this)} />
-        </form>
-      </TextEditorButton>
+        {label}
+      </Button>
+    ) : (
+      <TextEditorButton
+        className="Button Button--icon Button--link fof-upload-button"
+        icon="fas fa-file-upload"
+        loading={uploader.uploading}
+        disabled={disabled}
+        onclick={() => this.choose()}
+        title={extractText(label)}
+      />
     );
+
+    return [
+      button,
+      <input
+        className="fof-upload-input"
+        type="file"
+        multiple
+        hidden
+        tabindex="-1"
+        aria-hidden="true"
+        oncreate={(vnode: Mithril.VnodeDOM) => (this.input = vnode.dom as HTMLInputElement)}
+        onchange={() => this.chosen()}
+      />,
+    ];
   }
 
-  process(_e: Event): void {
-    const files = this.$('input').prop('files') as FileList | undefined;
-    if (!files || files.length === 0) {
-      return;
-    }
-    this.attrs.uploader.upload(files, !this.isMediaUploadButton);
+  choose(): void {
+    this.input?.click();
   }
 
-  uploadButtonClicked(_e: PointerEvent): void {
-    this.$('input').click();
+  chosen(): void {
+    const input = this.input;
+    const files = Array.from(input?.files ?? []);
+
+    if (!input || !files.length) return;
+
+    // Cleared whatever the outcome, so the same file can be chosen again.
+    this.attrs.uploader.upload(files, !this.attrs.isMediaUploadButton).finally(() => (input.value = ''));
   }
 }

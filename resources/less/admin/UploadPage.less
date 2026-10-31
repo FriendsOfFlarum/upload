@@ -1,0 +1,118 @@
+.UploadPage {
+  .SettingsTabs .Tabs-nav {
+    flex-wrap: wrap;
+    padding: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--control-bg);
+  }
+
+  .FieldSet--form + .FieldSet--form,
+  .UploadPage-intro + .FieldSet--form {
+    margin-top: 32px;
+  }
+
+  .Form-controls {
+    margin-top: 32px;
+  }
+}
+
+.MimeTypesField-scroll {
+  overflow-x: auto;
+}
+
+.MimeTypesField-table {
+  .Table();
+  width: 100%;
+  min-width: 760px;
+
+  thead th {
+    text-align: start;
+    padding: 12px 15px;
+  }
+
+  // Controls sit on the table's own surface, so they take the page's.
+  td {
+    --control-bg: var(--body-bg);
+    --pill-bg: var(--body-bg);
+    vertical-align: top;
+  }
+
+  th:first-child {
+    width: 40%;
+  }
+}
+
+.MimeTypeRow-chips,
+.MimeTypeRow-raw,
+.MimeTypeRow-addSubtype {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.MimeTypeRow-chips,
+.MimeTypeRow-raw {
+  min-width: 15em;
+}
+
+.MimeTypeRow-type {
+  font-weight: 600;
+}
+
+.MimeTypeRow-raw .FormControl {
+  font-family: var(--font-family-monospace, monospace);
+}
+
+.MimeTypeRow-addSubtype .FormControl {
+  width: 12em;
+}
+
+.MimeTypeRow-permission .FormControl {
+  min-width: 11em;
+}
+
+.MimeTypeRow-actions {
+  white-space: nowrap;
+}
+
+.MimeTypesField-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.MimeTypesField-templates {
+  margin-top: 12px;
+
+  summary {
+    cursor: pointer;
+    color: var(--muted-color);
+  }
+
+  dt {
+    margin-top: 8px;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--muted-color);
+  }
+}
+
+.FileSizeField-controls {
+  display: flex;
+  gap: 8px;
+  max-width: 320px;
+
+  .FormControl {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.SharedUploadPage-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

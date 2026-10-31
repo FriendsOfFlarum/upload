@@ -1,163 +1,156 @@
 import app from 'flarum/common/app';
-import { IFormModalAttrs } from 'flarum/common/components/FormModal';
-import FormModal from 'flarum/common/components/FormModal';
-import Switch from 'flarum/common/components/Switch';
-import mimeToIcon from '../mimeToIcon';
+import FormModal, { type IFormModalAttrs } from 'flarum/common/components/FormModal';
 import Button from 'flarum/common/components/Button';
+import Form from 'flarum/common/components/Form';
+import FormGroup from 'flarum/common/components/FormGroup';
+import Icon from 'flarum/common/components/Icon';
+import Stream from 'flarum/common/utils/Stream';
+import extractText from 'flarum/common/utils/extractText';
 import type Mithril from 'mithril';
-import type { ApiPayloadPlural } from 'flarum/common/Store';
 import type File from '../models/File';
+import mimeToIcon from '../mimeToIcon';
+import FileDropTarget from '../utils/FileDropTarget';
+import uploadFile from '../utils/uploadFile';
 
 type NativeFile = globalThis.File;
 
-interface CustomAttrs extends IFormModalAttrs {
+interface QueuedFile {
+  file: NativeFile;
+  preview: string | null;
+}
+
+export interface UploadSharedFileModalAttrs extends IFormModalAttrs {
+  // Files dropped on the shared library before this opened.
+  files?: NativeFile[];
   onUploadComplete: (files: File | File[]) => void;
 }
 
-interface UploadOptions {
-  shared: boolean;
-  hidden: boolean;
-}
+export default class UploadSharedFileModal extends FormModal<UploadSharedFileModalAttrs> {
+  queue: QueuedFile[] = [];
+  hidden = Stream(false);
+  dropTarget: FileDropTarget | null = null;
+  closed = false;
 
-export default class UploadSharedFileModal extends FormModal<CustomAttrs> {
-  files: NativeFile[] = [];
-  fileInput: HTMLInputElement | null = null;
-  options: UploadOptions = {
-    shared: true,
-    hidden: false,
-  };
-  loading: boolean = false;
-
-  oninit(vnode: Mithril.Vnode<CustomAttrs, this>) {
+  oninit(vnode: Mithril.Vnode<UploadSharedFileModalAttrs, this>) {
     super.oninit(vnode);
+
+    this.add(this.attrs.files ?? []);
   }
 
-  className() {
+  oncreate(vnode: Mithril.VnodeDOM<UploadSharedFileModalAttrs, this>) {
+    super.oncreate(vnode);
+
+    const zone = this.element.querySelector('.UploadSharedFileModal-dropzone');
+
+    if (zone) this.dropTarget = new FileDropTarget((files) => this.add(Array.from(files)), zone);
+  }
+
+  onremove(vnode: Mithril.VnodeDOM<UploadSharedFileModalAttrs, this>) {
+    super.onremove(vnode);
+
+    this.closed = true;
+    this.dropTarget?.unload();
+    this.queue.forEach((queued) => queued.preview && URL.revokeObjectURL(queued.preview));
+  }
+
+  className(): string {
     return 'UploadSharedFileModal Modal--medium';
   }
 
-  title() {
+  title(): Mithril.Children {
     return app.translator.trans('fof-upload.lib.upload-shared-file-modal.title');
   }
 
-  onFileChange(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (target.files) {
-      this.addFiles(Array.from(target.files));
-    }
-  }
-
-  addFiles(newFiles: NativeFile[]) {
-    this.files.push(...newFiles);
-    m.redraw();
-  }
-
-  onDragOver(e: DragEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  onDrop(e: DragEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.dataTransfer && e.dataTransfer.files) {
-      this.addFiles(Array.from(e.dataTransfer.files));
-    }
-  }
-
-  onDropzoneClick() {
-    if (this.fileInput) {
-      this.fileInput.click();
-    }
-  }
-
-  content() {
+  content(): Mithril.Children {
     return (
       <div className="Modal-body">
-        <div
-          className="UploadSharedFileModal-dropzone"
-          onclick={() => this.onDropzoneClick()}
-          ondragover={this.onDragOver.bind(this)}
-          ondrop={this.onDrop.bind(this)}
-        >
-          {app.translator.trans('fof-upload.lib.upload-shared-file-modal.dropzone')}
-          <input
-            type="file"
-            multiple
-            onchange={this.onFileChange.bind(this)}
-            style={{ opacity: 0, position: 'absolute', left: '-9999px' }}
-            oncreate={(vnode: Mithril.VnodeDOM) => {
-              this.fileInput = vnode.dom as HTMLInputElement;
-            }}
+        <Form>
+          <label className="UploadSharedFileModal-dropzone">
+            <Icon name="fas fa-cloud-upload-alt" />
+            <span>{app.translator.trans('fof-upload.lib.upload-shared-file-modal.dropzone')}</span>
+            <input className="visually-hidden" type="file" multiple disabled={this.loading} onchange={(e: Event) => this.chosen(e)} />
+          </label>
+
+          {this.queue.length ? (
+            <ul className="UploadSharedFileModal-files">
+              {this.queue.map((queued) => (
+                <li key={queued.preview ?? queued.file.name + queued.file.lastModified} className="UploadSharedFileModal-file">
+                  {queued.preview ? <img src={queued.preview} alt="" /> : <Icon name={mimeToIcon(queued.file.type)} />}
+                  <span className="UploadSharedFileModal-fileName">{queued.file.name}</span>
+                  <Button
+                    className="Button Button--icon Button--link"
+                    icon="fas fa-times"
+                    disabled={this.loading}
+                    aria-label={extractText(app.translator.trans('fof-upload.lib.upload-shared-file-modal.remove', { fileName: queued.file.name }))}
+                    onclick={() => this.remove(queued)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          <FormGroup
+            type="switch"
+            label={app.translator.trans('fof-upload.lib.upload-shared-file-modal.hide-from-media-gallery')}
+            stream={this.hidden}
           />
-        </div>
-        <div className="UploadSharedFileModal-files">
-          {this.files.map((file: NativeFile) => {
-            const isImage = file.type.startsWith('image/');
-            return (
-              <div className="UploadedFile">
-                {isImage ? <img src={URL.createObjectURL(file as Blob)} alt={file.name} /> : <i className={mimeToIcon(file.type)}></i>}
-                <div className="UploadedFile-name">{file.name}</div>
-                {/* Remove button */}
-                <Button
-                  className="Button Button--icon Button--link UploadedFile-remove"
-                  icon="fas fa-times"
-                  onclick={() => {
-                    this.files = this.files.filter((f: NativeFile) => f !== file);
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <div className="UploadSharedFileModal-options Form-group">
-          <Switch state={this.options.hidden} onchange={(value: boolean) => (this.options.hidden = value)}>
-            {app.translator.trans('fof-upload.lib.upload-shared-file-modal.hide-from-media-gallery')}
-          </Switch>
-        </div>
-        <div className="UploadSharedFileModal-submit App-primaryControl">
-          <Button
-            className="Button Button--primary"
-            loading={this.loading}
-            onclick={this.upload.bind(this)}
-            disabled={!this.files.length || this.loading}
-          >
-            {app.translator.trans('fof-upload.lib.upload-shared-file-modal.upload')}
-          </Button>
-        </div>
+
+          <div className="Form-group Form-controls">
+            <Button type="submit" className="Button Button--primary" loading={this.loading} disabled={!this.queue.length}>
+              {app.translator.trans('fof-upload.lib.upload-shared-file-modal.upload')}
+            </Button>
+          </div>
+        </Form>
       </div>
     );
   }
 
-  async upload() {
+  chosen(e: Event): void {
+    const input = e.target as HTMLInputElement;
+
+    this.add(Array.from(input.files ?? []));
+    input.value = '';
+  }
+
+  add(files: NativeFile[]): void {
+    this.queue.push(...files.map((file) => ({ file, preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null })));
+  }
+
+  remove(queued: QueuedFile): void {
+    if (queued.preview) URL.revokeObjectURL(queued.preview);
+
+    this.queue = this.queue.filter((item) => item !== queued);
+  }
+
+  async onsubmit(e: SubmitEvent): Promise<void> {
+    e.preventDefault();
+
+    if (!this.queue.length || this.loading) return;
+
     this.loading = true;
     m.redraw();
 
-    const formData = new FormData();
+    const uploaded: File[] = [];
 
-    // Append each file to the form data
-    this.files.forEach((file) => {
-      formData.append('files[]', file);
-    });
-
-    (Object.keys(this.options) as (keyof UploadOptions)[]).forEach((key) => {
-      formData.append(`options[${key}]`, String(this.options[key]));
-    });
-
-    const results = await app.request<ApiPayloadPlural>({
-      method: 'POST',
-      url: app.forum.attribute('apiUrl') + '/fof/upload',
-      serialize: (raw: FormData) => raw, // Prevent mithril from trying to serialize FormData
-      body: formData,
-    });
-
-    const uploadedFiles = app.store.pushPayload(results) as unknown as File | File[];
-
-    this.attrs.onUploadComplete(uploadedFiles);
-    this.files = [];
-    this.hide();
+    // Files that fail stay listed, so they can be removed or tried again.
+    for (const queued of [...this.queue]) {
+      try {
+        uploaded.push(await uploadFile(queued.file, { shared: true, hidden: this.hidden() }));
+        this.remove(queued);
+      } catch {
+        // uploadFile has already said which file failed and why.
+      }
+    }
 
     this.loading = false;
+
+    if (uploaded.length) this.attrs.onUploadComplete(uploaded);
+
+    // Closed during the uploads, hiding now would close whichever modal is on top instead.
+    if (!this.queue.length && !this.closed) {
+      this.hide();
+    }
+
     m.redraw();
   }
 }

@@ -11,35 +11,23 @@ interface UserWithUpload extends User {
 
 export default function addUserPageButton(): void {
   extend(UserPage.prototype, 'navItems', function (this: InstanceType<typeof UserPage>, items) {
-    const canUpload = !!app.forum.attribute('fof-upload.canUpload');
     const user = this.user as UserWithUpload | null;
-    const hasUploads = !!user?.uploadCountCurrent();
+    const viewer = app.session.user as UserWithUpload | null;
 
-    const sessionUser = app.session.user as UserWithUpload | null;
-    if (!this.user || !sessionUser) return;
-    if (sessionUser.viewOthersMediaLibrary() || (this.user === sessionUser && (canUpload || hasUploads))) {
-      const uploadCount = user?.uploadCountCurrent() ?? 0;
+    if (!user || !viewer) return;
 
-      items.add(
-        'uploads',
-        LinkButton.component(
-          {
-            href: app.route('user.uploads', {
-              username: this.user.slug(),
-            }),
-            name: 'uploads',
-            icon: 'fas fa-file-upload',
-          },
-          [
-            this.user === sessionUser
-              ? app.translator.trans('fof-upload.forum.buttons.media')
-              : app.translator.trans('fof-upload.forum.buttons.user_uploads'),
-            ' ',
-            uploadCount > 0 ? <span className="Button-badge">{uploadCount}</span> : null,
-          ]
-        ),
-        80
-      );
-    }
+    const own = user === viewer;
+    const count = user.uploadCountCurrent() ?? 0;
+
+    if (!viewer.viewOthersMediaLibrary() && !(own && (app.forum.attribute('fof-upload.canUpload') || count > 0))) return;
+
+    items.add(
+      'uploads',
+      <LinkButton href={app.route('user.uploads', { username: user.slug() })} name="uploads" icon="fas fa-file-upload">
+        {app.translator.trans(own ? 'fof-upload.forum.buttons.media' : 'fof-upload.forum.buttons.user_uploads')}
+        {count > 0 ? <span className="Button-badge">{count}</span> : null}
+      </LinkButton>,
+      80
+    );
   });
 }

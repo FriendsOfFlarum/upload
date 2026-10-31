@@ -35,6 +35,12 @@ class AddAvailableOptionsInAdmin
         $event->settings['fof-upload.php_ini.upload_max_filesize'] = ini_get('upload_max_filesize');
         $event->settings['fof-upload.fileinfo_available'] = MimeTypeDetector::fileinfoAvailable();
 
+        // The rule uploads fall back to when none are saved, shown so the page opens unchanged.
+        $stored = json_decode((string) ($event->settings['fof-upload.mimeTypes'] ?? ''), true);
+        if (empty($stored)) {
+            $event->settings['fof-upload.mimeTypes'] = json_encode($this->util->defaultMimeTypes(), JSON_UNESCAPED_SLASHES);
+        }
+
         // Expose mime-type permissions for dynamic frontend registration in the permission grid
         $mimePermissions = $this->util->getMimePermissions();
         $event->settings['fof-upload.mimePermissions'] = $mimePermissions->toArray();

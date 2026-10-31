@@ -208,15 +208,15 @@ class RenderUploadsTest extends TestCase
     {
         $posts = $this->renderedPosts();
 
-        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => 'http://localhost/assets/files/files/short.txt'];
+        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => $this->uuid(11), 'expand' => ''];
 
         $this->assertEquals([
-            // Short enough to show whole, blank lines dropped.
+            // Short enough to show whole, blank lines dropped, so there is nothing to expand.
             3  => [$short],
-            // Too long to show whole: the first five lines.
-            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => 'http://localhost/assets/files/files/long.txt']],
-            // A deleted file: as it was posted, with no snippet.
-            5  => [['label' => 'gone.txt', 'hasSnippet' => 'true', 'snippet' => '', 'download' => 'https://old.example.com/98']],
+            // Too long to show whole: the first five lines, and the live URL to expand from.
+            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => $this->uuid(12), 'expand' => 'http://localhost/assets/files/files/long.txt']],
+            // A deleted file: as it was posted, with no snippet and nothing to expand.
+            5  => [['label' => 'gone.txt', 'hasSnippet' => 'true', 'snippet' => '', 'download' => $this->uuid(98), 'expand' => '']],
             14 => [$short],
         ], array_map($this->textPreviews(...), array_intersect_key($posts, array_flip([3, 4, 5, 14]))));
     }
@@ -489,7 +489,8 @@ class RenderUploadsTest extends TestCase
             'label'      => $this->textOf($figure, './/*[contains(@class, "FofUpload-TextPreviewLabel")]'),
             'hasSnippet' => $figure->getAttribute('data-hassnippet'),
             'snippet'    => $this->textOf($figure, './/code'),
-            'download'   => $this->attributeOf($figure, './/a[contains(@class, "FofUpload-TextPreviewDownload")]', 'href'),
+            'download'   => $this->attributeOf($figure, './/*[contains(@class, "FofUpload-TextPreviewDownload")]', 'data-fof-upload-download-uuid'),
+            'expand'     => $this->attributeOf($figure, './/*[contains(@class, "FofUpload-TextPreviewToggle")]', 'data-url'),
         ], $this->find($html, '//figure[contains(@class, "FofUpload-TextPreview")]'));
     }
 
@@ -499,8 +500,8 @@ class RenderUploadsTest extends TestCase
         return array_map(fn (DOMElement $group) => [
             'uuid'  => $group->getAttribute('data-fof-upload-download-uuid'),
             'label' => $this->textOf($group, './/*[contains(@class, "fof-upload-download-label")]'),
-            'size'  => $this->textOf($group, './div[last()]'),
-        ], $this->find($html, '//*[@data-fof-upload-download-uuid]'));
+            'size'  => $this->textOf($group, './/*[contains(@class, "fof-upload-download-size")]'),
+        ], $this->find($html, '//*[contains(@class, "ButtonGroup")][@data-fof-upload-download-uuid]'));
     }
 
     /** @return DOMElement[] */

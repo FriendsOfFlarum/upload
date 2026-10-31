@@ -84,8 +84,4 @@ export default class File extends Model {
   canDelete() {
     return Model.attribute<boolean>('canDelete').call(this);
   }
-
-  apiEndpoint() {
-    return '/fof/uploads' + (this.exists ? '/' + this.id() : '');
-  }
 }

@@ -1,9 +1,10 @@
 import app from 'flarum/forum/app';
 import User from 'flarum/common/models/User';
 import Model from 'flarum/common/Model';
-import downloadButtonInteraction from './downloadButtonInteraction';
+import addContentControls from './addContentControls';
 import addUploadButton from './addUploadButton';
 import addUserPageButton from './addUserPageButton';
+import './compat';
 
 export { default as extend } from './extend';
 
@@ -16,6 +17,6 @@ app.initializers.add('fof-upload', () => {
   (User.prototype as any).accessSharedFiles = Model.attribute('fof-upload-accessSharedFiles');
 
   addUploadButton();
-  downloadButtonInteraction();
+  addContentControls();
   addUserPageButton();
 });

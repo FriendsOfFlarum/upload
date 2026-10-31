@@ -1,36 +1,35 @@
 import app from 'flarum/forum/app';
-import Component, { ComponentAttrs } from 'flarum/common/Component';
-import Button from 'flarum/common/components/Button';
+import Component, { type ComponentAttrs } from 'flarum/common/Component';
+import TextEditorButton from 'flarum/common/components/TextEditorButton';
+import extractText from 'flarum/common/utils/extractText';
+import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
 import FileManagerModal from './FileManagerModal';
-import Tooltip from 'flarum/common/components/Tooltip';
+import type Uploader from '../handler/Uploader';
 
 interface FileManagerButtonAttrs extends ComponentAttrs {
-  uploader: any;
+  uploader?: Uploader;
+  composer?: { editor: EditorDriverInterface | null };
+  disabled?: boolean;
+  // Shows the composer's upload progress when this is its only upload control.
+  loading?: boolean;
 }
 
 export default class FileManagerButton extends Component<FileManagerButtonAttrs> {
   view() {
     return (
-      <Tooltip text={app.translator.trans('fof-upload.forum.buttons.media')}>
-        {Button.component({
-          className: 'Button fof-upload-button Button--icon',
-          onclick: this.fileManagerButtonClicked.bind(this),
-          icon: 'fas fa-photo-video',
-        })}
-      </Tooltip>
+      <TextEditorButton
+        className="Button Button--icon Button--link fof-upload-button"
+        icon="fas fa-photo-video"
+        loading={this.attrs.loading}
+        disabled={this.attrs.disabled}
+        onclick={() => this.open()}
+        title={extractText(app.translator.trans('fof-upload.forum.buttons.media'))}
+      />
     );
   }
 
-  /**
-   * Event handler for upload button being clicked
-   */
-  fileManagerButtonClicked(e: PointerEvent) {
-    e.preventDefault();
-
-    // Note: FileManagerModal is imported synchronously to avoid chunk ID collision
-    // with Flarum core's ReplyComposer (both would get webpack chunk ID 378).
-    app.modal.show(FileManagerModal as any, {
-      uploader: this.attrs.uploader,
-    });
+  // FileManagerModal is imported synchronously: a lazy chunk collides with core's ReplyComposer chunk id.
+  open(): void {
+    app.modal.show(FileManagerModal, { composer: this.attrs.composer });
   }
 }

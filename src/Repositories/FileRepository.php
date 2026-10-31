@@ -179,7 +179,7 @@ class FileRepository
             case UPLOAD_ERR_FORM_SIZE:
                 throw new InvalidUploadException('max_upload_file_size_form', 413);
             case UPLOAD_ERR_PARTIAL:
-                throw new InvalidUploadException('partial_upload', 206);
+                throw new InvalidUploadException('partial_upload', 400);
             case UPLOAD_ERR_NO_FILE:
                 throw new InvalidUploadException('no_file_uploaded', 400);
             case UPLOAD_ERR_NO_TMP_DIR:

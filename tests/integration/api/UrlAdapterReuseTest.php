@@ -81,7 +81,8 @@ class UrlAdapterReuseTest extends EnhancedTestCase
             ] + (str_ends_with($name, '.txt')
                 // Its snippet already kept, as after its first render: reading
                 // one (#537) uses a fresh adapter, which isn't what's measured.
-                ? ['text_snippet' => 'a note', 'text_snippet_has_more' => false]
+                // More to show, so its live URL is rendered for expanding it.
+                ? ['text_snippet' => 'a note', 'text_snippet_has_more' => true]
                 : []);
             $content .= str_ends_with($name, '.txt')
                 ? "<UPL-TEXT-PREVIEW url=\"https://old.example.com/$name\" uuid=\"$uuid\"><s>[upl-text-preview uuid=$uuid url=https://old.example.com/$name]</s>$name<e>[/upl-text-preview]</e></UPL-TEXT-PREVIEW>"
@@ -145,7 +146,7 @@ class UrlAdapterReuseTest extends EnhancedTestCase
         );
 
         $html = json_decode((string) $response->getBody(), true)['data']['attributes']['contentHtml'] ?? '';
-        preg_match_all('#(?:src|href)="(https?://[^"]+/files/([^"/]+))"#', $html, $matches, PREG_SET_ORDER);
+        preg_match_all('#(?:src|href|data-url)="(https?://[^"]+/files/([^"/]+))"#', $html, $matches, PREG_SET_ORDER);
 
         $hosts = [];
         foreach ($matches as [, $url, $name]) {

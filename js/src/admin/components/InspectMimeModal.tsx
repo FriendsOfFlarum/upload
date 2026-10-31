@@ -1,6 +1,7 @@
 import app from 'flarum/admin/app';
-import FormModal from 'flarum/common/components/FormModal';
-import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import Modal, { type IInternalModalAttrs } from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import LabelValue from 'flarum/common/components/LabelValue';
 import Link from 'flarum/common/components/Link';
 import type Mithril from 'mithril';
 
@@ -12,119 +13,104 @@ interface InspectionResult {
   guessed_extension?: string;
 }
 
-export default class InspectMimeModal extends FormModal {
-  uploading = false;
-  inspection: InspectionResult = {};
-
-  oninit(vnode: Mithril.Vnode<Record<string, never>, this>) {
-    super.oninit(vnode);
-
-    this.uploading = false;
-    this.inspection = {};
-  }
+export default class InspectMimeModal extends Modal<IInternalModalAttrs> {
+  inspection: InspectionResult | null = null;
+  fileName = '';
+  input: HTMLInputElement | null = null;
 
   className(): string {
-    return 'Modal--small fof-upload-inspect-mime-modal';
+    return 'InspectMimeModal fof-upload-inspect-mime-modal Modal--small';
   }
 
-  title(): string {
-    return app.translator.trans('fof-upload.admin.inspect-mime.title') as string;
+  title(): Mithril.Children {
+    return app.translator.trans('fof-upload.admin.inspect-mime.title');
   }
 
   content(): Mithril.Children {
     return (
       <div className="Modal-body">
-        <p>
-          {app.translator.trans('fof-upload.admin.inspect-mime.description', {
-            a: (
-              <Link href="https://github.com/SoftCreatR/php-mime-detector" external={true} target="_blank">
-                PHP Mime Detector
-              </Link>
-            ),
-          })}
-        </p>
-        <p>{app.translator.trans('fof-upload.admin.inspect-mime.select')}</p>
-        <div>
-          <input type="file" onchange={(e: Event) => this.onupload(e)} disabled={this.uploading} />
-          {this.uploading ? <LoadingIndicator /> : null}
+        <div className="Form">
+          <div className="Form-group">
+            <p className="helpText">
+              {app.translator.trans('fof-upload.admin.inspect-mime.description', {
+                a: <Link href="https://github.com/SoftCreatR/php-mime-detector" external={true} target="_blank" />,
+              })}
+            </p>
+            <p className="helpText">{app.translator.trans('fof-upload.admin.inspect-mime.select')}</p>
+          </div>
+
+          <div className="Form-group">
+            <Button className="Button Button--primary" icon="fas fa-file" loading={this.loading} onclick={() => this.input?.click()}>
+              {app.translator.trans('fof-upload.admin.inspect-mime.choose')}
+            </Button>
+            <input
+              type="file"
+              hidden
+              aria-hidden="true"
+              tabindex="-1"
+              oncreate={(vnode: Mithril.VnodeDOM) => (this.input = vnode.dom as HTMLInputElement)}
+              onchange={(e: Event) => this.inspect(e.target as HTMLInputElement)}
+            />
+          </div>
+
+          {this.inspection ? this.results(this.inspection) : null}
         </div>
-        <dl>
-          <dt>{app.translator.trans('fof-upload.admin.inspect-mime.laravel-validation')}</dt>
-          <dd>
-            {typeof this.inspection.laravel_validation === 'undefined' ? (
-              <em>{app.translator.trans('fof-upload.admin.inspect-mime.no-file-selected')}</em>
-            ) : this.inspection.laravel_validation ? (
-              app.translator.trans('fof-upload.admin.inspect-mime.validation-passed')
-            ) : (
-              app.translator.trans('fof-upload.admin.inspect-mime.validation-failed', {
-                error: this.inspection.laravel_validation_error || '?',
-              })
-            )}
-          </dd>
-        </dl>
-        <dl>
-          <dt>{app.translator.trans('fof-upload.admin.inspect-mime.mime-detector')}</dt>
-          <dd>
-            {this.inspection.mime_detector ? (
-              <code>{this.inspection.mime_detector}</code>
-            ) : (
-              <em>{app.translator.trans('fof-upload.admin.inspect-mime.not-available')}</em>
-            )}
-          </dd>
-        </dl>
-        <dl>
-          <dt>{app.translator.trans('fof-upload.admin.inspect-mime.mime-fileinfo')}</dt>
-          <dd>
-            {this.inspection.php_mime ? (
-              <code>{this.inspection.php_mime}</code>
-            ) : (
-              <em>{app.translator.trans('fof-upload.admin.inspect-mime.not-available')}</em>
-            )}
-          </dd>
-        </dl>
-        <dl>
-          <dt>{app.translator.trans('fof-upload.admin.inspect-mime.guessed-extension')}</dt>
-          <dd>
-            {this.inspection.guessed_extension ? (
-              <code>{this.inspection.guessed_extension}</code>
-            ) : (
-              <em>{app.translator.trans('fof-upload.admin.inspect-mime.not-available')}</em>
-            )}
-          </dd>
-        </dl>
       </div>
     );
   }
 
-  onupload(event: Event): void {
-    const target = event.target as HTMLInputElement;
+  results(inspection: InspectionResult): Mithril.Children {
+    const none = <em>{app.translator.trans('fof-upload.admin.inspect-mime.not-available')}</em>;
+    const code = (value?: string) => (value ? <code>{value}</code> : none);
+
+    return (
+      <div className="Form-group InspectMimeModal-results" aria-live="polite">
+        <label>{this.fileName}</label>
+        <LabelValue
+          label={app.translator.trans('fof-upload.admin.inspect-mime.laravel-validation')}
+          value={
+            inspection.laravel_validation
+              ? app.translator.trans('fof-upload.admin.inspect-mime.validation-passed')
+              : app.translator.trans('fof-upload.admin.inspect-mime.validation-failed', { error: inspection.laravel_validation_error || '?' })
+          }
+        />
+        <LabelValue label={app.translator.trans('fof-upload.admin.inspect-mime.mime-detector')} value={code(inspection.mime_detector)} />
+        <LabelValue label={app.translator.trans('fof-upload.admin.inspect-mime.mime-fileinfo')} value={code(inspection.php_mime)} />
+        <LabelValue label={app.translator.trans('fof-upload.admin.inspect-mime.guessed-extension')} value={code(inspection.guessed_extension)} />
+      </div>
+    );
+  }
+
+  inspect(input: HTMLInputElement): void {
+    const file = input.files?.[0];
+
+    if (!file) return;
+
     const body = new FormData();
+    body.append('files[]', file);
 
-    for (let i = 0; i < target.files!.length; i++) {
-      body.append('files[]', target.files![i]);
-    }
-
-    this.uploading = true;
+    this.loading = true;
+    this.alertAttrs = null;
+    this.fileName = file.name;
 
     app
-      .request({
+      .request<InspectionResult>({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/fof/upload/inspect-mime',
         serialize: (raw: FormData) => raw,
         body,
+        errorHandler: (error) => {
+          this.alertAttrs = error.alert;
+        },
       })
-      .then((result: unknown) => {
-        const inspection = result as InspectionResult;
-        this.uploading = false;
-        this.inspection = inspection;
+      .then(
+        (inspection) => (this.inspection = inspection),
+        () => (this.inspection = null)
+      )
+      .finally(() => {
+        this.loading = false;
+        input.value = '';
         m.redraw();
-      })
-      .catch((error: unknown) => {
-        this.uploading = false;
-        this.inspection = {};
-        m.redraw();
-
-        throw error;
       });
   }
 }

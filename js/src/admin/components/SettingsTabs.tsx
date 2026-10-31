@@ -1,78 +1,77 @@
 import app from 'flarum/admin/app';
-import Component, { ComponentAttrs } from 'flarum/common/Component';
-import LinkButton from 'flarum/common/components/LinkButton';
-import classList from 'flarum/common/utils/classList';
+import Component, { type ComponentAttrs } from 'flarum/common/Component';
+import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
 
 export interface SettingsTab {
-  /** Stable key, also used as the `page` route parameter. */
   key: string;
   label: Mithril.Children;
-  icon: string;
-  /** Rendered only while this tab is active. */
+  icon?: string;
   content: () => Mithril.Children;
-  /** Shows an unsaved-changes marker on the tab button. */
-  dirty?: boolean;
+  // How many of this tab's settings are changed but not saved.
+  dirty?: number;
 }
 
 export interface SettingsTabsAttrs extends ComponentAttrs {
   tabs: SettingsTab[];
-  /** Extension id, used to build the route for each tab. */
-  extensionId: string;
+  active: string;
+  onchange: (key: string) => void;
 }
 
-/**
- * Tab strip for a long settings page.
- *
- * Only the active tab's content is rendered, which is the point — the page was
- * previously a single ~800 line scroll where everything competed for attention.
- *
- * The active tab lives in the `page` route parameter rather than component
- * state, following the same approach as fof/seo's admin pages. That matters
- * because the admin panel routes on the hash (`m.route.prefix = '#'`): writing a
- * tab key into `location.hash` directly replaces the route and bounces the admin
- * to the dashboard on reload. Using the route also makes each tab a real link —
- * middle-clickable, bookmarkable, and navigable with browser Back.
- */
+// The active tab is held by the page, not the route: a route change remounts the page and drops unsaved edits.
 export default class SettingsTabs extends Component<SettingsTabsAttrs> {
-  activeKey(): string {
-    const requested = m.route.param('page') as string | undefined;
-    const known = requested && this.attrs.tabs.some((tab) => tab.key === requested);
-
-    return known ? requested! : this.attrs.tabs[0]?.key;
-  }
-
   view() {
-    const { tabs, extensionId } = this.attrs;
-    const activeKey = this.activeKey();
-    const active = tabs.find((tab) => tab.key === activeKey) ?? tabs[0];
+    const { tabs } = this.attrs;
+    const active = tabs.find((tab) => tab.key === this.attrs.active) ?? tabs[0];
 
     return (
-      <div className="SettingsTabs">
-        <div className="SettingsTabs-nav">
-          {tabs.map((tab, index) => (
-            <LinkButton
-              key={tab.key}
-              className={classList('Button SettingsTabs-tab', tab.key === active.key && 'SettingsTabs-tab--active')}
-              icon={tab.icon}
-              // The first tab is the bare extension route, so the default view
-              // has a clean URL rather than a redundant ?page= parameter.
-              href={index === 0 ? app.route('extension', { id: extensionId }) : app.route('extension', { id: extensionId, page: tab.key })}
-            >
-              <span className="SettingsTabs-tabLabel">{tab.label}</span>
-              {tab.dirty && (
-                <span
-                  className="SettingsTabs-tabDirty"
-                  aria-label={app.translator.trans('fof-upload.admin.tabs.unsaved_changes', {}, true)}
-                  title={app.translator.trans('fof-upload.admin.tabs.unsaved_changes', {}, true)}
-                />
-              )}
-            </LinkButton>
-          ))}
+      <div className="Tabs SettingsTabs">
+        <div className="Tabs-nav" role="tablist" onkeydown={(e: KeyboardEvent) => this.keydown(e)}>
+          {tabs.map((tab) => {
+            const selected = tab.key === active.key;
+
+            return (
+              <Button
+                key={tab.key}
+                className="Button Button--link"
+                role="tab"
+                id={`fof-upload-tab-${tab.key}`}
+                aria-selected={selected ? 'true' : 'false'}
+                aria-controls={`fof-upload-tabpanel-${tab.key}`}
+                tabindex={selected ? 0 : -1}
+                active={selected}
+                icon={tab.icon}
+                data-tab={tab.key}
+                onclick={() => this.attrs.onchange(tab.key)}
+              >
+                {tab.label}
+                {tab.dirty ? (
+                  <span className="Button-badge">
+                    {tab.dirty}
+                    <span className="visually-hidden">{app.translator.trans('fof-upload.admin.tabs.unsaved_changes')}</span>
+                  </span>
+                ) : null}
+              </Button>
+            );
+          })}
         </div>
 
-        <div className="SettingsTabs-panel">{active.content()}</div>
+        <div className="Tabs-content" role="tabpanel" id={`fof-upload-tabpanel-${active.key}`} aria-labelledby={`fof-upload-tab-${active.key}`}>
+          {active.content()}
+        </div>
       </div>
     );
+  }
+
+  keydown(e: KeyboardEvent): void {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+
+    const keys = this.attrs.tabs.map((tab) => tab.key);
+    const next = keys[(keys.indexOf(this.attrs.active) + (e.key === 'ArrowRight' ? 1 : -1) + keys.length) % keys.length];
+
+    e.preventDefault();
+    this.attrs.onchange(next);
+    m.redraw.sync();
+    this.element.querySelector<HTMLElement>(`[data-tab="${next}"]`)?.focus();
   }
 }

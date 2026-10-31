@@ -55,7 +55,7 @@ class EmbeddedFiles extends Relation
             return $references;
         }
 
-        foreach (['UPL-IMAGE-PREVIEW', 'UPL-TEXT-PREVIEW'] as $tagName) {
+        foreach (['UPL-IMAGE-PREVIEW', 'UPL-IMAGE', 'UPL-TEXT-PREVIEW'] as $tagName) {
             Utils::replaceAttributes($xml, $tagName, function (array $attributes) use (&$references) {
                 if (!empty($attributes['uuid'])) {
                     $references['uuids'][] = $attributes['uuid'];
