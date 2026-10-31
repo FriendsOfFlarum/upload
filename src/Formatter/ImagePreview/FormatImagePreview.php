@@ -52,6 +52,12 @@ class FormatImagePreview
 
                 $attributes['title'] = $file->base_name;
 
+                // Expose original dimensions for other extensions, such as lightboxes.
+                if ($file->image_width > 0 && $file->image_height > 0) {
+                    $attributes['image_width'] = $file->image_width;
+                    $attributes['image_height'] = $file->image_height;
+                }
+
                 // Set alt to the filename unless the user provided a custom value.
                 // Also handles legacy posts where alt="{TEXT?}" was stored literally.
                 $alt = Arr::get($attributes, 'alt', '');

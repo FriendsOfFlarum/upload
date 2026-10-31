@@ -12,10 +12,12 @@
 
 namespace FoF\Upload\Tests\unit\Formatter;
 
+use Flarum\User\User;
 use FoF\Upload\File;
 use FoF\Upload\Formatter\ImagePreview\FormatImagePreview;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use s9e\TextFormatter\Renderer;
@@ -152,12 +154,14 @@ class FormatImagePreviewTest extends TestCase
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
 
-        $this->assertStringContainsString('width="1920"', $result);
-        $this->assertStringContainsString('height="1080"', $result);
+        $this->assertStringContainsString(' width="1920"', $result);
+        $this->assertStringContainsString(' height="1080"', $result);
+        $this->assertStringContainsString(' image_width="1920"', $result);
+        $this->assertStringContainsString(' image_height="1080"', $result);
     }
 
     #[Test]
-    public function uses_thumbnail_dimensions_when_a_thumbnail_is_rendered(): void
+    public function uses_thumbnail_dimensions_and_exposes_original_dimensions_with_a_non_post_context(): void
     {
         // The <img> src is the thumbnail, so width/height must describe the thumbnail —
         // not the (larger) full image — otherwise the browser upscales it back to full size.
@@ -167,14 +171,20 @@ class FormatImagePreviewTest extends TestCase
         $file->image_height = 1080;
         $file->thumbnail_width = 1000;
         $file->thumbnail_height = 563;
-        $formatter = new FormatImagePreview($this->makeRepository($file));
+        $xml = $this->makeXml('abc', 'https://example.com/photo.jpg');
+        $context = new User();
+        $repo = $this->makeRepository($file);
+        $repo->expects($this->once())->method('findEmbeddedIn')->with($xml, $context);
+        $formatter = new FormatImagePreview($repo);
 
-        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+        $result = $formatter($this->makeRenderer(), $context, $xml);
 
-        $this->assertStringContainsString('width="1000"', $result);
-        $this->assertStringContainsString('height="563"', $result);
-        $this->assertStringNotContainsString('width="1920"', $result);
-        $this->assertStringNotContainsString('height="1080"', $result);
+        $this->assertStringContainsString(' width="1000"', $result);
+        $this->assertStringContainsString(' height="563"', $result);
+        $this->assertStringNotContainsString(' width="1920"', $result);
+        $this->assertStringNotContainsString(' height="1080"', $result);
+        $this->assertStringContainsString(' image_width="1920"', $result);
+        $this->assertStringContainsString(' image_height="1080"', $result);
     }
 
     #[Test]
@@ -191,8 +201,8 @@ class FormatImagePreviewTest extends TestCase
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
 
-        $this->assertStringContainsString('width="1920"', $result);
-        $this->assertStringContainsString('height="1080"', $result);
+        $this->assertStringContainsString(' width="1920"', $result);
+        $this->assertStringContainsString(' height="1080"', $result);
     }
 
     #[Test]
@@ -204,8 +214,54 @@ class FormatImagePreviewTest extends TestCase
 
         $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
 
-        $this->assertStringNotContainsString('width="1', $result);
-        $this->assertStringNotContainsString('height="1', $result);
+        $this->assertStringNotContainsString(' width="', $result);
+        $this->assertStringNotContainsString(' height="', $result);
+        $this->assertStringNotContainsString(' image_width="', $result);
+        $this->assertStringNotContainsString(' image_height="', $result);
+    }
+
+    public static function incompleteOrNonPositiveDimensions(): array
+    {
+        return [
+            'missing width'   => [null, 800],
+            'missing height'  => [2400, null],
+            'zero width'      => [0, 800],
+            'zero height'     => [2400, 0],
+            'both zero'       => [0, 0],
+            'negative width'  => [-2400, 800],
+            'negative height' => [2400, -800],
+            'both negative'   => [-2400, -800],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('incompleteOrNonPositiveDimensions')]
+    public function does_not_expose_original_dimensions_unless_both_are_positive(?int $width, ?int $height): void
+    {
+        $file = $this->makeFile('abc', 'photo.jpg', 'https://example.com/photo.jpg');
+        $file->image_width = $width;
+        $file->image_height = $height;
+        $formatter = new FormatImagePreview($this->makeRepository($file));
+
+        $result = $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'));
+
+        $this->assertStringNotContainsString(' image_width="', $result);
+        $this->assertStringNotContainsString(' image_height="', $result);
+    }
+
+    #[Test]
+    public function leaves_xml_unchanged_when_no_file_matches(): void
+    {
+        $file = $this->makeFile('other', 'other.jpg', 'https://example.com/other.jpg');
+        $file->image_width = 2400;
+        $file->image_height = 800;
+        $repo = $this->makeRepository($file);
+        $repo->expects($this->never())->method('getUrlForFile');
+        $repo->expects($this->never())->method('getThumbnailUrlForFile');
+        $formatter = new FormatImagePreview($repo);
+        $xml = $this->makeXml('abc', 'https://example.com/photo.jpg');
+
+        $this->assertXmlStringEqualsXmlString($xml, $this->invoke($formatter, $xml));
     }
 
     #[Test]
