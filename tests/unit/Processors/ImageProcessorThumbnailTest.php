@@ -18,10 +18,12 @@ use FoF\Upload\Processors\ImageProcessor;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -66,6 +68,8 @@ class ImageProcessorThumbnailTest extends TestCase
      */
     private function makeSourceImage(int $width = 1600, int $height = 1200, string $format = 'jpeg'): string
     {
+        $this->requireCodec($format);
+
         $im = imagecreatetruecolor($width, $height);
 
         for ($y = 0; $y < $height; $y++) {
@@ -91,6 +95,19 @@ class ImageProcessorThumbnailTest extends TestCase
         imagedestroy($im);
 
         return $path;
+    }
+
+    /**
+     * WebP and AVIF are optional in GD builds. Without the codec, the format
+     * cases cannot make a source image, so they are skipped.
+     */
+    private function requireCodec(string $format): void
+    {
+        $support = ['webp' => 'WebP Support', 'avif' => 'AVIF Support'][$format] ?? null;
+
+        if ($support !== null && !(gd_info()[$support] ?? false)) {
+            $this->markTestSkipped("GD has no $format support");
+        }
     }
 
     /**
@@ -482,5 +499,47 @@ class ImageProcessorThumbnailTest extends TestCase
 
         $this->assertNotNull($file->thumbnailContent);
         $this->assertSame(400, $file->thumbnail_width);
+    }
+
+    /**
+     * A driver can decode a format it cannot encode. A failed thumbnail must
+     * not stop the file being stored, for example when a shared file is made
+     * public, and must not leave part of a thumbnail on the file.
+     */
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function failed_thumbnail_encode_from_contents_leaves_no_thumbnail(string $format, string $mimeType): void
+    {
+        $contents = file_get_contents($this->makeSourceImage(800, 600, $format));
+
+        $repo = $this->createStub(SettingsRepositoryInterface::class);
+        $repo->method('get')->willReturnCallback(fn (string $key, $default = null) => [
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => true,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+        ][$key] ?? $default);
+        $factory = $this->createStub(Factory::class);
+        $factory->method('disk')->willReturn($this->createStub(Filesystem::class));
+
+        $processor = new class($repo, ImageManager::gd(), $factory) extends ImageProcessor {
+            public function generateThumbnail(File $file, ImageInterface $image, string $mimeType): void
+            {
+                $file->thumbnail_width = 400;
+                $file->thumbnail_height = 300;
+
+                throw new RuntimeException('Encoding format is not supported');
+            }
+        };
+
+        $file = new File();
+        $file->type = $mimeType;
+
+        $processor->generateThumbnailFromContents($file, $contents);
+
+        $this->assertNull($file->thumbnailContent);
+        $this->assertNull($file->thumbnailExtension);
+        $this->assertNull($file->thumbnail_width);
+        $this->assertNull($file->thumbnail_height);
     }
 }

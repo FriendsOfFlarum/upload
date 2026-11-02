@@ -126,7 +126,7 @@ class ImageProcessor implements Processable
             return;
         }
 
-        $this->generateThumbnail($file, $image, $file->type);
+        $this->generateOptionalThumbnail($file, $image, $file->type);
     }
 
     /**
@@ -140,14 +140,26 @@ class ImageProcessor implements Processable
         try {
             $image = $this->imageManager->read($path);
             $image->orient();
+        } catch (Throwable) {
+            return;
+        }
 
-            $file->image_width = $image->width();
-            $file->image_height = $image->height();
+        $file->image_width = $image->width();
+        $file->image_height = $image->height();
 
+        $this->generateOptionalThumbnail($file, $image, $mimeType);
+    }
+
+    /**
+     * Generate a thumbnail, or leave the file without one when that fails. A
+     * driver can decode a format it cannot encode, and an optional thumbnail
+     * must never stop the file being stored.
+     */
+    protected function generateOptionalThumbnail(File $file, ImageInterface $image, string $mimeType): void
+    {
+        try {
             $this->generateThumbnail($file, $image, $mimeType);
         } catch (Throwable) {
-            $file->image_width = null;
-            $file->image_height = null;
             $file->thumbnail_width = null;
             $file->thumbnail_height = null;
             $file->thumbnailContent = null;
