@@ -14,6 +14,7 @@ namespace FoF\Upload\Console;
 
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\File;
+use FoF\Upload\Processors\ImageProcessor;
 use Illuminate\Console\Command;
 use Intervention\Image\Exceptions\DecoderException;
 use Intervention\Image\ImageManager;
@@ -25,11 +26,11 @@ class BackfillImageDimensionsCommand extends Command
         {--dry-run : Report how many images would be processed without making any changes}
     ';
 
-    protected $description = 'Backfill missing image dimensions (width/height) for existing JPEG, PNG, and GIF uploads';
+    protected $description = 'Backfill missing image dimensions (width/height) for existing JPEG, PNG, GIF, WebP, and AVIF uploads';
 
     public function handle(DefaultDownloader $downloader, ImageManager $imageManager): void
     {
-        $supportedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+        $supportedMimes = ImageProcessor::THUMBNAIL_TYPES;
         $chunkSize = max(1, (int) $this->option('chunk'));
         $dryRun = (bool) $this->option('dry-run');
 

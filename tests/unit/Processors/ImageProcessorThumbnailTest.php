@@ -19,6 +19,7 @@ use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -63,7 +64,7 @@ class ImageProcessorThumbnailTest extends TestCase
      * A large image with fine, high-frequency detail — the case where repeated
      * lossy encoding is most visible.
      */
-    private function makeSourceImage(int $width = 1600, int $height = 1200): string
+    private function makeSourceImage(int $width = 1600, int $height = 1200, string $format = 'jpeg'): string
     {
         $im = imagecreatetruecolor($width, $height);
 
@@ -81,8 +82,12 @@ class ImageProcessorThumbnailTest extends TestCase
             }
         }
 
-        $path = $this->workDir.'/source.jpg';
-        imagejpeg($im, $path, 100);
+        $path = $this->workDir.'/source.'.$format;
+        match ($format) {
+            'webp' => imagewebp($im, $path, 90),
+            'avif' => imageavif($im, $path, 90),
+            default => imagejpeg($im, $path, 100),
+        };
         imagedestroy($im);
 
         return $path;
@@ -106,17 +111,19 @@ class ImageProcessorThumbnailTest extends TestCase
         return new ImageProcessor($repo, ImageManager::gd(), $factory);
     }
 
-    private function process(array $settings, string $sourcePath): File
+    private function process(array $settings, string $sourcePath, string $mimeType = 'image/jpeg'): File
     {
         // The processor writes the encoded full-size image back over the upload,
         // so work on a copy to keep the pristine source for comparison.
-        $uploadPath = $this->workDir.'/upload.jpg';
+        $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
+        $uploadPath = $this->workDir.'/upload.'.$extension;
         copy($sourcePath, $uploadPath);
 
         $file = new File();
-        $upload = new UploadedFile($uploadPath, 'source.jpg', 'image/jpeg', null, true);
+        $file->type = $mimeType;
+        $upload = new UploadedFile($uploadPath, 'source.'.$extension, $mimeType, null, true);
 
-        $this->makeProcessor($settings)->process($file, $upload, 'image/jpeg');
+        $this->makeProcessor($settings)->process($file, $upload, $mimeType);
 
         return $file;
     }
@@ -353,5 +360,127 @@ class ImageProcessorThumbnailTest extends TestCase
         ], $this->makeSourceImage(600, 400));
 
         $this->assertNull($file->thumbnailContent);
+    }
+
+    // -----------------------------------------------------------------------
+    // WebP and AVIF sources (#549)
+    // -----------------------------------------------------------------------
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function modernFormats(): array
+    {
+        return [
+            'webp' => ['webp', 'image/webp'],
+            'avif' => ['avif', 'image/avif'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function modern_format_upload_gets_a_webp_thumbnail(string $format, string $mimeType): void
+    {
+        $file = $this->process([
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => true,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+        ], $this->makeSourceImage(800, 600, $format), $mimeType);
+
+        $this->assertNotNull($file->thumbnailContent);
+        $this->assertSame('webp', $file->thumbnailExtension);
+        $this->assertSame(400, $file->thumbnail_width);
+        $this->assertSame(300, $file->thumbnail_height);
+        $this->assertSame(800, $file->image_width);
+        $this->assertSame(600, $file->image_height);
+    }
+
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function modern_format_thumbnail_keeps_its_format_when_webp_is_disabled(string $format, string $mimeType): void
+    {
+        $file = $this->process([
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => false,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+        ], $this->makeSourceImage(800, 600, $format), $mimeType);
+
+        $this->assertNotNull($file->thumbnailContent);
+        $this->assertSame($format, $file->thumbnailExtension);
+        $this->assertSame($mimeType, (new \finfo(FILEINFO_MIME_TYPE))->buffer($file->thumbnailContent));
+    }
+
+    /**
+     * Only the thumbnail is new for these formats. The full-size file is stored
+     * as uploaded, so animated WebP files and AVIF files keep what a re-encode
+     * could lose.
+     */
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function modern_format_full_size_file_is_stored_as_uploaded(string $format, string $mimeType): void
+    {
+        $source = $this->makeSourceImage(800, 600, $format);
+        $uploadPath = $this->workDir.'/upload.'.$format;
+        copy($source, $uploadPath);
+
+        $file = new File();
+        $upload = new UploadedFile($uploadPath, 'source.'.$format, $mimeType, null, true);
+
+        $this->makeProcessor([
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => true,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+            'fof-upload.mustResize'         => true,
+            'fof-upload.resizeMaxWidth'     => 200,
+        ])->process($file, $upload, $mimeType);
+
+        $this->assertSame(file_get_contents($source), file_get_contents($uploadPath));
+    }
+
+    /**
+     * Before #549 these formats were stored without being read. A server whose
+     * image driver cannot decode them must still accept the upload.
+     */
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function unreadable_modern_format_upload_is_stored_without_a_thumbnail(string $format, string $mimeType): void
+    {
+        $uploadPath = $this->workDir.'/broken.'.$format;
+        file_put_contents($uploadPath, 'not an image');
+
+        $file = new File();
+        $upload = new UploadedFile($uploadPath, 'broken.'.$format, $mimeType, null, true);
+
+        $this->makeProcessor([
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => true,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+        ])->process($file, $upload, $mimeType);
+
+        $this->assertNull($file->thumbnailContent);
+        $this->assertNull($file->thumbnail_width);
+        $this->assertSame('not an image', file_get_contents($uploadPath));
+    }
+
+    #[Test]
+    #[DataProvider('modernFormats')]
+    public function thumbnail_from_contents_supports_modern_formats(string $format, string $mimeType): void
+    {
+        $file = new File();
+        $file->type = $mimeType;
+
+        $this->makeProcessor([
+            'fof-upload.generateThumbnails' => true,
+            'fof-upload.thumbnailWebp'      => true,
+            'fof-upload.thumbnailMaxWidth'  => 400,
+            'fof-upload.thumbnailQuality'   => 80,
+        ])->generateThumbnailFromContents($file, file_get_contents($this->makeSourceImage(800, 600, $format)));
+
+        $this->assertNotNull($file->thumbnailContent);
+        $this->assertSame(400, $file->thumbnail_width);
     }
 }
