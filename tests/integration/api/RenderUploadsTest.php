@@ -38,6 +38,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * - posts 2 to 10 have one upload each, by different authors, as most posts
  *   with uploads do: images, and text previews of a short file, a long one and
  *   a deleted one; post 6 has none;
+ * - post 10 also shows its image as a card;
  * - post 11 embeds another file by its URL alone, and post 12 a deleted image.
  *
  * Discussions 2 and 3 have one post each.
@@ -84,7 +85,7 @@ class RenderUploadsTest extends TestCase
                 $this->post(7, 1, 7, 2, $this->image(8)),
                 $this->post(8, 1, 8, 3, $this->image(9)),
                 $this->post(9, 1, 9, 2, $this->image(10)),
-                $this->post(10, 1, 10, 3, $this->image(13)),
+                $this->post(10, 1, 10, 3, $this->image(13).$this->card(13, 'post-ten.png')),
                 $this->post(11, 1, 11, 2, $this->legacyImage('legacy-two.png')),
                 $this->post(12, 1, 12, 3, $this->image(97)),
                 $this->post(13, 2, 1, 3, $this->image(15)),
@@ -587,6 +588,14 @@ class RenderUploadsTest extends TestCase
         $url = $this->storedUrl($name, 'local');
 
         return "<UPL-IMAGE-PREVIEW url=\"$url\">[upl-image-preview url=$url]</UPL-IMAGE-PREVIEW>";
+    }
+
+    /** An image card as stored, with the URL it had when it was posted. */
+    protected function card(int $id, string $label): string
+    {
+        $uuid = $this->uuid($id);
+
+        return "<UPL-IMAGE size=\"2MB\" url=\"https://old.example.com/$id\" uuid=\"$uuid\"><s>[upl-image uuid=$uuid size=2MB url=https://old.example.com/$id]</s>$label<e>[/upl-image]</e></UPL-IMAGE>";
     }
 
     protected function file(int $id, string $label): string
