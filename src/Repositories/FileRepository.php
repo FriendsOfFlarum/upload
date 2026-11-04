@@ -450,7 +450,7 @@ class FileRepository
             return null;
         }
 
-        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
+        return rtrim($this->getHostnameForFile($file, $adapter), '/').'/'.$file->path;
     }
 
     /**
