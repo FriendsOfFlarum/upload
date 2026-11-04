@@ -50,8 +50,14 @@ class FormatTextPreview
             if ($file) {
                 $attributes['url'] = $this->files->getEmbedUrlForFile($file);
 
-                $response = $this->downloader->download($file);
-                if ($response->getStatusCode() === 200) {
+                try {
+                    $response = $this->downloader->download($file);
+                } catch (\Throwable $e) {
+                    // Gone from storage, or storage can't be reached: show the file without a snippet.
+                    $response = null;
+                }
+
+                if ($response && $response->getStatusCode() === 200) {
                     $file_contents = $response->getBody()->getContents();
 
                     $lines = preg_split('/\R/', $file_contents);

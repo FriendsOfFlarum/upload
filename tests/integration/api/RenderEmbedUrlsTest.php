@@ -272,6 +272,33 @@ class RenderEmbedUrlsTest extends TestCase
     }
 
     /** @test */
+    public function local_files_behind_the_local_cdn_are_shown_from_the_cdn()
+    {
+        $this->setting('fof-upload.cdnUrl', 'https://cdn.example.com/');
+        $this->givenFile(26, 'holiday.png');
+        $this->givenFile(27, 'notes.txt');
+        $this->onDisk['notes.txt'] = "one\ntwo\n";
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 26));
+        $this->givenPost(2, $this->imagePreview(self::ELSEWHERE, 26));
+        $this->givenPost(3, $this->textPreview(self::ELSEWHERE, 27));
+
+        $this->assertSame(['https://cdn.example.com/assets/files/files/holiday.png'], $this->urlsIn(1));
+        $this->assertSame(['https://cdn.example.com/assets/files/files/holiday.png'], $this->urlsIn(2));
+        $this->assertSame(['https://cdn.example.com/assets/files/files/notes.txt'], $this->urlsIn(3));
+    }
+
+    /** @test */
+    public function a_text_preview_of_a_file_gone_from_disk_still_renders_without_a_snippet()
+    {
+        $this->givenFile(28, 'gone.txt');
+        $this->givenPost(1, $this->textPreview(self::ELSEWHERE, 28));
+
+        $html = $this->renderedHtml(1);
+        $this->assertStringContainsString('data-hassnippet="false"', $html);
+        $this->assertSame([self::LOCAL.'/gone.txt'], $this->urlsIn(1));
+    }
+
+    /** @test */
     public function a_post_with_several_image_cards_looks_their_files_up_together()
     {
         $this->givenFile(13, 'one.png');
