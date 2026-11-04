@@ -584,4 +584,31 @@ class FileRepository
 
         return $this->getHostnameForFile($file, $adapter).'/'.$file->thumbnail_path;
     }
+
+    /**
+     * Whether a URL points into the forum's own upload storage: the local
+     * files directory, or the S3 bucket or CDN when that adapter is set up.
+     */
+    public function isOnStorage(string $url): bool
+    {
+        $bases = [$this->url->to('forum')->path('assets/files')];
+
+        try {
+            $s3 = $this->manager->forUrls('aws-s3');
+
+            if ($s3 instanceof AwsS3) {
+                $bases[] = $s3->hostName();
+            }
+        } catch (\Throwable) {
+            // S3 is not set up on this forum.
+        }
+
+        foreach ($bases as $base) {
+            if ($base && str_starts_with($url, rtrim($base, '/').'/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

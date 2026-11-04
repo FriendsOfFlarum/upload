@@ -70,6 +70,23 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([], $this->urlsIn(1));
     }
 
+    #[Test]
+    public function an_image_preview_from_before_uuids_whose_file_is_gone_keeps_a_url_on_the_forums_own_storage()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.cdnUrl', 'https://cdn.example.com');
+
+        $this->givenPost(1, $this->imagePreview(self::LOCAL.'/gone.png', null));
+        $this->givenPost(2, $this->imagePreview('https://cdn.example.com/files/gone.png', null));
+        $this->givenPost(3, $this->imagePreview(self::ELSEWHERE, null));
+
+        // The link and the image itself.
+        $this->assertSame([self::LOCAL.'/gone.png', self::LOCAL.'/gone.png'], $this->urlsIn(1, unique: false));
+        $this->assertSame(['https://cdn.example.com/files/gone.png'], $this->urlsIn(2));
+        $this->assertSame([], $this->urlsIn(3));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
@@ -89,7 +106,7 @@ class RenderEmbedUrlsTest extends TestCase
      *
      * @return string[]
      */
-    protected function urlsIn(int $postId): array
+    protected function urlsIn(int $postId, bool $unique = true): array
     {
         if (!$this->seeded) {
             $this->seed();
@@ -121,7 +138,7 @@ class RenderEmbedUrlsTest extends TestCase
             }
         }
 
-        return array_values(array_unique($urls));
+        return $unique ? array_values(array_unique($urls)) : $urls;
     }
 
     protected function seed(): void

@@ -45,8 +45,15 @@ class FormatImagePreview
         return Utils::replaceAttributes($xml, 'UPL-IMAGE-PREVIEW', function ($attributes) use ($files) {
             $file = EmbeddedFiles::pick($files, Arr::get($attributes, 'uuid'), Arr::get($attributes, 'url'));
 
+            // Without a file, keep only a URL from before previews had a uuid,
+            // and only when it points into the forum's own storage.
             if (!$file) {
+                $url = Arr::get($attributes, 'url');
                 unset($attributes['url'], $attributes['thumbnail_url']);
+
+                if (!Arr::get($attributes, 'uuid') && $url && $this->files->isOnStorage($url)) {
+                    $attributes['url'] = $attributes['thumbnail_url'] = $url;
+                }
             }
 
             if ($file) {
