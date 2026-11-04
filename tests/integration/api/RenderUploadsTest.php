@@ -166,20 +166,20 @@ class RenderUploadsTest extends TestCase
     }
 
     #[Test]
-    public function an_image_preview_of_a_deleted_file_is_shown_as_it_was_posted()
+    public function an_image_preview_of_a_deleted_file_shows_no_url()
     {
         $posts = $this->renderedPosts();
 
         $this->assertEquals(
-            $this->expectedImage(99, 'https://old.example.com/99', 'https://old.example.com/99-thumb', '', '', '', ''),
+            $this->expectedImage(99, '', '', '', '', '', ''),
             $this->imagePreviews($posts[1])[4]
         );
         $this->assertEquals(
-            [$this->expectedImage(97, 'https://old.example.com/97', 'https://old.example.com/97-thumb', '', '', '', '')],
+            [$this->expectedImage(97, '', '', '', '', '', '')],
             $this->imagePreviews($posts[12])
         );
         $this->assertEquals(
-            $this->expectedImage(96, 'https://old.example.com/96', 'https://old.example.com/96-thumb', '', '', '', ''),
+            $this->expectedImage(96, '', '', '', '', '', ''),
             $this->imagePreviews($posts[14])[1]
         );
     }

@@ -45,6 +45,10 @@ class FormatImagePreview
         return Utils::replaceAttributes($xml, 'UPL-IMAGE-PREVIEW', function ($attributes) use ($files) {
             $file = EmbeddedFiles::pick($files, Arr::get($attributes, 'uuid'), Arr::get($attributes, 'url'));
 
+            if (!$file) {
+                unset($attributes['url'], $attributes['thumbnail_url']);
+            }
+
             if ($file) {
                 if ($fileUrl = $this->files->getUrlForFile($file)) {
                     $attributes['url'] = $fileUrl;
