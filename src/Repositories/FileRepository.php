@@ -446,31 +446,36 @@ class FileRepository
 
         try {
             $adapter = $this->manager->instantiate($file->upload_method);
-        } catch (ValidationException|\InvalidArgumentException $e) {
+
+            if (!in_array(get_class($adapter), [Adapters\Local::class, Adapters\AwsS3::class])) {
+                return null;
+            }
+
+            $host = $this->getHostnameForFile($file, $adapter);
+        } catch (ValidationException|\InvalidArgumentException|\RuntimeException $e) {
             // Not set up (any more), e.g. S3 with its settings removed.
             return null;
         }
 
-        $supportedAdapters = [
-            Adapters\Local::class,
-            Adapters\AwsS3::class,
-        ];
-
-        if (!in_array(get_class($adapter), $supportedAdapters)) {
-            return null;
-        }
-
-        return rtrim($this->getHostnameForFile($file, $adapter), '/').'/'.$file->path;
+        return rtrim($host, '/').'/'.$file->path;
     }
 
     /**
-     * The URL to render for a file embedded in a post. It's encoded the way
-     * the parser encodes posted URLs, as the templates use it in CSS and
-     * script as well as in attributes.
+     * The URL to render for a file embedded in a post, in the form the parser
+     * stores posted URLs.
      */
     public function getEmbedUrlForFile(File $file): string
     {
-        return UrlFilter::sanitizeUrl($this->getUrlForFile($file) ?: $file->url);
+        return $this->asPosted($this->getUrlForFile($file) ?: $file->url);
+    }
+
+    /**
+     * A URL as the parser stores posted ones: the host normalised and the rest
+     * percent-encoded, so it's safe in the templates' CSS and script too.
+     */
+    protected function asPosted(string $url): string
+    {
+        return UrlFilter::filter($url, ['allowedSchemes' => '/^https?$/i']) ?: '';
     }
 
     /**
@@ -490,7 +495,7 @@ class FileRepository
     }
 
     /**
-     * Worked out once: building the S3 adapter can mean reading AWS config files.
+     * Kept for this instance: building the S3 adapter can mean reading AWS config files.
      *
      * @return string[]
      */
@@ -516,6 +521,6 @@ class FileRepository
             // S3 is not set up on this forum.
         }
 
-        return $this->storageBases = array_values(array_filter(array_map(fn ($base) => rtrim((string) $base, '/'), $bases)));
+        return $this->storageBases = array_values(array_filter(array_map(fn ($base) => rtrim($this->asPosted(rtrim((string) $base, '/')), '/'), $bases)));
     }
 }

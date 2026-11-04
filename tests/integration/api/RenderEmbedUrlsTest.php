@@ -183,6 +183,50 @@ class RenderEmbedUrlsTest extends TestCase
     }
 
     /** @test */
+    public function urls_built_from_the_file_record_keep_an_ipv6_host()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', 'http://[::1]:9000/media');
+        $this->givenFile(23, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 23));
+
+        $this->assertSame(['http://[::1]:9000/media/files/on-s3.png'], $this->urlsIn(1));
+    }
+
+    /** @test */
+    public function an_image_preview_from_before_uuids_is_matched_to_storage_whose_url_the_parser_encoded()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', "https://cdn.example.com/team's(media)");
+        $posted = 'https://cdn.example.com/team%27s%28media%29/files/gone.png';
+        $this->givenPost(1, $this->imagePreview($posted, null));
+
+        $this->assertSame([$posted], $this->urlsIn(1));
+    }
+
+    /** @test */
+    public function an_image_preview_from_before_uuids_whose_file_is_found_by_url_shows_the_files_url()
+    {
+        $this->givenFile(24, 'by-url.png');
+        $this->givenPost(1, $this->imagePreview(self::STORED.'/by-url.png', null));
+
+        $this->assertSame([self::LOCAL.'/by-url.png'], $this->urlsIn(1));
+    }
+
+    /** @test */
+    public function an_image_card_finds_its_file_whatever_the_case_of_its_uuid()
+    {
+        $uuid = 'abcdef00-0000-0000-0000-000000000025';
+        $this->givenFile(25, 'holiday.png');
+        $this->files[25]['uuid'] = $uuid;
+        $this->givenPost(1, str_replace($this->uuid(25), strtoupper($uuid), $this->imageCard(self::ELSEWHERE, 25)));
+
+        $this->assertSame([self::LOCAL.'/holiday.png'], $this->urlsIn(1));
+    }
+
+    /** @test */
     public function an_image_card_of_a_file_with_no_recorded_upload_method_shows_its_stored_url()
     {
         $this->givenFile(12, 'no-method.png', null);

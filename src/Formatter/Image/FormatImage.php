@@ -49,10 +49,11 @@ class FormatImage
             return $attributes;
         });
 
-        $files = File::query()->whereIn('uuid', array_filter($uuids))->get()->keyBy('uuid');
+        // Keyed in lower case, as the database matches uuids whatever their case.
+        $files = File::query()->whereIn('uuid', array_filter($uuids))->get()->keyBy(fn (File $file) => strtolower($file->uuid));
 
         return Utils::replaceAttributes($xml, 'UPL-IMAGE', function ($attributes) use ($files) {
-            $file = $files->get(Arr::get($attributes, 'uuid'));
+            $file = $files->get(strtolower((string) Arr::get($attributes, 'uuid')));
 
             if ($file) {
                 $attributes['url'] = $this->files->getEmbedUrlForFile($file);

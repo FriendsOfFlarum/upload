@@ -110,16 +110,11 @@ class Manager
     /**
      * @param Util $util
      *
-     * @return Adapters\AwsS3|null
+     * @return Adapters\AwsS3
      */
     protected function awsS3(Util $util)
     {
         $config = $this->config->getS3Config();
-
-        // Without a bucket S3 isn't set up, e.g. after its settings were cleared.
-        if (empty($config['bucket'])) {
-            return null;
-        }
 
         $s3Config = [
             'region'                  => $config['region'],
