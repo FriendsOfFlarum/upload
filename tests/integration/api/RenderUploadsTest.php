@@ -215,8 +215,8 @@ class RenderUploadsTest extends TestCase
             3  => [$short],
             // Too long to show whole: the first five lines.
             4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => 'http://localhost/assets/files/files/long.txt']],
-            // A deleted file: as it was posted, with no snippet.
-            5  => [['label' => 'gone.txt', 'hasSnippet' => 'true', 'snippet' => '', 'download' => 'https://old.example.com/98']],
+            // A deleted file: no snippet, and no link.
+            5  => [['label' => 'gone.txt', 'hasSnippet' => 'true', 'snippet' => '', 'download' => '']],
             14 => [$short],
         ], array_map($this->textPreviews(...), array_intersect_key($posts, array_flip([3, 4, 5, 14]))));
     }

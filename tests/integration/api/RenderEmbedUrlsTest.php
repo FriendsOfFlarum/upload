@@ -97,6 +97,22 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/kept-by-imgur.png'], $this->urlsIn(1));
     }
 
+    #[Test]
+    public function a_text_previews_link_comes_from_its_file()
+    {
+        $this->setting('fof-upload.imgurClientId', 'client-id');
+        $this->givenFile(7, 'notes.txt');
+        $this->givenFile(9, 'imgur-notes.txt', 'imgur');
+        $this->onDisk['notes.txt'] = "one\ntwo\n";
+        $this->givenPost(1, $this->textPreview(self::ELSEWHERE, 7));
+        $this->givenPost(2, $this->textPreview(self::ELSEWHERE, 404));
+        $this->givenPost(3, $this->textPreview(self::ELSEWHERE, 9));
+
+        $this->assertSame([self::LOCAL.'/notes.txt'], $this->urlsIn(1));
+        $this->assertSame([], $this->urlsIn(2));
+        $this->assertSame([self::STORED.'/imgur-notes.txt'], $this->urlsIn(3));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
