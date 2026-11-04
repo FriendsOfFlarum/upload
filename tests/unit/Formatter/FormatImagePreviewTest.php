@@ -38,10 +38,10 @@ class FormatImagePreviewTest extends TestCase
     {
         $repo = $this->createMock(FileRepository::class);
         $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
-        $repo->method('getUrlForFile')->willReturn($file->url);
+        $repo->method('getEmbedUrlForFile')->willReturn($file->url);
         // Return the thumbnail URL derived from thumbnail_path, or null when absent —
         // mirroring FileRepository::getThumbnailUrlForFile() which uses thumbnail_path.
-        $repo->method('getThumbnailUrlForFile')->willReturnCallback(
+        $repo->method('getEmbedThumbnailUrlForFile')->willReturnCallback(
             fn (File $f) => $f->thumbnail_path
                 ? 'https://example.com/'.ltrim(str_replace('.jpg', '-thumb.webp', $f->thumbnail_path), '/')
                 : null
@@ -135,7 +135,7 @@ class FormatImagePreviewTest extends TestCase
 
         $repo = $this->createMock(FileRepository::class);
         $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
-        $repo->method('getUrlForFile')->willReturn('https://cdn.example.com/photo.jpg');
+        $repo->method('getEmbedUrlForFile')->willReturn('https://cdn.example.com/photo.jpg');
 
         $formatter = new FormatImagePreview($repo);
 
@@ -250,18 +250,20 @@ class FormatImagePreviewTest extends TestCase
     }
 
     #[Test]
-    public function leaves_xml_unchanged_when_no_file_matches(): void
+    public function drops_the_posted_url_when_no_file_matches(): void
     {
         $file = $this->makeFile('other', 'other.jpg', 'https://example.com/other.jpg');
         $file->image_width = 2400;
         $file->image_height = 800;
         $repo = $this->makeRepository($file);
-        $repo->expects($this->never())->method('getUrlForFile');
-        $repo->expects($this->never())->method('getThumbnailUrlForFile');
+        $repo->expects($this->never())->method('getEmbedUrlForFile');
+        $repo->expects($this->never())->method('getEmbedThumbnailUrlForFile');
         $formatter = new FormatImagePreview($repo);
-        $xml = $this->makeXml('abc', 'https://example.com/photo.jpg');
 
-        $this->assertXmlStringEqualsXmlString($xml, $this->invoke($formatter, $xml));
+        $this->assertXmlStringEqualsXmlString(
+            '<r><UPL-IMAGE-PREVIEW uuid="abc"/></r>',
+            $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'))
+        );
     }
 
     #[Test]

@@ -48,10 +48,13 @@ class FormatTextPreview
             $attributes['has_snippet'] = 'true';
             $snippet = '';
 
+            if (!$file) {
+                unset($attributes['url']);
+                $attributes['has_snippet'] = 'false';
+            }
+
             if ($file) {
-                if ($fileUrl = $this->files->getUrlForFile($file)) {
-                    $attributes['url'] = $fileUrl;
-                }
+                $attributes['url'] = $this->files->getTextPreviewUrlForFile($file);
 
                 $kept = $this->snippets->for($file);
 

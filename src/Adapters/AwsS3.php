@@ -85,7 +85,7 @@ class AwsS3 extends Flysystem implements UploadAdapter
         }
 
         // Use bucket and region passed from Manager
-        if ($this->bucket !== null && $this->region !== null) {
+        if (!empty($this->bucket) && $this->region !== null) {
             return sprintf('https://%s.s3.%s.amazonaws.com', $this->bucket, $this->region ?: 'us-east-1');
         }
 

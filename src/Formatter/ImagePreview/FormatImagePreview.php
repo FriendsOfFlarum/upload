@@ -45,10 +45,19 @@ class FormatImagePreview
         return Utils::replaceAttributes($xml, 'UPL-IMAGE-PREVIEW', function ($attributes) use ($files) {
             $file = EmbeddedFiles::pick($files, Arr::get($attributes, 'uuid'), Arr::get($attributes, 'url'));
 
-            if ($file) {
-                if ($fileUrl = $this->files->getUrlForFile($file)) {
-                    $attributes['url'] = $fileUrl;
+            // Without a file, keep only a URL from before previews had a uuid,
+            // and only when it points into the forum's own storage.
+            if (!$file) {
+                $url = Arr::get($attributes, 'url');
+                unset($attributes['url'], $attributes['thumbnail_url']);
+
+                if (!Arr::get($attributes, 'uuid') && $url && $this->files->isOnStorage($url)) {
+                    $attributes['url'] = $attributes['thumbnail_url'] = $url;
                 }
+            }
+
+            if ($file) {
+                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
 
                 $attributes['title'] = $file->base_name;
 
@@ -69,7 +78,7 @@ class FormatImagePreview
                 // Derived from thumbnail_path + live hostname so CDN domain changes
                 // are reflected automatically, same as getUrlForFile() does for url.
                 // Falls back to the main URL when no thumbnail exists (old posts, Imgur, etc.).
-                $thumbnailUrl = $this->files->getThumbnailUrlForFile($file);
+                $thumbnailUrl = $this->files->getEmbedThumbnailUrlForFile($file);
                 $attributes['thumbnail_url'] = $thumbnailUrl ?: $attributes['url'];
 
                 // The <img> loads thumbnail_url as its src, so width/height must describe

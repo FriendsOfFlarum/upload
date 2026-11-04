@@ -100,6 +100,7 @@ class FileRepositoryTest extends TestCase
                 $manager,
                 $this->createStub(UrlGenerator::class),
                 $this->createStub(\FoF\Upload\Mime\MimeTypeDetector::class),
+                $this->createStub(\FoF\Upload\Driver\Config::class),
             ])
             ->onlyMethods(['getHostnameForFile'])
             ->getMock();

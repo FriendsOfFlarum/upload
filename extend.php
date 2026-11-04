@@ -171,6 +171,7 @@ return [
         ->namespace('fof-upload.templates', __DIR__.'/resources/templates'),
 
     (new Extend\Formatter())
+        ->render(Formatter\Image\FormatImage::class)
         ->render(Formatter\ImagePreview\FormatImagePreview::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 

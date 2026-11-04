@@ -38,12 +38,15 @@ use Psr\Http\Message\ServerRequestInterface;
  * - posts 2 to 10 have one upload each, by different authors, as most posts
  *   with uploads do: images, and text previews of a short file, a long one and
  *   a deleted one; post 6 has none;
+ * - post 10 also shows its image as a card;
  * - post 11 embeds another file by its URL alone, and post 12 a deleted image.
  *
  * Discussions 2 and 3 have one post each.
  *
  * Every file's stored URL is out of date, as after a move to a CDN, so the
- * URLs rendered show they were worked out afresh.
+ * URLs rendered show they were worked out afresh: S3 files and local files
+ * alike come from the CDN, except text previews of local files, which the
+ * browser reads from the forum itself.
  */
 class RenderUploadsTest extends TestCase
 {
@@ -84,7 +87,7 @@ class RenderUploadsTest extends TestCase
                 $this->post(7, 1, 7, 2, $this->image(8)),
                 $this->post(8, 1, 8, 3, $this->image(9)),
                 $this->post(9, 1, 9, 2, $this->image(10)),
-                $this->post(10, 1, 10, 3, $this->image(13)),
+                $this->post(10, 1, 10, 3, $this->image(13).$this->card(13, 'post-ten.png')),
                 $this->post(11, 1, 11, 2, $this->legacyImage('legacy-two.png')),
                 $this->post(12, 1, 12, 3, $this->image(97)),
                 $this->post(13, 2, 1, 3, $this->image(15)),
@@ -155,9 +158,9 @@ class RenderUploadsTest extends TestCase
         ], array_slice($this->imagePreviews($posts[1]), 0, 4));
 
         $this->assertEquals([
-            2  => [$this->expectedImage(7, 'http://localhost/assets/files/files/post-two.jpg', 'http://localhost/assets/files/files/post-two.jpg', 'post-two.jpg', 'post-two.jpg', '30', '40')],
-            7  => [$this->expectedImage(8, 'http://localhost/assets/files/files/post-seven.jpg', 'http://localhost/assets/files/files/post-seven.jpg', 'post-seven.jpg', 'post-seven.jpg', '', '')],
-            8  => [$this->expectedImage(9, 'http://localhost/assets/files/files/post-eight.jpg', 'http://localhost/assets/files/files/post-eight.jpg', 'post-eight.jpg', 'post-eight.jpg', '50', '60')],
+            2  => [$this->expectedImage(7, self::CDN.'/assets/files/files/post-two.jpg', self::CDN.'/assets/files/files/post-two.jpg', 'post-two.jpg', 'post-two.jpg', '30', '40')],
+            7  => [$this->expectedImage(8, self::CDN.'/assets/files/files/post-seven.jpg', self::CDN.'/assets/files/files/post-seven.jpg', 'post-seven.jpg', 'post-seven.jpg', '', '')],
+            8  => [$this->expectedImage(9, self::CDN.'/assets/files/files/post-eight.jpg', self::CDN.'/assets/files/files/post-eight.jpg', 'post-eight.jpg', 'post-eight.jpg', '50', '60')],
             // A thumbnail, but no size recorded for it or the image.
             9  => [$this->expectedImage(10, self::CDN.'/files/post-nine.jpg', self::CDN.'/files/post-nine-thumb.webp', 'post-nine.jpg', 'post-nine.jpg', '', '')],
             10 => [$this->expectedImage(13, self::CDN.'/files/post-ten.png', self::CDN.'/files/post-ten.png', 'post-ten.png', 'post-ten.png', '640', '480')],
@@ -166,20 +169,20 @@ class RenderUploadsTest extends TestCase
     }
 
     #[Test]
-    public function an_image_preview_of_a_deleted_file_is_shown_as_it_was_posted()
+    public function an_image_preview_of_a_deleted_file_shows_no_url()
     {
         $posts = $this->renderedPosts();
 
         $this->assertEquals(
-            $this->expectedImage(99, 'https://old.example.com/99', 'https://old.example.com/99-thumb', '', '', '', ''),
+            $this->expectedImage(99, '', '', '', '', '', ''),
             $this->imagePreviews($posts[1])[4]
         );
         $this->assertEquals(
-            [$this->expectedImage(97, 'https://old.example.com/97', 'https://old.example.com/97-thumb', '', '', '', '')],
+            [$this->expectedImage(97, '', '', '', '', '', '')],
             $this->imagePreviews($posts[12])
         );
         $this->assertEquals(
-            $this->expectedImage(96, 'https://old.example.com/96', 'https://old.example.com/96-thumb', '', '', '', ''),
+            $this->expectedImage(96, '', '', '', '', '', ''),
             $this->imagePreviews($posts[14])[1]
         );
     }
@@ -190,15 +193,15 @@ class RenderUploadsTest extends TestCase
         $posts = $this->renderedPosts();
 
         $this->assertEquals(
-            $this->expectedImage(null, 'http://localhost/assets/files/files/legacy.png', 'http://localhost/assets/files/files/legacy.png', 'legacy.png', 'legacy.png', '10', '20'),
+            $this->expectedImage(null, self::CDN.'/assets/files/files/legacy.png', self::CDN.'/assets/files/files/legacy.png', 'legacy.png', 'legacy.png', '10', '20'),
             $this->imagePreviews($posts[1])[5]
         );
         $this->assertEquals(
-            [$this->expectedImage(null, 'http://localhost/assets/files/files/legacy-two.png', 'http://localhost/assets/files/files/legacy-two.png', 'legacy-two.png', 'legacy-two.png', '', '')],
+            [$this->expectedImage(null, self::CDN.'/assets/files/files/legacy-two.png', self::CDN.'/assets/files/files/legacy-two.png', 'legacy-two.png', 'legacy-two.png', '', '')],
             $this->imagePreviews($posts[11])
         );
         $this->assertEquals(
-            $this->expectedImage(null, 'http://localhost/assets/files/files/third.png', 'http://localhost/assets/files/files/third.png', 'third.png', 'third.png', '70', '80'),
+            $this->expectedImage(null, self::CDN.'/assets/files/files/third.png', self::CDN.'/assets/files/files/third.png', 'third.png', 'third.png', '70', '80'),
             $this->imagePreviews($posts[14])[0]
         );
     }
@@ -215,8 +218,8 @@ class RenderUploadsTest extends TestCase
             3  => [$short],
             // Too long to show whole: the first five lines.
             4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => 'http://localhost/assets/files/files/long.txt']],
-            // A deleted file: as it was posted, with no snippet.
-            5  => [['label' => 'gone.txt', 'hasSnippet' => 'true', 'snippet' => '', 'download' => 'https://old.example.com/98']],
+            // A deleted file: no snippet to expand, and no link.
+            5  => [['label' => 'gone.txt', 'hasSnippet' => 'false', 'snippet' => '', 'download' => '']],
             14 => [$short],
         ], array_map($this->textPreviews(...), array_intersect_key($posts, array_flip([3, 4, 5, 14]))));
     }
@@ -587,6 +590,14 @@ class RenderUploadsTest extends TestCase
         $url = $this->storedUrl($name, 'local');
 
         return "<UPL-IMAGE-PREVIEW url=\"$url\">[upl-image-preview url=$url]</UPL-IMAGE-PREVIEW>";
+    }
+
+    /** An image card as stored, with the URL it had when it was posted. */
+    protected function card(int $id, string $label): string
+    {
+        $uuid = $this->uuid($id);
+
+        return "<UPL-IMAGE size=\"2MB\" url=\"https://old.example.com/$id\" uuid=\"$uuid\"><s>[upl-image uuid=$uuid size=2MB url=https://old.example.com/$id]</s>$label<e>[/upl-image]</e></UPL-IMAGE>";
     }
 
     protected function file(int $id, string $label): string
