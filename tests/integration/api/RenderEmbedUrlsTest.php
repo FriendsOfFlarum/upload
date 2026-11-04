@@ -113,6 +113,17 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/imgur-notes.txt'], $this->urlsIn(3));
     }
 
+    #[Test]
+    public function an_image_cards_background_comes_from_its_file()
+    {
+        $this->givenFile(8, 'holiday.png');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 8));
+        $this->givenPost(2, $this->imageCard(self::ELSEWHERE, 404));
+
+        $this->assertSame([self::LOCAL.'/holiday.png'], $this->urlsIn(1));
+        $this->assertSame([], $this->urlsIn(2));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
