@@ -6,6 +6,17 @@
 .UploadPage {
   padding: 1.5rem 0;
 
+  // Section titles. Without this a legend renders as plain 13px text, weaker
+  // than core's 14px bold field labels (`.Form-group > label`) beneath it.
+  // A legend is not a flex item, so the fieldset's 10px gap skips it; the
+  // margin restores that spacing.
+  fieldset > legend {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 10px;
+  }
+
   @media @desktop-up {
     &-container.container {
       max-width: 900px;
