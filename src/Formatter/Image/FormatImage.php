@@ -55,7 +55,7 @@ class FormatImage
             $file = $files->get(Arr::get($attributes, 'uuid'));
 
             if ($file) {
-                $attributes['url'] = $this->files->getUrlForFile($file) ?: $file->url;
+                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
             } else {
                 unset($attributes['url']);
             }

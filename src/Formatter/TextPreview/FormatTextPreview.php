@@ -48,7 +48,7 @@ class FormatTextPreview
             }
 
             if ($file) {
-                $attributes['url'] = $this->files->getUrlForFile($file) ?: $file->url;
+                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
 
                 $response = $this->downloader->download($file);
                 if ($response->getStatusCode() === 200) {

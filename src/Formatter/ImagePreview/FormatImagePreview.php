@@ -52,7 +52,7 @@ class FormatImagePreview
             }
 
             if ($file) {
-                $attributes['url'] = $this->files->getUrlForFile($file) ?: $file->url;
+                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
 
                 if (Arr::get($attributes, 'alt') === '{TEXT?}') {
                     $attributes['alt'] = '';

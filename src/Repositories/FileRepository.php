@@ -40,6 +40,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
+use s9e\TextFormatter\Parser\AttributeFilters\UrlFilter;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -460,6 +461,16 @@ class FileRepository
         }
 
         return rtrim($this->getHostnameForFile($file, $adapter), '/').'/'.$file->path;
+    }
+
+    /**
+     * The URL to render for a file embedded in a post. It's encoded the way
+     * the parser encodes posted URLs, as the templates use it in CSS and
+     * script as well as in attributes.
+     */
+    public function getEmbedUrlForFile(File $file): string
+    {
+        return UrlFilter::sanitizeUrl($this->getUrlForFile($file) ?: $file->url);
     }
 
     /**
