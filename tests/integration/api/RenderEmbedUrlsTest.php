@@ -87,6 +87,16 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([], $this->urlsIn(3));
     }
 
+    #[Test]
+    public function an_image_preview_of_a_file_on_an_adapter_without_urls_shows_the_files_own_url()
+    {
+        $this->setting('fof-upload.imgurClientId', 'client-id');
+        $this->givenFile(5, 'kept-by-imgur.png', 'imgur');
+        $this->givenPost(1, $this->imagePreview(self::ELSEWHERE, 5));
+
+        $this->assertSame([self::STORED.'/kept-by-imgur.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;

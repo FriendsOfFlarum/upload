@@ -57,9 +57,7 @@ class FormatImagePreview
             }
 
             if ($file) {
-                if ($fileUrl = $this->files->getUrlForFile($file)) {
-                    $attributes['url'] = $fileUrl;
-                }
+                $attributes['url'] = $this->files->getUrlForFile($file) ?: $file->url;
 
                 $attributes['title'] = $file->base_name;
 
