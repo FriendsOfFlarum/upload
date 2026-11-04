@@ -38,7 +38,7 @@ class FormatImagePreviewTest extends TestCase
     {
         $repo = $this->createMock(FileRepository::class);
         $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
-        $repo->method('getUrlForFile')->willReturn($file->url);
+        $repo->method('getEmbedUrlForFile')->willReturn($file->url);
         // Return the thumbnail URL derived from thumbnail_path, or null when absent —
         // mirroring FileRepository::getThumbnailUrlForFile() which uses thumbnail_path.
         $repo->method('getThumbnailUrlForFile')->willReturnCallback(
@@ -135,7 +135,7 @@ class FormatImagePreviewTest extends TestCase
 
         $repo = $this->createMock(FileRepository::class);
         $repo->method('findEmbeddedIn')->willReturn(new Collection([$file]));
-        $repo->method('getUrlForFile')->willReturn('https://cdn.example.com/photo.jpg');
+        $repo->method('getEmbedUrlForFile')->willReturn('https://cdn.example.com/photo.jpg');
 
         $formatter = new FormatImagePreview($repo);
 
@@ -256,7 +256,7 @@ class FormatImagePreviewTest extends TestCase
         $file->image_width = 2400;
         $file->image_height = 800;
         $repo = $this->makeRepository($file);
-        $repo->expects($this->never())->method('getUrlForFile');
+        $repo->expects($this->never())->method('getEmbedUrlForFile');
         $repo->expects($this->never())->method('getThumbnailUrlForFile');
         $formatter = new FormatImagePreview($repo);
 

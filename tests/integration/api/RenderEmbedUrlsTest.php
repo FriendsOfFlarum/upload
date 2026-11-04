@@ -158,6 +158,42 @@ class RenderEmbedUrlsTest extends TestCase
     }
 
     #[Test]
+    public function an_image_card_of_a_file_on_s3_shows_its_stored_url_once_the_bucket_is_removed()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->givenFile(14, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 14));
+
+        $this->assertSame([self::STORED.'/on-s3.png'], $this->urlsIn(1));
+    }
+
+    #[Test]
+    public function an_image_card_of_a_file_on_s3_shows_its_stored_url_once_the_bucket_is_cleared()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', '');
+        $this->givenFile(15, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 15));
+
+        $this->assertSame([self::STORED.'/on-s3.png'], $this->urlsIn(1));
+    }
+
+    #[Test]
+    public function urls_built_from_the_file_record_are_encoded_like_posted_ones()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', "https://cdn.example.com/team's(media)");
+        $this->givenFile(16, 'on-s3.png', 'aws-s3', ['thumbnail_path' => 'files/on-s3-thumb.webp']);
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 16));
+        $this->givenPost(2, $this->imagePreview(self::ELSEWHERE, 16));
+
+        $base = 'https://cdn.example.com/team%27s%28media%29/files';
+        $this->assertSame(["$base/on-s3.png"], $this->urlsIn(1));
+        $this->assertSame(["$base/on-s3.png", "$base/on-s3-thumb.webp"], $this->urlsIn(2));
+    }
+
+    #[Test]
     public function an_image_card_of_a_file_with_no_recorded_upload_method_shows_its_stored_url()
     {
         $this->givenFile(13, 'no-method.png', null);
