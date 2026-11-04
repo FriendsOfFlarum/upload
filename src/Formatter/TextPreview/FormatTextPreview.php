@@ -48,7 +48,7 @@ class FormatTextPreview
             }
 
             if ($file) {
-                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
+                $attributes['url'] = $this->files->getTextPreviewUrlForFile($file);
 
                 try {
                     $response = $this->downloader->download($file);

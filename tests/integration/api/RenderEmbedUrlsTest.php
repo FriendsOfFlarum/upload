@@ -284,7 +284,8 @@ class RenderEmbedUrlsTest extends TestCase
 
         $this->assertSame(['https://cdn.example.com/assets/files/files/holiday.png'], $this->urlsIn(1));
         $this->assertSame(['https://cdn.example.com/assets/files/files/holiday.png'], $this->urlsIn(2));
-        $this->assertSame(['https://cdn.example.com/assets/files/files/notes.txt'], $this->urlsIn(3));
+        // The preview reads the file from the browser, which it can only do on the forum's own host.
+        $this->assertSame([self::LOCAL.'/notes.txt'], $this->urlsIn(3));
     }
 
     /** @test */
