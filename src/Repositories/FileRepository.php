@@ -50,6 +50,9 @@ class FileRepository
      */
     protected $path;
 
+    /** @var string[]|null */
+    protected $storageBases = null;
+
     public function __construct(
         Paths $paths,
         private UploadValidator $validator,
@@ -466,6 +469,26 @@ class FileRepository
      */
     public function isOnStorage(string $url): bool
     {
+        foreach ($this->storageBases() as $base) {
+            if (Str::startsWith($url, $base.'/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Worked out once: building the S3 adapter can mean reading AWS config files.
+     *
+     * @return string[]
+     */
+    protected function storageBases(): array
+    {
+        if ($this->storageBases !== null) {
+            return $this->storageBases;
+        }
+
         $bases = [$this->url->to('forum')->path('assets/files')];
 
         if ($cdnUrl = $this->config->getLocalCdnUrl()) {
@@ -482,12 +505,6 @@ class FileRepository
             // S3 is not set up on this forum.
         }
 
-        foreach ($bases as $base) {
-            if ($base && Str::startsWith($url, rtrim($base, '/').'/')) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->storageBases = array_values(array_filter(array_map(fn ($base) => rtrim((string) $base, '/'), $bases)));
     }
 }
