@@ -54,7 +54,7 @@ class FormatTextPreview
             }
 
             if ($file) {
-                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
+                $attributes['url'] = $this->files->getTextPreviewUrlForFile($file);
 
                 $kept = $this->snippets->for($file);
 

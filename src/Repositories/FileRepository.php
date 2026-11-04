@@ -605,6 +605,19 @@ class FileRepository
     }
 
     /**
+     * The URL a text preview reads from the browser. That only works on the
+     * forum's own host, so a local file comes from there even behind a CDN.
+     */
+    public function getTextPreviewUrlForFile(File $file): string
+    {
+        if ($file->upload_method === 'local') {
+            return $this->asPosted($this->url->to('forum')->path('assets/files').'/'.$file->path);
+        }
+
+        return $this->getEmbedUrlForFile($file);
+    }
+
+    /**
      * A URL as the parser stores posted ones: the host normalised and the rest
      * percent-encoded, so it's safe in the templates' CSS and script too.
      */

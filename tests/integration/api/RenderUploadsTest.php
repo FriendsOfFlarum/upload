@@ -45,7 +45,8 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * Every file's stored URL is out of date, as after a move to a CDN, so the
  * URLs rendered show they were worked out afresh: S3 files and local files
- * alike come from the CDN.
+ * alike come from the CDN, except text previews of local files, which the
+ * browser reads from the forum itself.
  */
 class RenderUploadsTest extends TestCase
 {
@@ -210,13 +211,13 @@ class RenderUploadsTest extends TestCase
     {
         $posts = $this->renderedPosts();
 
-        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => self::CDN.'/assets/files/files/short.txt'];
+        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => 'http://localhost/assets/files/files/short.txt'];
 
         $this->assertEquals([
             // Short enough to show whole, blank lines dropped.
             3  => [$short],
             // Too long to show whole: the first five lines.
-            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => self::CDN.'/assets/files/files/long.txt']],
+            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => 'http://localhost/assets/files/files/long.txt']],
             // A deleted file: no snippet to expand, and no link.
             5  => [['label' => 'gone.txt', 'hasSnippet' => 'false', 'snippet' => '', 'download' => '']],
             14 => [$short],
