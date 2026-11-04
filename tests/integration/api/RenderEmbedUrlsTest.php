@@ -125,6 +125,15 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([], $this->urlsIn(2));
     }
 
+    /** @test */
+    public function an_image_card_of_a_file_on_s3_still_renders_after_s3_is_unconfigured()
+    {
+        $this->givenFile(10, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 10));
+
+        $this->assertSame([self::STORED.'/on-s3.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;

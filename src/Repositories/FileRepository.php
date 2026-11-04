@@ -436,7 +436,8 @@ class FileRepository
     {
         try {
             $adapter = $this->manager->instantiate($file->upload_method);
-        } catch (ValidationException $e) {
+        } catch (ValidationException|\InvalidArgumentException $e) {
+            // Not set up (any more), e.g. S3 with its settings removed.
             return null;
         }
 
