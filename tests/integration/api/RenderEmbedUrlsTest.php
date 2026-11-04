@@ -36,6 +36,9 @@ class RenderEmbedUrlsTest extends TestCase
     /** @var array<int, array> */
     protected $files = [];
 
+    /** @var bool */
+    protected $seeded = false;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -49,6 +52,22 @@ class RenderEmbedUrlsTest extends TestCase
         $this->givenPost(1, $this->imagePreview(self::ELSEWHERE, 404));
 
         $this->assertSame([], $this->urlsIn(1));
+    }
+
+    /** @test */
+    public function an_image_preview_from_before_uuids_whose_file_is_gone_keeps_a_url_on_the_forums_own_storage()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.cdnUrl', 'https://cdn.example.com');
+
+        $this->givenPost(1, $this->imagePreview(self::LOCAL.'/gone.png', null));
+        $this->givenPost(2, $this->imagePreview('https://cdn.example.com/files/gone.png', null));
+        $this->givenPost(3, $this->imagePreview(self::ELSEWHERE, null));
+
+        $this->assertSame([self::LOCAL.'/gone.png'], $this->urlsIn(1));
+        $this->assertSame(['https://cdn.example.com/files/gone.png'], $this->urlsIn(2));
+        $this->assertSame([], $this->urlsIn(3));
     }
 
     protected function givenPost(int $id, string $content): void
@@ -72,17 +91,10 @@ class RenderEmbedUrlsTest extends TestCase
      */
     protected function urlsIn(int $postId): array
     {
-        $this->prepareDatabase([
-            'users'       => [$this->normalUser()],
-            'discussions' => [
-                ['id' => 1, 'title' => 'Uploads', 'user_id' => 2, 'created_at' => '2026-01-01 00:00:00', 'first_post_id' => 1, 'comment_count' => count($this->posts), 'last_post_number' => count($this->posts)],
-            ],
-            'posts' => array_map(fn (int $id) => [
-                'id'      => $id, 'discussion_id' => 1, 'number' => $id, 'user_id' => 2, 'type' => 'comment',
-                'content' => '<r>'.$this->posts[$id].'</r>', 'created_at' => '2026-01-01 00:00:00',
-            ], array_keys($this->posts)),
-            'fof_upload_files' => array_values($this->files),
-        ]);
+        if (!$this->seeded) {
+            $this->seed();
+            $this->seeded = true;
+        }
 
         $response = $this->send($this->request('GET', "/api/posts/$postId"));
         $body = (string) $response->getBody();
@@ -104,6 +116,21 @@ class RenderEmbedUrlsTest extends TestCase
         }
 
         return array_values(array_unique($urls));
+    }
+
+    protected function seed(): void
+    {
+        $this->prepareDatabase([
+            'users'       => [$this->normalUser()],
+            'discussions' => [
+                ['id' => 1, 'title' => 'Uploads', 'user_id' => 2, 'created_at' => '2026-01-01 00:00:00', 'first_post_id' => 1, 'comment_count' => count($this->posts), 'last_post_number' => count($this->posts)],
+            ],
+            'posts' => array_map(fn (int $id) => [
+                'id'      => $id, 'discussion_id' => 1, 'number' => $id, 'user_id' => 2, 'type' => 'comment',
+                'content' => '<r>'.$this->posts[$id].'</r>', 'created_at' => '2026-01-01 00:00:00',
+            ], array_keys($this->posts)),
+            'fof_upload_files' => array_values($this->files),
+        ]);
     }
 
     protected function uuid(int $id): string

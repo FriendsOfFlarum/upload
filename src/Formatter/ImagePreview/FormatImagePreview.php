@@ -45,7 +45,9 @@ class FormatImagePreview
                 $file = $this->files->findByUrl($url);
             }
 
-            if (!$file) {
+            // Without a file, keep only a URL from before previews had a uuid,
+            // and only when it points into the forum's own storage.
+            if (!$file && ($uuid || !$url || !$this->files->isOnStorage($url))) {
                 unset($attributes['url']);
             }
 
