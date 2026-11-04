@@ -114,6 +114,17 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([], $this->urlsIn(2));
     }
 
+    /** @test */
+    public function an_image_cards_background_comes_from_its_file()
+    {
+        $this->givenFile(8, 'holiday.png');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 8));
+        $this->givenPost(2, $this->imageCard(self::ELSEWHERE, 404));
+
+        $this->assertSame([self::LOCAL.'/holiday.png'], $this->urlsIn(1));
+        $this->assertSame([], $this->urlsIn(2));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
@@ -216,5 +227,12 @@ class RenderEmbedUrlsTest extends TestCase
         $uuid = $this->uuid($fileId);
 
         return "<UPL-TEXT-PREVIEW url=\"$url\" uuid=\"$uuid\"><s>[upl-text-preview uuid=$uuid url=$url]</s>notes.txt<e>[/upl-text-preview]</e></UPL-TEXT-PREVIEW>";
+    }
+
+    protected function imageCard(string $url, int $fileId): string
+    {
+        $uuid = $this->uuid($fileId);
+
+        return "<UPL-IMAGE size=\"1kB\" url=\"$url\" uuid=\"$uuid\"><s>[upl-image uuid=$uuid size=1kB url=$url]</s>holiday.png<e>[/upl-image]</e></UPL-IMAGE>";
     }
 }

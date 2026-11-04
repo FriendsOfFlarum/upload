@@ -109,6 +109,7 @@ return [
         ->attributes(Extenders\AddUserAttributes::class),
 
     (new Extend\Formatter())
+        ->render(Formatter\Image\FormatImage::class)
         ->render(Formatter\ImagePreview\FormatImagePreview::class)
         ->render(Formatter\TextPreview\FormatTextPreview::class),
 
