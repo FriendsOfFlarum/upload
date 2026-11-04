@@ -45,10 +45,14 @@ class FormatImagePreview
                 $file = $this->files->findByUrl($url);
             }
 
+            // Without a file, keep only a URL from before previews had a uuid,
+            // and only when it points into the forum's own storage.
+            if (!$file && ($uuid || !$url || !$this->files->isOnStorage($url))) {
+                unset($attributes['url']);
+            }
+
             if ($file) {
-                if ($fileUrl = $this->files->getUrlForFile($file)) {
-                    $attributes['url'] = $fileUrl;
-                }
+                $attributes['url'] = $this->files->getEmbedUrlForFile($file);
 
                 if (Arr::get($attributes, 'alt') === '{TEXT?}') {
                     $attributes['alt'] = '';

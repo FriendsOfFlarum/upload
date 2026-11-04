@@ -42,9 +42,22 @@ class FormatTextPreview
             $attributes['has_snippet'] = 'true';
             $snippet = '';
 
+            if (!$file) {
+                unset($attributes['url']);
+                $attributes['has_snippet'] = 'false';
+            }
+
             if ($file) {
-                $response = $this->downloader->download($file);
-                if ($response->getStatusCode() === 200) {
+                $attributes['url'] = $this->files->getTextPreviewUrlForFile($file);
+
+                try {
+                    $response = $this->downloader->download($file);
+                } catch (\Throwable $e) {
+                    // Gone from storage, or storage can't be reached: show the file without a snippet.
+                    $response = null;
+                }
+
+                if ($response && $response->getStatusCode() === 200) {
                     $file_contents = $response->getBody()->getContents();
 
                     $lines = preg_split('/\R/', $file_contents);

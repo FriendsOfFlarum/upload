@@ -26,6 +26,7 @@ use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
+use FoF\Upload\Driver\Config;
 use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
@@ -39,6 +40,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Http\Message\UploadedFileInterface;
 use Ramsey\Uuid\Uuid;
+use s9e\TextFormatter\Parser\AttributeFilters\UrlFilter;
 use Symfony\Component\HttpFoundation\File\UploadedFile as Upload;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -49,6 +51,9 @@ class FileRepository
      */
     protected $path;
 
+    /** @var string[]|null */
+    protected $storageBases = null;
+
     public function __construct(
         Paths $paths,
         private UploadValidator $validator,
@@ -58,7 +63,8 @@ class FileRepository
         private TranslatorInterface $translator,
         private Manager $manager,
         private UrlGenerator $url,
-        private MimeTypeDetector $mimeTypeDetector
+        private MimeTypeDetector $mimeTypeDetector,
+        private Config $config
     ) {
         $this->path = $paths->storage;
     }
@@ -327,7 +333,11 @@ class FileRepository
             ->where('shared', false)
             ->where('created_at', '<', $before)
             ->each(function (File $file) use ($manager, &$count, $confirm) {
-                $adapter = $manager->instantiate($file->upload_method);
+                try {
+                    $adapter = $manager->instantiate($file->upload_method);
+                } catch (ValidationException $e) {
+                    return;
+                }
 
                 if ($confirm !== null && $confirm($file, $adapter) !== true) {
                     return;
@@ -415,6 +425,11 @@ class FileRepository
         if ($adapter instanceof AwsS3) {
             return $adapter->hostName();
         } elseif ($adapter instanceof Adapters\Local) {
+            // Uploads made while a CDN is set were given its URL, so build the same one.
+            if ($cdnUrl = $this->config->getLocalCdnUrl()) {
+                return rtrim($cdnUrl, '/').'/assets/files';
+            }
+
             return $this->url->to('forum')->path('assets/files');
         }
 
@@ -430,17 +445,100 @@ class FileRepository
      */
     public function getUrlForFile(File $file): ?string
     {
-        $adapter = $this->manager->instantiate($file->upload_method);
-
-        $supportedAdapters = [
-            Adapters\Local::class,
-            Adapters\AwsS3::class,
-        ];
-
-        if (!in_array(get_class($adapter), $supportedAdapters)) {
+        if (!$file->upload_method) {
             return null;
         }
 
-        return $this->getHostnameForFile($file, $adapter).'/'.$file->path;
+        try {
+            $adapter = $this->manager->instantiate($file->upload_method);
+
+            if (!in_array(get_class($adapter), [Adapters\Local::class, Adapters\AwsS3::class])) {
+                return null;
+            }
+
+            $host = $this->getHostnameForFile($file, $adapter);
+        } catch (ValidationException|\InvalidArgumentException|\RuntimeException $e) {
+            // Not set up (any more), e.g. S3 with its settings removed.
+            return null;
+        }
+
+        return rtrim($host, '/').'/'.$file->path;
+    }
+
+    /**
+     * The URL to render for a file embedded in a post, in the form the parser
+     * stores posted URLs.
+     */
+    public function getEmbedUrlForFile(File $file): string
+    {
+        return $this->asPosted($this->getUrlForFile($file) ?: $file->url);
+    }
+
+    /**
+     * The URL a text preview reads from the browser. That only works on the
+     * forum's own host, so a local file comes from there even behind a CDN.
+     */
+    public function getTextPreviewUrlForFile(File $file): string
+    {
+        if ($file->upload_method === 'local') {
+            return $this->asPosted($this->url->to('forum')->path('assets/files').'/'.$file->path);
+        }
+
+        return $this->getEmbedUrlForFile($file);
+    }
+
+    /**
+     * A URL as the parser stores posted ones: the host normalised and the rest
+     * percent-encoded, so it's safe in the templates' CSS and script too.
+     */
+    protected function asPosted(string $url): string
+    {
+        return UrlFilter::filter($url, ['allowedSchemes' => '/^https?$/i']) ?: '';
+    }
+
+    /**
+     * Whether a URL points into the forum's own upload storage: the local
+     * files directory (on the forum or its CDN), or the S3 bucket or CDN when
+     * that adapter is set up.
+     */
+    public function isOnStorage(string $url): bool
+    {
+        foreach ($this->storageBases() as $base) {
+            if (Str::startsWith($url, $base.'/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Kept for this instance: building the S3 adapter can mean reading AWS config files.
+     *
+     * @return string[]
+     */
+    protected function storageBases(): array
+    {
+        if ($this->storageBases !== null) {
+            return $this->storageBases;
+        }
+
+        $bases = [$this->url->to('forum')->path('assets/files')];
+
+        if ($cdnUrl = $this->config->getLocalCdnUrl()) {
+            $bases[] = rtrim($cdnUrl, '/').'/assets/files';
+        }
+
+        try {
+            $s3 = $this->manager->instantiate('aws-s3');
+
+            if ($s3 instanceof AwsS3) {
+                $bases[] = $s3->hostName();
+            }
+        } catch (\Throwable $e) {
+            // S3 is not set up on this forum.
+        }
+
+        return $this->storageBases = array_values(array_filter(array_map(fn ($base) => rtrim($this->asPosted(rtrim((string) $base, '/')), '/'), $bases)));
     }
 }

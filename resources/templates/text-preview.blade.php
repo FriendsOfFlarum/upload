@@ -47,9 +47,15 @@ $translator = resolve('translator');
             const snippetText = '';
 
             const testUrl = new URL(location.origin);
-            const url = new URL('{@url}');
+            let url = null;
 
-            if (testUrl.origin !== url.origin) {
+            try {
+                url = new URL('{@url}');
+            } catch (e) {
+                // No file to preview.
+            }
+
+            if (!url || testUrl.origin !== url.origin) {
               // Prevent cross-origin requests
               handleError(new Error('Attempted to fetch a cross-origin file in text preview.'));
             }
@@ -73,7 +79,7 @@ $translator = resolve('translator');
             let fileContent = null;
 
             // Only allow toggling preview if showing a snippet
-            if ({@has_snippet} && testUrl.origin === url.origin) {
+            if ({@has_snippet} && url && testUrl.origin === url.origin) {
                 toggleBtn.addEventListener('click', () => {
                     if (fileContent !== null) {
                         const expanded = figure.getAttribute('data-expanded') === 'true';

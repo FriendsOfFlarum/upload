@@ -159,6 +159,56 @@ class SharedFilesTest extends EnhancedTestCase
     /**
      * @test
      */
+    public function a_hidden_shared_file_uploads_while_its_mime_types_s3_has_no_bucket()
+    {
+        $this->setting('fof-upload.mimeTypes', json_encode([
+            '^image\\/jpeg$' => ['adapter' => 'aws-s3', 'template' => 'image-preview'],
+        ]));
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', '');
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+                'json' => [
+                    'options' => [
+                        'shared' => true,
+                        'hidden' => true,
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode(), (string) $response->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function an_upload_whose_mime_types_adapter_is_not_set_up_is_refused()
+    {
+        $this->setting('fof-upload.mimeTypes', json_encode([
+            '^image\\/jpeg$' => ['adapter' => 'imgur', 'template' => 'image-preview'],
+        ]));
+
+        $response = $this->send(
+            $this->request('POST', '/api/fof/upload', [
+                'authenticatedAs' => 1,
+                'multipart'       => [
+                    $this->uploadFile($this->fixtures('MilkyWay.jpg')),
+                ],
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode(), (string) $response->getBody());
+    }
+
+    /**
+     * @test
+     */
     public function shared_hidden_files_are_proxied_via_our_controller()
     {
         $response = $this->send(

@@ -92,6 +92,10 @@ class AwsS3 extends Flysystem implements UploadAdapter
             $region = $this->adapter->getClient()->getRegion();
             $bucket = $this->adapter->getBucket();
 
+            if (empty($bucket)) {
+                throw new \RuntimeException('AwsS3 adapter requires a bucket for URL generation');
+            }
+
             return sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region ?: 'us-east-1');
         }
 
