@@ -250,7 +250,7 @@ class FormatImagePreviewTest extends TestCase
     }
 
     #[Test]
-    public function leaves_xml_unchanged_when_no_file_matches(): void
+    public function drops_the_posted_url_when_no_file_matches(): void
     {
         $file = $this->makeFile('other', 'other.jpg', 'https://example.com/other.jpg');
         $file->image_width = 2400;
@@ -259,9 +259,11 @@ class FormatImagePreviewTest extends TestCase
         $repo->expects($this->never())->method('getUrlForFile');
         $repo->expects($this->never())->method('getThumbnailUrlForFile');
         $formatter = new FormatImagePreview($repo);
-        $xml = $this->makeXml('abc', 'https://example.com/photo.jpg');
 
-        $this->assertXmlStringEqualsXmlString($xml, $this->invoke($formatter, $xml));
+        $this->assertXmlStringEqualsXmlString(
+            '<r><UPL-IMAGE-PREVIEW uuid="abc"/></r>',
+            $this->invoke($formatter, $this->makeXml('abc', 'https://example.com/photo.jpg'))
+        );
     }
 
     #[Test]
