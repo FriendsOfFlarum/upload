@@ -157,6 +157,15 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame(['https://cdn.example.com/files/on-s3.png', 'https://cdn.example.com/files/on-s3-thumb.webp'], $this->urlsIn(1));
     }
 
+    #[Test]
+    public function an_image_card_of_a_file_with_no_recorded_upload_method_shows_its_stored_url()
+    {
+        $this->givenFile(13, 'no-method.png', null);
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 13));
+
+        $this->assertSame([self::STORED.'/no-method.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;

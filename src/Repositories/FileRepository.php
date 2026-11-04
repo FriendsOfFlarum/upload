@@ -532,6 +532,10 @@ class FileRepository
      */
     public function getUrlForFile(File $file): ?string
     {
+        if (!$file->upload_method) {
+            return null;
+        }
+
         try {
             $adapter = $this->manager->forUrls($file->upload_method);
         } catch (ValidationException|\InvalidArgumentException $e) {
@@ -564,7 +568,7 @@ class FileRepository
      */
     public function getThumbnailUrlForFile(File $file): ?string
     {
-        if (!$file->thumbnail_path) {
+        if (!$file->thumbnail_path || !$file->upload_method) {
             return null;
         }
 
