@@ -194,6 +194,55 @@ class RenderEmbedUrlsTest extends TestCase
     }
 
     #[Test]
+    public function an_image_card_of_a_file_on_s3_shows_its_stored_url_when_s3_cannot_name_its_host()
+    {
+        // The SDK finds the region in the environment, but the adapter only knows the region setting.
+        putenv('AWS_REGION=eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->givenFile(17, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 17));
+
+        try {
+            $this->assertSame([self::STORED.'/on-s3.png'], $this->urlsIn(1));
+        } finally {
+            putenv('AWS_REGION');
+        }
+    }
+
+    #[Test]
+    public function urls_built_from_the_file_record_keep_an_ipv6_host()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', 'http://[::1]:9000/media');
+        $this->givenFile(18, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 18));
+
+        $this->assertSame(['http://[::1]:9000/media/files/on-s3.png'], $this->urlsIn(1));
+    }
+
+    #[Test]
+    public function an_image_preview_from_before_uuids_is_matched_to_storage_whose_url_the_parser_encoded()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', "https://cdn.example.com/team's(media)");
+        $posted = 'https://cdn.example.com/team%27s%28media%29/files/gone.png';
+        $this->givenPost(1, $this->imagePreview($posted, null));
+
+        $this->assertSame([$posted], $this->urlsIn(1));
+    }
+
+    #[Test]
+    public function an_image_preview_from_before_uuids_whose_file_is_found_by_url_shows_the_files_url()
+    {
+        $this->givenFile(19, 'by-url.png');
+        $this->givenPost(1, $this->imagePreview(self::STORED.'/by-url.png', null));
+
+        $this->assertSame([self::LOCAL.'/by-url.png'], $this->urlsIn(1));
+    }
+
+    #[Test]
     public function an_image_card_of_a_file_with_no_recorded_upload_method_shows_its_stored_url()
     {
         $this->givenFile(13, 'no-method.png', null);

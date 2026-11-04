@@ -129,8 +129,8 @@ class Manager
     {
         $config = $this->config->getS3Config();
 
-        // Without a bucket S3 isn't set up, e.g. after its settings were cleared.
-        if (empty($config['bucket'])) {
+        // Without a bucket setting the adapter can't be built: S3 isn't set up.
+        if (!is_string($config['bucket'])) {
             return null;
         }
 

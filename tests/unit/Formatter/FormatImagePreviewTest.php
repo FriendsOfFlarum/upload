@@ -41,7 +41,7 @@ class FormatImagePreviewTest extends TestCase
         $repo->method('getEmbedUrlForFile')->willReturn($file->url);
         // Return the thumbnail URL derived from thumbnail_path, or null when absent —
         // mirroring FileRepository::getThumbnailUrlForFile() which uses thumbnail_path.
-        $repo->method('getThumbnailUrlForFile')->willReturnCallback(
+        $repo->method('getEmbedThumbnailUrlForFile')->willReturnCallback(
             fn (File $f) => $f->thumbnail_path
                 ? 'https://example.com/'.ltrim(str_replace('.jpg', '-thumb.webp', $f->thumbnail_path), '/')
                 : null
@@ -257,7 +257,7 @@ class FormatImagePreviewTest extends TestCase
         $file->image_height = 800;
         $repo = $this->makeRepository($file);
         $repo->expects($this->never())->method('getEmbedUrlForFile');
-        $repo->expects($this->never())->method('getThumbnailUrlForFile');
+        $repo->expects($this->never())->method('getEmbedThumbnailUrlForFile');
         $formatter = new FormatImagePreview($repo);
 
         $this->assertXmlStringEqualsXmlString(
