@@ -45,6 +45,10 @@ class FormatImagePreview
                 $file = $this->files->findByUrl($url);
             }
 
+            if (!$file) {
+                unset($attributes['url']);
+            }
+
             if ($file) {
                 if ($fileUrl = $this->files->getUrlForFile($file)) {
                     $attributes['url'] = $fileUrl;
