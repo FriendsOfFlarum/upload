@@ -434,6 +434,10 @@ class FileRepository
      */
     public function getUrlForFile(File $file): ?string
     {
+        if (!$file->upload_method) {
+            return null;
+        }
+
         try {
             $adapter = $this->manager->instantiate($file->upload_method);
         } catch (ValidationException|\InvalidArgumentException $e) {
