@@ -133,6 +133,18 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/on-s3.png'], $this->urlsIn(1));
     }
 
+    #[Test]
+    public function an_image_card_on_s3_behind_a_custom_url_ending_in_a_slash_has_no_double_slash()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', 'https://cdn.example.com/');
+        $this->givenFile(11, 'on-s3.png', 'aws-s3');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 11));
+
+        $this->assertSame(['https://cdn.example.com/files/on-s3.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
