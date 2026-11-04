@@ -149,6 +149,8 @@ fof-upload:
         mime_remove_subtype: "Remove {subtype}"
         mime_add_prompt: Add file types…
         mime_add_custom: Custom pattern…
+        title: General preferences
+        php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       mime_presets:
         images: Images
         pdf: PDF documents
@@ -157,8 +159,6 @@ fof-upload:
         archives: Archives (zip, tar, 7z)
         audio: Audio
         video: Video
-        title: General preferences
-        php_ini_values: "Your <code>php.ini</code> values are <code>post_max_size={post}</code> and <code>upload_max_filesize={upload}</code>. Ensure the value set here is below these thresholds, or adjust them accordingly. If using <code>Nginx</code>, also ensure that <code>client_max_body_size</code> is of sufficient size for your chosen max limit."
       resize:
         max_width: Maximum image width/height
         title: Image resize
@@ -298,6 +298,7 @@ fof-upload:
       cannot_write_to_disk: Cannot write to disk.
       upload_blocked_by_php_extension: A php extension blocked the upload.
       no_files_made_it_to_upload: Please upload files no larger than {max} kb.
+      svg_failure: This SVG file could not be read safely, so it was not uploaded. It may be damaged or not a valid SVG.
   lib:
     upload-shared-file-modal:
       title: New shared file
