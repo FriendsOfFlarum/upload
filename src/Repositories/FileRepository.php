@@ -26,6 +26,7 @@ use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Commands\Download as DownloadCommand;
 use FoF\Upload\Contracts\UploadAdapter;
 use FoF\Upload\Download;
+use FoF\Upload\Driver\Config;
 use FoF\Upload\Events\File\IsSlugged;
 use FoF\Upload\Exceptions\InvalidUploadException;
 use FoF\Upload\File;
@@ -58,7 +59,8 @@ class FileRepository
         private TranslatorInterface $translator,
         private Manager $manager,
         private UrlGenerator $url,
-        private MimeTypeDetector $mimeTypeDetector
+        private MimeTypeDetector $mimeTypeDetector,
+        private Config $config
     ) {
         $this->path = $paths->storage;
     }
@@ -459,11 +461,16 @@ class FileRepository
 
     /**
      * Whether a URL points into the forum's own upload storage: the local
-     * files directory, or the S3 bucket or CDN when that adapter is set up.
+     * files directory (on the forum or its CDN), or the S3 bucket or CDN when
+     * that adapter is set up.
      */
     public function isOnStorage(string $url): bool
     {
         $bases = [$this->url->to('forum')->path('assets/files')];
+
+        if ($cdnUrl = $this->config->getLocalCdnUrl()) {
+            $bases[] = rtrim($cdnUrl, '/').'/assets/files';
+        }
 
         try {
             $s3 = $this->manager->instantiate('aws-s3');

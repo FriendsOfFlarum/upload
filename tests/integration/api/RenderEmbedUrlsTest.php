@@ -155,6 +155,15 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/no-method.png'], $this->urlsIn(1));
     }
 
+    /** @test */
+    public function an_image_preview_from_before_uuids_on_the_local_cdn_is_kept_without_s3()
+    {
+        $this->setting('fof-upload.cdnUrl', 'https://cdn.example.com');
+        $this->givenPost(1, $this->imagePreview('https://cdn.example.com/assets/files/gone.png', null));
+
+        $this->assertSame(['https://cdn.example.com/assets/files/gone.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
