@@ -44,6 +44,7 @@ class FormatTextPreview
 
             if (!$file) {
                 unset($attributes['url']);
+                $attributes['has_snippet'] = 'false';
             }
 
             if ($file) {

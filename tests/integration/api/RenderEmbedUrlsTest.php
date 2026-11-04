@@ -183,6 +183,14 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([], $this->urlsIn(2));
     }
 
+    /** @test */
+    public function a_text_preview_of_a_missing_file_offers_no_snippet_to_expand()
+    {
+        $this->givenPost(1, $this->textPreview(self::ELSEWHERE, 404));
+
+        $this->assertStringContainsString('data-hassnippet="false"', $this->renderedHtml(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
@@ -204,24 +212,8 @@ class RenderEmbedUrlsTest extends TestCase
      */
     protected function urlsIn(int $postId): array
     {
-        if (!$this->seeded) {
-            $this->seed();
-            $this->seeded = true;
-
-            @mkdir($this->localFiles(), 0777, true);
-
-            foreach ($this->onDisk as $name => $contents) {
-                file_put_contents($this->localFiles()."/$name", $contents);
-            }
-        }
-
-        $response = $this->send($this->request('GET', "/api/posts/$postId"));
-        $body = (string) $response->getBody();
-        $this->assertSame(200, $response->getStatusCode(), $body);
-        $html = json_decode($body, true)['data']['attributes']['contentHtml'];
-
         $document = new DOMDocument();
-        $document->loadHTML('<?xml encoding="utf-8"?><body>'.$html.'</body>', LIBXML_NOERROR);
+        $document->loadHTML('<?xml encoding="utf-8"?><body>'.$this->renderedHtml($postId).'</body>', LIBXML_NOERROR);
         $urls = [];
 
         foreach ((new DOMXPath($document))->query('//@src | //@href | //@style') as $attribute) {
@@ -242,6 +234,26 @@ class RenderEmbedUrlsTest extends TestCase
         }
 
         return array_values(array_unique($urls));
+    }
+
+    protected function renderedHtml(int $postId): string
+    {
+        if (!$this->seeded) {
+            $this->seed();
+            $this->seeded = true;
+
+            @mkdir($this->localFiles(), 0777, true);
+
+            foreach ($this->onDisk as $name => $contents) {
+                file_put_contents($this->localFiles()."/$name", $contents);
+            }
+        }
+
+        $response = $this->send($this->request('GET', "/api/posts/$postId"));
+        $body = (string) $response->getBody();
+        $this->assertSame(200, $response->getStatusCode(), $body);
+
+        return json_decode($body, true)['data']['attributes']['contentHtml'];
     }
 
     protected function seed(): void
