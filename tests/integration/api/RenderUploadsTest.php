@@ -44,7 +44,8 @@ use Psr\Http\Message\ServerRequestInterface;
  * Discussions 2 and 3 have one post each.
  *
  * Every file's stored URL is out of date, as after a move to a CDN, so the
- * URLs rendered show they were worked out afresh.
+ * URLs rendered show they were worked out afresh: S3 files and local files
+ * alike come from the CDN.
  */
 class RenderUploadsTest extends TestCase
 {
@@ -156,9 +157,9 @@ class RenderUploadsTest extends TestCase
         ], array_slice($this->imagePreviews($posts[1]), 0, 4));
 
         $this->assertEquals([
-            2  => [$this->expectedImage(7, 'http://localhost/assets/files/files/post-two.jpg', 'http://localhost/assets/files/files/post-two.jpg', 'post-two.jpg', 'post-two.jpg', '30', '40')],
-            7  => [$this->expectedImage(8, 'http://localhost/assets/files/files/post-seven.jpg', 'http://localhost/assets/files/files/post-seven.jpg', 'post-seven.jpg', 'post-seven.jpg', '', '')],
-            8  => [$this->expectedImage(9, 'http://localhost/assets/files/files/post-eight.jpg', 'http://localhost/assets/files/files/post-eight.jpg', 'post-eight.jpg', 'post-eight.jpg', '50', '60')],
+            2  => [$this->expectedImage(7, self::CDN.'/assets/files/files/post-two.jpg', self::CDN.'/assets/files/files/post-two.jpg', 'post-two.jpg', 'post-two.jpg', '30', '40')],
+            7  => [$this->expectedImage(8, self::CDN.'/assets/files/files/post-seven.jpg', self::CDN.'/assets/files/files/post-seven.jpg', 'post-seven.jpg', 'post-seven.jpg', '', '')],
+            8  => [$this->expectedImage(9, self::CDN.'/assets/files/files/post-eight.jpg', self::CDN.'/assets/files/files/post-eight.jpg', 'post-eight.jpg', 'post-eight.jpg', '50', '60')],
             // A thumbnail, but no size recorded for it or the image.
             9  => [$this->expectedImage(10, self::CDN.'/files/post-nine.jpg', self::CDN.'/files/post-nine-thumb.webp', 'post-nine.jpg', 'post-nine.jpg', '', '')],
             10 => [$this->expectedImage(13, self::CDN.'/files/post-ten.png', self::CDN.'/files/post-ten.png', 'post-ten.png', 'post-ten.png', '640', '480')],
@@ -191,15 +192,15 @@ class RenderUploadsTest extends TestCase
         $posts = $this->renderedPosts();
 
         $this->assertEquals(
-            $this->expectedImage(null, 'http://localhost/assets/files/files/legacy.png', 'http://localhost/assets/files/files/legacy.png', 'legacy.png', 'legacy.png', '10', '20'),
+            $this->expectedImage(null, self::CDN.'/assets/files/files/legacy.png', self::CDN.'/assets/files/files/legacy.png', 'legacy.png', 'legacy.png', '10', '20'),
             $this->imagePreviews($posts[1])[5]
         );
         $this->assertEquals(
-            [$this->expectedImage(null, 'http://localhost/assets/files/files/legacy-two.png', 'http://localhost/assets/files/files/legacy-two.png', 'legacy-two.png', 'legacy-two.png', '', '')],
+            [$this->expectedImage(null, self::CDN.'/assets/files/files/legacy-two.png', self::CDN.'/assets/files/files/legacy-two.png', 'legacy-two.png', 'legacy-two.png', '', '')],
             $this->imagePreviews($posts[11])
         );
         $this->assertEquals(
-            $this->expectedImage(null, 'http://localhost/assets/files/files/third.png', 'http://localhost/assets/files/files/third.png', 'third.png', 'third.png', '70', '80'),
+            $this->expectedImage(null, self::CDN.'/assets/files/files/third.png', self::CDN.'/assets/files/files/third.png', 'third.png', 'third.png', '70', '80'),
             $this->imagePreviews($posts[14])[0]
         );
     }
@@ -209,13 +210,13 @@ class RenderUploadsTest extends TestCase
     {
         $posts = $this->renderedPosts();
 
-        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => 'http://localhost/assets/files/files/short.txt'];
+        $short = ['label' => 'short.txt', 'hasSnippet' => 'false', 'snippet' => "one\ntwo\nthree", 'download' => self::CDN.'/assets/files/files/short.txt'];
 
         $this->assertEquals([
             // Short enough to show whole, blank lines dropped.
             3  => [$short],
             // Too long to show whole: the first five lines.
-            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => 'http://localhost/assets/files/files/long.txt']],
+            4  => [['label' => 'long.txt', 'hasSnippet' => 'true', 'snippet' => "l1\nl2\nl3\nl4\nl5", 'download' => self::CDN.'/assets/files/files/long.txt']],
             // A deleted file: no snippet to expand, and no link.
             5  => [['label' => 'gone.txt', 'hasSnippet' => 'false', 'snippet' => '', 'download' => '']],
             14 => [$short],

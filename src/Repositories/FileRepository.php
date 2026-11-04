@@ -523,6 +523,11 @@ class FileRepository
         if ($adapter instanceof AwsS3) {
             return $adapter->hostName();
         } elseif ($adapter instanceof Adapters\Local) {
+            // Uploads made while a CDN is set were given its URL, so build the same one.
+            if ($cdnUrl = $this->config->getLocalCdnUrl()) {
+                return rtrim($cdnUrl, '/').'/assets/files';
+            }
+
             return $this->url->to('forum')->path('assets/files');
         }
 

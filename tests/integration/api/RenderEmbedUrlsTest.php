@@ -243,6 +243,23 @@ class RenderEmbedUrlsTest extends TestCase
     }
 
     #[Test]
+    public function local_files_behind_the_local_cdn_are_shown_from_the_cdn()
+    {
+        $this->setting('fof-upload.cdnUrl', 'https://cdn.example.com/');
+        $this->givenFile(20, 'holiday.png', 'local', ['thumbnail_path' => 'files/holiday-thumb.webp']);
+        $this->givenFile(21, 'notes.txt');
+        $this->onDisk['notes.txt'] = "one\ntwo\n";
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 20));
+        $this->givenPost(2, $this->imagePreview(self::ELSEWHERE, 20));
+        $this->givenPost(3, $this->textPreview(self::ELSEWHERE, 21));
+
+        $cdn = 'https://cdn.example.com/assets/files/files';
+        $this->assertSame(["$cdn/holiday.png"], $this->urlsIn(1));
+        $this->assertSame(["$cdn/holiday.png", "$cdn/holiday-thumb.webp"], $this->urlsIn(2));
+        $this->assertSame(["$cdn/notes.txt"], $this->urlsIn(3));
+    }
+
+    #[Test]
     public function an_image_card_of_a_file_with_no_recorded_upload_method_shows_its_stored_url()
     {
         $this->givenFile(13, 'no-method.png', null);
