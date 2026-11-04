@@ -191,6 +191,27 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertStringContainsString('data-hassnippet="false"', $this->renderedHtml(1));
     }
 
+    /** @test */
+    public function a_post_with_several_image_cards_looks_their_files_up_together()
+    {
+        $this->givenFile(13, 'one.png');
+        $this->givenFile(14, 'two.png');
+        $this->givenFile(15, 'three.png');
+        $this->givenPost(1, $this->imageCard(self::ELSEWHERE, 13).$this->imageCard(self::ELSEWHERE, 14).$this->imageCard(self::ELSEWHERE, 15));
+        $this->renderedHtml(1);
+
+        $database = $this->database();
+        $database->flushQueryLog();
+        $database->enableQueryLog();
+        $this->renderedHtml(1);
+        $queries = array_column($database->getQueryLog(), 'query');
+        $database->disableQueryLog();
+
+        $selects = array_filter($queries, fn (string $sql) => stripos(ltrim($sql), 'select') === 0);
+        $this->assertCount(1, array_filter($selects, fn (string $sql) => str_contains($sql, 'fof_upload_files')), implode("\n", $selects));
+        $this->assertCount(0, array_filter($selects, fn (string $sql) => str_contains($sql, 'fof_upload_downloads')), implode("\n", $selects));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;

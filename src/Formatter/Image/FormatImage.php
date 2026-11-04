@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Formatter\Image;
 
+use FoF\Upload\File;
 use FoF\Upload\Repositories\FileRepository;
 use Illuminate\Support\Arr;
 use s9e\TextFormatter\Renderer;
@@ -36,8 +37,22 @@ class FormatImage
      */
     public function __invoke(Renderer $renderer, $context, string $xml)
     {
-        return Utils::replaceAttributes($xml, 'UPL-IMAGE', function ($attributes) {
-            $file = $this->files->findByUuid(Arr::get($attributes, 'uuid'));
+        if (strpos($xml, '<UPL-IMAGE ') === false) {
+            return $xml;
+        }
+
+        $uuids = [];
+
+        Utils::replaceAttributes($xml, 'UPL-IMAGE', function ($attributes) use (&$uuids) {
+            $uuids[] = Arr::get($attributes, 'uuid');
+
+            return $attributes;
+        });
+
+        $files = File::query()->whereIn('uuid', array_filter($uuids))->get()->keyBy('uuid');
+
+        return Utils::replaceAttributes($xml, 'UPL-IMAGE', function ($attributes) use ($files) {
+            $file = $files->get(Arr::get($attributes, 'uuid'));
 
             if ($file) {
                 $attributes['url'] = $this->files->getUrlForFile($file) ?: $file->url;
