@@ -145,14 +145,26 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame(['https://cdn.example.com/files/on-s3.png'], $this->urlsIn(1));
     }
 
+    #[Test]
+    public function an_image_preview_thumbnail_on_s3_behind_a_custom_url_ending_in_a_slash_has_no_double_slash()
+    {
+        $this->setting('fof-upload.awsS3Region', 'eu-west-1');
+        $this->setting('fof-upload.awsS3Bucket', 'bucket');
+        $this->setting('fof-upload.awsS3CustomUrl', 'https://cdn.example.com/');
+        $this->givenFile(12, 'on-s3.png', 'aws-s3', ['thumbnail_path' => 'files/on-s3-thumb.webp']);
+        $this->givenPost(1, $this->imagePreview(self::ELSEWHERE, 12));
+
+        $this->assertSame(['https://cdn.example.com/files/on-s3.png', 'https://cdn.example.com/files/on-s3-thumb.webp'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
     }
 
-    protected function givenFile(int $id, string $name, string $method = 'local'): void
+    protected function givenFile(int $id, string $name, ?string $method = 'local', array $extra = []): void
     {
-        $this->files[$id] = [
+        $this->files[$id] = $extra + [
             'id'            => $id, 'uuid' => $this->uuid($id), 'base_name' => $name, 'path' => "files/$name",
             'url'           => self::STORED."/$name", 'type' => 'image/png', 'size' => 1000,
             'upload_method' => $method, 'actor_id' => 2, 'shared' => false, 'created_at' => '2026-01-01 00:00:00',
