@@ -98,7 +98,13 @@ class Manager
             throw new ValidationException(['upload' => "Cannot instantiate adapter $adapter"]);
         }
 
-        return $driver ?? $this->{$method}($this->util);
+        $instance = $driver ?? $this->{$method}($this->util);
+
+        if ($instance === null) {
+            throw new ValidationException(['upload' => "Cannot instantiate adapter $adapter"]);
+        }
+
+        return $instance;
     }
 
     /**

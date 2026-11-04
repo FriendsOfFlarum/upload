@@ -80,6 +80,15 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/kept-by-imgur.png'], $this->urlsIn(1));
     }
 
+    /** @test */
+    public function an_image_preview_of_a_file_whose_adapter_is_not_set_up_still_renders()
+    {
+        $this->givenFile(6, 'imgur-no-longer-set-up.png', 'imgur');
+        $this->givenPost(1, $this->imagePreview(self::ELSEWHERE, 6));
+
+        $this->assertSame([self::STORED.'/imgur-no-longer-set-up.png'], $this->urlsIn(1));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;

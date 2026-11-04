@@ -327,7 +327,11 @@ class FileRepository
             ->where('shared', false)
             ->where('created_at', '<', $before)
             ->each(function (File $file) use ($manager, &$count, $confirm) {
-                $adapter = $manager->instantiate($file->upload_method);
+                try {
+                    $adapter = $manager->instantiate($file->upload_method);
+                } catch (ValidationException $e) {
+                    return;
+                }
 
                 if ($confirm !== null && $confirm($file, $adapter) !== true) {
                     return;
@@ -430,7 +434,11 @@ class FileRepository
      */
     public function getUrlForFile(File $file): ?string
     {
-        $adapter = $this->manager->instantiate($file->upload_method);
+        try {
+            $adapter = $this->manager->instantiate($file->upload_method);
+        } catch (ValidationException $e) {
+            return null;
+        }
 
         $supportedAdapters = [
             Adapters\Local::class,
