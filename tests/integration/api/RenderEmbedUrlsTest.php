@@ -14,6 +14,7 @@ namespace FoF\Upload\Tests\integration\api;
 
 use DOMDocument;
 use DOMXPath;
+use Flarum\Foundation\Paths;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
 
@@ -36,6 +37,9 @@ class RenderEmbedUrlsTest extends TestCase
     /** @var array<int, array> */
     protected $files = [];
 
+    /** @var array<string, string> */
+    protected $onDisk = [];
+
     /** @var bool */
     protected $seeded = false;
 
@@ -44,6 +48,15 @@ class RenderEmbedUrlsTest extends TestCase
         parent::setUp();
 
         $this->extension('fof-upload');
+    }
+
+    public function tearDown(): void
+    {
+        foreach (array_keys($this->onDisk) as $name) {
+            @unlink($this->localFiles()."/$name");
+        }
+
+        parent::tearDown();
     }
 
     /** @test */
@@ -89,6 +102,18 @@ class RenderEmbedUrlsTest extends TestCase
         $this->assertSame([self::STORED.'/imgur-no-longer-set-up.png'], $this->urlsIn(1));
     }
 
+    /** @test */
+    public function a_text_previews_link_comes_from_its_file()
+    {
+        $this->givenFile(7, 'notes.txt');
+        $this->onDisk['notes.txt'] = "one\ntwo\n";
+        $this->givenPost(1, $this->textPreview(self::ELSEWHERE, 7));
+        $this->givenPost(2, $this->textPreview(self::ELSEWHERE, 404));
+
+        $this->assertSame([self::LOCAL.'/notes.txt'], $this->urlsIn(1));
+        $this->assertSame([], $this->urlsIn(2));
+    }
+
     protected function givenPost(int $id, string $content): void
     {
         $this->posts[$id] = $content;
@@ -113,6 +138,12 @@ class RenderEmbedUrlsTest extends TestCase
         if (!$this->seeded) {
             $this->seed();
             $this->seeded = true;
+
+            @mkdir($this->localFiles(), 0777, true);
+
+            foreach ($this->onDisk as $name => $contents) {
+                file_put_contents($this->localFiles()."/$name", $contents);
+            }
         }
 
         $response = $this->send($this->request('GET', "/api/posts/$postId"));
@@ -134,6 +165,13 @@ class RenderEmbedUrlsTest extends TestCase
             }
         }
 
+        // Text previews hand their URL to an inline script.
+        foreach ((new DOMXPath($document))->query('//script') as $script) {
+            if (preg_match("/new URL\\('([^']*)'\\)/", $script->textContent, $m) && $m[1] !== '') {
+                $urls[] = $m[1];
+            }
+        }
+
         return array_values(array_unique($urls));
     }
 
@@ -152,6 +190,11 @@ class RenderEmbedUrlsTest extends TestCase
         ]);
     }
 
+    protected function localFiles(): string
+    {
+        return $this->app()->getContainer()->make(Paths::class)->public.'/assets/files/files';
+    }
+
     protected function uuid(int $id): string
     {
         return sprintf('00000000-0000-0000-0000-%012d', $id);
@@ -166,5 +209,12 @@ class RenderEmbedUrlsTest extends TestCase
         $uuid = $this->uuid($fileId);
 
         return "<UPL-IMAGE-PREVIEW url=\"$url\" uuid=\"$uuid\">[upl-image-preview uuid=$uuid url=$url]</UPL-IMAGE-PREVIEW>";
+    }
+
+    protected function textPreview(string $url, int $fileId): string
+    {
+        $uuid = $this->uuid($fileId);
+
+        return "<UPL-TEXT-PREVIEW url=\"$url\" uuid=\"$uuid\"><s>[upl-text-preview uuid=$uuid url=$url]</s>notes.txt<e>[/upl-text-preview]</e></UPL-TEXT-PREVIEW>";
     }
 }
