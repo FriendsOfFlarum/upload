@@ -423,7 +423,7 @@ class ConfigTest extends TestCase
         putenv('FOF_UPLOAD_AWS_S3_BUCKET=env-bucket');
         putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
         putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
-        putenv('FOF_UPLOAD_AWS_S3_PREFIX=/uploads/');
+        putenv('FOF_UPLOAD_AWS_S3_PREFIX=/forum/uploads/');
 
         $this->assertSame('forum/uploads', $this->config->getS3Config()['prefix']);
     }
@@ -431,7 +431,7 @@ class ConfigTest extends TestCase
     #[Test]
     public function getS3Config_reads_and_normalizes_prefix_from_settings()
     {
-        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(' /uploads/ ');
+        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(' /forum/uploads/ ');
         $this->settings->shouldReceive('get')->andReturn(null);
 
         $this->assertSame('forum/uploads', $this->config->getS3Config()['prefix']);
