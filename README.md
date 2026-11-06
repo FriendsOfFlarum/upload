@@ -193,6 +193,7 @@ FOF_UPLOAD_AWS_S3_ACL=public-read                    # Object ACL (public-read, 
 FOF_UPLOAD_AWS_S3_ENDPOINT=https://s3.example.com    # For S3-compatible services (MinIO, Wasabi, etc.)
 FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT=true           # Required for MinIO and some S3-compatible services
 FOF_UPLOAD_AWS_S3_CUSTOM_URL=https://cdn.example.com # Custom domain for your bucket
+FOF_UPLOAD_AWS_S3_PREFIX=forum/uploads               # Store uploads under this path in the bucket
 FOF_UPLOAD_CDN_URL=https://cdn.example.com           # CDN URL for serving files
 ```
 

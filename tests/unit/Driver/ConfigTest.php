@@ -55,6 +55,7 @@ class ConfigTest extends TestCase
             'FOF_UPLOAD_AWS_S3_PATH_STYLE_ENDPOINT',
             'FOF_UPLOAD_AWS_S3_ACL',
             'FOF_UPLOAD_AWS_S3_CUSTOM_URL',
+            'FOF_UPLOAD_AWS_S3_PREFIX',
             'FOF_UPLOAD_AWS_S3_USE_IAM',
             'FOF_UPLOAD_CDN_URL',
         ];
@@ -156,6 +157,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Key')->andReturn('settings-key');
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Secret')->andReturn('settings-secret');
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Bucket')->andReturn('settings-bucket');
+        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3ACL')->andReturn('public-read');
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3CustomUrl')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.cdnUrl')->andReturn(null);
@@ -236,6 +238,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Key')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Secret')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Bucket')->andReturn('settings-bucket');
+        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3ACL')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3CustomUrl')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.cdnUrl')->andReturn(null);
@@ -274,6 +277,7 @@ class ConfigTest extends TestCase
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Key')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Secret')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3Bucket')->andReturn(null);
+        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3ACL')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.awsS3CustomUrl')->andReturn(null);
         $this->settings->shouldReceive('get')->with('fof-upload.cdnUrl')->andReturn(null);
@@ -401,5 +405,35 @@ class ConfigTest extends TestCase
         $url = $this->config->getS3CdnUrl();
 
         $this->assertEquals('https://settings-s3-cdn.example.com', $url);
+    }
+
+    #[Test]
+    public function getS3Config_defaults_prefix_to_empty_string()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_BUCKET=env-bucket');
+        putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+
+        $this->assertSame('', $this->config->getS3Config()['prefix']);
+    }
+
+    #[Test]
+    public function getS3Config_reads_and_normalizes_prefix_from_env()
+    {
+        putenv('FOF_UPLOAD_AWS_S3_BUCKET=env-bucket');
+        putenv('FOF_UPLOAD_AWS_S3_REGION=us-west-2');
+        putenv('FOF_UPLOAD_AWS_S3_USE_IAM=true');
+        putenv('FOF_UPLOAD_AWS_S3_PREFIX=/forum/uploads/');
+
+        $this->assertSame('forum/uploads', $this->config->getS3Config()['prefix']);
+    }
+
+    #[Test]
+    public function getS3Config_reads_and_normalizes_prefix_from_settings()
+    {
+        $this->settings->shouldReceive('get')->with('fof-upload.awsS3Prefix')->andReturn(' /forum/uploads/ ');
+        $this->settings->shouldReceive('get')->andReturn(null);
+
+        $this->assertSame('forum/uploads', $this->config->getS3Config()['prefix']);
     }
 }

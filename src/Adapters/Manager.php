@@ -149,7 +149,8 @@ class Manager
 
         $leagueAdapter = new AwsS3V3Adapter(
             new S3Client($s3Config),
-            $config['bucket']
+            $config['bucket'],
+            $config['prefix'] ?? ''
         );
 
         return new Adapters\AwsS3(
@@ -158,7 +159,8 @@ class Manager
             $this->url,
             $this->config,
             $config['bucket'],
-            $config['region'] ?? null
+            $config['region'] ?? null,
+            $config['prefix'] ?? ''
         );
     }
 

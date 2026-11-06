@@ -58,7 +58,7 @@ class Config
      * Get S3 configuration array.
      * Returns configuration from ENV if available, otherwise from settings.
      *
-     * @return array{region: string|null, endpoint: string|null, use_path_style_endpoint: bool|null, credentials: array{key: string, secret: string}|null, bucket: string, acl: string|null, custom_url: string|null, cdn_url: string|null}
+     * @return array{region: string|null, endpoint: string|null, use_path_style_endpoint: bool|null, credentials: array{key: string, secret: string}|null, bucket: string, prefix: string, acl: string|null, custom_url: string|null, cdn_url: string|null}
      */
     public function getS3Config(): array
     {
@@ -145,6 +145,7 @@ class Config
         $key = getenv('FOF_UPLOAD_AWS_S3_KEY');
         $secret = getenv('FOF_UPLOAD_AWS_S3_SECRET');
         $bucket = getenv('FOF_UPLOAD_AWS_S3_BUCKET');
+        $prefix = getenv('FOF_UPLOAD_AWS_S3_PREFIX');
         $acl = getenv('FOF_UPLOAD_AWS_S3_ACL');
         $customUrl = getenv('FOF_UPLOAD_AWS_S3_CUSTOM_URL');
         $cdnUrl = getenv('FOF_UPLOAD_CDN_URL');
@@ -154,6 +155,7 @@ class Config
             'endpoint'                => empty($endpoint) ? null : $endpoint,
             'use_path_style_endpoint' => empty($pathStyle) ? null : (bool) $pathStyle,
             'bucket'                  => $bucket,
+            'prefix'                  => $this->normalizePrefix($prefix),
             'acl'                     => empty($acl) ? null : $acl,
             'custom_url'              => empty($customUrl) ? null : $customUrl,
             'cdn_url'                 => empty($cdnUrl) ? null : $cdnUrl,
@@ -182,6 +184,7 @@ class Config
         $key = $this->settings->get('fof-upload.awsS3Key');
         $secret = $this->settings->get('fof-upload.awsS3Secret');
         $bucket = $this->settings->get('fof-upload.awsS3Bucket');
+        $prefix = $this->settings->get('fof-upload.awsS3Prefix');
         $acl = $this->settings->get('fof-upload.awsS3ACL');
         $customUrl = $this->settings->get('fof-upload.awsS3CustomUrl');
         $cdnUrl = $this->settings->get('fof-upload.cdnUrl');
@@ -191,6 +194,7 @@ class Config
             'endpoint'                => empty($endpoint) ? null : $endpoint,
             'use_path_style_endpoint' => empty($pathStyle) ? null : (bool) $pathStyle,
             'bucket'                  => $bucket,
+            'prefix'                  => $this->normalizePrefix($prefix),
             'acl'                     => empty($acl) ? null : $acl,
             'custom_url'              => empty($customUrl) ? null : $customUrl,
             'cdn_url'                 => empty($cdnUrl) ? null : $cdnUrl,
@@ -206,5 +210,17 @@ class Config
         }
 
         return $config;
+    }
+
+    /**
+     * Strip surrounding slashes and whitespace from an S3 key prefix.
+     *
+     * Flysystem appends its own separator after the prefix, and a leading slash
+     * would produce object keys beginning with "/", so "/uploads/forum/" and
+     * "uploads/forum" both become "uploads/forum".
+     */
+    protected function normalizePrefix(mixed $prefix): string
+    {
+        return is_string($prefix) ? trim($prefix, " \t\n\r\0\x0B/\\") : '';
     }
 }

@@ -75,6 +75,10 @@ fof-upload:
       custom_s3_url: |
         The public base URL your files are served from — a CDN or custom domain in front of the bucket.
         Leave blank to use the provider's default URL. Must include <code>https://</code>.
+      s3_prefix: |
+        S3 bucket prefix for uploads, e.g. <code>forum/uploads</code>.
+        The Public URL should still point at the bucket root. Changing this later may break links to files
+        already uploaded.
       s3_instance_profile: |
         Leave both blank to use an IAM role instead — only works on EC2, ECS or EKS.
       composer_buttons: |
@@ -92,6 +96,7 @@ fof-upload:
         hide_unused: Hide services that are not in use
       aws-s3:
         bucket: Bucket
+        prefix: Path prefix
         key: Access key ID
         region: Region
         secret: Secret access key
