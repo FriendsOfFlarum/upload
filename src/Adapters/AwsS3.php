@@ -34,7 +34,8 @@ class AwsS3 extends Flysystem implements UploadAdapter
         UrlGenerator $url,
         protected ?UploadConfig $uploadConfig = null,
         protected ?string $bucket = null,
-        protected ?string $region = null
+        protected ?string $region = null,
+        protected string $prefix = ''
     ) {
         parent::__construct($adapter, $settings, $url);
     }
@@ -64,13 +65,28 @@ class AwsS3 extends Flysystem implements UploadAdapter
     }
 
     /**
-     * Determine the hostname of the storage adapter.
+     * Determine the base URL that file paths are appended to.
+     *
+     * Includes the key prefix, if one is set: the underlying Flysystem adapter
+     * stores "a/b.png" as "{prefix}/a/b.png", while File::$path stays
+     * unprefixed. A custom or CDN URL is therefore expected to point at the
+     * bucket root, not at the prefix.
      *
      * @throws \RuntimeException If the adapter is not an instance of AwsS3Adapter.
      *
      * @return string
      */
     public function hostName(): string
+    {
+        $host = rtrim($this->bucketUrl(), '/');
+
+        return $this->prefix === '' ? $host : $host.'/'.$this->prefix;
+    }
+
+    /**
+     * The public URL of the bucket root.
+     */
+    protected function bucketUrl(): string
     {
         // Fetch custom S3 URL from config (ENV or settings)
         $customUrl = $this->uploadConfig ? $this->uploadConfig->getS3CustomUrl() : $this->settings->get('fof-upload.awsS3CustomUrl');

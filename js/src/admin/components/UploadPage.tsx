@@ -67,6 +67,7 @@ const TAB_FIELDS: Record<string, string[]> = {
     'awsS3Key',
     'awsS3Secret',
     'awsS3Bucket',
+    'awsS3Prefix',
     'awsS3Region',
     'awsS3Endpoint',
     'awsS3ACL',
@@ -151,6 +152,7 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
       'awsS3Key',
       'awsS3Secret',
       'awsS3Bucket',
+      'awsS3Prefix',
       'awsS3Region',
       'awsS3Endpoint',
       'awsS3ACL',
@@ -687,6 +689,17 @@ export default class UploadPage extends ExtensionPage<ExtensionPageAttrs> {
           <div className="Form-group">
             <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.bucket')}</label>
             <input className="FormControl" value={this.values.awsS3Bucket() ?? ''} oninput={withAttr('value', this.values.awsS3Bucket)} />
+          </div>
+
+          <div className="Form-group">
+            <label>{app.translator.trans('fof-upload.admin.labels.aws-s3.prefix')}</label>
+            <input
+              className="FormControl"
+              placeholder="forum/uploads"
+              value={this.values.awsS3Prefix() ?? ''}
+              oninput={withAttr('value', this.values.awsS3Prefix)}
+            />
+            <p className="helpText">{app.translator.trans('fof-upload.admin.help_texts.s3_prefix')}</p>
           </div>
 
           {provider.needsRegion && (
