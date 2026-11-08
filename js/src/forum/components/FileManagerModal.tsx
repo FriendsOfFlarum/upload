@@ -235,9 +235,8 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
   }
 
   onSelect() {
-    this.hide();
-
     if (this.attrs.onSelect) {
+      this.hide();
       this.attrs.onSelect(this.selectedFiles);
       return;
     }
@@ -246,20 +245,26 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
       .map((fileId) => (app.store.getById('files', fileId) || app.store.getById('shared-files', fileId)) as File | undefined)
       .filter((file): file is File => !!file && typeof file.bbcode === 'function');
 
-    if (!app.composer.editor) return;
+    // Insert once this modal has finished closing. The display name prompt is a
+    // modal too, and showing it while this one is still animating out leaves
+    // core's ModalManager waiting for a transition that never ends, after which
+    // it ignores every close: the prompt's X, Escape and Insert all do nothing.
+    this.attrs.animateHide(() => {
+      if (!app.composer.editor) return;
 
-    const insert = (bbcode: string) => app.composer.editor!.insertAtCursor(bbcode + '\n', false);
+      const insert = (bbcode: string) => app.composer.editor!.insertAtCursor(bbcode + '\n', false);
 
-    // Prompting per file would mean a chain of modals, so the display name is
-    // only offered when a single file is being inserted. Multi-select keeps the
-    // file names, which the author can still edit in the composer afterwards.
-    if (files.length === 1) {
-      insertWithDisplayName(files[0], insert);
+      // Prompting per file would mean a chain of modals, so the display name is
+      // only offered when a single file is being inserted. Multi-select keeps the
+      // file names, which the author can still edit in the composer afterwards.
+      if (files.length === 1) {
+        insertWithDisplayName(files[0], insert);
 
-      return;
-    }
+        return;
+      }
 
-    files.forEach((file) => insert(file.bbcode()));
+      files.forEach((file) => insert(file.bbcode()));
+    });
   }
 
   showUploadModal() {
