@@ -9,7 +9,7 @@ An extension that handles file uploads intelligently for your forum.
 - For images:
   - Auto watermarks with proportional scaling, opacity and padding controls.
   - Auto resizing.
-  - Dimension storage (width × height) for JPEG, PNG, and GIF — prevents layout shifts when images lazy-load.
+  - Dimension storage (width × height) for JPEG, PNG, GIF, WebP, and AVIF — prevents layout shifts when images lazy-load.
   - WebP thumbnail generation at upload time — reduces bandwidth; clicking the thumbnail opens the original in a new tab.
   - Animated GIF support for resize operations.
 - Mime type to upload adapter mapping.
@@ -107,13 +107,15 @@ When **Watermark images** is enabled, FoF Upload stamps every uploaded JPEG or P
 
 ### Image Dimensions & Layout Shift Prevention
 
-FoF Upload automatically stores the width and height (in pixels) of every JPEG, PNG, and GIF processed at upload time. These are recorded after any resizing or EXIF orientation correction is applied, so they always reflect the **final image as stored**.
+FoF Upload automatically stores the width and height (in pixels) of every JPEG, PNG, GIF, WebP, and AVIF processed at upload time. These are recorded after any resizing or EXIF orientation correction is applied, so they always reflect the **final image as stored**.
 
 The stored dimensions are injected as `width` and `height` HTML attributes on the `<img>` tag rendered by the **Image Preview** template. Modern browsers use these attributes to reserve the correct amount of layout space before the image has loaded, eliminating [Cumulative Layout Shift (CLS)](https://web.dev/cls/) in threads that contain lazy-loaded images.
 
-**No configuration is required** — this happens automatically for all new JPEG, PNG, and GIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
+**No configuration is required** — this happens automatically for all new JPEG, PNG, GIF, WebP, and AVIF uploads. Images uploaded before this feature was added will not have stored dimensions; they continue to render without `width`/`height` attributes and are unaffected.
 
 > **GIF support:** Animated GIF uploads now also benefit from the **Resize images** setting. Watermarks are intentionally not applied to GIFs to avoid palette quality degradation.
+
+> **WebP and AVIF support:** WebP and AVIF originals are stored exactly as uploaded. The **Resize images** and **Watermark images** settings do not apply to them, so an animated WebP keeps its animation. FoF Upload still stores their dimensions and generates a thumbnail. If the server's image driver cannot read the format, the file is stored without dimensions or a thumbnail.
 
 ### Image Thumbnails
 
@@ -133,7 +135,7 @@ When enabled, the **Image Preview** template displays the thumbnail as the visib
 | Setting | Default | Description |
 |---|---|---|
 | **Generate thumbnails on upload** | On | Master toggle. Disable to revert to full-resolution images in the Image Preview template. |
-| **Encode thumbnails as WebP** | On | Use WebP encoding for the thumbnail. Disable to use the original image format (JPEG/PNG/GIF). |
+| **Encode thumbnails as WebP** | On | Use WebP encoding for the thumbnail. Disable to use the original image format (JPEG/PNG/GIF/WebP/AVIF). |
 | **Thumbnail max width (px)** | `1000` | Thumbnails are scaled down so neither dimension exceeds this value. Images smaller than this are not upscaled. |
 
 #### Backwards compatibility
@@ -416,7 +418,7 @@ php flarum fof:upload --map --cleanup --force
 
 ### BackfillImageDimensionsCommand
 
-The `php flarum fof:upload:backfill-dimensions` command retroactively stores `image_width` and `image_height` for existing JPEG, PNG, and GIF uploads that were created before the dimension-storage feature was introduced.
+The `php flarum fof:upload:backfill-dimensions` command retroactively stores `image_width` and `image_height` for existing JPEG, PNG, GIF, WebP, and AVIF uploads that were created before the dimension-storage feature was introduced.
 
 The command downloads each image (using whatever storage backend the file was uploaded to — local, S3, CDN, etc.), reads its dimensions with Intervention Image, and saves them to the database. Images that already have dimensions stored are skipped automatically.
 
@@ -451,7 +453,7 @@ php flarum fof:upload:backfill-dimensions --chunk=25
 
 ### BackfillThumbnailsCommand
 
-The `php flarum fof:upload:backfill-thumbnails` command generates thumbnails for existing JPEG, PNG, and GIF uploads that were created before the thumbnail feature was introduced (or while the feature was disabled).
+The `php flarum fof:upload:backfill-thumbnails` command generates thumbnails for existing JPEG, PNG, GIF, WebP, and AVIF uploads that were created before the thumbnail feature was introduced (or while the feature was disabled).
 
 The command downloads each image via the same storage backend used to upload it, scales it to the configured thumbnail width, encodes it as WebP (or the original format if WebP is disabled), and writes the thumbnail file alongside the original. Uploads already having a `thumbnail_url` are skipped automatically.
 

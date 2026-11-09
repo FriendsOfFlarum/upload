@@ -31,6 +31,6 @@ class AddImageProcessor
 
     protected function validateMime(string $mime): bool
     {
-        return in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'], true);
+        return in_array($mime, [...ImageProcessor::THUMBNAIL_TYPES, 'image/svg+xml'], true);
     }
 }
