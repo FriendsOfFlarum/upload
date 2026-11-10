@@ -1,8 +1,9 @@
 import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
-import TextEditorButton from 'flarum/common/components/TextEditorButton';
+import Button from 'flarum/common/components/Button';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import classList from 'flarum/common/utils/classList';
+import Tooltip from 'flarum/common/components/Tooltip';
 
 export default class UploadButton extends Component {
   oninit(vnode) {
@@ -24,14 +25,16 @@ export default class UploadButton extends Component {
       ? app.translator.trans('fof-upload.forum.states.loading')
       : app.translator.trans('fof-upload.forum.buttons.upload');
 
-    return (
-      <TextEditorButton
+    const shouldShowLabel = this.isMediaUploadButton || this.attrs.uploader.uploading;
+
+    const button = (
+      <Button
         className={classList([
           'Button',
           'hasIcon',
           'fof-upload-button',
-          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--icon',
-          !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
+          /*!this.isMediaUploadButton && !this.attrs.uploader.uploading &&*/ 'Button--icon',
+          // !this.isMediaUploadButton && !this.attrs.uploader.uploading && 'Button--link',
           this.attrs.uploader.uploading && 'uploading',
         ])}
         icon={!this.attrs.uploader.uploading && 'fas fa-file-upload'}
@@ -40,12 +43,14 @@ export default class UploadButton extends Component {
         title={buttonText}
       >
         {this.attrs.uploader.uploading && <LoadingIndicator size="small" display="inline" className="Button-icon" />}
-        {(this.isMediaUploadButton || this.attrs.uploader.uploading) && <span className="Button-label">{buttonText}</span>}
+        {shouldShowLabel && <span className="Button-label">{buttonText}</span>}
         <form>
           <input type="file" multiple={true} onchange={this.process.bind(this)} />
         </form>
-      </TextEditorButton>
+      </Button>
     );
+
+    return shouldShowLabel ? button : <Tooltip text={buttonText}>{button}</Tooltip>;
   }
 
   /**
