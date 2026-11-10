@@ -66,9 +66,16 @@ export default class FileListState {
       } as ApiQueryParamsPlural;
     }
 
-    const results = await app.store.find<File[]>(route, params);
-
-    return this.parseResults(results);
+    try {
+      const results = await app.store.find<File[]>(route, params);
+      return this.parseResults(results);
+    } catch (error) {
+      // Ensure loading is reset on failure so consumers (e.g. SharedFileList's loadFileList guard)
+      // can detect that the previous attempt finished and a retry is allowed.
+      this.loading = false;
+      m.redraw();
+      throw error;
+    }
   }
 
   /**
