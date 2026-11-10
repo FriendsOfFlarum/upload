@@ -60,7 +60,7 @@ class FormatTextPreview
                 if ($response && $response->getStatusCode() === 200) {
                     $file_contents = $response->getBody()->getContents();
 
-                    $lines = preg_split('/\R/', $file_contents);
+                    $lines = preg_split('/\R/u', $file_contents);
                     $lines = array_filter($lines, 'trim');
 
                     if (count($lines) <= 5) {
