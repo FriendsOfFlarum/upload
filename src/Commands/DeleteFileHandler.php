@@ -14,6 +14,7 @@ namespace FoF\Upload\Commands;
 
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\Exception\PermissionDeniedException;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
@@ -42,30 +43,21 @@ class DeleteFileHandler
 
     public function handle(DeleteFile $command): void
     {
+        if (!$command->actor->can('delete', $command->file)) {
+            throw new PermissionDeniedException();
+        }
+
         $privateShared = $this->util->isPrivateShared($command->file);
 
-        if ($privateShared || $command->file->shared) {
-            $command->actor->assertCan('fof-upload.upload-shared-files');
-        } else {
-            // We don't currently have a permission for this, so we'll just use admin.
-            $command->actor->assertAdmin();
-        }
-
-        $success = false;
-
-        // Delete the file from storage.
-        if ($privateShared) {
-            $success = $this->deleteSharedFile($command->file);
-        } else {
-            $success = $this->deleteFileViaAdaptor($command->file);
-        }
+        $success = $privateShared
+            ? $this->deleteSharedFile($command->file)
+            : $this->deleteFileViaAdaptor($command->file);
 
         if ($success === false) {
             throw new ValidationException(['file' => 'Could not delete file.']);
-        } else {
-            // Delete the file record from the database.
-            $command->file->delete();
         }
+
+        $command->file->delete();
     }
 
     protected function deleteSharedFile(File $file): bool

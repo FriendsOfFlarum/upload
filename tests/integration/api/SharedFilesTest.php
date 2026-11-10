@@ -12,6 +12,7 @@
 
 namespace FoF\Upload\Tests\integration\api;
 
+use Flarum\Group\Group;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use FoF\Upload\File;
 use FoF\Upload\Tests\EnhancedTestCase;
@@ -36,7 +37,8 @@ class SharedFilesTest extends EnhancedTestCase
                 ['user_id' => 3, 'group_id' => 4],
             ],
             'group_permission' => [
-                ['permission' => 'fof-upload.upload-shared-files', 'group_id' => 4],
+                ['permission' => 'fof-upload.upload-shared-files', 'group_id' => Group::MODERATOR_ID],
+                ['permission' => 'fof-upload.deleteSharedUploads', 'group_id' => Group::MODERATOR_ID],
             ],
         ]);
     }
