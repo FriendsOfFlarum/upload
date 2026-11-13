@@ -1,5 +1,28 @@
 import app from 'flarum/forum/app';
 import type File from '../../common/models/File';
+import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
+
+/**
+ * An insert function that puts text where the editor's cursor is right now.
+ *
+ * Call it before showing a modal: once the modal has taken focus, some editor
+ * drivers no longer know where the cursor was and would insert at the start of
+ * the text. Like insertAtCursor(), it inserts before any selected text rather
+ * than replacing it. Only the first insert uses the saved position; any later
+ * one goes at the cursor.
+ */
+export function insertsAtSelection(editor: EditorDriverInterface): (text: string) => void {
+  let position: number | null = editor.getSelectionRange()[0];
+
+  return (text: string) => {
+    if (position !== null) {
+      editor.insertAt(position, text, false);
+      position = null;
+    } else {
+      editor.insertAtCursor(text, false);
+    }
+  };
+}
 
 /**
  * Templates whose BBCode renders a visible label between the opening and
@@ -62,8 +85,8 @@ export function applyDisplayName(bbcode: string, displayName: string): string {
  * Files whose template has no label (images rendered inline, plain URLs) are
  * inserted straight away, so the prompt only appears where it means something.
  */
-export function insertWithDisplayName(file: File, insert: (bbcode: string) => void): void {
-  insertWithDisplayNames([file], insert);
+export function insertWithDisplayName(file: File, insert: (bbcode: string) => void, stack?: boolean): void {
+  insertWithDisplayNames([file], insert, stack);
 }
 
 /**
@@ -78,25 +101,37 @@ export function insertWithDisplayName(file: File, insert: (bbcode: string) => vo
  * Files whose template has no label (images rendered inline, plain URLs) are
  * inserted straight away, so the prompt only covers what it can actually change.
  */
-export function insertWithDisplayNames(files: File[], insert: (bbcode: string) => void): void {
+export function insertWithDisplayNames(files: File[], insert: (bbcode: string) => void, stack: boolean = app.modal.isModalOpen()): void {
   const labelled = files.filter(supportsDisplayName);
 
+  // Everything goes in with one insert: some editor drivers apply inserts
+  // asynchronously, so a run of them can land out of order.
   if (!labelled.length) {
-    files.forEach((file) => insert(file.bbcode()));
+    insert(files.map((file) => file.bbcode()).join('\n'));
 
     return;
   }
 
-  app.modal.show(() => import('../components/DisplayNameModal'), {
-    files: labelled,
-    onsubmit: (displayNames: Record<string, string>) => {
-      // Preserve the original upload order rather than grouping labelled files
-      // together, so the composer reflects what the author selected.
-      files.forEach((file) => {
-        const bbcode = file.bbcode();
+  // When the editor sits inside a modal of its own (another extension's form),
+  // `stack` puts the prompt on top of it rather than replacing it and losing the form.
+  app.modal.show(
+    () => import('../components/DisplayNameModal'),
+    {
+      files: labelled,
+      onsubmit: (displayNames: Record<string, string>) => {
+        // Preserve the original upload order rather than grouping labelled files
+        // together, so the composer reflects what the author selected.
+        insert(
+          files
+            .map((file) => {
+              const bbcode = file.bbcode();
 
-        insert(supportsDisplayName(file) ? applyDisplayName(bbcode, displayNames[file.id()!] ?? '') : bbcode);
-      });
+              return supportsDisplayName(file) ? applyDisplayName(bbcode, displayNames[file.id()!] ?? '') : bbcode;
+            })
+            .join('\n')
+        );
+      },
     },
-  });
+    stack
+  );
 }

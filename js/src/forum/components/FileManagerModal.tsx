@@ -8,11 +8,17 @@ import DragAndDrop from './DragAndDrop';
 import ItemList from 'flarum/common/utils/ItemList';
 import SharedFileList from '../../common/components/SharedFileList';
 import FileListState from '../../common/states/FileListState';
-import { insertWithDisplayName } from '../utils/applyDisplayName';
+import { insertWithDisplayName, insertsAtSelection } from '../utils/applyDisplayName';
 import type Uploader from '../handler/Uploader';
 import type File from '../../common/models/File';
 import type User from 'flarum/common/models/User';
 import type Mithril from 'mithril';
+import type EditorDriverInterface from 'flarum/common/utils/EditorDriverInterface';
+
+/** Whatever a text editor was given as its `composer` attr: it holds that editor's driver. */
+export interface EditorHost {
+  editor?: EditorDriverInterface | null;
+}
 
 type FilesLibrary = 'user' | 'shared';
 
@@ -25,6 +31,8 @@ interface FileManagerModalAttrs {
   restrictFileType?: string | null;
   defaultFilesLibrary?: FilesLibrary;
   onSelect?: (selectedFileIds: string[]) => void;
+  /** The editor host to insert into. Defaults to the forum composer. */
+  composer?: EditorHost;
 }
 
 export default class FileManagerModal extends (Modal as any)<FileManagerModalAttrs, undefined> {
@@ -36,9 +44,14 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
   selectedFilesLibrary: FilesLibrary = 'user';
   userFileState!: FileListState;
   sharedFileState!: FileListState;
+  /** Inserts where the editor's cursor was when this opened; null without an editor. */
+  insertText: ((text: string) => void) | null = null;
 
   oninit(vnode: Mithril.Vnode<FileManagerModalAttrs, this>) {
     super.oninit(vnode);
+
+    const editor = (vnode.attrs.composer ?? app.composer).editor;
+    this.insertText = editor ? insertsAtSelection(editor) : null;
 
     this.uploader = vnode.attrs.uploader;
     this.selectedFiles = [];
@@ -250,9 +263,11 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
     // core's ModalManager waiting for a transition that never ends, after which
     // it ignores every close: the prompt's X, Escape and Insert all do nothing.
     this.attrs.animateHide(() => {
-      if (!app.composer.editor) return;
+      const insertText = this.insertText;
 
-      const insert = (bbcode: string) => app.composer.editor!.insertAtCursor(bbcode + '\n', false);
+      if (!insertText) return;
+
+      const insert = (bbcode: string) => insertText(bbcode + '\n');
 
       // Prompting per file would mean a chain of modals, so the display name is
       // only offered when a single file is being inserted. Multi-select keeps the
@@ -263,7 +278,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
         return;
       }
 
-      files.forEach((file) => insert(file.bbcode()));
+      if (files.length) insert(files.map((file) => file.bbcode()).join('\n'));
     });
   }
 
