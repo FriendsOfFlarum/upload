@@ -5,7 +5,7 @@ import DragAndDrop from './components/DragAndDrop';
 import PasteClipboard from './components/PasteClipboard';
 import Uploader from './handler/Uploader';
 import FileManagerButton from './components/FileManagerButton';
-import { insertWithDisplayNames } from './utils/applyDisplayName';
+import { insertWithDisplayNames, insertsAtSelection } from './utils/applyDisplayName';
 import type File from '../common/models/File';
 
 import TextEditor from 'flarum/common/components/TextEditor';
@@ -25,6 +25,7 @@ export default function addUploadButton(): void {
         'fof-upload-media',
         FileManagerButton.component({
           uploader: this.uploader,
+          composer: this.attrs.composer,
         })
       );
     }
@@ -60,9 +61,14 @@ export default function addUploadButton(): void {
       if (!pending.length) return;
 
       const files = pending.splice(0, pending.length);
+      const editor = this.attrs.composer.editor;
+
+      if (!editor) return;
+
+      const insertText = insertsAtSelection(editor);
 
       const insert = (bbcode: string) => {
-        this.attrs.composer.editor!.insertAtCursor(bbcode + '\n', false);
+        insertText(bbcode + '\n');
 
         if (typeof this.attrs.preview === 'function') {
           const originalIsFullScreen = app.composer.isFullScreen;
@@ -72,7 +78,18 @@ export default function addUploadButton(): void {
         }
       };
 
-      insertWithDisplayNames(files, insert);
+      // A text editor can sit inside another extension's modal: the prompt then
+      // stacks on that modal, or is skipped if it is closing, since a modal shown
+      // now would be the one core removes once the closing animation ends.
+      const dialog = this.element?.closest('.ModalManager .Modal');
+
+      if (!this.element?.isConnected || dialog?.classList.contains('out')) {
+        insert(files.map((file) => file.bbcode()).join('\n'));
+
+        return;
+      }
+
+      insertWithDisplayNames(files, insert, !!dialog);
     });
 
     const dragAndDropTarget = (this as any).fofUploadDragAndDropTarget?.();
