@@ -17,6 +17,7 @@ use FoF\Upload\Adapters\Flysystem;
 use FoF\Upload\Adapters\Manager;
 use FoF\Upload\Downloader\DefaultDownloader;
 use FoF\Upload\File;
+use FoF\Upload\Processors\ImageProcessor;
 use Illuminate\Console\Command;
 use Intervention\Image\Exceptions\DecoderException;
 use Intervention\Image\ImageManager;
@@ -28,7 +29,7 @@ class BackfillThumbnailsCommand extends Command
         {--dry-run : Report how many images would be processed without making any changes}
     ';
 
-    protected $description = 'Backfill missing image thumbnails and thumbnail dimensions for existing JPEG, PNG, and GIF uploads';
+    protected $description = 'Backfill missing image thumbnails and thumbnail dimensions for existing JPEG, PNG, GIF, WebP, and AVIF uploads';
 
     public function handle(
         DefaultDownloader $downloader,
@@ -36,7 +37,7 @@ class BackfillThumbnailsCommand extends Command
         Manager $manager,
         SettingsRepositoryInterface $settings
     ): void {
-        $supportedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+        $supportedMimes = ImageProcessor::THUMBNAIL_TYPES;
         $chunkSize = max(1, (int) $this->option('chunk'));
         $dryRun = (bool) $this->option('dry-run');
 
@@ -114,21 +115,7 @@ class BackfillThumbnailsCommand extends Command
                         continue;
                     }
 
-                    $mimeType = $file->type;
-
-                    $thumbEncoded = $useWebp
-                        ? $thumb->toWebp(quality: $quality)
-                        : match ($mimeType) {
-                            'image/jpeg' => $thumb->toJpeg(quality: $quality),
-                            'image/gif'  => $thumb->toGif(),
-                            default      => $thumb->toPng(),
-                        };
-
-                    $ext = $useWebp ? 'webp' : match ($mimeType) {
-                        'image/jpeg' => 'jpg',
-                        'image/gif'  => 'gif',
-                        default      => 'png',
-                    };
+                    [$thumbContent, $ext] = ImageProcessor::encodeThumbnail($thumb, $file->type, $useWebp, $quality);
 
                     $adapter = $manager->instantiate($file->upload_method);
 
@@ -138,7 +125,7 @@ class BackfillThumbnailsCommand extends Command
                         continue;
                     }
 
-                    if ($adapter->storeThumbnail($file, $thumbEncoded->toString(), $ext)) {
+                    if ($adapter->storeThumbnail($file, $thumbContent, $ext)) {
                         $file->save();
                         $generated++;
                     } else {

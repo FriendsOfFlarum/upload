@@ -29,6 +29,18 @@ class ImageProcessor implements Processable
 {
     public const PROCESSED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 
+    /**
+     * Types that get a thumbnail and recorded dimensions, but whose full-size
+     * file is stored as uploaded. A re-encode could drop WebP animation, and
+     * not every server's image driver can read or write these formats.
+     */
+    public const THUMBNAIL_ONLY_TYPES = ['image/webp', 'image/avif'];
+
+    /**
+     * Every type a thumbnail can be generated for.
+     */
+    public const THUMBNAIL_TYPES = [...self::PROCESSED_TYPES, ...self::THUMBNAIL_ONLY_TYPES];
+
     protected \Illuminate\Contracts\Filesystem\Filesystem $assetsDir;
 
     public function __construct(
@@ -41,6 +53,12 @@ class ImageProcessor implements Processable
 
     public function process(File $file, UploadedFile $upload, string $mimeType): void
     {
+        if (in_array($mimeType, self::THUMBNAIL_ONLY_TYPES, true)) {
+            $this->processThumbnailOnly($file, $upload->getRealPath(), $mimeType);
+
+            return;
+        }
+
         if (!in_array($mimeType, self::PROCESSED_TYPES, true)) {
             return;
         }
@@ -96,7 +114,7 @@ class ImageProcessor implements Processable
      */
     public function generateThumbnailFromContents(File $file, string $contents): void
     {
-        if (!in_array($file->type, self::PROCESSED_TYPES, true) || !$this->settings->get('fof-upload.generateThumbnails')) {
+        if (!in_array($file->type, self::THUMBNAIL_TYPES, true) || !$this->settings->get('fof-upload.generateThumbnails')) {
             return;
         }
 
@@ -108,7 +126,45 @@ class ImageProcessor implements Processable
             return;
         }
 
-        $this->generateThumbnail($file, $image, $file->type);
+        $this->generateOptionalThumbnail($file, $image, $file->type);
+    }
+
+    /**
+     * Record the dimensions of a WebP or AVIF upload and prepare its thumbnail.
+     * The upload itself is not changed. When the image driver cannot read or
+     * encode the format, the file is stored without them, as it was before
+     * these formats got thumbnails.
+     */
+    protected function processThumbnailOnly(File $file, string $path, string $mimeType): void
+    {
+        try {
+            $image = $this->imageManager->read($path);
+            $image->orient();
+        } catch (Throwable) {
+            return;
+        }
+
+        $file->image_width = $image->width();
+        $file->image_height = $image->height();
+
+        $this->generateOptionalThumbnail($file, $image, $mimeType);
+    }
+
+    /**
+     * Generate a thumbnail, or leave the file without one when that fails. A
+     * driver can decode a format it cannot encode, and an optional thumbnail
+     * must never stop the file being stored.
+     */
+    protected function generateOptionalThumbnail(File $file, ImageInterface $image, string $mimeType): void
+    {
+        try {
+            $this->generateThumbnail($file, $image, $mimeType);
+        } catch (Throwable) {
+            $file->thumbnail_width = null;
+            $file->thumbnail_height = null;
+            $file->thumbnailContent = null;
+            $file->thumbnailExtension = null;
+        }
     }
 
     /**
@@ -131,23 +187,31 @@ class ImageProcessor implements Processable
             $useWebp = (bool) $this->settings->get('fof-upload.thumbnailWebp');
             $quality = max(1, min(100, (int) $this->settings->get('fof-upload.thumbnailQuality')));
 
-            $thumbEncoded = $useWebp
-                ? $thumb->toWebp(quality: $quality)
-                : match ($mimeType) {
-                    'image/jpeg' => $thumb->toJpeg(quality: $quality),
-                    // GIF and PNG are lossless formats; the quality setting does
-                    // not apply to them.
-                    'image/gif'  => $thumb->toGif(),
-                    default      => $thumb->toPng(),
-                };
-
-            $file->thumbnailContent = $thumbEncoded->toString();
-            $file->thumbnailExtension = $useWebp ? 'webp' : match ($mimeType) {
-                'image/jpeg' => 'jpg',
-                'image/gif'  => 'gif',
-                default      => 'png',
-            };
+            [$file->thumbnailContent, $file->thumbnailExtension] = self::encodeThumbnail($thumb, $mimeType, $useWebp, $quality);
         }
+    }
+
+    /**
+     * Encode a scaled thumbnail. With WebP thumbnails off, it keeps the
+     * source's format.
+     *
+     * @return array{string, string} The encoded bytes and the file extension.
+     */
+    public static function encodeThumbnail(ImageInterface $thumb, string $mimeType, bool $useWebp, int $quality): array
+    {
+        if ($useWebp) {
+            return [$thumb->toWebp(quality: $quality)->toString(), 'webp'];
+        }
+
+        return match ($mimeType) {
+            'image/jpeg' => [$thumb->toJpeg(quality: $quality)->toString(), 'jpg'],
+            'image/webp' => [$thumb->toWebp(quality: $quality)->toString(), 'webp'],
+            'image/avif' => [$thumb->toAvif(quality: $quality)->toString(), 'avif'],
+            // GIF and PNG are lossless formats; the quality setting does
+            // not apply to them.
+            'image/gif'  => [$thumb->toGif()->toString(), 'gif'],
+            default      => [$thumb->toPng()->toString(), 'png'],
+        };
     }
 
     protected function resize(ImageInterface $image): void

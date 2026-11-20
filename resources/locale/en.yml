@@ -44,7 +44,7 @@ fof-upload:
         clicking it opens the original full-resolution file in a new tab. Thumbnails significantly
         reduce bandwidth and page weight for forums with many large images.
       thumbnail_quality: |
-        Encode quality from 1 to 100, applied to WebP and JPEG thumbnails. Higher values look sharper
+        Encode quality from 1 to 100, applied to WebP, JPEG, and AVIF thumbnails. Higher values look sharper
         but produce larger files. GIF and PNG thumbnails are lossless and ignore this setting.
         Existing thumbnails keep their current quality until regenerated with the backfill command.
       watermark: |
