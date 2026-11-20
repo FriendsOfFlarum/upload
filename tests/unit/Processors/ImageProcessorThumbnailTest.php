@@ -88,8 +88,8 @@ class ImageProcessorThumbnailTest extends TestCase
 
         $path = $this->workDir.'/source.'.$format;
         match ($format) {
-            'webp' => imagewebp($im, $path, 90),
-            'avif' => imageavif($im, $path, 90),
+            'webp'  => imagewebp($im, $path, 90),
+            'avif'  => imageavif($im, $path, 90),
             default => imagejpeg($im, $path, 100),
         };
         imagedestroy($im);
