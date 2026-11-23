@@ -21,6 +21,7 @@ use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -103,7 +104,7 @@ class ImageProcessorThumbnailTest extends TestCase
         $factory = $this->createStub(Factory::class);
         $factory->method('disk')->willReturn($this->createStub(Filesystem::class));
 
-        return new ImageProcessor($repo, ImageManager::gd(), $factory);
+        return new ImageProcessor($repo, ImageManager::gd(), $factory, new NullLogger());
     }
 
     private function process(array $settings, string $sourcePath): File
