@@ -18,8 +18,10 @@ use FoF\Upload\Contracts\Processable;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Filesystem\Factory;
+use Intervention\Image\Decoders\BinaryImageDecoder;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Throwable;
@@ -34,7 +36,8 @@ class ImageProcessor implements Processable
     public function __construct(
         protected SettingsRepositoryInterface $settings,
         protected ImageManager $imageManager,
-        Factory $factory
+        Factory $factory,
+        protected LoggerInterface $logger
     ) {
         $this->assetsDir = $factory->disk('flarum-assets');
     }
@@ -159,18 +162,36 @@ class ImageProcessor implements Processable
     protected function watermark(ImageInterface $image): void
     {
         $watermarkPath = $this->settings->get('fof-watermark_path');
-        if ($watermarkPath && $this->assetsDir->exists($watermarkPath)) {
-            $fullPath = $this->assetsDir->path($watermarkPath);
-            $position = $this->settings->get('fof-upload.watermarkPosition', 'bottom-right');
-            $opacity = max(0, min(100, (int) $this->settings->get('fof-upload.watermarkOpacity', 100)));
-            $sizePercent = max(1, min(100, (int) $this->settings->get('fof-upload.watermarkSizePercent', 25)));
-            $padding = max(0, (int) $this->settings->get('fof-upload.watermarkPadding', 10));
-
-            $targetWidth = (int) round($image->width() * $sizePercent / 100);
-            $watermark = $this->imageManager->read($fullPath);
-            $watermark->scale(width: $targetWidth);
-
-            $image->place($watermark, $position, $padding, $padding, $opacity);
+        if (!$watermarkPath) {
+            return;
         }
+
+        try {
+            // The contents, not path(): on a remote disk such as S3, path() is the object key, not a local file.
+            // get() returns null rather than throwing when the file is missing or unreadable.
+            $contents = $this->assetsDir->get($watermarkPath)
+                ?? throw new RuntimeException('The watermark file is missing or unreadable.');
+
+            // Bytes only: the default decoders would also accept the contents as a local file path.
+            $watermark = $this->imageManager->read($contents, BinaryImageDecoder::class);
+        } catch (Throwable $e) {
+            // A broken watermark must not fail every image upload.
+            $this->logger->warning('[FoF Upload] Watermark skipped: it could not be read or decoded.', [
+                'path'      => $watermarkPath,
+                'exception' => $e,
+            ]);
+
+            return;
+        }
+
+        $position = $this->settings->get('fof-upload.watermarkPosition', 'bottom-right');
+        $opacity = max(0, min(100, (int) $this->settings->get('fof-upload.watermarkOpacity', 100)));
+        $sizePercent = max(1, min(100, (int) $this->settings->get('fof-upload.watermarkSizePercent', 25)));
+        $padding = max(0, (int) $this->settings->get('fof-upload.watermarkPadding', 10));
+
+        // Intervention rejects a width of 0, which rounding gives on very narrow images.
+        $watermark->scale(width: max(1, (int) round($image->width() * $sizePercent / 100)));
+
+        $image->place($watermark, $position, $padding, $padding, $opacity);
     }
 }
