@@ -175,7 +175,7 @@ class ImageProcessor implements Processable
             $watermark = $this->imageManager->read($contents);
         } catch (Throwable $e) {
             // A broken watermark must not fail every image upload.
-            $this->logger->warning('fof/upload: watermark skipped, it could not be read or decoded', [
+            $this->logger->warning('[FoF Upload] Watermark skipped: it could not be read or decoded.', [
                 'path'      => $watermarkPath,
                 'exception' => $e,
             ]);
