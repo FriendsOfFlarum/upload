@@ -155,13 +155,28 @@ class ImageProcessorWatermarkTest extends TestCase
         $this->assertSame([255, 255, 255], $this->cornerColor($result));
     }
 
+    /** Laravel's get() returns null instead of throwing when the file is missing or unreadable. */
     #[Test]
-    public function a_missing_watermark_file_is_skipped_silently(): void
+    public function a_watermark_the_disk_returns_no_contents_for_is_skipped_and_logged(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->never())->method('warning');
+        $logger->expects($this->once())->method('warning');
 
         $result = $this->processWhitePng($this->disk(null), $logger);
+
+        $this->assertSame([255, 255, 255], $this->cornerColor($result));
+    }
+
+    #[Test]
+    public function watermark_contents_are_not_interpreted_as_a_local_file_path(): void
+    {
+        $localImage = $this->workDir.'/local.png';
+        file_put_contents($localImage, $this->png(40, 40, 255, 0, 0));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning');
+
+        $result = $this->processWhitePng($this->disk($localImage), $logger);
 
         $this->assertSame([255, 255, 255], $this->cornerColor($result));
     }

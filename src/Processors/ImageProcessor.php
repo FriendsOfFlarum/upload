@@ -18,6 +18,7 @@ use FoF\Upload\Contracts\Processable;
 use FoF\Upload\File;
 use FoF\Upload\Helpers\Util;
 use Illuminate\Contracts\Filesystem\Factory;
+use Intervention\Image\Decoders\BinaryImageDecoder;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 use Psr\Log\LoggerInterface;
@@ -167,12 +168,12 @@ class ImageProcessor implements Processable
 
         try {
             // The contents, not path(): on a remote disk such as S3, path() is the object key, not a local file.
-            $contents = $this->assetsDir->get($watermarkPath);
-            if ($contents === null) {
-                return;
-            }
+            // get() returns null rather than throwing when the file is missing or unreadable.
+            $contents = $this->assetsDir->get($watermarkPath)
+                ?? throw new RuntimeException('The watermark file is missing or unreadable.');
 
-            $watermark = $this->imageManager->read($contents);
+            // Bytes only: the default decoders would also accept the contents as a local file path.
+            $watermark = $this->imageManager->read($contents, BinaryImageDecoder::class);
         } catch (Throwable $e) {
             // A broken watermark must not fail every image upload.
             $this->logger->warning('[FoF Upload] Watermark skipped: it could not be read or decoded.', [
