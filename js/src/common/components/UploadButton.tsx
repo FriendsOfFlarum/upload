@@ -31,8 +31,8 @@ export default class UploadButton extends Component<UploadButtonAttrs> {
 
   view() {
     const buttonText = this.attrs.uploader.uploading
-      ? app.translator.trans('fof-upload.forum.states.loading')
-      : app.translator.trans('fof-upload.forum.buttons.upload');
+      ? app.translator.trans('fof-upload.lib.states.loading')
+      : app.translator.trans('fof-upload.lib.buttons.upload');
 
     return (
       <TextEditorButton

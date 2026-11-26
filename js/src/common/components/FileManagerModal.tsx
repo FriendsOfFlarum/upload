@@ -100,7 +100,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
                     this.showUploadModal();
                   }}
                 >
-                  {app.translator.trans('fof-upload.forum.buttons.upload')}
+                  {app.translator.trans('fof-upload.lib.buttons.upload')}
                 </Button>
               )}
           </div>
@@ -114,7 +114,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
           </div>
 
           <div className="Modal-header">
-            <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
+            <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.lib.media_manager')}</h3>
             {app.session.user &&
               (app.session.user as unknown as { accessSharedFiles(): boolean }).accessSharedFiles() &&
               !hideUser &&
@@ -134,7 +134,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
 
           <div className="Modal-footer">
             <Button onclick={this.hide.bind(this)} className="Button">
-              {app.translator.trans('fof-upload.forum.buttons.cancel')}
+              {app.translator.trans('fof-upload.lib.buttons.cancel')}
             </Button>
 
             <Button
@@ -156,14 +156,14 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
     items.add(
       'user',
       <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'user' ? 'active' : ''}`} onclick={() => this.setLibrary('user')}>
-        {app.translator.trans('fof-upload.forum.buttons.media')}
+        {app.translator.trans('fof-upload.lib.buttons.media')}
       </Button>
     );
 
     items.add(
       'shared',
       <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'shared' ? 'active' : ''}`} onclick={() => this.setLibrary('shared')}>
-        {app.translator.trans('fof-upload.forum.buttons.shared_media')}
+        {app.translator.trans('fof-upload.lib.buttons.shared_media')}
       </Button>
     );
 
