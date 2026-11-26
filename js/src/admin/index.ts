@@ -1,5 +1,11 @@
 import app from 'flarum/admin/app';
 import extendAdminNav from './extendAdminNav';
+import addUserAttributes from '../common/addUserAttributes';
+
+// Not used by fof/upload's own admin pages: bundled so that other extensions can
+// open the media manager on admin through ext:fof/upload/common/...
+import '../common/components/FileManagerModal';
+import '../common/handler/Uploader';
 
 export { default as extend } from './extend';
 
@@ -30,6 +36,7 @@ export function registerMimePermissions(perms: Array<{ slug: string; label: stri
 
 app.initializers.add('fof-upload', () => {
   extendAdminNav();
+  addUserAttributes();
 
   // Dynamically register per-mime-type upload permissions in the permission grid.
   // This runs after app.data is fully loaded, so settings are available here.

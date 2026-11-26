@@ -1,4 +1,4 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 import Component from 'flarum/common/Component';
 import TextEditorButton from 'flarum/common/components/TextEditorButton';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
@@ -31,8 +31,8 @@ export default class UploadButton extends Component<UploadButtonAttrs> {
 
   view() {
     const buttonText = this.attrs.uploader.uploading
-      ? app.translator.trans('fof-upload.forum.states.loading')
-      : app.translator.trans('fof-upload.forum.buttons.upload');
+      ? app.translator.trans('fof-upload.lib.states.loading')
+      : app.translator.trans('fof-upload.lib.buttons.upload');
 
     return (
       <TextEditorButton

@@ -1,16 +1,15 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Alert from 'flarum/common/components/Alert';
 import UploadButton from './UploadButton';
-import UserFileList from '../../common/components/UserFileList';
+import UserFileList from './UserFileList';
 import DragAndDrop from './DragAndDrop';
 import ItemList from 'flarum/common/utils/ItemList';
-import SharedFileList from '../../common/components/SharedFileList';
-import FileListState from '../../common/states/FileListState';
-import { insertWithDisplayName } from '../utils/applyDisplayName';
+import SharedFileList from './SharedFileList';
+import FileListState from '../states/FileListState';
 import type Uploader from '../handler/Uploader';
-import type File from '../../common/models/File';
+import type File from '../models/File';
 import type User from 'flarum/common/models/User';
 import type Mithril from 'mithril';
 
@@ -101,7 +100,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
                     this.showUploadModal();
                   }}
                 >
-                  {app.translator.trans('fof-upload.forum.buttons.upload')}
+                  {app.translator.trans('fof-upload.lib.buttons.upload')}
                 </Button>
               )}
           </div>
@@ -115,7 +114,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
           </div>
 
           <div className="Modal-header">
-            <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.forum.media_manager')}</h3>
+            <h3 className="App-titleControl App-titleControl--text">{app.translator.trans('fof-upload.lib.media_manager')}</h3>
             {app.session.user &&
               (app.session.user as unknown as { accessSharedFiles(): boolean }).accessSharedFiles() &&
               !hideUser &&
@@ -135,7 +134,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
 
           <div className="Modal-footer">
             <Button onclick={this.hide.bind(this)} className="Button">
-              {app.translator.trans('fof-upload.forum.buttons.cancel')}
+              {app.translator.trans('fof-upload.lib.buttons.cancel')}
             </Button>
 
             <Button
@@ -157,14 +156,14 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
     items.add(
       'user',
       <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'user' ? 'active' : ''}`} onclick={() => this.setLibrary('user')}>
-        {app.translator.trans('fof-upload.forum.buttons.media')}
+        {app.translator.trans('fof-upload.lib.buttons.media')}
       </Button>
     );
 
     items.add(
       'shared',
       <Button className={`Button Button--flat ${this.selectedFilesLibrary === 'shared' ? 'active' : ''}`} onclick={() => this.setLibrary('shared')}>
-        {app.translator.trans('fof-upload.forum.buttons.shared_media')}
+        {app.translator.trans('fof-upload.lib.buttons.shared_media')}
       </Button>
     );
 
@@ -237,34 +236,12 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
   onSelect() {
     this.hide();
 
-    if (this.attrs.onSelect) {
-      this.attrs.onSelect(this.selectedFiles);
-      return;
-    }
-
-    const files = this.selectedFiles
-      .map((fileId) => (app.store.getById('files', fileId) || app.store.getById('shared-files', fileId)) as File | undefined)
-      .filter((file): file is File => !!file && typeof file.bbcode === 'function');
-
-    if (!app.composer.editor) return;
-
-    const insert = (bbcode: string) => app.composer.editor!.insertAtCursor(bbcode + '\n', false);
-
-    // Prompting per file would mean a chain of modals, so the display name is
-    // only offered when a single file is being inserted. Multi-select keeps the
-    // file names, which the author can still edit in the composer afterwards.
-    if (files.length === 1) {
-      insertWithDisplayName(files[0], insert);
-
-      return;
-    }
-
-    files.forEach((file) => insert(file.bbcode()));
+    this.attrs.onSelect?.(this.selectedFiles);
   }
 
   showUploadModal() {
     app.modal.show(
-      () => import('../../common/components/UploadSharedFileModal'),
+      () => import('./UploadSharedFileModal'),
       {
         onUploadComplete: (files: File[]) => {
           this.sharedFileState.addToList(files);

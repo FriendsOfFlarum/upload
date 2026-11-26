@@ -249,8 +249,6 @@ fof-upload:
       guessed-extension: Default file extension (if original is not whitelisted)
       not-available: No result
   forum:
-    media_manager: Media manager
-
     display_name:
       title: Name this download
       title_plural: "Name these downloads"
@@ -260,16 +258,12 @@ fof-upload:
 
     buttons:
       attach: Attach
-      upload: Upload
       upload_shared: Shared
       user_uploads: User uploads
-      cancel: Cancel
-      media: My media
-      shared_media: Shared media
+      media: => fof-upload.lib.buttons.media
 
     states:
       error: Error
-      loading: Uploading
       unauthorized: You are not allowed to download this file
       permission_required: Permission required
 
@@ -299,6 +293,17 @@ fof-upload:
       upload_blocked_by_php_extension: A php extension blocked the upload.
       no_files_made_it_to_upload: Please upload files no larger than {max} kb.
   lib:
+    media_manager: Media manager
+
+    buttons:
+      upload: Upload
+      cancel: Cancel
+      media: My media
+      shared_media: Shared media
+
+    states:
+      loading: Uploading
+
     upload-shared-file-modal:
       title: New shared file
       dropzone: Drag and drop files here or click to browse
