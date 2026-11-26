@@ -8,7 +8,6 @@ import DragAndDrop from './DragAndDrop';
 import ItemList from 'flarum/common/utils/ItemList';
 import SharedFileList from '../../common/components/SharedFileList';
 import FileListState from '../../common/states/FileListState';
-import { insertWithDisplayName } from '../utils/applyDisplayName';
 import type Uploader from '../handler/Uploader';
 import type File from '../../common/models/File';
 import type User from 'flarum/common/models/User';
@@ -237,29 +236,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
   onSelect() {
     this.hide();
 
-    if (this.attrs.onSelect) {
-      this.attrs.onSelect(this.selectedFiles);
-      return;
-    }
-
-    const files = this.selectedFiles
-      .map((fileId) => (app.store.getById('files', fileId) || app.store.getById('shared-files', fileId)) as File | undefined)
-      .filter((file): file is File => !!file && typeof file.bbcode === 'function');
-
-    if (!app.composer.editor) return;
-
-    const insert = (bbcode: string) => app.composer.editor!.insertAtCursor(bbcode + '\n', false);
-
-    // Prompting per file would mean a chain of modals, so the display name is
-    // only offered when a single file is being inserted. Multi-select keeps the
-    // file names, which the author can still edit in the composer afterwards.
-    if (files.length === 1) {
-      insertWithDisplayName(files[0], insert);
-
-      return;
-    }
-
-    files.forEach((file) => insert(file.bbcode()));
+    this.attrs.onSelect?.(this.selectedFiles);
   }
 
   showUploadModal() {
