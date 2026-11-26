@@ -1,15 +1,15 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Alert from 'flarum/common/components/Alert';
 import UploadButton from './UploadButton';
-import UserFileList from '../../common/components/UserFileList';
+import UserFileList from './UserFileList';
 import DragAndDrop from './DragAndDrop';
 import ItemList from 'flarum/common/utils/ItemList';
-import SharedFileList from '../../common/components/SharedFileList';
-import FileListState from '../../common/states/FileListState';
+import SharedFileList from './SharedFileList';
+import FileListState from '../states/FileListState';
 import type Uploader from '../handler/Uploader';
-import type File from '../../common/models/File';
+import type File from '../models/File';
 import type User from 'flarum/common/models/User';
 import type Mithril from 'mithril';
 
@@ -241,7 +241,7 @@ export default class FileManagerModal extends (Modal as any)<FileManagerModalAtt
 
   showUploadModal() {
     app.modal.show(
-      () => import('../../common/components/UploadSharedFileModal'),
+      () => import('./UploadSharedFileModal'),
       {
         onUploadComplete: (files: File[]) => {
           this.sharedFileState.addToList(files);

@@ -1,4 +1,4 @@
-import app from 'flarum/forum/app';
+import app from 'flarum/common/app';
 import Component from 'flarum/common/Component';
 import TextEditorButton from 'flarum/common/components/TextEditorButton';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
